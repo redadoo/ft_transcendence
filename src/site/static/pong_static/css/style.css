@@ -1,0 +1,49 @@
+/* Reset margini e padding globali */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    padding: 0;
+    height: 100vh; /* Occupare l'intera altezza della finestra */
+}
+
+/* Chat container */
+#chat-container {
+    position: fixed; /* La chat rimane fissa rispetto alla finestra del browser */
+    bottom: 20px;    /* Posiziona la chat a 20px dal bordo inferiore */
+    left: 20px;      /* Posiziona la chat a 20px dal lato sinistro */
+    width: 300px;    /* Larghezza della chat */
+    max-height: calc(100vh - 100px); /* Altezza massima della chat */
+    background-color: rgba(0, 0, 0, 0.7); /* Sfondo semi-trasparente */
+    border-radius: 5px; /* Bordi arrotondati */
+    padding: 10px;  /* Spazio interno del contenitore della chat */
+    display: flex;  /* Layout flessibile per organizzare il contenuto */
+    flex-direction: column;
+    z-index: 1000;  /* Porta la chat sopra gli altri elementi della pagina */
+}
+
+/* Area in cui verranno mostrati i messaggi della chat */
+#chat-display {
+    flex: 1; /* Occupa tutto lo spazio disponibile */
+    overflow-y: auto; /* Abilita lo scroll verticale se ci sono troppi messaggi */
+    margin-bottom: 10px;
+    color: white;
+    font-family: Arial, sans-serif;
+    font-size: 14px;
+    /* Imposta un'altezza minima per garantire lo scroll */
+    min-height: 0; /* Questo è importante per consentire il corretto funzionamento del flexbox */
+}
+
+/* Campo di input per inserire il testo */
+#chat-input {
+    padding: 5px;
+    border: none;
+    border-radius: 5px;
+    width: 100%;
+    box-sizing: border-box;
+    font-size: 14px;
+}

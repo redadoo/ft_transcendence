@@ -1,0 +1,11 @@
+Here’s how your URLs would look:
+
+    List Users: /api/users/ (GET)
+    Create User: /api/users/ (POST)
+    Retrieve User: /api/users/{id}/ (GET)
+    Update User: /api/users/{id}/ (PUT/PATCH)
+    Delete User: /api/users/{id}/ (DELETE)
+    Custom Actions:
+        Register User: /api/users/register/ (POST)
+        Login User: /api/users/login/ (POST)
+        Logout User: /api/users/logout/ (POST)
