@@ -127,7 +127,7 @@ class Game {
 	preload3DModels() 
 	{
 		this.loadingPromises.push(
-			this.loadModel('/static/liarsbar_static/assets/liarsbar/cabin.glb', 'pokertable_round')
+			this.loadModel('/static/liarsbar_static/assets/liarsbar/LiarsBarScene.glb', 'scene')
 		);
 
 		// this.loadingPromises.push(
@@ -161,9 +161,9 @@ class Game {
 		});
 	}
 
-	initScene() 
+	initScene()
 	{
-		const table = this.modelsLoaded["pokertable_round"];
+		const table = this.modelsLoaded["scene"];
 		table.scene.rotation.y = Math.PI / 8;
 		table.scene.position.x = 0;
 		table.scene.position.y = 80;
