@@ -232,63 +232,65 @@ class Game {
 	}
 
 	setupGameEntities(data) {
-        this.bounds = new Bounds(data.bounds["xMin"], data.bounds["xMax"], data.bounds["yMin"], data.bounds["yMax"]);
-
-        // Recupera i dati del giocatore usando l'ID
-        const playerData = data.players[data.playerId];
-        const aiData = data.players["AI"];
-
-        this.pongPlayer = new PongPlayer('KeyW', 'KeyS', this.gameSocket, data.playerId, playerData);
-        this.pongAI = new PongEnemy(aiData);
-
-        this.ball = new Ball(data.ball.radius);
-
-        this.background = new Background(this.sceneManager.scene, this.bounds.xMax * 2, this.bounds.yMax * 2);
-
-        this.sceneManager.scene.add(this.ball.mesh);
-        this.sceneManager.scene.add(this.pongPlayer.paddle.mesh);
-        this.sceneManager.scene.add(this.pongAI.paddle.mesh);
-
-        this.gameSocket.send(
-
-            JSON.stringify({
-                type: "ready",
-                playerId: this.pongPlayer.playerId,
-            })
-        );
-    }
+		this.bounds = new Bounds(data.bounds["xMin"], data.bounds["xMax"], data.bounds["yMin"], data.bounds["yMax"]);
+	
+		// Configura il giocatore locale
+		const playerData = Object.values(data.players).find(player => player.id === data.playerId);
+		console.log("Dati ricevuti dal server:", data);
+		console.log("Dati ricevuti dal server:", playerData);
+		console.log("Giocatore locale:", data.players[data.playerId]);
+		console.log("Avversario:", Object.keys(data.players).find(id => id !== data.playerId));
+		this.pongPlayer = new PongPlayer('KeyW', 'KeyS', this.gameSocket, data.playerId, playerData);
+		// Configura l'avversario
+		const opponentId = Object.keys(data.players).find(id => id !== data.playerId);
+		const opponentData = data.players[opponentId];
+		this.pongOpponent = new PongPlayer(null, null, this.gameSocket, opponentId, opponentData);
+	
+		this.ball = new Ball(data.ball.radius);
+		this.background = new Background(this.sceneManager.scene, this.bounds.xMax * 2, this.bounds.yMax * 2);
+	
+		// Aggiungi gli elementi alla scena
+		this.sceneManager.scene.add(this.ball.mesh);
+		this.sceneManager.scene.add(this.pongPlayer.paddle.mesh);
+		this.sceneManager.scene.add(this.pongOpponent.paddle.mesh);
+	
+		// Notifica al server che il giocatore è pronto
+		this.gameSocket.send(
+			JSON.stringify({
+				type: "ready",
+				playerId: this.pongPlayer.playerId,
+			})
+		);
+	}
+	
 
     updateGameState(data) {
-        if (data.ball) {
-            this.ball.newPosX = data.ball.x;
-            this.ball.newPosY = data.ball.y;
-        }
+		if (data.ball) {
+			this.ball.newPosX = data.ball.x;
+			this.ball.newPosY = data.ball.y;
+		}
+	
+		if (data.players) {
+			Object.values(data.players).forEach(player => {
+				if (player.id === this.pongPlayer.playerId) {
+					this.pongPlayer.newY = player.y;
+				} else if (player.id === this.pongOpponent.playerId) {
+					this.pongOpponent.newY = player.y;
+				}
+			});
+		}
+	}
 
-        if (data.players) {
-            Object.values(data.players).forEach(player => {
-                if (player.id === "AI") {
-                    this.pongAI.newY = player.y;
-                }
-                if (player.id === this.pongPlayer.playerId) {
-                    this.pongPlayer.newY = player.y;
-                }
-            });
-        }
-    }
-
-	fixedUpdate() 
-	{
-
-		if (!this.pongPlayer) 
-			return;
-
-		//player
+	fixedUpdate() {
+		if (!this.pongPlayer || !this.pongOpponent) return;
+	
+		// Aggiorna la posizione del giocatore locale
 		this.pongPlayer.paddle.mesh.position.y = this.pongPlayer.newY;
-		
-		//ia
-		this.pongAI.paddle.mesh.position.y = this.pongAI.newY;
-
-		//ball
+	
+		// Aggiorna la posizione dell'avversario
+		this.pongOpponent.paddle.mesh.position.y = this.pongOpponent.newY;
+	
+		// Aggiorna la posizione della pallina
 		this.ball.mesh.position.x = this.ball.newPosX;
 		this.ball.mesh.position.y = this.ball.newPosY;
 	}
