@@ -3,7 +3,6 @@ from django.conf import settings
 from pong.models import PongMatch
 from liarsbar.models import LiarsBarMatch
 from datetime import datetime
-from django.db.models import Q
 from django.contrib.auth.models import AbstractUser, Group, Permission
 
 exp_for_level = [
