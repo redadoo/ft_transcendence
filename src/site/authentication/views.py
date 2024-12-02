@@ -93,7 +93,6 @@ class Auth42(View):
 		base_uri = "https://api.intra.42.fr/oauth/authorize"
 		query_string = "&".join(f"{key}={value}" for key, value in self.params_auth.items())
 		redirect_url = f"{base_uri}?{query_string}"
-		print(redirect_url)
 		return redirect(redirect_url)
 
 	def handle_callback(self, request):
