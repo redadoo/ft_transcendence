@@ -12,6 +12,7 @@ const router = {
 			'/logout': 'logout',
 			'/multiplayer': 'multiplayer',
 			'/multiplayer/pong': 'pong',
+			'/multiplayer/liarsbar': 'liarsbar',
 			'/profile': 'profile',
 			'/register': 'register',
 			'/singleplayer': 'singleplayer',

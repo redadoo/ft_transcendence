@@ -132,6 +132,20 @@
 				});
 		},
 
+		async liarsbar() {
+			return html.liarsbar;
+		},
+
+		liarsbarScripts() {
+			import('../../liarsbar_static/js/Game.js')
+			.then(module => {
+				console.log('liarsbar script loaded');
+			})
+			.catch(error => {
+				console.error('liarsbar script error:', error);
+			});
+		},
+
 		// Profile
 		async profile() {
 			return html.profile;

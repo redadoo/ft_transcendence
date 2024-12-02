@@ -218,7 +218,7 @@ const html = {
 				</div>
 
 				<div class="col-5 p-4">
-					<div class="game-card game2" data-link="">
+					<div class="game-card game2" data-link="/multiplayer/liarsbar">
 					<div class="game-box">
 						<div class="game-content">
 						<h2 class="pixel-font">LIAR'S BAR</h2>
@@ -288,6 +288,10 @@ const html = {
 
 	pong: `
 		<div> </div>
+	`,
+	
+	liarsbar: `
+	<div> </div>
 	`,
 
 	profile: `
