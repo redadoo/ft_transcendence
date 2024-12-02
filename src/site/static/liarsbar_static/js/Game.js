@@ -4,11 +4,12 @@ import * as THREE from '../../lib/threejs/src/Three.js';
 
 class Game {
 	constructor() {
-
+		
 		this.ambientLight = undefined;
 		this.pointLight = undefined;
 		this.lightHelper = undefined;
-
+		this.gameSocket = undefined;
+		
 		this.sceneManager = new SceneManager(true);
 		
 		this.sceneManager.fov = 75;
@@ -20,8 +21,8 @@ class Game {
 		this.initCamera();
 		this.initLights();
 
-		this.connectionString = `ws://${window.location.host}/ws/liarsbar`;
-		this.gameSocket = new WebSocket(this.connectionString);
+		this.initWebSocket();
+
 
 		this.modelsLoaded = {};
 		this.loadingPromises = [];
@@ -38,6 +39,37 @@ class Game {
 		});
 
 		this.sceneManager.setExternalFunction(() => this.fixedUpdate());
+	}
+
+	async initWebSocket() {
+		try {
+			const roomName = await this.getRoomInfo();
+			this.connectionString = `ws://${window.location.host}/ws/multiplayer/liarsbar/${roomName}`;
+			this.gameSocket = new WebSocket(this.connectionString);
+
+			this.gameSocket.onmessage = this.handleSocketMessage.bind(this);
+		} catch (error) {
+			console.error('Failed to fetch room info:', error);
+		}
+	}
+
+	async getRoomInfo() {
+		const response = await fetch('/api/multiplayer/liarsbar', {
+			method: 'GET',
+			headers: {
+				'Accept': 'application/json',
+				'X-Requested-With': 'XMLHttpRequest'
+			},
+			credentials: 'include'
+		});
+		
+		console.log(response);
+		if (!response.ok) {
+			throw new Error(`HTTP error! Status: ${response.status}`);
+		}
+
+		const data = await response.json();
+		return data.room_name;
 	}
 
 	loadManager(){	
@@ -178,31 +210,9 @@ class Game {
 		}
 	}
 
-	showCardsAnimation() 
-	{
-	}
+	showCardsAnimation() {}
 
-	fixedUpdate() 
-	{
-		// console.log(this.sceneManager.controls);
-		// console.log(this.sceneManager.camera.quaternion);
-		// if (this.kingCardsModel.length > 0)
-		// 	this.kingCardsModel[0].position.x += 0.01;
-
-		// for (let i = 0; i < 18; i++) 
-		// {
-		// 	const card = this.modelsLoaded[modelName].scene.clone();
-
-		// 	card.position.set(
-		// 		basePosition.x,
-		// 		basePosition.y + i * offsetY,
-		// 		basePosition.z
-		// 	);
-
-		// 	card.scale.set(1, 1, 1);
-		// 	this.sceneManager.scene.add(card);
-		// }
-	}
+	fixedUpdate() {}
 }
 
 const game = new Game();
