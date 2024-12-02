@@ -8,6 +8,7 @@ urlpatterns = [
     
     path('', include("authentication.urls")),
     path('', include("pong.urls")),
+    path('', include("liarsbar.urls")),
     path('', include("website.urls")),
 ]
 

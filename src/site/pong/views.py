@@ -3,7 +3,6 @@ import asyncio
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from rest_framework.response import Response
 from channels.layers import get_channel_layer
 
 @api_view(['GET'])
