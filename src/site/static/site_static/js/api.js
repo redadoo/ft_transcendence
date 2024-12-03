@@ -1,165 +1,100 @@
-	const api = {
-		async checkAuth() {
-			try {
-				const response = await fetch('/api/users/is_logged_in/', {
-					method: 'GET',
-					headers: {
-						'Accept': 'application/json',
-						'X-Requested-With': 'XMLHttpRequest'
-					},
-					credentials: 'include'
-				});
+const api = {
+	async fetchJson(url, options = {}) {
+		try {
+			const defaultOpts = {
+				headers: {
+					'Accept': 'application/json',
+					'X-Requested-With': 'XMLHttpRequest'
+				},
+				credentials: 'include'
+			};
 
-				if (!response.ok) {
-					throw new Error(`HTTP error! status: ${response.status}`);
+			const mergedOptions = {
+				...defaultOpts,
+				...options,
+				headers: {
+					...defaultOpts.headers,
+					...options.headers
 				}
+			};
 
-				const data = await response.json();
-				console.log('Auth check response:', data);
-				return data.success === 'true';
-			} catch (error) {
-				console.error('Auth check failed:', error);
-				return false;
-			}
-		},
+			const response = await fetch(url, mergedOptions);
+			if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+			return await response.json();
+		} catch (error) {
+			throw error;
+		}
+	},
 
-		async getHeaderInfo() {
-			try {
-				const response = await fetch('/api/profile', {
-					method: 'GET',
-					headers: {
-						'Accept': 'application/json',
-						'X-Requested-With': 'XMLHttpRequest'
-					},
-					credentials: 'include'
-				});
+	async checkAuth() {
+		try {
+			const data = await this.fetchJson('/api/users/is_logged_in/');
+			return data.success === 'true';
+		} catch (error) {
+			console.error('Auth check failed:', error);
+			return false;
+		}
+	},
 
-				if (!response.ok) {
-					throw new Error(`HTTP error! status: ${response.status}`);
-				}
+	async getHeaderInfo() {
+		try {
+			return await this.fetchJson('/api/profile');
+		} catch (error) {
+			console.error('Header info error:', error);
+			return false;
+		}
+	},
 
-				const data = await response.json();
-				console.log('Header info response:', data);
-				return data;
-			} catch (error) {
-				console.error('Header info error:', error);
-				return false;
-			}
-		},
+	async getProfileInfo() {
+		try {
+			return await this.fetchJson('/api/profile?include=created_at');
+		} catch (error) {
+			console.error('Profile info error:', error);
+			return false;
+		}
+	},
 
-		async getProfileInfo() {
-			try {
-				const response = await fetch('/api/profile?include=created_at', {
-					method: 'GET',
-					headers: {
-						'Accept': 'application/json',
-						'X-Requested-With': 'XMLHttpRequest'
-					},
-					credentials: 'include'
-				});
+	async login(username, password) {
+		try {
+			return await this.fetchJson('/api/users/login/', {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json'
+				},
+				body: JSON.stringify({ username, password })
+			});
+		} catch (error) {
+			console.error('Login error:', error);
+			return { success: false, error: 'Network error' };
+		}
+	},
 
-				if (!response.ok) {
-					throw new Error(`HTTP error! status: ${response.status}`);
-				}
+	login42() {
+		window.location.href = '/42login';
+	},
 
-				const data = await response.json();
-				console.log('Profile info response:', data);
-				return data;
-			} catch (error) {
-				console.error('Profile info error:', error);
-				return false;
-			}
-		},
+	async logout() {
+		try {
+			const data = await this.fetchJson('/api/users/logout/');
+			return data.success === 'true';
+		} catch (error) {
+			console.error('Logout error:', error);
+			return false;
+		}
+	},
 
-		async login(username, password) {
-			try {
-				const response = await fetch('/api/users/login/', {
-					method: 'POST',
-					headers: {
-						'Accept': 'application/json',
-						'Content-Type': 'application/json',
-						'X-Requested-With': 'XMLHttpRequest'
-					},
-					body: JSON.stringify({
-						username: username,
-						password: password
-					}),
-					credentials: 'include',
-				});
-
-				if (!response.ok) {
-					throw new Error(`HTTP error! status: ${response.status}`);
-				}
-
-				const data = await response.json();
-				console.log('Login response:', data);
-				return data;
-			} catch (error) {
-				console.error('Login error:', error);
-				return { success: false, error: 'Network error' };
-			}
-		},
-
-		async login42() {
-			try {
-				window.location.href = '/42login';
-			} catch (error) {
-				console.error('42Login error:', error);
-			}
-		},
-
-		async logout() {
-			try {
-				const response = await fetch('/api/users/logout/', {
-					method: 'GET',
-					headers: {
-						'Accept': 'application/json',
-						'X-Requested-With': 'XMLHttpRequest'
-					},
-					credentials: 'include'
-				});
-
-				if (!response.ok) {
-					throw new Error(`HTTP error! status: ${response.status}`);
-				}
-
-				const data = await response.json();
-				console.log('Logout response:', data);
-				return data.success === 'true';
-			} catch (error) {
-				console.error('Logout error:', error);
-				return false;
-			}
-		},
-
-		async register(username, email, password1, password2) {
-			try {
-				const response = await fetch('/api/users/register/', {
-					method: 'POST',
-					headers: {
-						'Accept': 'application/json',
-						'Content-Type': 'application/json',
-						'X-Requested-With': 'XMLHttpRequest'
-					},
-					body: JSON.stringify({
-						username: username,
-						email: email,
-						password1: password1,
-						password2: password2
-					}),
-					credentials: 'include'
-				});
-
-				if (!response.ok) {
-					throw new Error(`HTTP error! status: ${response.status}`);
-				}
-
-				const data = await response.json();
-				console.log('Register response:', data);
-				return data;
-			} catch (error) {
-				console.error('Register error:', error);
-				return false;
-			}
-		},
-	};
+	async register(username, email, password1, password2) {
+		try {
+			return await this.fetchJson('/api/users/register/', {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json'
+				},
+				body: JSON.stringify({ username, email, password1, password2 })
+			});
+		} catch (error) {
+			console.error('Register error:', error);
+			return false;
+		}
+	}
+};
