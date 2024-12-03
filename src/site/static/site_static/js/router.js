@@ -1,6 +1,5 @@
 const router = {
 	init: function() {
-		// Define routes in alphabetical order
 		this.routes = {
 			'/': 'home',
 			'/about': 'about',
@@ -19,10 +18,7 @@ const router = {
 			'/singleplayer/pong': 'pong',
 		};
 
-		// Set up event listeners
 		this.setupEventListeners();
-
-		// Handle initial location
 		this.handleLocation();
 	},
 
@@ -56,10 +52,8 @@ const router = {
 	},
 
 	setupEventListeners: function() {
-		// Handle browser back/forward buttons
 		window.addEventListener('popstate', this.handleLocation.bind(this));
 
-		// Handle navigation links
 		document.body.addEventListener('click', (e) => {
 			const link = e.target.closest('[data-link]');
 			if (link) {

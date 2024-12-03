@@ -6,10 +6,7 @@ const views = {
 
 	async home() {
 		const isAuth = await api.checkAuth();
-		if (!isAuth) {
-			router.navigateTo('/login');
-			return;
-		}
+		if (!isAuth) { router.navigateTo('/login'); }
 		const data = await api.getHeaderInfo();
 		['profileBtn', 'notificationBtn'].forEach(id => document.getElementById(id).classList.remove('d-none'));
 		document.getElementById('headerUsername').textContent = data.username;
@@ -19,65 +16,71 @@ const views = {
 	},
 
 	async login() {
-		if (await api.checkAuth()) {
-			router.navigateTo('/already-logged-in');
-			return;
-		}
+		if (await api.checkAuth()) { return router.navigateTo('/already-logged-in'); }
 		return html.login;
 	},
 
 	loginScripts() {
-	document.getElementById('loginForm')?.addEventListener('submit', async (e) => {
-		e.preventDefault();
-		const res = await api.login(document.getElementById('username').value, document.getElementById('password').value);
-		if (res.success === 'true') {
-			router.navigateTo('/');
-		}
-		else {
-			const err = document.getElementById('loginError');
-			err.textContent = res.error || 'Login failed';
-			err.classList.remove('d-none');
-		}
-	});
-},
+		document.getElementById('loginForm')?.addEventListener('submit', async (e) => {
+			e.preventDefault();
+			const res = await api.login(document.getElementById('username').value, document.getElementById('password').value);
+			if (res.success === 'true') {
+				router.navigateTo('/');
+			}
+			else {
+				const err = document.getElementById('loginError');
+				err.textContent = res.error || 'Login failed';
+				err.classList.remove('d-none');
+			}
+		});
+	},
 
-async register() {
-	if (await api.checkAuth()) {
-		router.navigateTo('/already-logged-in');
-		return;
-	}
-	return html.register;
-},
+	async login42() {
+		if (await api.checkAuth()) { return router.navigateTo('/already-logged-in'); }
+		return html.login42;
+	},
 
-registerScripts() {
-	document.getElementById('registerForm')?.addEventListener('submit', async (e) => {
-		e.preventDefault();
-		const res = await api.register(
-			document.getElementById('username').value,
-			document.getElementById('email').value,
-			document.getElementById('password1').value,
-			document.getElementById('password2').value
-		);
-		if (res.success === 'true') {
-			router.navigateTo('/login');
-		}
-		else if (res.errors) {
-			Object.entries(res.errors).forEach(([field, errors]) => {
-				const elem = document.getElementById(field === 'non_field_errors' ? 'non-field-errors' : `invalid-${field}`);
-				if (elem) {
-				elem.textContent = errors.join(' ');
-				elem.classList.remove('d-none');
-				}
-			});
-		}
-	});
-},
+	login42Scripts() {
+		document.getElementById('loginForm')?.addEventListener('submit', (e) => {
+			e.preventDefault();
+			window.location.href = '/42login';
+		});
+	},
 
-async logout() {
-	await api.logout();
-	['profileBtn', 'notificationBtn'].forEach(id => document.getElementById(id).classList.add('d-none'));
-	router.navigateTo('/login');
-},
+	async register() {
+		if (await api.checkAuth()) { return router.navigateTo('/already-logged-in'); }
+		return html.register;
+	},
+
+	registerScripts() {
+		document.getElementById('registerForm')?.addEventListener('submit', async (e) => {
+			e.preventDefault();
+			const res = await api.register(
+				document.getElementById('username').value,
+				document.getElementById('email').value,
+				document.getElementById('password1').value,
+				document.getElementById('password2').value
+			);
+			if (res.success === 'true') {
+				router.navigateTo('/login');
+			}
+			else if (res.errors) {
+				Object.entries(res.errors).forEach(([field, errors]) => {
+					const elem = document.getElementById(field === 'non_field_errors' ? 'non-field-errors' : `invalid-${field}`);
+					if (elem) {
+						elem.textContent = errors.join(' ');
+						elem.classList.remove('d-none');
+					}
+				});
+			}
+		});
+	},
+
+	async logout() {
+		await api.logout();
+		['profileBtn', 'notificationBtn'].forEach(id => document.getElementById(id).classList.add('d-none'));
+		router.navigateTo('/login');
+	},
 
 	// Game views
 	async multiplayer() {
@@ -110,10 +113,7 @@ async logout() {
 	},
 
 	async profileScripts() {
-		if (!await api.checkAuth()) {
-			router.navigateTo('/login');
-			return;
-		}
+		if (!await api.checkAuth()) { return router.navigateTo('/login'); }
 		const data = await api.getProfileInfo();
 		const updateElement = (id, value) => document.getElementById(id).textContent = value;
 
@@ -131,6 +131,8 @@ async logout() {
 		updateElement('profilePageLongestGame', data.stat.longest_game);
 		updateElement('profilePageTime', data.stat.time_on_site);
 		updateElement('profilePageCreated', data.created_at);
-	},
 
+		matchHistoryHelpers.renderMatchHistory(data.history, data.username);
+	},
 };
+

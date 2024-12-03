@@ -344,40 +344,15 @@ const html = {
 					</div>
 				</div>
 
+				<div class="col-7 nav-wrapper">
+					<div class="match-history-container">
+						<div class="mb-2">
+							<span class="pixel-font match-history">MATCH HISTORY</span>
+						</div>
+						<div id="matchHistoryContent"></div>
+					</div>
 				</div>
-				</div>
-				`,
+			</div>
+		</div>
+	`,
 };
-
-				// <div class="col-7 nav-wrapper">
-				// 	<div class="match-history-container">
-				// 		<div class="mb-2"><span class="pixel-font match-history">MATCH HISTORY</span></div><div>
-				// 			{% for match_context in matches_context %}
-				// 				<div class="match-item d-flex justify-content-between align-items-center mb-2">
-				// 					{% if user.username == match_context.match.get_winner %}
-				// 						<div class="result-box win"><span class="pixel-font result-box">WIN</span></div>
-				// 					{% else %}
-				// 						<div class="result-box lose"><span class="pixel-font result-box">LOSE</span></div>
-				// 					{% endif %}
-				// 					{% if match_context.type == 'Pong' %}
-				// 						<div class="match-history-box left"><span class="pixel-font match-history-entry">{{ match_context.other_users|join:" " }}</span></div>
-				// 						<div class="match-history-box center"><span class="pixel-font match-history-entry">{{ match_context.score }}</span></div>
-				// 						<div class="match-history-box left"><span class="pixel-font match-history-entry">{{ match_context.match.get_duration }}</span></div>
-				// 						{% if user.username == match_context.match.get_winner %}
-				// 						<div class="match-history-box center"><span class="pixel-font plus-rp">+{{ match_context.match.first_user_mmr_gain}}RP</span></div>
-				// 						{% else %}
-				// 						<div class="match-history-box center"><span class="pixel-font minus-rp">{{ match_context.match.first_user_mmr_gain }}RP</span></div>
-				// 						{% endif %}
-				// 						<div class="history-image-container"><img src="{% static 'site_static/media/img/pong.gif' %}" alt="Profile" class="history-image"></div>
-				// 					{% else %}
-				// 						<div class="match-history-box left"><span class="pixel-font match-history-entry">{{ match_context.other_users|join:" " }}</span></div>
-				// 						<div class="match-history-box"></div>
-				// 						<div class="match-history-box left"><span class="pixel-font match-history-entry">{{ match_context.match.get_duration }}</span></div>
-				// 						<div class="match-history-box"></div>
-				// 						<div class="history-image-container"><img src="{% static 'site_static/media/img/liarsbar.gif' %}" alt="Profile" class="history-image"></div>
-				// 					{% endif %}
-				// 				</div>
-				// 			{% endfor %}
-				// 		</div>
-				// 	</div>
-				// </div>

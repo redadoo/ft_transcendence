@@ -47,7 +47,7 @@ const api = {
 
 	async getProfileInfo() {
 		try {
-			return await this.fetchJson('/api/profile?include=created_at');
+			return await this.fetchJson('/api/profile?include=created_at&include=history');
 		} catch (error) {
 			console.error('Profile info error:', error);
 			return false;
@@ -67,10 +67,6 @@ const api = {
 			console.error('Login error:', error);
 			return { success: false, error: 'Network error' };
 		}
-	},
-
-	login42() {
-		window.location.href = '/42login';
 	},
 
 	async logout() {
