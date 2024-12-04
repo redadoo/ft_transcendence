@@ -5,8 +5,11 @@ import { OrbitControls } from '../../lib/threejs/examples/jsm/controls/OrbitCont
 import Stats from '../../lib/threejs/examples/jsm/libs/stats.module.js';
 
 export default class SceneManager {
+  
   constructor(needOrbital = true) {
     
+		this.gltfLoader = undefined;
+
     this.scene = undefined;
     this.camera = undefined;
     this.renderer = undefined;
@@ -21,7 +24,6 @@ export default class SceneManager {
 
     this.externalFunction = null;
     this.lightHelper = undefined;
-
     this.needOrbital = needOrbital;
 
     this.fov = 45;
@@ -31,6 +33,37 @@ export default class SceneManager {
     this.accumulatedTime = 0;
     this.fixedTimeStep = 1 / 60;
 
+  }
+
+  setCameraValue(fov, nearPlane, farPlane)
+  {
+		this.fov = fov;
+		this.nearPlane = nearPlane;
+		this.farPlane = farPlane;
+  }
+
+  setCameraTransform(position, rotation, target) 
+  {
+    if (this.needOrbital && target) 
+      this.controls.target.copy(target);
+    else if (!this.needOrbital && target) 
+      throw new Error("An orbital camera is required to set a target.");
+
+    this.camera.position.copy(position);
+    this.camera.rotation.set(rotation.x, rotation.y, rotation.z);
+  }
+  
+  setCameraState(position, quaternion, target) 
+  {
+    if (!this.camera) {
+      throw new Error("Camera must be initialized before setting its state.");
+    }
+    this.camera.position.copy(position);
+    this.camera.quaternion.copy(quaternion);
+
+    if (this.controls && target) {
+      this.controls.target.copy(target);
+    }
   }
 
   setExternalFunction(func) 
