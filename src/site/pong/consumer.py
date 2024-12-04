@@ -8,7 +8,7 @@ from pong.scritps.ai import PongAI
 from utilities.lobbies import Lobbies
 from pong.scritps import constants
 from pong.scritps.ball import Ball
-
+from pong.scritps import PongGameManager
 
 lobbies = Lobbies()
 
@@ -22,6 +22,7 @@ class  PongSingleplayerConsumer(AsyncWebsocketConsumer):
 		self.room_group_name = f"pong_singleplayer_{self.room_name}"
 
 		# Crea o recupera la lobby usando la classe Lobbies
+
 		self.lobby = lobbies.create_lobby(self.room_name, {
 				"players": {},
 				"ball": Ball(),

@@ -5,6 +5,8 @@ import * as THREE from '../../lib/threejs/src/Three.js';
 class Game {
 	constructor() {
 		
+		window.location.hash = "#deleted_something";
+
 		this.ambientLight = undefined;
 		this.pointLight = undefined;
 		this.lightHelper = undefined;
@@ -39,6 +41,8 @@ class Game {
 		});
 
 		this.sceneManager.setExternalFunction(() => this.fixedUpdate());
+
+		this.setupHashChangeDetection();
 	}
 
 	async initWebSocket() {
@@ -70,6 +74,17 @@ class Game {
 
 		const data = await response.json();
 		return data.room_name;
+	}
+
+	handleSocketMessage(event) 
+	{
+		try 
+		{
+			const data = JSON.parse(event.data);
+		} 
+		catch (error) {
+			console.error("Error processing WebSocket message:", error);
+		}
 	}
 
 	loadManager(){	
@@ -213,6 +228,25 @@ class Game {
 	showCardsAnimation() {}
 
 	fixedUpdate() {}
+
+	setupHashChangeDetection() {
+		let currentHash = window.location.hash;
+
+		setInterval(() => {
+			if (window.location.hash !== currentHash) {
+				currentHash = window.location.hash;
+				console.log("User navigated to: " + currentHash);
+				this.handleStateChange(currentHash);
+			}
+		}, 100);
+	}
+
+	handleStateChange(hash) {
+		if (confirm("want to leave ?")) {
+			close();
+		}
+	}
+
 }
 
 const game = new Game();
