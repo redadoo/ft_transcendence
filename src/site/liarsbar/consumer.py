@@ -22,3 +22,9 @@ class  liarsBarConsumer(AsyncWebsocketConsumer):
 
 	async def disconnect(self, close_code):
 		await self.close()
+
+	async def receive(self, text_data):
+		pass
+
+	async def broadcast_lobby(self):
+		await self.channel_layer.group_send(self.room_group_name,{},)

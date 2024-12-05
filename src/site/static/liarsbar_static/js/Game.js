@@ -20,6 +20,7 @@ class Game {
 		this.sceneManager = new SceneManager(true);
 		
 		this.sceneManager.initialize();
+
 		this.sceneManager.setCameraState(
 			new THREE.Vector3(-34.619, 96.642, 233.726),
 			new THREE.Quaternion(-0.188, 0.223, 0, 0.95),
@@ -28,17 +29,17 @@ class Game {
 		
 		this.initLights();
 		this.initWebSocket();
+
 		this.sceneManager.initModelLoader();
-		
+		this.sceneManager.initTextVar();
+
 		this.sceneManager.loadModel({
 			'/static/liarsbar_static/assets/liarsbar/LobbyScene2.glb' : 'LobbyScene',
 			'/static/liarsbar_static/assets/liarsbar/human.glb' : 'human'
-		}).then(() => {this.setupModels();})
-		
+		})
+
 
 		this.sceneManager.setExternalFunction(() => this.fixedUpdate());
-
-		this.sceneManager.initTextVar();
 	}
 
 	async initWebSocket() {
@@ -77,22 +78,26 @@ class Game {
 		try 
 		{
 			const data = JSON.parse(event.data);
-
-			if (data.type == "init_lobby")
-			{
-
-			}
-			else if (data.type == "add_player_to_lobby")
-			{
-
-			}
-			else if (data.type == "init_game")
-			{
-
-			}
-			else if (data.type == "state_update")
-			{
-
+			switch (data.type) {
+				case 'init_lobby':
+					this.initLobby();
+				  	break;
+				case 'add_player_to_lobby':
+					this.addPlayerToLobby();
+					break;
+				case 'init_game':
+					this.initGame();
+				  	break;
+				case 'state_update':
+					break;
+				case 'player_disconnect':
+					this.playerDisconnect();
+					break;
+				case 'lobby_closed':
+					this.cleanUp();
+					break;
+				default:
+				  console.log(`This type of event is not managed.`);
 			}
 		} 
 		catch (error) {
@@ -126,9 +131,7 @@ class Game {
 		this.sceneManager.scene.add(this.pointLight);
 	}
 
-
-	setupModels()
-	{
+	initLobby() {
 		const LobbyScene = this.sceneManager.modelsLoaded["LobbyScene"];
 		LobbyScene.scene.scale.set(10, 10, 10);
 		this.sceneManager.scene.add(LobbyScene.scene);
@@ -141,6 +144,14 @@ class Game {
 		human.scene.rotation.y = Math.PI / 8;
 		this.sceneManager.scene.add(human.scene);
 	}
+
+	addPlayerToLobby(){}
+
+	initGame(){}
+
+	playerDisconnect(){}
+
+	cleanUp(){}
 
 	fixedUpdate() {}
 
