@@ -38,7 +38,6 @@ class Game {
 
 		this.sceneManager.setExternalFunction(() => this.fixedUpdate());
 
-		this.setupHashChangeDetection();
 		this.sceneManager.initTextVar();
 	}
 
@@ -78,6 +77,23 @@ class Game {
 		try 
 		{
 			const data = JSON.parse(event.data);
+
+			if (data.type == "init_lobby")
+			{
+
+			}
+			else if (data.type == "add_player_to_lobby")
+			{
+
+			}
+			else if (data.type == "init_game")
+			{
+
+			}
+			else if (data.type == "state_update")
+			{
+
+			}
 		} 
 		catch (error) {
 			console.error("Error processing WebSocket message:", error);
@@ -127,24 +143,6 @@ class Game {
 	}
 
 	fixedUpdate() {}
-
-	setupHashChangeDetection() {
-		let currentHash = window.location.hash;
-
-		setInterval(() => {
-			if (window.location.hash !== currentHash) {
-				currentHash = window.location.hash;
-				console.log("User navigated to: " + currentHash);
-				this.handleStateChange(currentHash);
-			}
-		}, 100);
-	}
-
-	handleStateChange(hash) {
-		if (confirm("want to leave ?")) {
-			close();
-		}
-	}
 
 }
 
