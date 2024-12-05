@@ -1,9 +1,9 @@
-import { GLTFLoader } from '../../lib/threejs/examples/jsm/loaders/GLTFLoader.js';
-import SceneManager from '../../common_static/js/SceneManager.js';
 import * as THREE from '../../lib/threejs/src/Three.js';
+import SceneManager from '../../common_static/js/SceneManager.js';
+
 class Game {
 	constructor() {
-		
+
 		//light
 		this.ambientLight = undefined;
 		this.pointLight = undefined;
@@ -11,12 +11,6 @@ class Game {
 		
 		//socket
 		this.gameSocket = undefined;
-
-		//3d models
-		this.aceCardsModel = [];
-		this.kingCardsModel = [];
-		this.queenCardsModel = [];
-		this.AllCardsModel = [];
 
 		this.initGame();
 	}
@@ -28,7 +22,7 @@ class Game {
 		this.sceneManager.initialize();
 		this.sceneManager.setCameraState(
 			new THREE.Vector3(-34.619, 96.642, 233.726),
-			new THREE.Quaternion(-0.188, 0.223, 0, 0.95),  // Adjust based on full quaternion.
+			new THREE.Quaternion(-0.188, 0.223, 0, 0.95),
 			new THREE.Vector3(-173.113, -31.705, -47.019)
 		  );
 		
@@ -39,7 +33,7 @@ class Game {
 		this.sceneManager.loadModel({
 			'/static/liarsbar_static/assets/liarsbar/LobbyScene2.glb' : 'LobbyScene',
 			'/static/liarsbar_static/assets/liarsbar/human.glb' : 'human'
-		}).then(() => {this.initScene();})
+		}).then(() => {this.setupModels();})
 		
 
 		this.sceneManager.setExternalFunction(() => this.fixedUpdate());
@@ -117,7 +111,7 @@ class Game {
 	}
 
 
-	initScene()
+	setupModels()
 	{
 		const LobbyScene = this.sceneManager.modelsLoaded["LobbyScene"];
 		LobbyScene.scene.scale.set(10, 10, 10);
