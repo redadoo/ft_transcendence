@@ -4,19 +4,25 @@ import * as THREE from '../../lib/threejs/src/Three.js';
 class Game {
 	constructor() {
 		
-		// window.location.hash = "#deleted_something";
+		//light
 		this.ambientLight = undefined;
 		this.pointLight = undefined;
 		this.lightHelper = undefined;
+		
+		//socket
 		this.gameSocket = undefined;
 
-		this.loadingPromises = [];
+		//3d models
 		this.aceCardsModel = [];
 		this.kingCardsModel = [];
 		this.queenCardsModel = [];
 		this.AllCardsModel = [];
-		this.modelsLoaded = {};
-		
+
+		this.initGame();
+	}
+
+	initGame()
+	{
 		this.sceneManager = new SceneManager(true);
 		
 		this.sceneManager.initialize();
@@ -28,16 +34,18 @@ class Game {
 		
 		this.initLights();
 		this.initWebSocket();
-
-		this.gltfLoader = new GLTFLoader();
-
-		this.preload3DModels().then(() => {
-			this.initScene();
-		});
+		this.sceneManager.initModelLoader();
+		
+		this.sceneManager.loadModel({
+			'/static/liarsbar_static/assets/liarsbar/LobbyScene2.glb' : 'LobbyScene',
+			'/static/liarsbar_static/assets/liarsbar/human.glb' : 'human'
+		}).then(() => {this.initScene();})
+		
 
 		this.sceneManager.setExternalFunction(() => this.fixedUpdate());
 
 		this.setupHashChangeDetection();
+		this.sceneManager.initTextVar();
 	}
 
 	async initWebSocket() {
@@ -82,7 +90,6 @@ class Game {
 		}
 	}
 
-
 	initLights()
 	{
 		this.ambientLight = new THREE.AmbientLight(0xb0e0e6,10.1); //0.1
@@ -105,66 +112,19 @@ class Game {
 		this.pointLight.shadow.normalBias = 0.1;
 		this.pointLight.shadow.bias = -0.0001;
 
-		// this.lightHelper = new THREE.SpotLightHelper(this.pointLight, 5, 0xFFD580 );
-
 		this.sceneManager.scene.add(this.ambientLight);
 		this.sceneManager.scene.add(this.pointLight);
-		this.sceneManager.scene.add(this.lightHelper);
 	}
 
-	preload3DModels() 
-	{
-		this.loadingPromises.push(
-			this.loadModel('/static/liarsbar_static/assets/liarsbar/LobbyScene2.glb', 'LobbyScene')
-		);
-
-		this.loadingPromises.push(
-			this.loadModel('/static/liarsbar_static/assets/liarsbar/human.glb', 'human')
-		);
-
-		// this.loadingPromises.push(
-		// 	this.loadModel('/static/liarsbar_static/assets/liarsbar/LiarsBarScene.glb', 'game_scene')
-		// );
-
-		// this.loadingPromises.push(
-		// 	this.loadModel('/static/liarsbar_static/assets/ace.glb', 'ace')
-		// );
-		// this.loadingPromises.push(
-		// 	this.loadModel('/static/liarsbar_static/assets/king.glb', 'king')
-		// );
-		// this.loadingPromises.push(
-		// 	this.loadModel('/static/liarsbar_static/assets/queen.glb', 'queen')
-		// );
-
-		return Promise.all(this.loadingPromises);
-	}
-
-	loadModel(path, modelName) 
-	{
-		return new Promise((resolve, reject) => {
-			this.gltfLoader.load(
-				path,
-				(gltfScene) => {
-					this.modelsLoaded[modelName] = gltfScene;
-					resolve();
-				},
-				undefined,
-				(error) => {
-					console.error(`Error loading model ${modelName}:`, error);
-					reject(error);
-				}
-			);
-		});
-	}
 
 	initScene()
 	{
-		const LobbyScene = this.modelsLoaded["LobbyScene"];
+		const LobbyScene = this.sceneManager.modelsLoaded["LobbyScene"];
 		LobbyScene.scene.scale.set(10, 10, 10);
 		this.sceneManager.scene.add(LobbyScene.scene);
 		LobbyScene.scene.rotation.y = 90;
 
-		const human = this.modelsLoaded["human"];
+		const human = this.sceneManager.modelsLoaded["human"];
 		human.scene.scale.set(0.3, 0.3, 0.3);
 		human.scene.position.x = -280;
 		human.scene.position.z = 100;
