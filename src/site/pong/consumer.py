@@ -61,7 +61,7 @@ class  PongSingleplayerConsumer(AsyncWebsocketConsumer):
 		await self.send(
 			text_data=json.dumps(
 				{
-					"type": "playerId",
+					"type": "initLobby",
 					"playerId": self.player_id,
 					"players": {
 						pid: player.to_dict()
@@ -267,7 +267,7 @@ class PongMultiplayerConsumer(AsyncWebsocketConsumer):
 		# Invia i dati iniziali al client
 		await self.send(
 			text_data=json.dumps({
-				"type": "playerId",
+				"type": "initLobby",
 				"playerId": self.player_id,
 				"position": self.player_position,
 				"players": {

@@ -1,5 +1,6 @@
 import * as THREE from '../../lib/threejs/src/Three.js';
 import SceneManager from '../../common_static/js/SceneManager.js';
+import GameSocketManager from '../../common_static/js/GameSocketManager.js';
 
 class Game {
 	constructor() {
@@ -11,10 +12,10 @@ class Game {
 		//socket
 		this.gameSocket = undefined;
 
-		this.initSceneGame();
+		this.initGameEnviroment();
 	}
 	
-	initSceneGame()
+	initGameEnviroment()
 	{
 		this.sceneManager = new SceneManager(true);
 		this.sceneManager.initialize();
@@ -26,7 +27,12 @@ class Game {
 		  );
 		
 		this.initLights();
-		this.initWebSocket();
+
+		this.gameSocket = GameSocketManager();
+		this.gameSocket.initWebSocket(
+			'liarsbar',
+			'/api/multiplayer/liarsbar',
+			this.handleSocketMessage);
 
 		this.sceneManager.initModelLoader();
 		this.sceneManager.initTextVar();
@@ -36,38 +42,7 @@ class Game {
 			'/static/liarsbar_static/assets/liarsbar/human.glb' : 'human'
 		})
 
-
 		this.sceneManager.setExternalFunction(() => this.fixedUpdate());
-	}
-
-	async initWebSocket() {
-		try {
-			const roomName = await this.getRoomInfo();
-			this.connectionString = `ws://${window.location.host}/ws/multiplayer/liarsbar/${roomName}`;
-			this.gameSocket = new WebSocket(this.connectionString);
-
-			this.gameSocket.onmessage = this.handleSocketMessage.bind(this);
-		} catch (error) {
-			console.error('Failed to fetch room info:', error);
-		}
-	}
-
-	async getRoomInfo() {
-		const response = await fetch('/api/multiplayer/liarsbar', {
-			method: 'GET',
-			headers: {
-				'Accept': 'application/json',
-				'X-Requested-With': 'XMLHttpRequest'
-			},
-			credentials: 'include'
-		});
-		
-		if (!response.ok) {
-			throw new Error(`HTTP error! Status: ${response.status}`);
-		}
-
-		const data = await response.json();
-		return data.room_name;
 	}
 
 	handleSocketMessage(event) 

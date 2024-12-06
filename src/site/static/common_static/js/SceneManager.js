@@ -20,11 +20,8 @@ export default class SceneManager {
 	this.textMesh1 = undefined; 
 	this.materials = undefined;
 
-	this.firstLetter = true;
-	this.mirror = false;
 	this.bevelEnabled = true,
 	this.font = undefined,
-
 
 	this.depth = 20,
 	this.size = 70,
@@ -35,7 +32,6 @@ export default class SceneManager {
 
 
 	this.fontMap = {
-
 	  'helvetiker': 0,
 	  'optimer': 1,
 	  'gentilis': 2,
@@ -82,6 +78,12 @@ export default class SceneManager {
 
 	this.accumulatedTime = 0;
 	this.fixedTimeStep = 1 / 60;
+
+	//audio
+	this.audio = undefined;
+	this.listener = undefined;
+	this.audioLoader = undefined;
+	this.audioContext = undefined;
 
   }
 
@@ -285,4 +287,106 @@ export default class SceneManager {
 		  );
 	  });
   }
+
+  initAudioVar()
+  {
+	this.audioLoader = new THREE.AudioLoader();
+	this.listener = new THREE.AudioListener();
+	this.audioContext = new (window.AudioContext || window.webkitAudioContext)({ latencyHint: 'interactive' });
+	THREE.AudioContext.setContext(this.audioContext);
+	this.audio = new THREE.Audio(this.listener);
+	this.sceneManager.camera.add(this.listener);
+  }
+
+  playAuidio(audioPath)
+  {
+	const loadAndPlayAudio = () => {
+		this.audioLoader.load(audioPath, (buffer) => {
+			if (buffer) {
+				this.audio.setBuffer(buffer);
+				this.audio.setLoop(true);
+				this.audio.setVolume(1.0);
+				this.audio.play();
+				console.log("Audio playback started.");
+			} else {
+				console.error("Audio buffer not loaded.");
+			}
+		});
+	};
+
+	const resumeAudioContext = () => {
+		if (this.audioContext.state === 'suspended') {
+			this.audioContext.resume().then(() => {
+				console.log("AudioContext resumed.");
+				loadAndPlayAudio(); 
+			}).catch((error) => {
+				console.error("Error resuming AudioContext:", error);
+			});
+		} else {
+			loadAndPlayAudio(); 
+		}
+	};
+
+	document.addEventListener('click', resumeAudioContext, { once: true });
+
+	this.audioLoader.load(audioPath, (buffer) => {
+		if (buffer) {
+			this.audio.setBuffer(buffer);
+			this.audio.setLoop(true);
+			this.audio.setVolume(0);
+			this.audio.play().then(() => {
+				console.log("Audio autoplay (muted) started.");
+				setTimeout(() => this.audio.setVolume(1.0), 1);
+			}).catch((error) => {
+				console.warn("Autoplay blocked, waiting for user interaction.");
+			});
+		}
+	});
+  }
+
+  initAudio() {
+	  
+	const loadAndPlayAudio = () => {
+		this.audioLoader.load("/static/pong_static/assets/audio/SceneAudio.mp3", (buffer) => {
+			if (buffer) {
+				this.audio.setBuffer(buffer);
+				this.audio.setLoop(true);
+				this.audio.setVolume(1.0);
+				this.audio.play();
+				console.log("Audio playback started.");
+			} else {
+				console.error("Audio buffer not loaded.");
+			}
+		});
+	};
+
+	const resumeAudioContext = () => {
+		if (this.audioContext.state === 'suspended') {
+			this.audioContext.resume().then(() => {
+				console.log("AudioContext resumed.");
+				loadAndPlayAudio(); 
+			}).catch((error) => {
+				console.error("Error resuming AudioContext:", error);
+			});
+		} else {
+			loadAndPlayAudio(); 
+		}
+	};
+
+	document.addEventListener('click', resumeAudioContext, { once: true });
+
+	this.audioLoader.load("/static/pong_static/assets/audio/SceneAudio.mp3", (buffer) => {
+		if (buffer) {
+			this.audio.setBuffer(buffer);
+			this.audio.setLoop(true);
+			this.audio.setVolume(0);
+			this.audio.play().then(() => {
+				console.log("Audio autoplay (muted) started.");
+				setTimeout(() => this.audio.setVolume(1.0), 10);
+			}).catch((error) => {
+				console.warn("Autoplay blocked, waiting for user interaction.");
+			});
+		}
+	});
+}
 }
