@@ -3,7 +3,6 @@ import SceneManager from '../../common_static/js/SceneManager.js';
 
 class Game {
 	constructor() {
-
 		//light
 		this.ambientLight = undefined;
 		this.pointLight = undefined;
@@ -12,13 +11,12 @@ class Game {
 		//socket
 		this.gameSocket = undefined;
 
-		this.initGame();
+		this.initSceneGame();
 	}
-
-	initGame()
+	
+	initSceneGame()
 	{
 		this.sceneManager = new SceneManager(true);
-		
 		this.sceneManager.initialize();
 
 		this.sceneManager.setCameraState(
@@ -64,7 +62,6 @@ class Game {
 			credentials: 'include'
 		});
 		
-		console.log(response);
 		if (!response.ok) {
 			throw new Error(`HTTP error! Status: ${response.status}`);
 		}
@@ -131,7 +128,8 @@ class Game {
 		this.sceneManager.scene.add(this.pointLight);
 	}
 
-	initLobby() {
+	initLobby() 
+	{
 		const LobbyScene = this.sceneManager.modelsLoaded["LobbyScene"];
 		LobbyScene.scene.scale.set(10, 10, 10);
 		this.sceneManager.scene.add(LobbyScene.scene);
@@ -145,13 +143,13 @@ class Game {
 		this.sceneManager.scene.add(human.scene);
 	}
 
-	addPlayerToLobby(){}
+	addPlayerToLobby() {}
 
-	initGame(){}
+	initGame() {}
 
-	playerDisconnect(){}
+	playerDisconnect() {}
 
-	cleanUp(){}
+	cleanUp() {}
 
 	fixedUpdate() {}
 

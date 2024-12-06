@@ -13,12 +13,12 @@ class  liarsBarConsumer(AsyncWebsocketConsumer):
 		self.room_group_name = f"liarsbar_multiplayer_{self.room_name}"
 
 		self.lobby = self.lobbies._create_lobby(self.room_name,  LiarsBarGameManager())
+		self.update_lock = asyncio.Lock()
 
 		await self.channel_layer.group_add(self.room_group_name, self.channel_name)
 		await self.accept()
 		await self.send(text_data=json.dumps(self.lobby.to_dict()))
 
-		self.update_lock = asyncio.Lock()
 
 	async def disconnect(self, close_code):
 		await self.close()
@@ -27,4 +27,5 @@ class  liarsBarConsumer(AsyncWebsocketConsumer):
 		pass
 
 	async def broadcast_lobby(self):
-		await self.channel_layer.group_send(self.room_group_name,{},)
+		# await self.channel_layer.group_send(self.room_group_name,{},)
+		pass
