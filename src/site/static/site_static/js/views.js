@@ -4,9 +4,16 @@ const views = {
 		return html.alreadyLoggedIn;
 	},
 
+	async alreadyLoggedInScripts() {
+		if (!await api.checkAuth()) { return router.navigateTo('/login'); }
+		const data = await api.getProfileInfo();
+
+		document.getElementById('alreadyLoggedInUsername').textContent = "You are already logged in as " + data.username;
+
+	},
+
 	async home() {
-		const isAuth = await api.checkAuth();
-		if (!isAuth) { router.navigateTo('/login'); }
+		if (!await api.checkAuth()) { router.navigateTo('/login'); }
 		const data = await api.getHeaderInfo();
 		['profileBtn', 'notificationBtn'].forEach(id => document.getElementById(id).classList.remove('d-none'));
 		document.getElementById('headerUsername').textContent = data.username;
@@ -84,16 +91,20 @@ const views = {
 
 	// Game views
 	async multiplayer() {
+		if (!await api.checkAuth()) { router.navigateTo('/login'); }
 		return html.multiplayer;
 	},
 
 	async singleplayer() {
+		if (!await api.checkAuth()) { router.navigateTo('/login'); }
 		return html.singleplayer;
 	},
 	async pong() {
+		if (!await api.checkAuth()) { router.navigateTo('/login'); }
 		return html.pong;
 	},
 	async liarsbar() {
+		if (!await api.checkAuth()) { router.navigateTo('/login'); }
 		return html.liarsbar;
 	},
 
