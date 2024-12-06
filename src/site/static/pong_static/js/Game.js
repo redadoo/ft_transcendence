@@ -13,7 +13,7 @@ const CAMERA_SETTINGS = {
     FOV: 75,
     NEAR_PLANE: 0.1,
     FAR_PLANE: 1500,
-	POSITION : THREE.Vector3(0, -20, 40),
+	POSITION : new THREE.Vector3(0, -20, 40),
     ROTATION_X: Math.PI / 6,
 };
 
@@ -52,30 +52,33 @@ class Game {
 		this.sceneManager.camera.rotation.x = CAMERA_SETTINGS.ROTATION_X;
 
 		//init WebSocket
-		this.gameSocket = GameSocketManager();
+		this.gameSocket = new GameSocketManager();
 		this.gameSocket.initWebSocket(
 			'pong',
 			'/api/singleplayer/pong',
-			this.handleSocketMessage);
+			this.handleSocketMessage.bind(this));
 		
 		//init scene element
+		this.sceneManager.initModelLoader();
 		this.sceneManager.initAudioVar();
-		this.sceneManager.playAuidio("/static/pong_static/assets/audio/SceneAudio.mp3")
+		this.sceneManager.playAudio("/static/pong_static/assets/audio/SceneAudio.mp3");
 		this.initializeLights();
 		this.initPaddles();
 
 		//load 3d model
 		this.sceneManager.loadModel({
 			'/static/pong_static/assets/models/Scene.glb': 'room'
-		})
-		
+				}).then(() => {
+					this.initScene();
+				});
+
 		this.sceneManager.setExternalFunction(() => this.fixedUpdate());
 	}
 
 	initScene()
 	{
 		//init and add to scene cabinet room
-		const room = this.modelsLoaded["room"];
+		const room = this.sceneManager.modelsLoaded["room"];
 		room.scene.scale.set(10,10,10);
 		room.scene.position.set(800, -134, 191);
 		room.scene.rotation.y = Math.PI / -2;
@@ -99,39 +102,6 @@ class Game {
 
 		this.sceneManager.scene.add(this.ambientLight);
 		this.sceneManager.scene.add(this.directionalLight);
-	}
-
-	handleSocketMessage(event) 
-	{
-		try 
-		{
-			const data = JSON.parse(event.data);
-			switch (data.type) {
-				case 'initLobby':
-					this.initLobby();
-				  	break;
-				case 'addPlayerToLobby':
-					this.addPlayerToLobby();
-					break;
-				case 'initGame':
-					this.initGame();
-				  	break;
-				case 'stateUpdate':
-					this.updateGameState(data);
-					break;
-				case 'playerDisconnect':
-					this.playerDisconnect();
-					break;
-				case 'lobbyClosed':
-					this.cleanUp();
-					break;
-				default:
-				  console.log(`This type of event is not managed.`);
-			}
-		}
-		catch (error) {
-			console.error("Error processing WebSocket message:", error);
-		}
 	}
 
 	initLobby(data) {
@@ -191,6 +161,39 @@ class Game {
 		// Aggiorna la posizione della pallina
 		this.ball.mesh.position.x = this.ball.newPosX;
 		this.ball.mesh.position.y = this.ball.newPosY;
+	}
+
+	handleSocketMessage(event) 
+	{
+		try 
+		{
+			const data = JSON.parse(event.data);
+			switch (data.type) {
+				case 'initLobby':
+					this.initLobby(data);
+				  	break;
+				case 'addPlayerToLobby':
+					this.addPlayerToLobby();
+					break;
+				case 'initGame':
+					this.initGame();
+				  	break;
+				case 'stateUpdate':
+					this.updateGameState(data);
+					break;
+				case 'playerDisconnect':
+					this.playerDisconnect();
+					break;
+				case 'lobbyClosed':
+					this.cleanUp();
+					break;
+				default:
+				  console.log(`This type of event is not managed.`);
+			}
+		}
+		catch (error) {
+			console.error("Error processing WebSocket message:", error);
+		}
 	}
 }
 

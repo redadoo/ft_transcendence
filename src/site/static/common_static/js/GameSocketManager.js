@@ -1,6 +1,6 @@
 export default class GameSocketManager {
     constructor() {
-        this.gameSocket = null;
+        this.socket = null;
     }
 
     /**
@@ -15,9 +15,9 @@ export default class GameSocketManager {
             const mode = this.getModeFromPath();
             
             const socketUrl = `ws://${window.location.host}/ws/${mode}/${gameName}/${roomName}`;
-            this.gameSocket = new WebSocket(socketUrl);
+            this.socket = new WebSocket(socketUrl);
 
-            this.gameSocket.onmessage = handleSocketMessage.bind(this);
+            this.socket.onmessage = handleSocketMessage;
         } catch (error) {
             console.error('Failed to initialize WebSocket:', error.message);
         }
@@ -59,5 +59,10 @@ export default class GameSocketManager {
     getModeFromPath() {
         const pathSegments = window.location.pathname.split('/').filter(Boolean);
         return pathSegments[0] || 'default';
+    }
+
+    send(data)
+    {
+        this.socket.send(data);
     }
 }

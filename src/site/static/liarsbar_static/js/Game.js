@@ -28,11 +28,11 @@ class Game {
 		
 		this.initLights();
 
-		this.gameSocket = GameSocketManager();
+		this.gameSocket = new GameSocketManager();
 		this.gameSocket.initWebSocket(
 			'liarsbar',
 			'/api/multiplayer/liarsbar',
-			this.handleSocketMessage);
+			this.handleSocketMessage.bind(this));
 
 		this.sceneManager.initModelLoader();
 		this.sceneManager.initTextVar();

@@ -87,59 +87,59 @@ export default class SceneManager {
 
   }
 
-  setCameraValue(fov, nearPlane, farPlane)
-  {
+	setCameraValue(fov, nearPlane, farPlane)
+	{
 		this.fov = fov;
 		this.nearPlane = nearPlane;
 		this.farPlane = farPlane;
-  }
+	}
 
-  setCameraTransform(position, rotation, target) 
-  {
+	setCameraTransform(position, rotation, target) 
+	{
 	if (this.needOrbital && target) 
-	  this.controls.target.copy(target);
+		this.controls.target.copy(target);
 	else if (!this.needOrbital && target) 
-	  throw new Error("An orbital camera is required to set a target.");
+		throw new Error("An orbital camera is required to set a target.");
 
 	this.camera.position.copy(position);
 	this.camera.rotation.set(rotation.x, rotation.y, rotation.z);
-  }
-  
-  setCameraState(position, quaternion, target) 
-  {
+	}
+
+	setCameraState(position, quaternion, target) 
+	{
 	if (!this.camera)
-	  throw new Error("Camera must be initialized before setting its state.");
-	
+		throw new Error("Camera must be initialized before setting its state.");
+
 	this.camera.position.copy(position);
 	this.camera.quaternion.copy(quaternion);
 
 	if (this.controls && target) 
-	  this.controls.target.copy(target);
-  }
+		this.controls.target.copy(target);
+	}
 
-  setExternalFunction(func) 
-  {
+	setExternalFunction(func) 
+	{
 	if (typeof func === "function") 
-	  this.externalFunction = func;
+		this.externalFunction = func;
 	else 
-	  console.warn("setExternalFunction expects a valid function.");
-  }
-  
-  initialize() 
-  {
+		console.warn("setExternalFunction expects a valid function.");
+	}
+
+	initialize() 
+	{
 	this.scene = new THREE.Scene();
 	this.clock = new THREE.Clock();
-	
+
 	this.renderer = new THREE.WebGLRenderer({ antialias: true });
 	this.renderer.setSize(window.innerWidth, window.innerHeight);
 	this.renderer.shadowMap.enabled = true;
 		this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
-	
+
 	this.camera = new THREE.PerspectiveCamera(
-	  this.fov,
-	  window.innerWidth / window.innerHeight,
-	  this.nearPlane,
-	  this.farPlane
+		this.fov,
+		window.innerWidth / window.innerHeight,
+		this.nearPlane,
+		this.farPlane
 	);
 
 	this.camera.position.z = 48;
@@ -147,14 +147,14 @@ export default class SceneManager {
 
 	document.body.appendChild(this.stats.dom);
 	document.body.appendChild(this.renderer.domElement);
-	
-	if (this.needOrbital)
-	  this.controls = new OrbitControls(this.camera, this.renderer.domElement);
-	
-	window.addEventListener("resize", () => this.onWindowResize(), false);
-  }
 
-  animate() {
+	if (this.needOrbital)
+		this.controls = new OrbitControls(this.camera, this.renderer.domElement);
+
+	window.addEventListener("resize", () => this.onWindowResize(), false);
+	}
+
+	animate() {
 	window.requestAnimationFrame(this.animate.bind(this));
 
 	const deltaTime = this.clock.getDelta();
@@ -162,31 +162,31 @@ export default class SceneManager {
 
 	while (this.accumulatedTime >= this.fixedTimeStep) 
 	{
-	  if (this.externalFunction) 
+		if (this.externalFunction) 
 		this.externalFunction(this.fixedTimeStep);
-	  this.accumulatedTime -= this.fixedTimeStep;
+		this.accumulatedTime -= this.fixedTimeStep;
 	}
 
 	this.render();
 	this.stats.update();
-	
+
 	if (this.needOrbital)
-	  this.controls.update();
-  }
+		this.controls.update();
+	}
 
-  render() 
-  {
+	render() 
+	{
 	this.renderer.render(this.scene, this.camera);
-  }
+	}
 
-  onWindowResize() {
+	onWindowResize() {
 	this.renderer.setSize(window.innerWidth, window.innerHeight);
 	this.camera.updateProjectionMatrix();
 	this.camera.aspect = window.innerWidth / window.innerHeight;
-  }
+	}
 
-  initTextVar()
-  {
+	initTextVar()
+	{
 	if (this.scene == undefined || this.scene == null)
 		throw new Error("scene need to be initialized");
 
@@ -201,45 +201,45 @@ export default class SceneManager {
 	this.scene.add( this.group );
 
 	this.loadFont()
-  }
+	}
 
-  loadFont() {
+	loadFont() {
 	this.fontLoader = new FontLoader();
 	this.fontLoader.load(
-	  this.fontPath + this.fontName + "_" + this.fontWeight + ".typeface.json",
-	  (response) => {
+		this.fontPath + this.fontName + "_" + this.fontWeight + ".typeface.json",
+		(response) => {
 		this.font = response;
 		this.refreshText();
-	  },
-	  undefined,
-	  (error) => {
+		},
+		undefined,
+		(error) => {
 		console.error("Error loading font:", error);
-	  }
+		}
 	);
-  }
-  
+	}
 
-  refreshText() {
+
+	refreshText() {
 	this.group.remove(this.textMesh1);
 
 	if (!this.text) return;
-  
-	this.createText();
-  }
 
-  createText(text, position, rotation) 
-  {
+	this.createText();
+	}
+
+	createText(text, position, rotation) 
+	{
 	textGeo = new TextGeometry( text, {
 
-	  font: this.font,
+		font: this.font,
 
-	  size: this.size,
-	  depth: this.depth,
-	  curveSegments: this.curveSegments,
+		size: this.size,
+		depth: this.depth,
+		curveSegments: this.curveSegments,
 
-	  bevelThickness: this.bevelThickness,
-	  bevelSize: this.bevelSize,
-	  bevelEnabled: this.bevelEnabled
+		bevelThickness: this.bevelThickness,
+		bevelSize: this.bevelSize,
+		bevelEnabled: this.bevelEnabled
 
 	});
 
@@ -253,140 +253,95 @@ export default class SceneManager {
 	textMesh1.position.copy(rotation);
 
 	this.group.add( textMesh1 );
-  }
-
-  initModelLoader()
-  {
-	this.gltfLoader = new GLTFLoader();
-  }
-
-  loadModel(models)
-  {
-	for (const [key, value] of Object.entries(models)) {
-		console.log(key, value);
-		this.loadingPromises.push(this._loadModel(key, value)
-		);
 	}
-	return Promise.all(this.loadingPromises);
-  }
 
-  _loadModel(path, modelName) 
-  {
-	  return new Promise((resolve, reject) => {
-		  this.gltfLoader.load(
-			  path,
-			  (gltfScene) => {
-				  this.modelsLoaded[modelName] = gltfScene;
-				  resolve();
-			  },
-			  undefined,
-			  (error) => {
-				  console.error(`Error loading model ${modelName}:`, error);
-				  reject(error);
-			  }
-		  );
-	  });
-  }
+	initModelLoader()
+	{
+	this.gltfLoader = new GLTFLoader();
+	}
 
-  initAudioVar()
-  {
-	this.audioLoader = new THREE.AudioLoader();
-	this.listener = new THREE.AudioListener();
-	this.audioContext = new (window.AudioContext || window.webkitAudioContext)({ latencyHint: 'interactive' });
-	THREE.AudioContext.setContext(this.audioContext);
-	this.audio = new THREE.Audio(this.listener);
-	this.sceneManager.camera.add(this.listener);
-  }
+	loadModel(models)
+	{
+		for (const [key, value] of Object.entries(models)) {
+			this.loadingPromises.push(this._loadModel(key, value)
+			);
+		}
+		return Promise.all(this.loadingPromises);
+	}
 
-  playAuidio(audioPath)
-  {
-	const loadAndPlayAudio = () => {
+	_loadModel(path, modelName) 
+	{
+		return new Promise((resolve, reject) => {
+			this.gltfLoader.load(
+				path,
+				(gltfScene) => {
+					this.modelsLoaded[modelName] = gltfScene;
+					resolve();
+				},
+				undefined,
+				(error) => {
+					console.error(`Error loading model ${modelName}:`, error);
+					reject(error);
+				}
+			);
+		});
+	}
+
+	initAudioVar()
+	{
+		this.audioLoader = new THREE.AudioLoader();
+		this.listener = new THREE.AudioListener();
+		this.audioContext = new (window.AudioContext || window.webkitAudioContext)({ latencyHint: 'interactive' });
+		THREE.AudioContext.setContext(this.audioContext);
+		this.audio = new THREE.Audio(this.listener);
+		this.camera.add(this.listener);
+	}
+
+	playAudio(audioPath) 
+	{
+		const loadAndPlayAudio = () => {
+			this.audioLoader.load(audioPath, (buffer) => {
+				if (buffer) {
+					this.audio.setBuffer(buffer);
+					this.audio.setLoop(true);
+					this.audio.setVolume(1.0);
+					this.audio.play();
+					console.log("Audio playback started.");
+				} else {
+					console.error("Audio buffer not loaded.");
+				}
+			});
+		};
+
+		const resumeAudioContext = () => {
+			if (this.audioContext.state === 'suspended') {
+				this.audioContext.resume().then(() => {
+					console.log("AudioContext resumed.");
+					loadAndPlayAudio(); 
+				}).catch((error) => {
+					console.error("Error resuming AudioContext:", error);
+				});
+			} else {
+				loadAndPlayAudio(); 
+			}
+		};
+
+		document.addEventListener('click', resumeAudioContext, { once: true });
+
+		// Loading and playing the audio
 		this.audioLoader.load(audioPath, (buffer) => {
 			if (buffer) {
 				this.audio.setBuffer(buffer);
 				this.audio.setLoop(true);
-				this.audio.setVolume(1.0);
+				this.audio.setVolume(0);
 				this.audio.play();
-				console.log("Audio playback started.");
-			} else {
-				console.error("Audio buffer not loaded.");
-			}
-		});
-	};
-
-	const resumeAudioContext = () => {
-		if (this.audioContext.state === 'suspended') {
-			this.audioContext.resume().then(() => {
-				console.log("AudioContext resumed.");
-				loadAndPlayAudio(); 
-			}).catch((error) => {
-				console.error("Error resuming AudioContext:", error);
-			});
-		} else {
-			loadAndPlayAudio(); 
-		}
-	};
-
-	document.addEventListener('click', resumeAudioContext, { once: true });
-
-	this.audioLoader.load(audioPath, (buffer) => {
-		if (buffer) {
-			this.audio.setBuffer(buffer);
-			this.audio.setLoop(true);
-			this.audio.setVolume(0);
-			this.audio.play().then(() => {
 				console.log("Audio autoplay (muted) started.");
 				setTimeout(() => this.audio.setVolume(1.0), 1);
-			}).catch((error) => {
-				console.warn("Autoplay blocked, waiting for user interaction.");
-			});
-		}
-	});
-  }
-
-  initAudio() {
-	  
-	const loadAndPlayAudio = () => {
-		this.audioLoader.load("/static/pong_static/assets/audio/SceneAudio.mp3", (buffer) => {
-			if (buffer) {
-				this.audio.setBuffer(buffer);
-				this.audio.setLoop(true);
-				this.audio.setVolume(1.0);
-				this.audio.play();
-				console.log("Audio playback started.");
-			} else {
+			}
+			else {
 				console.error("Audio buffer not loaded.");
 			}
 		});
-	};
+	}
 
-	const resumeAudioContext = () => {
-		if (this.audioContext.state === 'suspended') {
-			this.audioContext.resume().then(() => {
-				console.log("AudioContext resumed.");
-				loadAndPlayAudio(); 
-			}).catch((error) => {
-				console.error("Error resuming AudioContext:", error);
-			});
-		} else {
-			loadAndPlayAudio(); 
-		}
-	};
-
-	document.addEventListener('click', resumeAudioContext, { once: true });
-
-	this.audioLoader.load("/static/pong_static/assets/audio/SceneAudio.mp3", (buffer) => {
-		if (buffer) {
-			this.audio.setBuffer(buffer);
-			this.audio.setLoop(true);
-			this.audio.setVolume(0);
-			this.audio.play().then(() => {
-				console.log("Audio autoplay (muted) started.");
-				setTimeout(() => this.audio.setVolume(1.0), 10);
-			}).catch((error) => {
-				console.warn("Autoplay blocked, waiting for user interaction.");
-			});
-		}
-	});
-}
 }
