@@ -100,16 +100,6 @@ const views = {
 		return html.pongSelection;
 	},
 
-	async pongRanked() {
-		if (!await api.checkAuth()) { router.navigateTo('/login'); }
-		return html.pong;
-	},
-
-	async pongUnranked() {
-		if (!await api.checkAuth()) { router.navigateTo('/login'); }
-		return html.pong;
-	},
-
 	async singleplayer() {
 		if (!await api.checkAuth()) { router.navigateTo('/login'); }
 		return html.singleplayer;

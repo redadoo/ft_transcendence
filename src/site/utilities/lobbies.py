@@ -23,7 +23,7 @@ class Lobbies:
 			self._lobbies[room_name] = Lobby(game_manager)
 		return self._lobbies[room_name]
 
-	def add_user_to_lobby(self, player, lobby):
+	def _join_lobby(self, player, lobby):
 		try:
 			lobby.game_manager.add_player(player)
 		except:

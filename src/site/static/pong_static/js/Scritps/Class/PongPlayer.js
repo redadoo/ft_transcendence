@@ -6,7 +6,6 @@ export default class PongPlayer {
 	{
 		this.playerId = playerId;
 		this.socket = socket;
-		console.log(data);
 		this.paddle = new Paddle(data.width, data.height, data.depth, data.color);
 		this.input = new PongInput(upKey, downKey);
 		
