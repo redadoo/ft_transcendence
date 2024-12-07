@@ -207,7 +207,7 @@ const html = {
 				</div>
 
 				<div class="col-5 p-4">
-					<div class="game-card pong" data-link="/multiplayer/pong">
+					<div class="game-card pong" data-link="/multiplayer/pong_selection">
 					<div class="game-box">
 						<div class="game-content">
 						<h2 class="pixel-font">PONG</h2>
@@ -406,6 +406,62 @@ const html = {
 									<span class="hundin-font text-down user-status">APPEAR BUSY</span>
 								</div>
 							</div>
+						</div>
+					</nav>
+				</div>
+			</div>
+		</div>
+	`,
+
+	pongSelection: `
+		<div class="container-fluid game-container">
+			<div class="row h-100">
+
+				<div class="col-2 px-0">
+					<nav class="nav-wrapper">
+						<div class="d-flex flex-column">
+							<a class="nav-link-left back" data-link="/multiplayer">
+								<span class="hundin-font back">BACK</span>
+							</a>
+						</div>
+					</nav>
+				</div>
+				<div class="col-1"></div>
+
+
+				<div class="col-9 px-0">
+					<nav class="nav-wrapper">
+						<input type="lobbyID" class="pfw-font lobbyID-input" placeholder="enter room id or url and hit enter..." id="lobbyID" name="lobbyID">
+
+						<div class="d-flex flex-column">
+							<a class="nav-link-right tournament" data-link="/">
+								<span class="pixel-font tournament">TMT</span>
+								<div class="column-text">
+									<span class="hundin-font tournament text-up">TOURNAMENT</span>
+									<span class="hundin-font tournament text-down">KINGDOM HEARTS PROPAGANDA</span>
+								</div>
+							</a>
+							<a class="nav-link-right ranked" data-link="/multiplayer/pong_ranked">
+								<span class="pixel-font ranked">RNK</span>
+								<div class="column-text">
+									<span class="hundin-font ranked text-up">RANKED</span>
+									<span class="hundin-font ranked text-down">KINGDOM HEARTS PROPAGANDA</span>
+								</div>
+							</a>
+							<a class="nav-link-right unranked" data-link="/multiplayer/pong_unranked">
+								<span class="pixel-font unranked">UNK</span>
+								<div class="column-text">
+									<span class="hundin-font unranked text-up">UNRANKED</span>
+									<span class="hundin-font unranked text-down">KINGDOM HEARTS PROPAGANDA</span>
+								</div>
+							</a>
+							<a class="nav-link-right lobby" data-link="/">
+								<span class="pixel-font lobby">LBY</span>
+								<div class="column-text">
+									<span class="hundin-font lobby text-up">LOBBY</span>
+									<span class="hundin-font lobby text-down">KINGDOM HEARTS PROPAGANDA</span>
+								</div>
+							</a>
 						</div>
 					</nav>
 				</div>
