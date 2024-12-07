@@ -24,27 +24,12 @@
 	</script>
 </head>
 <body>
-	<div id="overlay" class="overlay"></div>
-	<div id="status-overlay" class="status-overlay"></div>
-
-	<header class="header d-flex align-items-start justify-content-between px-2 fixed-top">
-		<span class="px-4"><div id="header_text"></div></span>
-		<div class="d-flex">
-			<div class="header-button notification d-none" id="notificationBtn"></div>
-
-			<div class="header-button profile d-none" id="profileBtn" data-link="/profile">
-				<div class="d-flex flex-column">
-					<span class="hundin-font header-text-up" id="headerUsername"></span>
-					<span class="hundin-font header-text-bottom" id="headerLevel">LV. </span>
-				</div>
-				<div class="header-profile-image-container mb-4"><img src="" alt="Profile" class="profile-image" id="headerProfileImage"></div>
-			</div>
-		</div>
-	</header>
+	<div id="overlay" class="overlay d-none"></div>
+	<div id="status-overlay" class="status-overlay d-none"></div>
+	<header id="header" class="header d-flex align-items-start justify-content-between px-2 fixed-top"></header>
 	<div id="app"></div>
-	<footer class="footer d-flex align-items-center px-4 fixed-bottom">
-		<div id="footer_text"></div>
-	</footer>
+	<footer id="footer" class="footer d-flex align-items-center px-4 fixed-bottom"></footer>
+
 	<!-- <script src="{% static 'site_static/js/overlay.js' %}"></script> -->
 	<script src="{% static 'site_static/js/api.js' %}"></script>
 	<script src="{% static 'site_static/js/app.js' %}"></script>
@@ -53,6 +38,5 @@
 	<script src="{% static 'site_static/js/router.js' %}"></script>
 	<script src="{% static 'site_static/js/views.js' %}"></script>
 	<script src="{% static 'lib/bootstrap/js/bootstrap.js' %}"></script>
-	<!-- <script type="module"  src="static/pong_static/js/Game.js"></script> -->
 </body>
 </html>

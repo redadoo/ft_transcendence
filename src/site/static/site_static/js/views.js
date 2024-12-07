@@ -7,13 +7,14 @@ const views = {
 	async alreadyLoggedInScripts() {
 		if (!await api.checkAuth()) { return router.navigateTo('/login'); }
 		const data = await api.getProfileInfo();
-
 		document.getElementById('alreadyLoggedInUsername').textContent = "You are already logged in as " + data.username;
-
 	},
 
 	async home() {
 		if (!await api.checkAuth()) { return router.navigateTo('/login'); }
+		document.getElementById('overlay').innerHTML = html.overlay;
+		document.getElementById('status-overlay').innerHTML = html.statusOverlay;
+		document.getElementById('header').innerHTML = html.header;
 		const data = await api.getHeaderInfo();
 		['profileBtn', 'notificationBtn'].forEach(id => document.getElementById(id).classList.remove('d-none'));
 		document.getElementById('headerUsername').textContent = data.username;

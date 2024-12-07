@@ -664,63 +664,48 @@ label {
 	background-color: rgba(0, 0, 0, 0.7);
 	z-index: 9999;
 	transition: all 0.3s ease;
-	opacity: 0;
-	visibility: hidden;
 }
-
-.overlay.active {
-	opacity: 1;
-	visibility: visible;
-}
-
 
 
 .status-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100vw;
-    height: 100vh;
-    background-color: rgba(0, 0, 0, 0.8);
-    z-index: 10001;
-    opacity: 0;
-    visibility: hidden;
-    transition: all 0.3s ease;
-}
-
-.status-overlay.active {
-    opacity: 1;
-    visibility: visible;
+	position: fixed;
+	top: 0;
+	left: 0;
+	width: 100vw;
+	height: 100vh;
+	background-color: rgba(0, 0, 0, 0.8);
+	z-index: 10001;
+	transition: all 0.3s ease;
 }
 
 .status-modal {
-    position: fixed;
-    left: 30%;
-    top: 50%;
-    transform: translateY(-50%);
-    background-color: #1e1d2d;
-    padding: 20px;
-    border-radius: 5px;
-    border: 1px solid rgba(255, 255, 255, 0.1);
+	position: fixed;
+	left: 30%;
+	top: 50%;
+	transform: translateY(-50%);
+	background-color: #1e1d2d;
+	padding: 20px;
+	border-radius: 5px;
+	border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .status-option {
-    display: flex;
-    align-items: center;
-    padding: 10px;
-    cursor: pointer;
-    transition: background-color 0.2s;
+	display: flex;
+	align-items: center;
+	padding: 10px;
+	cursor: pointer;
+	transition: background-color 0.2s;
 }
 
 .status-option:hover {
-    background-color: rgba(255, 255, 255, 0.1);
+	background-color: rgba(255, 255, 255, 0.1);
 }
 
 .status-dot {
-    width: 10px;
-    height: 10px;
-    border-radius: 50%;
-    margin-right: 10px;
+	width: 10px;
+	height: 10px;
+	border-radius: 50%;
+	margin-right: 10px;
 }
 
 .status-dot.online { background-color: #4ba644; }

@@ -466,4 +466,19 @@ const html = {
 			</div>
 		</div>
 	`,
+
+	header: `
+		<span class="px-4"><div id="header_text"></div></span>
+		<div class="d-flex">
+			<div class="header-button notification d-none" id="notificationBtn"></div>
+
+			<div class="header-button profile d-none" id="profileBtn" data-link="/profile">
+				<div class="d-flex flex-column">
+					<span class="hundin-font header-text-up" id="headerUsername"></span>
+					<span class="hundin-font header-text-bottom" id="headerLevel">LV. </span>
+				</div>
+				<div class="header-profile-image-container mb-4"><img src="" alt="Profile" class="profile-image" id="headerProfileImage"></div>
+			</div>
+		</div>
+	`,
 };
