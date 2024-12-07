@@ -49,7 +49,8 @@ class LiarsBarMatch(models.Model):
         help_text="The user who won the match."
     )
     start_date = models.DateTimeField(
-        default=now,
+        null=True,
+        blank=True,
         help_text="Timestamp when the match started."
     )
     end_date = models.DateTimeField(

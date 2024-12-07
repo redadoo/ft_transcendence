@@ -10,13 +10,17 @@ class PongMatch(models.Model):
 	id = models.AutoField(primary_key=True)
 	first_user = models.ForeignKey(
 		settings.AUTH_USER_MODEL,
-		on_delete=models.CASCADE,
+		on_delete=models.SET_NULL,
+		null=True,
+		blank=True,
 		related_name="matches_as_first_user",
 		help_text="Reference to the first user.",
 	)
 	second_user = models.ForeignKey(
 		settings.AUTH_USER_MODEL,
-		on_delete=models.CASCADE,
+		on_delete=models.SET_NULL,
+		null=True,
+		blank=True,
 		related_name="matches_as_second_user",
 		help_text="Reference to the second user.",
 	)
@@ -38,13 +42,14 @@ class PongMatch(models.Model):
 	)
 	
 	start_date = models.DateTimeField(
-		default=now, help_text="Timestamp when the match started."
+		null=True,
+		blank=True,
+		help_text="Timestamp when the match started."
 	)
-	
 	end_date = models.DateTimeField(
 		null=True,
 		blank=True,
-		help_text="Timestamp when the match ended.",
+		help_text="Timestamp when the match ended."
 	)
 
 	def get_winner(self):
@@ -67,13 +72,13 @@ class PongMatch(models.Model):
 		else:
 			return "Match is still ongoing"
 
-
-
 	def __str__(self):
 		"""
 		String representation of the PongMatch instance.
 		"""
-		return f"Pong Match between {self.first_user.username} and {self.second_user.username}"
+		first_username = self.first_user.username if self.first_user else "Unknown"
+		second_username = self.second_user.username if self.second_user else "Unknown"
+		return f"{first_username} vs {second_username}"
 
 	class Meta:	
 		verbose_name = "Pong match"

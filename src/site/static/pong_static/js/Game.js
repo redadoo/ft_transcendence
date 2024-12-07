@@ -53,7 +53,7 @@ class Game {
 
 		//init WebSocket
 		this.gameSocket = new GameSocketManager();
-		this.gameSocket.initWebSocket(
+		this.gameSocket.initGameWebSocket(
 			'pong',
 			'/api/singleplayer/pong',
 			this.handleSocketMessage.bind(this));

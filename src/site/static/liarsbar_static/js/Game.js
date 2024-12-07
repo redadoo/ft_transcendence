@@ -29,7 +29,7 @@ class Game {
 		this.initLights();
 
 		this.gameSocket = new GameSocketManager();
-		this.gameSocket.initWebSocket(
+		this.gameSocket.initGameWebSocket(
 			'liarsbar',
 			'/api/multiplayer/liarsbar',
 			this.handleSocketMessage.bind(this));

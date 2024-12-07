@@ -94,6 +94,17 @@ const views = {
 	},
 
 	// Game views
+
+	async pongMatchmaking() {
+		if (!await api.checkAuth()) { router.navigateTo('/login'); }
+		return html.pongMatchmaking;
+	},
+
+	pongMatchmakingScripts: () => {
+		import('../../common_static/js/Matchmaking.js')
+		.catch(e => console.error('Pong script error:', e));
+	},
+
 	async multiplayer() {
 		if (!await api.checkAuth()) { router.navigateTo('/login'); }
 		return html.multiplayer;

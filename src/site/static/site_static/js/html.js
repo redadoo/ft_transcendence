@@ -481,4 +481,16 @@ const html = {
 			</div>
 		</div>
 	`,
+	
+	pongMatchmaking:`
+		<div class="container-fluid game-container">
+			<div class="row h-100">
+				<div class="col d-flex justify-content-center align-items-center">
+					<button id="startMatchmaking" class="btn btn-primary btn-lg">
+						Start Matchmaking
+					</button>
+				</div>
+			</div>
+		</div>
+	`,
 };
