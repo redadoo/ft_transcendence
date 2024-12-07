@@ -12,7 +12,21 @@ from pong.scritps import PongGameManager
 
 lobbies = Lobbies()
 
-class  PongSingleplayerConsumer(AsyncWebsocketConsumer):
+class PongMatchmaking(AsyncWebsocketConsumer):
+
+	async def connect(self):
+		self.room_name = self.scope["url_route"]["kwargs"]["room_name"]
+		self.room_group_name = f"liarsbar_multiplayer_{self.room_name}"
+
+		self.update_lock = asyncio.Lock()
+
+		await self.channel_layer.group_add(self.room_group_name, self.channel_name)
+		await self.accept()
+		# await self.send(text_data=json.dumps(self.lobby.to_dict()))
+
+	pass
+
+class PongSingleplayerConsumer(AsyncWebsocketConsumer):
 	game_started = False
 	game_over = False
 
@@ -223,7 +237,6 @@ class  PongSingleplayerConsumer(AsyncWebsocketConsumer):
 			if player:
 				player.update_from_dict(event["player_data"])
 				await self.broadcast_lobby()
-
 
 class PongMultiplayerConsumer(AsyncWebsocketConsumer):
 	async def connect(self):

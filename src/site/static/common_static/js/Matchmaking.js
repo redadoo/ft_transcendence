@@ -20,6 +20,20 @@ class Matchking {
     
     handleSocketMessage(event)
     {
-    
+        try 
+		{
+			const data = JSON.parse(event.data);
+			switch (data.type) 
+            {
+				case 'init_lobby':
+					this.initLobby();
+				  	break;
+				default:
+				  console.log(`This type of event is not managed.`);
+			}
+		} 
+		catch (error) {
+			console.error("Error processing WebSocket message:", error);
+		}
     }
 }
