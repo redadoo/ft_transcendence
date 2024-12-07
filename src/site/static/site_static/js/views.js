@@ -13,7 +13,7 @@ const views = {
 	},
 
 	async home() {
-		if (!await api.checkAuth()) { router.navigateTo('/login'); }
+		if (!await api.checkAuth()) { return router.navigateTo('/login'); }
 		const data = await api.getHeaderInfo();
 		['profileBtn', 'notificationBtn'].forEach(id => document.getElementById(id).classList.remove('d-none'));
 		document.getElementById('headerUsername').textContent = data.username;

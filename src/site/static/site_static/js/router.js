@@ -65,5 +65,7 @@ const router = {
 				this.navigateTo(path);
 			}
 		});
+
+		// document.
 	},
 };

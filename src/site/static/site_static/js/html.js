@@ -357,58 +357,56 @@ const html = {
 	`,
 
 	overlay: `
-		<div id="overlay" class="overlay d-none">
-			<div class="friends-sidebar">
-				<div class="friends-header pixel-font" style="text-align: right;">
-					<span id="overlayUsername"></span>
-					<span class="friend-status online">Online</span>
-				</div>
-
-				<div class="friends-search">
-					<input type="text" placeholder="FIND SOMEONE..." class="search-input pixel-font">
-				</div>
-
-				<div class="friends-tabs pixel-font">
-					<span class="tab online active">ONLINE</span>
-					<span class="tab all">ALL</span>
-					<span class="tab other">OTHER</span>
-					<span class="tab blocked">BLOCKED</span>
-				</div>
-
-				<div class="friends-list" id="online-list"></div>
-				<div class="friends-list d-none" id="all-list"></div>
-				<div class="friends-list d-none" id="other-list"></div>
-				<div class="friends-list d-none" id="blocked-list"></div>
+		<div class="friends-sidebar">
+			<div class="friends-header pixel-font" style="text-align: right;">
+				<span id="overlayUsername"></span>
+				<span class="friend-status online">Online</span>
 			</div>
-		</div>
 
-		<div id="status-overlay" class="status-overlay d-none">
-			<div class="row h-100">
-			<div class="col-3"></div>
-				<div class="col-9 px-0">
-					<nav class="nav-wrapper">
-						<div class="d-flex flex-column">
-							<div class="nav-link-right user-status" data-status="Online">
-								<div style="display: flex; flex-direction: column;">
-									<span class="hundin-font text-up user-status online">ONLINE</span>
-									<span class="hundin-font text-down user-status">APPEAR AS USUAL</span>
-								</div>
-							</div>
-							<div class="nav-link-right user-status" data-status="Away">
-								<div style="display: flex; flex-direction: column;">
-									<span class="hundin-font text-up user-status away">AWAY</span>
-									<span class="hundin-font text-down user-status">APPEAR AWAY</span>
-								</div>
-							</div>
-							<div class="nav-link-right user-status" data-status="Busy">
-								<div style="display: flex; flex-direction: column;">
-									<span class="hundin-font text-up user-status busy">BUSY</span>
-									<span class="hundin-font text-down user-status">APPEAR BUSY</span>
-								</div>
+			<div class="friends-search">
+				<input type="text" placeholder="FIND SOMEONE..." class="search-input pixel-font">
+			</div>
+
+			<div class="friends-tabs pixel-font">
+				<span class="tab online active">ONLINE</span>
+				<span class="tab all">ALL</span>
+				<span class="tab other">OTHER</span>
+				<span class="tab blocked">BLOCKED</span>
+			</div>
+
+			<div class="friends-list" id="online-list"></div>
+			<div class="friends-list d-none" id="all-list"></div>
+			<div class="friends-list d-none" id="other-list"></div>
+			<div class="friends-list d-none" id="blocked-list"></div>
+		</div>
+	`,
+
+	statusOverlay: `
+		<div class="row h-100">
+		<div class="col-3"></div>
+			<div class="col-9 px-0">
+				<nav class="nav-wrapper">
+					<div class="d-flex flex-column">
+						<div class="nav-link-right user-status" data-status="Online">
+							<div style="display: flex; flex-direction: column;">
+								<span class="hundin-font text-up user-status online">ONLINE</span>
+								<span class="hundin-font text-down user-status">APPEAR AS USUAL</span>
 							</div>
 						</div>
-					</nav>
-				</div>
+						<div class="nav-link-right user-status" data-status="Away">
+							<div style="display: flex; flex-direction: column;">
+								<span class="hundin-font text-up user-status away">AWAY</span>
+								<span class="hundin-font text-down user-status">APPEAR AWAY</span>
+							</div>
+						</div>
+						<div class="nav-link-right user-status" data-status="Busy">
+							<div style="display: flex; flex-direction: column;">
+								<span class="hundin-font text-up user-status busy">BUSY</span>
+								<span class="hundin-font text-down user-status">APPEAR BUSY</span>
+							</div>
+						</div>
+					</div>
+				</nav>
 			</div>
 		</div>
 	`,

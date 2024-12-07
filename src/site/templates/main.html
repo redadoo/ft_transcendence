@@ -24,88 +24,8 @@
 	</script>
 </head>
 <body>
-	<div id="overlay" class="overlay d-none">
-		<div class="friends-sidebar">
-			<div class="friends-header pixel-font" style="text-align: right;">
-				<span>{{ user.username }}</span>
-				<span class="friend-status online">Online</span>
-			</div>
-
-			<div class="friends-search">
-				<input type="text" placeholder="FIND SOMEONE..." class="search-input pixel-font">
-			</div>
-
-			<div class="friends-tabs pixel-font">
-				<span class="tab online active">ONLINE</span>
-				<span class="tab all ">ALL</span>
-				<span class="tab other ">OTHER</span>
-				<span class="tab blocked ">BLOCKED</span>
-			</div>
-			<div class="friends-list" id="online-list">
-				{% for friend in friends  %}
-					{% if friend.status == 'Online'  %}
-						<div class="friend-item">
-							<img src="{{ friend.profile_image }}" alt="avatar" class="friend-avatar">
-							<span class="friend-name pixel-font" data-username="{{ friend.nickname }}">{{ friend.nickname }}</span>
-							<span class="friend-status">{{ friend.status }}</span>
-						</div>
-					{% endif  %}
-				{% endfor %}
-			</div>
-			<div class="friends-list d-none" id="all-list">
-				{% for friend in friends  %}
-					<div class="friend-item">
-						<img src="{{ friend.profile_image }}" alt="avatar" class="friend-avatar">
-						<span class="friend-name pixel-font" data-username="{{ friend.nickname }}">{{ friend.nickname }}</span>
-						<span class="friend-status">{{ friend.status }}</span>
-					</div>
-				{% endfor %}
-			</div>
-			<div class="friends-list d-none" id="other-list">
-
-			</div>
-			<div class="friends-list d-none" id="blocked-list">
-			{% for blocked in block  %}
-				<div class="friend-item">
-					<img src="{{ blocked.profile_image }}" alt="avatar" class="friend-avatar">
-					<span class="friend-name pixel-font">{{ blocked.nickname }}</span>
-				</div>
-			{% endfor %}
-			</div>
-		</div>
-	</div>
-
-
-	<div id="status-overlay" class="status-overlay d-none">
-		<div class="row h-100">
-			<div class="col-3"></div>
-
-			<div class="col-9 px-0">
-				<nav class="nav-wrapper">
-					<div class="d-flex flex-column">
-						<div class="nav-link-right user-status" data-status="Online">
-							<div style="display: flex; flex-direction: column;">
-								<span class="hundin-font text-up user-status online">ONLINE</span>
-								<span class="hundin-font text-down user-status">APPEAR AS USUAL</span>
-							</div>
-						</div>
-						<div class="nav-link-right user-status" data-status="Away">
-							<div style="display: flex; flex-direction: column;">
-								<span class="hundin-font text-up user-status away">AWAY</span>
-								<span class="hundin-font text-down user-status">APPEAR AWAY</span>
-							</div>
-						</div>
-						<div class="nav-link-right user-status" data-status="Busy">
-							<div style="display: flex; flex-direction: column;">
-								<span class="hundin-font text-up user-status busy">BUSY</span>
-								<span class="hundin-font text-down user-status">APPEAR BUSY</span>
-							</div>
-						</div>
-					</div>
-				</nav>
-			</div>
-		</div>
-	</div>
+	<div id="overlay" class="overlay"></div>
+	<div id="status-overlay" class="status-overlay"></div>
 
 	<header class="header d-flex align-items-start justify-content-between px-2 fixed-top">
 		<span class="px-4"><div id="header_text"></div></span>
@@ -125,7 +45,7 @@
 	<footer class="footer d-flex align-items-center px-4 fixed-bottom">
 		<div id="footer_text"></div>
 	</footer>
-	<script src="{% static 'site_static/js/overlay.js' %}"></script>
+	<!-- <script src="{% static 'site_static/js/overlay.js' %}"></script> -->
 	<script src="{% static 'site_static/js/api.js' %}"></script>
 	<script src="{% static 'site_static/js/app.js' %}"></script>
 	<script src="{% static 'site_static/js/html.js' %}"></script>

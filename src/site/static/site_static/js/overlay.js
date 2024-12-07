@@ -16,7 +16,7 @@ document.addEventListener('DOMContentLoaded', function () {
 		constructor() {
 			this.connect();
 			this.reconnectAttempts = 0;
-			this.maxReconnectAttempts = 5;
+			this.maxReconnectAttempts = 0;
 			this.reconnectDelay = 5000;
 		}
 
@@ -160,7 +160,7 @@ document.addEventListener('DOMContentLoaded', function () {
 		toggle(overlay) {
 			if (this.timeout) return;
 
-			if (overlay.classList.contains('d-none')) {
+			if (overlay.innerHTML === '') {
 				this.show(overlay);
 			} else {
 				this.hide(overlay);
@@ -168,14 +168,14 @@ document.addEventListener('DOMContentLoaded', function () {
 		},
 
 		show(overlay) {
-			overlay.classList.remove('d-none');
+			overlay.innerHTML = html.overlay;
 			requestAnimationFrame(() => overlay.classList.add('active'));
 		},
 
 		hide(overlay) {
 			overlay.classList.remove('active');
 			this.timeout = setTimeout(() => {
-				overlay.classList.add('d-none');
+				overlay.innerHTML = '';
 				this.timeout = null;
 			}, this.transitionDuration);
 		}
