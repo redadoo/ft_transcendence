@@ -15,6 +15,7 @@ const views = {
 		document.getElementById('overlay').innerHTML = html.overlay;
 		document.getElementById('status-overlay').innerHTML = html.statusOverlay;
 		document.getElementById('header').innerHTML = html.header;
+		overlayManager.addEventListeners();
 		const data = await api.getHeaderInfo();
 		['profileBtn', 'notificationBtn'].forEach(id => document.getElementById(id).classList.remove('d-none'));
 		document.getElementById('headerUsername').textContent = data.username;
@@ -22,6 +23,7 @@ const views = {
 		document.getElementById('headerProfileImage').src = data.image_url.avatar_url;
 		return html.home;
 	},
+
 
 	async login() {
 		if (await api.checkAuth()) { return router.navigateTo('/already-logged-in'); }
@@ -85,6 +87,7 @@ const views = {
 	},
 
 	async logout() {
+		overlayManager.removeEventListener();
 		await api.logout();
 		['profileBtn', 'notificationBtn'].forEach(id => document.getElementById(id).classList.add('d-none'));
 		router.navigateTo('/login');
@@ -149,7 +152,7 @@ const views = {
 		updateElement('profilePageTime', data.stat.time_on_site);
 		updateElement('profilePageCreated', data.created_at);
 
-		matchHistoryHelpers.renderMatchHistory(data.history, data.username);
+		matchHistory.renderMatchHistory(data.history, data.username);
 	},
 };
 

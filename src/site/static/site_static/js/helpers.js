@@ -1,4 +1,4 @@
-const matchHistoryHelpers = {
+const matchHistory = {
 	getMatchDetails(match, currentUser) {
 		const isPongMatch = match.type === "Pong Match";
 		const details = match.details;
@@ -76,3 +76,43 @@ const matchHistoryHelpers = {
 		.join('');
 	}
 };
+
+const overlayManager = {
+	container: document.getElementById('overlay'),
+	handleKeyboardShortcutsBound: null,
+
+	toggle() {
+		if (this.container.classList.contains('d-none')) {
+			this.show();
+		} else {
+			this.hide();
+		}
+	},
+
+	show() {
+		this.container.classList.remove('d-none');
+	},
+
+	hide() {
+		this.container.classList.add('d-none');
+	},
+
+	addEventListeners() {
+		this.handleKeyboardShortcutsBound = this.handleKeyboardShortcuts.bind(this);
+		document.body.addEventListener('keydown', this.handleKeyboardShortcutsBound);
+	},
+
+	removeEventListener() {
+		document.body.removeEventListener('keydown', this.handleKeyboardShortcutsBound);
+	},
+
+	handleKeyboardShortcuts(e) {
+		if (e.key === 'Tab') {
+			e.preventDefault();
+			this.toggle();
+		} else if (e.key === 'Escape') {
+			this.hide();
+		}
+	},
+};
+
