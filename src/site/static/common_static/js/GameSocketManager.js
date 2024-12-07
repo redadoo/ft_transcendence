@@ -17,6 +17,18 @@ export default class GameSocketManager {
 			const socketUrl = `ws://${window.location.host}/ws/${finalSocketUrl}`;
 			this.socket = new WebSocket(socketUrl);
 
+			this.socket.onopen = () => {
+				console.log('WebSocket connection opened');
+			};
+		
+			this.socket.onclose = () => {
+				console.log('WebSocket connection closed');
+			};
+		
+			this.socket.onerror = (error) => {
+				console.error('WebSocket error:', error);
+			};
+
 			this.socket.onmessage = handleSocketMessage;
 		} catch (error) {
 			console.error('Failed to initialize WebSocket:', error.message);
@@ -37,6 +49,18 @@ export default class GameSocketManager {
 			const socketUrl = `ws://${window.location.host}/ws/${mode}/${gameName}/${roomName}`;
 			this.socket = new WebSocket(socketUrl);
 
+			this.socket.onopen = () => {
+				console.log('WebSocket connection opened');
+			};
+		
+			this.socket.onclose = () => {
+				console.log('WebSocket connection closed');
+			};
+		
+			this.socket.onerror = (error) => {
+				console.error('WebSocket error:', error);
+			};
+			
 			this.socket.onmessage = handleSocketMessage;
 		} catch (error) {
 			console.error('Failed to initialize WebSocket:', error.message);
@@ -84,5 +108,9 @@ export default class GameSocketManager {
 	send(data)
 	{
 		this.socket.send(data);
+	}
+
+	close() {
+		this.socket.close();
 	}
 }

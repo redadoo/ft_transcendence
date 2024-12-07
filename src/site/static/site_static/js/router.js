@@ -14,6 +14,7 @@ const router = {
 			'/multiplayer/pong_ranked': 'pongMatchmaking',
 			'/multiplayer/pong_selection': 'pongSelection',
 			'/multiplayer/pong_unranked': 'pongMatchmaking',
+			'/multiplayer/pong': 'pong',			
 			'/profile': 'profile',
 			'/register': 'register',
 			'/singleplayer': 'singleplayer',

@@ -7,11 +7,12 @@ websocket_pong_urlpatterns = [
         PongSingleplayerConsumer.as_asgi()
     ),
     re_path(
+        r"ws/multiplayer/pong/matchmaking",
+        PongMatchmaking.as_asgi()
+    ),
+    
+    re_path(
         r"ws/multiplayer/pong/(?P<room_name>[\w\-]+)$",
         PongMultiplayerConsumer.as_asgi()
     ),
-    re_path(
-        r"ws/multiplayer/pong/matchmaking",
-        PongMatchmaking.as_asgi()
-    )
 ]

@@ -13,18 +13,53 @@ from pong.scritps import PongGameManager
 lobbies = Lobbies()
 
 class PongMatchmaking(AsyncWebsocketConsumer):
+	matchmaking_queue = []
+	room_group_name = "pong_matchmaking"
 
 	async def connect(self):
-		self.room_name = self.scope["url_route"]["kwargs"]["room_name"]
-		self.room_group_name = f"liarsbar_multiplayer_{self.room_name}"
-
-		self.update_lock = asyncio.Lock()
-
 		await self.channel_layer.group_add(self.room_group_name, self.channel_name)
 		await self.accept()
-		# await self.send(text_data=json.dumps(self.lobby.to_dict()))
 
-	pass
+	async def disconnect(self, close_code):
+		await self.channel_layer.group_discard(self.room_group_name, self.channel_name)
+		if self.channel_name in self.matchmaking_queue:
+			self.matchmaking_queue.remove(self.channel_name)
+
+	async def receive(self, text_data):
+		request = json.loads(text_data)
+		if request.get("action") == "join_matchmaking":
+			self.matchmaking_queue.append(self.channel_name)
+			await self.check_for_match()
+
+	async def check_for_match(self):
+		while len(self.matchmaking_queue) >= 2:
+			player1 = self.matchmaking_queue.pop(0)
+			player2 = self.matchmaking_queue.pop(0)
+
+			room_name = str(uuid.uuid4())
+
+			await self.channel_layer.send(
+				player1,
+				{
+					"type": "send.match.found",
+					"room_name": room_name,
+				}
+			)
+			await self.channel_layer.send(
+				player2,
+				{
+					"type": "send.match.found",
+					"room_name": room_name,
+				}
+			)
+
+	async def send_match_found(self, event):
+		room_name = event["room_name"]
+		print(room_name)
+		await self.send(text_data=json.dumps({
+			"type": "init_lobby", 
+			"room_name": room_name
+			}))
 
 class PongSingleplayerConsumer(AsyncWebsocketConsumer):
 	game_started = False
