@@ -127,31 +127,31 @@ export default class SceneManager {
 
 	initialize() 
 	{
-	this.scene = new THREE.Scene();
-	this.clock = new THREE.Clock();
+		this.scene = new THREE.Scene();
+		this.clock = new THREE.Clock();
 
-	this.renderer = new THREE.WebGLRenderer({ antialias: true });
-	this.renderer.setSize(window.innerWidth, window.innerHeight);
-	this.renderer.shadowMap.enabled = true;
-		this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+		this.renderer = new THREE.WebGLRenderer({ antialias: true });
+		this.renderer.setSize(window.innerWidth, window.innerHeight);
+		this.renderer.shadowMap.enabled = true;
+			this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 
-	this.camera = new THREE.PerspectiveCamera(
-		this.fov,
-		window.innerWidth / window.innerHeight,
-		this.nearPlane,
-		this.farPlane
-	);
+		this.camera = new THREE.PerspectiveCamera(
+			this.fov,
+			window.innerWidth / window.innerHeight,
+			this.nearPlane,
+			this.farPlane
+		);
 
-	this.camera.position.z = 48;
-	this.stats = Stats();
+		this.camera.position.z = 48;
+		this.stats = Stats();
 
-	document.body.appendChild(this.stats.dom);
-	document.body.appendChild(this.renderer.domElement);
+		document.body.appendChild(this.stats.dom);
+		document.body.appendChild(this.renderer.domElement);
 
-	if (this.needOrbital)
-		this.controls = new OrbitControls(this.camera, this.renderer.domElement);
+		if (this.needOrbital)
+			this.controls = new OrbitControls(this.camera, this.renderer.domElement);
 
-	window.addEventListener("resize", () => this.onWindowResize(), false);
+		window.addEventListener("resize", () => this.onWindowResize(), false);
 	}
 
 	animate() {

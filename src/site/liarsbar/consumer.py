@@ -19,7 +19,6 @@ class  liarsBarConsumer(AsyncWebsocketConsumer):
 		await self.accept()
 		await self.send(text_data=json.dumps(self.lobby.to_dict()))
 
-
 	async def disconnect(self, close_code):
 		await self.close()
 
@@ -27,5 +26,4 @@ class  liarsBarConsumer(AsyncWebsocketConsumer):
 		pass
 
 	async def broadcast_lobby(self):
-		# await self.channel_layer.group_send(self.room_group_name,{},)
 		pass

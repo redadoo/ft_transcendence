@@ -52,3 +52,4 @@ read [Subject](https://github.com/redadoo/ft_transcendence/blob/master/en.subjec
 [example threejs](https://github.com/Rikki407/threejs-projects/blob/master/projects/shootout/Game.js#L256)
 [threejs  tutorial](https://github.com/SuboptimalEng/three-js-tutorials/tree/main)
 [client-side-prediction](https://www.gabrielgambetta.com/client-side-prediction-server-reconciliation.html)
+[improving-database-accessibility](https://dev.to/slavkus/django-41-improving-database-accessibility-4hbh)

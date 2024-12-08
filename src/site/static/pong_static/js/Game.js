@@ -20,6 +20,8 @@ const CAMERA_SETTINGS = {
 class Game {
 	constructor() {
 
+		this.sceneManager = undefined;
+		this.isInit = false;
 		//light 
 		this.ambientLight = undefined;
 		this.directionalLight = undefined;
@@ -28,14 +30,16 @@ class Game {
 		this.bounds = undefined;
 		this.pongPlayer = undefined;
 		this.ball = undefined;
-		this.pongAi = undefined;
-		
+
+		//matchmaking var
+		this.button = undefined;
+
 		this.gameSocket = undefined;
 
-		this.initGameEnviroment();
+		// this.pongAi = undefined;
 	}
 
-	initGameEnviroment()
+	init()
 	{
 		//init Threejs
 		this.sceneManager = new SceneManager(true);
@@ -46,18 +50,75 @@ class Game {
 		this.sceneManager.farPlane = CAMERA_SETTINGS.FAR_PLANE;
 		
 		this.sceneManager.initialize();
+		
+		this.setupMatchmaking();
+	}
 
+	setupMatchmaking()
+	{
+		this.button = document.getElementById('startMatchmaking');
+		if (this.button) 
+		{
+			this.button.addEventListener('click', () => {
+				this.startMatchmaking();
+			});
+		}
+		else 
+			console.error("Button with id 'startMatchmaking' not found.");
+	}
+
+	async startMatchmaking() 
+	{
+		this.gameSocket = new GameSocketManager();
+		this.gameSocket.initWebSocket(
+			'multiplayer/pong/matchmaking',
+			this.handleMatchmakingSocketMessage.bind(this));
+
+		this.gameSocket.socket.onopen = () => {
+			console.log("WebSocket connection established. Sending matchmaking request.");
+			this.gameSocket.send(JSON.stringify({
+				action: 'join_matchmaking'
+			}));
+		};
+	}
+
+	handleMatchmakingSocketMessage(event)
+	{
+		try 
+		{
+			const data = JSON.parse(event.data);
+			switch (data.type) {
+				case 'init_lobby':
+					this.initLobby(data);
+				  	break;
+				default:
+				  console.log(`This type of event is not managed.`);
+			}
+		}
+		catch (error) {
+			console.error("Error processing WebSocket message:", error);
+		}
+	}
+
+	initLobby(data)
+	{
+		document.getElementById("testId").remove();
+		this.gameSocket.close();
+		this.gameSocket.initGameWebSocket(
+			'pong',
+			this.handleGameSocketMessage.bind(this),
+			data.room_name
+		);
+
+		this.initGameEnviroment();
+	}
+
+	initGameEnviroment()
+	{
 		//Camera trasform
 		this.sceneManager.camera.position.copy(CAMERA_SETTINGS.POSITION);
 		this.sceneManager.camera.rotation.x = CAMERA_SETTINGS.ROTATION_X;
 
-		//init WebSocket
-		this.gameSocket = new GameSocketManager();
-		this.gameSocket.initGameWebSocket(
-			'pong',
-			'/api/singleplayer/pong',
-			this.handleSocketMessage.bind(this));
-		
 		//init scene element
 		this.sceneManager.initModelLoader();
 		this.sceneManager.initAudioVar();
@@ -73,6 +134,8 @@ class Game {
 				});
 
 		this.sceneManager.setExternalFunction(() => this.fixedUpdate());
+		console.log("si va aaaalleleltl = ");
+
 	}
 
 	initScene()
@@ -83,6 +146,7 @@ class Game {
 		room.scene.position.set(800, -134, 191);
 		room.scene.rotation.y = Math.PI / -2;
 		this.sceneManager.scene.add(room.scene);
+		console.log("arriviamo = ");
 	}
 
 	initPaddles()
@@ -104,7 +168,7 @@ class Game {
 		this.sceneManager.scene.add(this.directionalLight);
 	}
 
-	initLobby(data) {
+	initGame(data) {
 		this.bounds = new Bounds(data.bounds["xMin"], data.bounds["xMax"], data.bounds["yMin"], data.bounds["yMax"]);
 	
 		// Configura il giocatore locale
@@ -163,14 +227,14 @@ class Game {
 		this.ball.mesh.position.y = this.ball.newPosY;
 	}
 
-	handleSocketMessage(event) 
+	handleGameSocketMessage(event) 
 	{
 		try 
 		{
 			const data = JSON.parse(event.data);
 			switch (data.type) {
-				case 'initLobby':
-					this.initLobby(data);
+				case 'initGame':
+					this.initGame(data);
 				  	break;
 				case 'addPlayerToLobby':
 					this.addPlayerToLobby();
@@ -198,4 +262,5 @@ class Game {
 }
 
 const game = new Game();
+game.init();
 game.sceneManager.animate();

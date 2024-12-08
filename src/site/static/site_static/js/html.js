@@ -287,7 +287,15 @@ const html = {
 	`,
 
 	pong: `
-		<div> </div>
+		<div id="testId" class="container-fluid game-container">
+			<div class="row h-100">
+				<div class="col d-flex justify-content-center align-items-center">
+					<button id="startMatchmaking" class="btn btn-primary btn-lg">
+						Start Matchmaking
+					</button>
+				</div>
+			</div>
+		</div>
 	`,
 
 	liarsbar: `
@@ -478,18 +486,6 @@ const html = {
 					<span class="hundin-font header-text-bottom" id="headerLevel">LV. </span>
 				</div>
 				<div class="header-profile-image-container mb-4"><img src="" alt="Profile" class="profile-image" id="headerProfileImage"></div>
-			</div>
-		</div>
-	`,
-	
-	pongMatchmaking:`
-		<div class="container-fluid game-container">
-			<div class="row h-100">
-				<div class="col d-flex justify-content-center align-items-center">
-					<button id="startMatchmaking" class="btn btn-primary btn-lg">
-						Start Matchmaking
-					</button>
-				</div>
 			</div>
 		</div>
 	`,

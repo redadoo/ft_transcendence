@@ -110,7 +110,7 @@ class PongSingleplayerConsumer(AsyncWebsocketConsumer):
 		await self.send(
 			text_data=json.dumps(
 				{
-					"type": "initLobby",
+					"type": "initGame",
 					"playerId": self.player_id,
 					"players": {
 						pid: player.to_dict()
@@ -274,6 +274,8 @@ class PongSingleplayerConsumer(AsyncWebsocketConsumer):
 				await self.broadcast_lobby()
 
 class PongMultiplayerConsumer(AsyncWebsocketConsumer):
+	matchmaking_queue = []
+
 	async def connect(self):
 		# Recupera il nome della stanza dall'URL
 		self.room_name = self.scope["url_route"]["kwargs"]["room_name"]
@@ -315,7 +317,7 @@ class PongMultiplayerConsumer(AsyncWebsocketConsumer):
 		# Invia i dati iniziali al client
 		await self.send(
 			text_data=json.dumps({
-				"type": "initLobby",
+				"type": "initGame",
 				"playerId": self.player_id,
 				"position": self.player_position,
 				"players": {

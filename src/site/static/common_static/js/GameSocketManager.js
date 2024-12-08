@@ -38,12 +38,11 @@ export default class GameSocketManager {
 	/**
 	 * Initializes the WebSocket connection for a game.
 	 * @param {string} gameName - The name of the game.
-	 * @param {string} apiUrl - The API URL to fetch room info.
 	 * @param {function} handleSocketMessage - Callback to handle incoming WebSocket messages.
+	 * @param {string} roomName - The uuid of the room.
 	 */
-	async initGameWebSocket(gameName, apiUrl, handleSocketMessage) {
+	async initGameWebSocket(gameName, handleSocketMessage, roomName) {
 		try {
-			const roomName = await this.fetchRoomName(apiUrl);
 			const mode = this.getModeFromPath();
 			
 			const socketUrl = `ws://${window.location.host}/ws/${mode}/${gameName}/${roomName}`;
