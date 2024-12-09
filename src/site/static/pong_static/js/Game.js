@@ -51,7 +51,14 @@ class Game {
 		
 		this.sceneManager.initialize();
 		
-		this.setupMatchmaking();
+		if (GameSocketManager.getModeFromPath() != 'singleplayer')
+		{
+			this.setupMatchmaking();
+		}
+		else
+		{
+			this.initLobby();
+		}
 	}
 
 	setupMatchmaking()
@@ -110,12 +117,17 @@ class Game {
 		document.getElementById("pong-container").remove();
 
 		//restablish socket connection to pong backend
-		this.gameSocket.close();
-		this.gameSocket.initGameWebSocket(
-			'pong',
-			this.handleGameSocketMessage.bind(this),
-			data.room_name
-		);
+		if (this.gameSocket != undefined)
+		{
+			this.gameSocket.close();
+			
+			this.gameSocket.initGameWebSocket(
+				'pong',
+				this.handleGameSocketMessage.bind(this),
+				data.room_name
+			);
+		}
+
 
 		this.initGameEnviroment();
 	}
@@ -216,17 +228,21 @@ class Game {
 	}
 
 	fixedUpdate() {
-		// if (!this.pongPlayer || !this.pongOpponent) return;
-	
-		// Aggiorna la posizione del giocatore locale
-		this.pongPlayer.paddle.mesh.position.y = this.pongPlayer.newY;
-	
-		// Aggiorna la posizione dell'avversario
-		this.pongOpponent.paddle.mesh.position.y = this.pongOpponent.newY;
-	
-		// Aggiorna la posizione della pallina
-		this.ball.mesh.position.x = this.ball.newPosX;
-		this.ball.mesh.position.y = this.ball.newPosY;
+
+		if(this.gameSocket != undefined)
+		{
+			// if (!this.pongPlayer || !this.pongOpponent) return;
+		
+			// Aggiorna la posizione del giocatore locale
+			this.pongPlayer.paddle.mesh.position.y = this.pongPlayer.newY;
+		
+			// Aggiorna la posizione dell'avversario
+			this.pongOpponent.paddle.mesh.position.y = this.pongOpponent.newY;
+		
+			// Aggiorna la posizione della pallina
+			this.ball.mesh.position.x = this.ball.newPosX;
+			this.ball.mesh.position.y = this.ball.newPosY;
+		}
 	}
 
 	handleGameSocketMessage(event) 

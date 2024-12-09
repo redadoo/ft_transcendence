@@ -99,7 +99,7 @@ export default class GameSocketManager {
 	 * Extracts the mode from the current URL path.
 	 * @returns {string} The mode (first segment of the path).
 	 */
-	getModeFromPath() {
+	static getModeFromPath() {
 		const pathSegments = window.location.pathname.split('/').filter(Boolean);
 		return pathSegments[0] || 'default';
 	}
@@ -109,7 +109,9 @@ export default class GameSocketManager {
 		this.socket.send(data);
 	}
 
-	close() {
-		this.socket.close();
+	close() 
+	{
+		if(this.socket != null)
+			this.socket.close();
 	}
 }

@@ -9,6 +9,7 @@ from utilities.lobbies import Lobbies
 from pong.scritps import constants
 from pong.scritps.ball import Ball
 from pong.scritps import PongGameManager
+from utilities.lobby import Lobby
 
 lobbies = Lobbies()
 
