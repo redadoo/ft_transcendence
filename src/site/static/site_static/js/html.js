@@ -298,6 +298,8 @@ const html = {
 		</div>
 	`,
 
+	singleplayerPong: `<div></div>`,
+
 	liarsbar: `
 	<div> </div>
 	`,

@@ -17,7 +17,7 @@ const router = {
 			'/profile': 'profile',
 			'/register': 'register',
 			'/singleplayer': 'singleplayer',
-			'/singleplayer/pong': 'pong',
+			'/singleplayer/pong': 'singleplayerPong',
 		};
 
 		this.setupEventListeners();

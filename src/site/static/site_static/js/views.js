@@ -109,16 +109,29 @@ const views = {
 		if (!await api.checkAuth()) { router.navigateTo('/login'); }
 		return html.singleplayer;
 	},
+
 	async pong() {
 		if (!await api.checkAuth()) { router.navigateTo('/login'); }
 		return html.pong;
 	},
+
+	async singleplayerPong() {
+		if (!await api.checkAuth()) { router.navigateTo('/login'); }
+		return html.singleplayerPong;
+	},
+
 	async liarsbar() {
 		if (!await api.checkAuth()) { router.navigateTo('/login'); }
 		return html.liarsbar;
 	},
 
 	pongScripts() {
+		import('../../pong_static/js/Game.js')
+		.catch(e => console.error('Pong script error:', e));
+	},
+
+	singleplayerPongScripts() {
+		console.log("stanco capo");
 		import('../../pong_static/js/Game.js')
 		.catch(e => console.error('Pong script error:', e));
 	},

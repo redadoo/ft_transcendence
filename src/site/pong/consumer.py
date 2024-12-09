@@ -9,7 +9,7 @@ from utilities.lobbies import Lobbies
 from pong.scritps import constants
 from pong.scritps.ball import Ball
 from pong.scritps import PongGameManager
-from utilities.lobby import Lobby
+from utilities.lobbies import Lobbies
 
 lobbies = Lobbies()
 
@@ -58,7 +58,7 @@ class PongMatchmaking(AsyncWebsocketConsumer):
 		room_name = event["room_name"]
 		print(room_name)
 		await self.send(text_data=json.dumps({
-			"type": "init_lobby", 
+			"type": "setup_pong_lobby", 
 			"room_name": room_name
 			}))
 
@@ -67,8 +67,12 @@ class PongSingleplayerConsumer(AsyncWebsocketConsumer):
 	game_over = False
 
 	async def connect(self):
-		# Recupera il nome della stanza dall'URL
-		self.room_name = self.scope["url_route"]["kwargs"]["room_name"]
+		room_name_dict = self.scope["url_route"]["kwargs"]
+		room_name_components = [str(value) for value in room_name_dict.values()]
+		room_name_components.append(str(uuid.uuid4()))
+
+		# Convert room name components to a single string
+		self.room_name = "_".join(room_name_components)
 		self.room_group_name = f"pong_singleplayer_{self.room_name}"
 
 		# Crea o recupera la lobby usando la classe Lobbies
@@ -257,22 +261,6 @@ class PongSingleplayerConsumer(AsyncWebsocketConsumer):
 				}
 			)
 		)
-
-	async def external_start_game(self, event):
-			"""
-			Handle the start game event triggered from the API.
-			"""
-			if not self.game_started:
-				self.game_started = True
-				await self.send(text_data=json.dumps({"type": "system", "message": event["message"]}))
-				asyncio.create_task(self.game_loop())
-
-	async def external_update_player(self, event):
-		async with self.update_lock:
-			player = self.lobby["players"].get(event["player_id"])
-			if player:
-				player.update_from_dict(event["player_data"])
-				await self.broadcast_lobby()
 
 class PongMultiplayerConsumer(AsyncWebsocketConsumer):
 

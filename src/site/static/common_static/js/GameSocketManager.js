@@ -43,7 +43,7 @@ export default class GameSocketManager {
 	 */
 	async initGameWebSocket(gameName, handleSocketMessage, roomName) {
 		try {
-			const mode = this.getModeFromPath();
+			const mode = GameSocketManager.getModeFromPath();
 			
 			const socketUrl = `ws://${window.location.host}/ws/${mode}/${gameName}/${roomName}`;
 			this.socket = new WebSocket(socketUrl);

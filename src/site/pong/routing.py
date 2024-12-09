@@ -3,7 +3,7 @@ from .consumer import *
 
 websocket_pong_urlpatterns = [
     re_path(
-        r"ws/singleplayer/pong/(?P<room_name>[\w\-]+)$",
+        r"ws/singleplayer/pong/",
         PongSingleplayerConsumer.as_asgi()
     ),
     re_path(
