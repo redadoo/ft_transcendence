@@ -274,7 +274,6 @@ class PongSingleplayerConsumer(AsyncWebsocketConsumer):
 				await self.broadcast_lobby()
 
 class PongMultiplayerConsumer(AsyncWebsocketConsumer):
-	matchmaking_queue = []
 
 	async def connect(self):
 		# Recupera il nome della stanza dall'URL
@@ -449,3 +448,25 @@ class PongMultiplayerConsumer(AsyncWebsocketConsumer):
 	def start_game(self):
 		"""Avvia il gioco."""
 		self.lobby["ball"].reset()
+
+class PongMultiplayerConsumerV2(AsyncWebsocketConsumer):
+
+	async def connect(self):
+		self.room_name = self.scope["url_route"]["kwargs"]["room_name"]
+		self.room_group_name = f"pong_multiplayer_{self.room_name}"
+
+		self.lobby = self.lobbies._create_lobby(self.room_name,  PongGameManager())
+		self.update_lock = asyncio.Lock()
+
+		await self.channel_layer.group_add(self.room_group_name, self.channel_name)
+		await self.accept()
+		await self.send(text_data=json.dumps(self.lobby.to_dict()))
+
+	async def disconnect(self, close_code):
+		await self.close()
+
+	async def receive(self, text_data):
+		pass
+
+	async def broadcast_lobby(self):
+		pass

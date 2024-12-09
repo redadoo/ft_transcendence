@@ -287,7 +287,7 @@ const html = {
 	`,
 
 	pong: `
-		<div id="testId" class="container-fluid game-container">
+		<div id="pong-container" class="container-fluid game-container">
 			<div class="row h-100">
 				<div class="col d-flex justify-content-center align-items-center">
 					<button id="startMatchmaking" class="btn btn-primary btn-lg">

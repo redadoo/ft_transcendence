@@ -69,17 +69,21 @@ class Game {
 
 	async startMatchmaking() 
 	{
-		this.gameSocket = new GameSocketManager();
-		this.gameSocket.initWebSocket(
-			'multiplayer/pong/matchmaking',
-			this.handleMatchmakingSocketMessage.bind(this));
-
-		this.gameSocket.socket.onopen = () => {
-			console.log("WebSocket connection established. Sending matchmaking request.");
-			this.gameSocket.send(JSON.stringify({
-				action: 'join_matchmaking'
-			}));
-		};
+		if (this.isInit === false)
+		{
+			this.gameSocket = new GameSocketManager();
+			this.gameSocket.initWebSocket(
+				'multiplayer/pong/matchmaking',
+				this.handleMatchmakingSocketMessage.bind(this));
+				
+			this.gameSocket.socket.onopen = () => {
+				console.log("WebSocket connection established. Sending matchmaking request.");
+				this.gameSocket.send(JSON.stringify({
+					action: 'join_matchmaking'
+				}));
+			};
+		}
+		isInit = true;
 	}
 
 	handleMatchmakingSocketMessage(event)
@@ -102,7 +106,10 @@ class Game {
 
 	initLobby(data)
 	{
-		document.getElementById("testId").remove();
+		//remove html in pong
+		document.getElementById("pong-container").remove();
+
+		//restablish socket connection to pong backend
 		this.gameSocket.close();
 		this.gameSocket.initGameWebSocket(
 			'pong',
@@ -134,8 +141,6 @@ class Game {
 				});
 
 		this.sceneManager.setExternalFunction(() => this.fixedUpdate());
-		console.log("si va aaaalleleltl = ");
-
 	}
 
 	initScene()
@@ -146,15 +151,11 @@ class Game {
 		room.scene.position.set(800, -134, 191);
 		room.scene.rotation.y = Math.PI / -2;
 		this.sceneManager.scene.add(room.scene);
-		console.log("arriviamo = ");
 	}
 
 	initPaddles()
 	{
-		if (this.mode == "singleplayer")
-			this.pongEnemy = new pongEnemy(this.gameSocket);
-		else
-			this.pongEnemy = new Paddle(0.7, 4, 1.2, 0xffffff);
+		this.pongEnemy = new Paddle(0.7, 4, 1.2, 0xffffff);
 	}
 
 	initializeLights() 
@@ -172,6 +173,7 @@ class Game {
 		this.bounds = new Bounds(data.bounds["xMin"], data.bounds["xMax"], data.bounds["yMin"], data.bounds["yMax"]);
 	
 		// Configura il giocatore locale
+		console.log(data);
 		const playerData = Object.values(data.players).find(player => player.id === data.playerId);
 		this.pongPlayer = new PongPlayer('KeyW', 'KeyS', this.gameSocket, data.playerId, playerData);
 		// Configura l'avversario
@@ -214,7 +216,7 @@ class Game {
 	}
 
 	fixedUpdate() {
-		if (!this.pongPlayer || !this.pongOpponent) return;
+		// if (!this.pongPlayer || !this.pongOpponent) return;
 	
 		// Aggiorna la posizione del giocatore locale
 		this.pongPlayer.paddle.mesh.position.y = this.pongPlayer.newY;
