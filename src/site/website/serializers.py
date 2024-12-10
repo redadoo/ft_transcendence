@@ -107,8 +107,8 @@ class UserProfileSerializer(serializers.ModelSerializer):
 
 class SimpleUserProfileSerializer(serializers.ModelSerializer):
     image_url = UserImageSerializer(source='user_image', read_only=True)
-    status = serializers.CharField(source='user_stat.status', read_only=True)
-
+    status = serializers.CharField(source='get_status_display', read_only=True)
+	
     class Meta:
         model = User
         fields = ['username', 'image_url', 'status']

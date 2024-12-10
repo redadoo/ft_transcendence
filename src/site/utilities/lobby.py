@@ -4,9 +4,10 @@ class Lobby:
 
 	class LobbyStatus(Enum):
 		TO_SETUP = 0
-		PLAYING = 1
+		READY = 1
+		PLAYING = 2
 		ENDED = 3
-		WAITING_PLAYER_RECONNECTION = 4
+		WAITING_PLAYER_RECONNECTION = 5
 
 	def __init__(self, game_manager) -> None:
 		self.players_id = []
@@ -22,6 +23,7 @@ class Lobby:
 		if player_id not in self.players_id:
 			self.players_id.append(player_id)
 			if len(self.players_id) == self.game_manager.max_players:
+				self.lobby_status = Lobby.LobbyStatus.READY
 				self.game_manager.init_player(self.players_id)
 		else:
 			print(f"Player {player_id} already exists in lobby.")

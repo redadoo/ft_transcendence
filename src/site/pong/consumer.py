@@ -467,11 +467,12 @@ class PongMultiplayerConsumerV2(AsyncWebsocketConsumer):
 				case _:
 					print(f"Unhandled event type: {event_type}")
 
-	async def broadcast_lobby(self):
+	async def broadcast_lobby(self, type):
 		await self.channel_layer.group_send(
 			self.room_group_name,
 			{
-				"type": "state_update",
+				"type": type,
+				"lobby": self.lobby.to_dict()
 			}
 		)
 
