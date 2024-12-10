@@ -13,11 +13,18 @@ class Lobby:
 		self.lobby_status = Lobby.LobbyStatus.TO_SETUP
 		self.game_manager = game_manager
 
-	def add_player(self, player_id):
-		self.players_id.append(player_id)
-		print(f"id new player :{player_id}")
-		if len(self.players_id) == self.game_manager.max_players:
-			self.game_manager.init_player(self.players_id)
+	def add_player(self, data):
+		player_id = data.get("player_id") 
+		if player_id == None:
+			print(f"player_id is None when trying to get it from data")
+			return
+		
+		if player_id not in self.players_id:
+			self.players_id.append(player_id)
+			if len(self.players_id) == self.game_manager.max_players:
+				self.game_manager.init_player(self.players_id)
+		else:
+			print(f"Player {player_id} already exists in lobby.")
 
 	def remove_player(self, player_id):
 		self.lobby_status = Lobby.LobbyStatus.WAITING_PLAYER_RECONNECTION

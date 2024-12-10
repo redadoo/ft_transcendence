@@ -443,17 +443,12 @@ class PongMultiplayerConsumerV2(AsyncWebsocketConsumer):
 	async def connect(self):
 		self.room_name = self.scope["url_route"]["kwargs"]["room_name"]
 		self.room_group_name = f"pong_multiplayer_{self.room_name}"
-		print(f"Connecting client to room: {self.room_group_name}")
 	
 		self.update_lock = asyncio.Lock()
 		self.lobby = lobbies._get_lobby(self.room_name) 
 		if self.lobby == None:
 			self.lobby = lobbies._create_lobby(self.room_name,  PongGameManager())
-			print(f"Created new lobby: {self.room_name}")
-		else:
-			print(f"joined lobby: {self.room_name}")
 
-		print(f"self.channel_name : {self.channel_name}")
 		await self.channel_layer.group_add(self.room_group_name, self.channel_name)
 		await self.accept()
 
@@ -464,21 +459,27 @@ class PongMultiplayerConsumerV2(AsyncWebsocketConsumer):
 		async with self.update_lock:
 			data = json.loads(text_data)
 			event_type = data.get("type")
-			print(f"Received event: {event_type} with data: {data}")
 
 			match event_type:
 				case "init_player":
-					player_id = data.get("player_id")
-					if player_id not in self.lobby.players_id:
-						self.lobby.add_player(player_id)
-						print(f"Added player {player_id} to lobby {self.room_name}")
-					else:
-						print(f"Player {player_id} already exists in lobby.")
+					self.lobby.add_player(data)
 					await self.broadcast_lobby()
-
 				case _:
 					print(f"Unhandled event type: {event_type}")
 
-
 	async def broadcast_lobby(self):
-		pass
+		await self.channel_layer.group_send(
+			self.room_group_name,
+			{
+				"type": "state_update",
+			}
+		)
+
+	async def state_update(self, event):
+		"""Aggiorna lo stato lato client."""
+
+		await self.send(
+			text_data=json.dumps({
+				"type": "stateUpdate",
+			})
+		)
