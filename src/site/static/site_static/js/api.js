@@ -45,6 +45,15 @@ const api = {
 		}
 	},
 
+	async getUsers() {
+		try {
+			return await this.fetchJson('/api/users');
+		} catch (error) {
+			console.error('Users error:', error);
+			return false;
+		}
+	},
+
 	async getProfileInfo() {
 		try {
 			return await this.fetchJson('/api/profile?include=created_at&include=history');
