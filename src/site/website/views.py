@@ -47,5 +47,5 @@ class UsersView(APIView):
 
         # Fetch all users and serialize with specific fields
         users = User.objects.all()
-        serializer = SimpleUserProfileSerializer(users, many=True, fields=fields)
+        serializer = SimpleUserProfileSerializer(users, many=True)
         return Response(serializer.data)
