@@ -1,4 +1,5 @@
 const views = {
+	overlay: new overlayManager(),
 	// Auth views
 	async alreadyLoggedIn() {
 		return html.alreadyLoggedIn;
@@ -15,7 +16,7 @@ const views = {
 		document.getElementById('overlay').innerHTML = html.overlay;
 		document.getElementById('statusOverlay').innerHTML = html.statusOverlay;
 		document.getElementById('header').innerHTML = html.header;
-		overlayManager.addEventListeners();
+		this.overlay.initialize();
 		const data = await api.getHeaderInfo();
 		['profileBtn', 'notificationBtn'].forEach(id => document.getElementById(id).classList.remove('d-none'));
 		document.getElementById('headerUsername').textContent = data.username;
@@ -87,7 +88,7 @@ const views = {
 	},
 
 	async logout() {
-		overlayManager.removeEventListener();
+		this.overlay.cleanup();
 		await api.logout();
 		['profileBtn', 'notificationBtn'].forEach(id => document.getElementById(id).classList.add('d-none'));
 		router.navigateTo('/login');
@@ -131,6 +132,7 @@ const views = {
 	},
 
 	singleplayerPongScripts() {
+		console.log("stanco capo");
 		import('../../pong_static/js/Game.js')
 		.catch(e => console.error('Pong script error:', e));
 	},
