@@ -104,7 +104,6 @@ class UserProfileSerializer(serializers.ModelSerializer):
 		)
 		return FriendshipsSerializer(friendships, many=True).data
 	
-
 class SimpleUserProfileSerializer(serializers.ModelSerializer):
     image_url = UserImageSerializer(source='user_image', read_only=True)
     status = serializers.CharField(source='get_status_display', read_only=True)

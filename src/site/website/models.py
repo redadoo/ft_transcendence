@@ -172,10 +172,6 @@ class Friendships(models.Model):
 	class Meta:
 		db_table = "Friendships"
 		
-		constraints = [
-			models.UniqueConstraint(fields=['first_user', 'second_user'], name='unique_friendships friendships')
-		]
-
 		indexes = [
 			models.Index(fields=['status']),
 			models.Index(fields=['first_user']),
