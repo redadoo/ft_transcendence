@@ -78,28 +78,41 @@ const matchHistory = {
 };
 
 const overlayManager = {
-	container: document.getElementById('overlay'),
+	overlay: document.getElementById('overlay'),
+	overlayStatus: document.getElementById('statusOverlay'),
 	handleKeyboardShortcutsBound: null,
 
-	toggle() {
-		if (this.container.classList.contains('d-none')) {
-			this.show();
+	toggle(overlay) {
+		console.log('Toggling overlay');
+		if (overlay.classList.contains('d-none')) {
+			this.show(overlay);
 		} else {
-			this.hide();
+			this.hide(overlay);
 		}
 	},
 
-	show() {
-		this.container.classList.remove('d-none');
+	show(overlay) {
+		overlay.classList.remove('d-none');
 	},
 
-	hide() {
-		this.container.classList.add('d-none');
+	hide(overlay) {
+		overlay.classList.add('d-none');
 	},
 
 	addEventListeners() {
+		tabs = document.querySelectorAll('.tab');
+		notificationBtn = document.getElementById('notificationBtn');
+		userStatus = document.getElementById('userStatus');
+		userStatusOptions = document.querySelectorAll('.nav-link-right.user-status');
+
 		this.handleKeyboardShortcutsBound = this.handleKeyboardShortcuts.bind(this);
+
+		notificationBtn?.addEventListener('click', () => this.toggle(this.overlay));
+		this.overlay.addEventListener('click', (e) => { if (e.target === this.overlay) this.hide(this.overlay); });
 		document.body.addEventListener('keydown', this.handleKeyboardShortcutsBound);
+		tabs.forEach(tab => { tab.addEventListener('click', () => this.handleTabSwitch(tabs, tab)); });
+		userStatus?.addEventListener('click', (e) => { e.stopPropagation(); this.toggle(this.overlayStatus); });
+		userStatusOptions.forEach(statusOption => { statusOption.addEventListener('click', () => this.handleStatusChange(statusOption)); });
 	},
 
 	removeEventListener() {
@@ -109,10 +122,25 @@ const overlayManager = {
 	handleKeyboardShortcuts(e) {
 		if (e.key === 'Tab') {
 			e.preventDefault();
-			this.toggle();
+			this.toggle(this.overlay);
 		} else if (e.key === 'Escape') {
-			this.hide();
+			this.hide(this.overlay);
 		}
+	},
+
+	handleTabSwitch(tabs, selectedTab) {
+		tabs.forEach(tab => tab.classList.toggle('active', tab === selectedTab));
+		// const selectedType = selectedTab.textContent.trim().toLowerCase();
+	},
+
+	handleStatusChange(statusOption) {
+		userStatus = document.getElementById('userStatus');
+		newStatus = statusOption.dataset.status;
+
+		userStatus.textContent = newStatus;
+		userStatus.className = `friend-status ${newStatus.toLowerCase()}`;
+
+		this.hide(this.overlayStatus);
 	},
 };
 

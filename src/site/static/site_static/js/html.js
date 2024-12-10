@@ -370,7 +370,7 @@ const html = {
 		<div class="friends-sidebar">
 			<div class="friends-header pixel-font" style="text-align: right;">
 				<span id="overlayUsername"></span>
-				<span class="friend-status online">Online</span>
+				<span class="friend-status online" id="userStatus">Online</span>
 			</div>
 
 			<div class="friends-search">
@@ -393,7 +393,7 @@ const html = {
 
 	statusOverlay: `
 		<div class="row h-100">
-		<div class="col-3"></div>
+			<div class="col-3"></div>
 			<div class="col-9 px-0">
 				<nav class="nav-wrapper">
 					<div class="d-flex flex-column">

@@ -645,6 +645,7 @@ label {
 	color: rgba(255, 255, 255, 0.5);
 	font-size: 12px;
 	font-family: "Press Start 2P";
+	cursor: pointer;
 }
 .friend-status.online { color: #4ba644; }
 .friend-status.offline { color: #de4f5d; }

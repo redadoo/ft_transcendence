@@ -13,7 +13,7 @@ const views = {
 	async home() {
 		if (!await api.checkAuth()) { return router.navigateTo('/login'); }
 		document.getElementById('overlay').innerHTML = html.overlay;
-		document.getElementById('status-overlay').innerHTML = html.statusOverlay;
+		document.getElementById('statusOverlay').innerHTML = html.statusOverlay;
 		document.getElementById('header').innerHTML = html.header;
 		overlayManager.addEventListeners();
 		const data = await api.getHeaderInfo();
