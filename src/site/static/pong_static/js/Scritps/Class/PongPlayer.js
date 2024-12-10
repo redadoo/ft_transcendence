@@ -16,6 +16,16 @@ export default class PongPlayer {
 		this.setUpEvents();
 	}
 
+	updatePosition(newY)
+	{
+	  this.newY = newY;
+	}
+  
+	syncPosition()
+	{
+	  this.paddle.mesh.position.y = this.newY;
+	}
+
 	setUpEvents()
 	{
 		this.input.addEvent('keydown', this.handleKeyDown.bind(this));

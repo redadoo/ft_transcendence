@@ -453,6 +453,7 @@ class PongMultiplayerConsumerV2(AsyncWebsocketConsumer):
 		await self.accept()
 
 	async def disconnect(self, close_code):
+		await self.broadcast_lobby("lobbyInfo")
 		await self.channel_layer.group_discard(self.room_group_name, self.channel_name)
 
 	async def receive(self, text_data):
@@ -463,7 +464,12 @@ class PongMultiplayerConsumerV2(AsyncWebsocketConsumer):
 			match event_type:
 				case "init_player":
 					self.lobby.add_player(data)
-					await self.broadcast_lobby()
+					brodcast_event_type = "lobbyInfo"
+					if self.lobby.is_full() == True:
+						brodcast_event_type = "initGame"
+					else:
+						brodcast_event_type = "lobbyInfo"
+					await self.broadcast_lobby(brodcast_event_type)
 				case _:
 					print(f"Unhandled event type: {event_type}")
 
@@ -471,8 +477,8 @@ class PongMultiplayerConsumerV2(AsyncWebsocketConsumer):
 		await self.channel_layer.group_send(
 			self.room_group_name,
 			{
-				"type": type,
-				"lobby": self.lobby.to_dict()
+				"type": "state_update",
+				"message_type": type,
 			}
 		)
 
@@ -481,6 +487,7 @@ class PongMultiplayerConsumerV2(AsyncWebsocketConsumer):
 
 		await self.send(
 			text_data=json.dumps({
-				"type": "stateUpdate",
+				"type": event["message_type"],
+				"lobby": self.lobby.to_dict()
 			})
 		)

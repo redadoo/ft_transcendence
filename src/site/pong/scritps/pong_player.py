@@ -32,7 +32,8 @@ class PongPlayer:
 
 	def to_dict(self):
 		"""Converte l'oggetto in un dizionario per il broadcasting."""
-		data = {
+		
+		return {
 			"status": self.status.name,
 			"id": self.id,
 			"x": self.x,
@@ -45,4 +46,3 @@ class PongPlayer:
 			"isMovingUp": self.isMovingUp,
 			"isMovingDown": self.isMovingDown,
 		}
-		return data

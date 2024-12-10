@@ -29,6 +29,7 @@ class Game {
 		this.pongOpponent = null;
 		this.ball = null;
 		this.background = null;
+		this.player_id = null;
 
 		// Networking
 		this.gameSocket = null;
@@ -86,6 +87,7 @@ class Game {
 		
 		const response = await fetch("/api/profile?include=id");
 		const json_response = await response.json();
+		this.player_id = json_response["id"];
 
 		this.gameSocket.close();
 		delete this.gameSocket;
@@ -96,10 +98,11 @@ class Game {
 			data.room_name
 		);
 
+
 		this.gameSocket.socket.onopen = () => {
 			this.gameSocket.send(JSON.stringify({ 
 				type: 'init_player', 
-				player_id: json_response["id"]
+				player_id: this.player_id
 			}));
 		};
 		
@@ -163,29 +166,53 @@ class Game {
 	}
 
 	initGame(data) {
-		this.bounds = new Bounds(data.bounds.xMin, data.bounds.xMax, data.bounds.yMin, data.bounds.yMax);
+		try {
+			const bounds_data = data?.lobby?.game_manager?.bounds;
+			const ball_data = data?.lobby?.game_manager?.ball;
+			const players = data?.lobby?.game_manager?.players;
+	
+			if (!bounds_data || !ball_data || !players) {
+				console.error("Game data is missing or incomplete:", data);
+				return;
+			}
+	
+			this.bounds = new Bounds(bounds_data.xMin, bounds_data.xMax, bounds_data.yMin, bounds_data.yMax);
+	
+			const playerData = players[this.player_id];
+			if (!playerData) {
+				console.error(`Player data not found for player ID: ${this.player_id}`);
+				return;
+			}
+			this.pongPlayer = new PongPlayer('KeyW', 'KeyS', this.gameSocket, this.player_id, playerData);
+	
+			const opponentId = Object.keys(players).find(id => id != this.player_id);
+			if (!opponentId) {
+				console.error("No opponent found in players data:", players);
+				return;
+			}
 
-		// Player setup
-		const playerData = Object.values(data.players).find(p => p.id === data.playerId);
-		this.pongPlayer = new PongPlayer('KeyW', 'KeyS', this.gameSocket, data.playerId, playerData);
+			console.log(`opponent player id is ${opponentId} my id is ${this.player_id}`);
 
-		// Opponent setup
-		const opponentId = Object.keys(data.players).find(id => id !== data.playerId);
-		const opponentData = data.players[opponentId];
-		this.pongOpponent = new PongPlayer(null, null, this.gameSocket, opponentId, opponentData);
-
-		this.ball = new Ball(data.ball.radius);
-		this.background = new Background(this.sceneManager.scene, this.bounds.xMax * 2, this.bounds.yMax * 2);
-
-		// Add elements to the scene
-		this.sceneManager.scene.add(this.ball.mesh);
-		this.sceneManager.scene.add(this.pongPlayer.paddle.mesh);
-		this.sceneManager.scene.add(this.pongOpponent.paddle.mesh);
-
-		// Notify server
-		this.gameSocket.send(JSON.stringify({ type: 'ready', playerId: this.pongPlayer.playerId }));
+			const opponentData = players[opponentId];
+			this.pongOpponent = new PongPlayer(null, null, this.gameSocket, opponentId, opponentData);
+	
+			this.ball = new Ball(ball_data.radius);
+	
+			this.background = new Background(this.sceneManager.scene, this.bounds.xMax * 2, this.bounds.yMax * 2);
+	
+			this.sceneManager.scene.add(this.ball.mesh);
+			this.sceneManager.scene.add(this.pongPlayer.paddle.mesh);
+			this.sceneManager.scene.add(this.pongOpponent.paddle.mesh);
+	
+			console.log("Player initialized:", this.pongPlayer);
+			console.log("Opponent initialized:", this.pongOpponent);
+	
+			this.gameSocket.send(JSON.stringify({ type: 'ready', playerId: this.pongPlayer.playerId }));
+		} catch (error) {
+			console.error("An error occurred during game initialization:", error);
+		}
 	}
-
+	
 	updateGameState(data) {
 		if (data.ball) 
 			this.ball.updatePosition(data.ball);
@@ -212,7 +239,11 @@ class Game {
 	handleGameSocketMessage(event) {
 		try {
 			const data = JSON.parse(event.data);
+			console.log(data);
 			switch (data.type) {
+				case 'lobbyInfo':
+					console.log("ricevuto lobby info");
+					break;
 				case 'initGame':
 					this.initGame(data);
 					break;

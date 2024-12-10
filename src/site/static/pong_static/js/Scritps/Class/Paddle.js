@@ -39,14 +39,4 @@ export default class Paddle {
 	  this.mesh.position.y = bounds.yMax - this.mesh.geometry.parameters.height / 2;
 	}
   }
-  
-  updatePosition(newY)
-  {
-	this.newY = newY;
-  }
-
-  syncPosition()
-  {
-	this.mesh.position.y = this.pongPlayer.newY;
-  }
 }

@@ -32,6 +32,9 @@ class Lobby:
 		self.lobby_status = Lobby.LobbyStatus.WAITING_PLAYER_RECONNECTION
 		self.game_manager.player_disconnected(player_id)
 
+	def is_full(self):
+		return len(self.players_id) == self.game_manager.max_players
+
 	def to_dict(self):
 		"""
 		Converts the lobby to a dictionary.

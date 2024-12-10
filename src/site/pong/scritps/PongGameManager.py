@@ -47,5 +47,5 @@ class PongGameManager:
 			"scores": self.score,
 			"ball": self.ball.to_dict(),
 			"bounds": constants.GAME_BOUNDS,
-			"players": [player.to_dict() for player in self.players],
+			"players": {player_id: player.to_dict() for player_id, player in self.players.items()},
 		}

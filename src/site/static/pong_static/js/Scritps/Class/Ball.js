@@ -22,7 +22,7 @@ export default class Ball
 
   	syncPosition()
 	{
-		this.mesh.position.x = this.ball.newPosX;
-		this.mesh.position.y = this.ball.newPosY;
+		this.mesh.position.x = this.newPosX;
+		this.mesh.position.y = this.newPosY;
 	}
 }
