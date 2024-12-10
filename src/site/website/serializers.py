@@ -103,3 +103,23 @@ class UserProfileSerializer(serializers.ModelSerializer):
 			models.Q(first_user=obj) | models.Q(second_user=obj)
 		)
 		return FriendshipsSerializer(friendships, many=True).data
+	
+
+class SimpleUserProfileSerializer(serializers.ModelSerializer):
+    image_url = UserImageSerializer(source='user_image', read_only=True)
+    status = serializers.CharField(source='user_stat.status', read_only=True)
+
+    class Meta:
+        model = User
+        fields = ['username', 'image_url', 'status']
+        read_only_fields = ['username', 'image_url', 'status']
+
+    def __init__(self, *args, **kwargs):
+        fields = kwargs.pop('fields', None)
+        super().__init__(*args, **kwargs)
+        
+        if fields:
+            allowed = set(fields)
+            existing = set(self.fields)
+            for field_name in existing - allowed:
+                self.fields.pop(field_name)
