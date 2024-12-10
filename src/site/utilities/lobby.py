@@ -4,16 +4,24 @@ class Lobby:
 
 	class LobbyStatus(Enum):
 		TO_SETUP = 0
-		WAITING_OTHER_PLAYER_CONNECTION = 1
-		WAITING_PLAYER_RECONNECTION = 2
-		PLAYING = 3
-		ENDED = 4
+		PLAYING = 1
+		ENDED = 3
+		WAITING_PLAYER_RECONNECTION = 4
 
 	def __init__(self, game_manager) -> None:
-		self.max_player = game_manager.max_player
-		self.players = []
+		self.players_id = []
 		self.lobby_status = Lobby.LobbyStatus.TO_SETUP
 		self.game_manager = game_manager
+
+	def add_player(self, player_id):
+		self.players_id.append(player_id)
+		print(f"id new player :{player_id}")
+		if len(self.players_id) == self.game_manager.max_players:
+			self.game_manager.init_player(self.players_id)
+
+	def remove_player(self, player_id):
+		self.lobby_status = Lobby.LobbyStatus.WAITING_PLAYER_RECONNECTION
+		self.game_manager.player_disconnected(player_id)
 
 	def to_dict(self):
 		"""

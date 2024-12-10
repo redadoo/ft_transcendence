@@ -1,7 +1,15 @@
+from enum import Enum
 from pong.scritps import constants
 
 class PongPlayer:
+
+	class PlayerConnectionState(Enum):
+		CONNECTED = 0
+		DISCONNECTED = 1
+
 	def __init__(self, player_id, x,  color):
+
+		self.status = PongPlayer.PlayerConnectionState.CONNECTED
 		self.id = player_id
 		self.x = x
 		self.y = 0
@@ -25,6 +33,7 @@ class PongPlayer:
 	def to_dict(self):
 		"""Converte l'oggetto in un dizionario per il broadcasting."""
 		data = {
+			"status": self.status.name,
 			"id": self.id,
 			"x": self.x,
 			"y": self.y,

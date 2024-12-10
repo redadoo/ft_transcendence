@@ -8,7 +8,7 @@ from pong.scritps.ai import PongAI
 from utilities.lobbies import Lobbies
 from pong.scritps import constants
 from pong.scritps.ball import Ball
-from pong.scritps import PongGameManager
+from pong.scritps.PongGameManager import PongGameManager
 from utilities.lobbies import Lobbies
 
 lobbies = Lobbies()
@@ -443,19 +443,42 @@ class PongMultiplayerConsumerV2(AsyncWebsocketConsumer):
 	async def connect(self):
 		self.room_name = self.scope["url_route"]["kwargs"]["room_name"]
 		self.room_group_name = f"pong_multiplayer_{self.room_name}"
-
-		self.lobby = self.lobbies._create_lobby(self.room_name,  PongGameManager())
+		print(f"Connecting client to room: {self.room_group_name}")
+	
 		self.update_lock = asyncio.Lock()
+		self.lobby = lobbies._get_lobby(self.room_name) 
+		if self.lobby == None:
+			self.lobby = lobbies._create_lobby(self.room_name,  PongGameManager())
+			print(f"Created new lobby: {self.room_name}")
+		else:
+			print(f"joined lobby: {self.room_name}")
 
+		print(f"self.channel_name : {self.channel_name}")
 		await self.channel_layer.group_add(self.room_group_name, self.channel_name)
 		await self.accept()
-		await self.send(text_data=json.dumps(self.lobby.to_dict()))
 
 	async def disconnect(self, close_code):
-		await self.close()
+		await self.channel_layer.group_discard(self.room_group_name, self.channel_name)
 
 	async def receive(self, text_data):
-		pass
+		async with self.update_lock:
+			data = json.loads(text_data)
+			event_type = data.get("type")
+			print(f"Received event: {event_type} with data: {data}")
+
+			match event_type:
+				case "init_player":
+					player_id = data.get("player_id")
+					if player_id not in self.lobby.players_id:
+						self.lobby.add_player(player_id)
+						print(f"Added player {player_id} to lobby {self.room_name}")
+					else:
+						print(f"Player {player_id} already exists in lobby.")
+					await self.broadcast_lobby()
+
+				case _:
+					print(f"Unhandled event type: {event_type}")
+
 
 	async def broadcast_lobby(self):
 		pass

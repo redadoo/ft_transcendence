@@ -29,7 +29,6 @@ class Lobbies:
 		except:
 			raise Exception(f"error when add player to lobby")
 		
-					
 	def _get_lobby(self, room_name):
 		return self._lobbies.get(room_name, None)
 	

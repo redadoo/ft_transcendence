@@ -4,7 +4,7 @@
  */
 export default class GameSocketManager {
 	constructor() {
-		this.socket = null;
+		this.socket = undefined;
 	}
 
 	/**
@@ -13,6 +13,9 @@ export default class GameSocketManager {
 	 * @param {function} handleSocketMessage - Callback to handle incoming WebSocket messages.
 	 */
 	async initWebSocket(finalSocketUrl, handleSocketMessage) {
+		if (this.socket)
+			this.socket.close();
+		
 		try {
 			const socketUrl = `ws://${window.location.host}/ws/${finalSocketUrl}`;
 			this.socket = new WebSocket(socketUrl);
@@ -42,6 +45,13 @@ export default class GameSocketManager {
 	 * @param {string} roomName - The uuid of the room.
 	 */
 	async initGameWebSocket(gameName, handleSocketMessage, roomName) {
+
+		if (this.socket)
+		{
+			console.log("try to init connection with socket but the connection is already establish");
+			this.socket.close();
+		}
+		
 		try {
 			const mode = GameSocketManager.getModeFromPath();
 			
@@ -111,7 +121,12 @@ export default class GameSocketManager {
 
 	close() 
 	{
-		if(this.socket != null)
+		if(this.socket != undefined)
+		{
+			console.log("close socket connection and set to undefined the socket");
 			this.socket.close();
+			delete this.socket;
+			this.socket = undefined;
+		}
 	}
 }
