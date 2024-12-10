@@ -45,8 +45,6 @@ class FriendshipsSerializer(serializers.ModelSerializer):
 			'status_display',
 			'first_user_username',
 			'second_user_username',
-			'date_created',
-			'date_updated'
 		]
 		read_only_fields = ['date_created', 'date_updated']
 
@@ -111,8 +109,6 @@ class UserProfileSerializer(serializers.ModelSerializer):
 			friendships_data.append({
 				'status_display': friendship.get_status_display(),
 				'other_user_username': other_user.username,
-				'date_created': friendship.date_created,
-				'date_updated': friendship.date_updated,
 			})
 
 		return friendships_data
