@@ -30,7 +30,7 @@ class UserProfileView(APIView):
 			fields.append(field)
 
 		user = request.user
-		serializer = UserProfileSerializer(user, fields=fields)
+		serializer = UserProfileSerializer(user, fields=fields,context={'request': request})
 		return Response(serializer.data)
 	
 class UsersView(APIView):

@@ -42,12 +42,8 @@ class FriendshipsSerializer(serializers.ModelSerializer):
 	class Meta:
 		model = Friendships
 		fields = [
-			'id',
-			'status',
 			'status_display',
-			'first_user',
 			'first_user_username',
-			'second_user',
 			'second_user_username',
 			'date_created',
 			'date_updated'
@@ -99,10 +95,28 @@ class UserProfileSerializer(serializers.ModelSerializer):
 				self.fields.pop(field_name)
 
 	def get_friendships(self, obj):
+		current_user = self.context['request'].user
+		
 		friendships = Friendships.objects.filter(
 			models.Q(first_user=obj) | models.Q(second_user=obj)
 		)
-		return FriendshipsSerializer(friendships, many=True).data
+
+		friendships_data = []
+		for friendship in friendships:
+			if friendship.first_user == current_user:
+				other_user = friendship.second_user
+			else:
+				other_user = friendship.first_user
+			
+			friendships_data.append({
+				'status_display': friendship.get_status_display(),
+				'other_user_username': other_user.username,
+				'date_created': friendship.date_created,
+				'date_updated': friendship.date_updated,
+			})
+
+		return friendships_data
+
 	
 class SimpleUserProfileSerializer(serializers.ModelSerializer):
     image_url = UserImageSerializer(source='user_image', read_only=True)
