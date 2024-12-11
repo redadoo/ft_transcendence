@@ -68,6 +68,24 @@ class overlayManager {
 		this.userStatusOptions.forEach(statusOption => {
 			statusOption.addEventListener('click', () => this.handleStatusChange(statusOption));
 		});
+
+		document.addEventListener('click', (e) => {
+			const blockBtn = e.target.closest('#blockUser');
+			if (blockBtn) {
+				const friendItem = blockBtn.closest('.friend-item');
+				const username = friendItem.querySelector('.friend-name').textContent;
+				this.handleBlockUser(username);
+			}
+		});
+
+		document.addEventListener('click', (e) => {
+			const unblockBtn = e.target.closest('#unblockUser');
+			if (unblockBtn) {
+				const friendItem = unblockBtn.closest('.friend-item');
+				const username = friendItem.querySelector('.friend-name').textContent;
+				this.handleUnblockUser(username);
+			}
+		});
 	}
 
 	setupFriendList() {
@@ -136,10 +154,12 @@ class overlayManager {
 
 	createFriendElement(username, imageUrl, status) {
 		return `
-			<div class="friend-item">
+			<div class="friend-item" id="friendItem">
 				<img src="${imageUrl}" alt="avatar" class="friend-avatar">
 				<span class="friend-name pixel-font">${username}</span>
 				<span class="friend-status">${status}</span>
+				<span class="friend-action" id="openChat">💬</span>
+				<span class="friend-action" id="blockUser">🔒 </span>
 			</div>
 		`;
 	}
@@ -149,8 +169,26 @@ class overlayManager {
 			<div class="friend-item">
 				<img src="${imageUrl}" alt="avatar" class="friend-avatar">
 				<span class="friend-name pixel-font">${username}</span>
+				<span class="friend-action" id="unblockUser">🔓</span>
 			</div>
 		`;
+	}
+
+	handleBlockUser(username) {
+		if (!this.data.blockedUsers.includes(username)) {
+			this.data.blockedUsers.push(username);
+			this.data.friendUsers = this.data.friendUsers.filter(friend => friend !== username);
+
+			this.setupFriendList();
+		}
+	}
+
+	handleUnblockUser(username) {
+		if (this.data.blockedUsers.includes(username)) {
+			this.data.friendUsers.push(username);
+			this.data.blockedUsers = this.data.blockedUsers.filter(blocked => blocked !== username);
+			this.setupFriendList();
+		}
 	}
 
 	handleTabSwitch(selectedTab) {

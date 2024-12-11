@@ -370,7 +370,7 @@ const html = {
 		<div class="friends-sidebar">
 			<div class="friends-header pixel-font" style="text-align: right;">
 				<span id="overlayUsername"></span>
-				<span class="friend-status online" id="userStatus">Online</span>
+				<span class="friend-status online" style="cursor: pointer;" id="userStatus">Online</span>
 			</div>
 
 			<div class="friends-search">
