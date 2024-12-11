@@ -384,10 +384,10 @@ const html = {
 				<span class="tab blocked">BLOCKED</span>
 			</div>
 
-			<div class="friends-list" id="online-list"></div>
-			<div class="friends-list d-none" id="all-list"></div>
-			<div class="friends-list d-none" id="other-list"></div>
-			<div class="friends-list d-none" id="blocked-list"></div>
+			<div class="friends-list" id="onlineList"></div>
+			<div class="friends-list d-none" id="allList"></div>
+			<div class="friends-list d-none" id="otherList"></div>
+			<div class="friends-list d-none" id="blockedList"></div>
 		</div>
 	`,
 

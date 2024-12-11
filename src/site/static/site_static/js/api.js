@@ -36,11 +36,63 @@ const api = {
 		}
 	},
 
+	async getAllUsers() {
+		try {
+			return await this.fetchJson('/api/all_user/');
+
+		} catch (error) {
+			console.error('Users error:', error);
+			return false;
+		}
+	},
+
+	async getBlockedUsers() {
+		try {
+			const response = await this.fetchJson('/api/profile?include=friendships');
+
+			const blockedNames = response.friendships
+			.filter(friendship => friendship.status_display === 'block')
+			.map(friendship => friendship.other_user_username);
+
+			return blockedNames;
+		} catch (error) {
+			console.error('Blocked users error:', error);
+			return false;
+		}
+	},
+
+	async getFriendUsers() {
+		try {
+			const response = await this.fetchJson('/api/profile?include=friendships');
+
+			const friendNames = response.friendships
+			.filter(friendship => friendship.status_display === 'friends')
+			.map(friendship => friendship.other_user_username);
+
+			friendNames.push(response.username);
+
+			return friendNames;
+		} catch (error) {
+			console.error('Friendship info error:', error);
+			return false;
+		}
+	},
+
 	async getHeaderInfo() {
 		try {
 			return await this.fetchJson('/api/profile');
 		} catch (error) {
 			console.error('Header info error:', error);
+			return false;
+		}
+	},
+
+	async getUsername() {
+		try {
+			const data = await this.fetchJson('/api/profile');
+			return data.username;
+		} catch (error) {
+			console.error('Username error:', error);
 			return false;
 		}
 	},

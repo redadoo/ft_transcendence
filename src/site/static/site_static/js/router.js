@@ -20,6 +20,11 @@ const router = {
 			'/singleplayer/pong': 'singleplayerPong',
 		};
 
+		document.getElementById('overlay').innerHTML = html.overlay;
+		document.getElementById('statusOverlay').innerHTML = html.statusOverlay;
+		document.getElementById('header').innerHTML = html.header;
+
+		this.overlay = new overlayManager();
 		this.setupEventListeners();
 		this.handleLocation();
 	},

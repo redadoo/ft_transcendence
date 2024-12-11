@@ -1,47 +1,176 @@
 class overlayManager {
 	constructor() {
+		this.initializeElements();
+		this.data = {
+			username: null,
+			friendUsers: [],
+			blockedUsers: [],
+			allUsers: []
+		};
+	}
+
+	initializeElements() {
 		this.overlay = document.getElementById('overlay');
 		this.overlayStatus = document.getElementById('statusOverlay');
-
-		this.handleKeyboardShortcutsBound = this.handleKeyboardShortcuts.bind(this);
-	}
-
-	initialize() {
-		this.tabs = document.querySelectorAll('.tab');
 		this.notificationBtn = document.getElementById('notificationBtn');
 		this.userStatus = document.getElementById('userStatus');
+		this.overlayUsername = document.getElementById('overlayUsername');
+
+		this.lists = {
+			online: document.getElementById('onlineList'),
+			all: document.getElementById('allList'),
+			other: document.getElementById('otherList'),
+			blocked: document.getElementById('blockedList')
+		};
+
+		this.tabs = document.querySelectorAll('.tab');
 		this.userStatusOptions = document.querySelectorAll('.nav-link-right.user-status');
 
-		this.setupEventListeners();
+		this.handleKeyboardShortcuts = this.handleKeyboardShortcuts.bind(this);
 	}
 
-	setupEventListeners() {
-		this.notificationBtn?.addEventListener('click', () => this.toggle(this.overlay)); // Notification button
-		this.overlay.addEventListener('click', (e) => { if (e.target === this.overlay) this.hide(this.overlay); }); // Overlay click handling
-		document.body.addEventListener(	'keydown', this.handleKeyboardShortcutsBound); // Keyboard shortcuts
-		this.tabs.forEach(tab => { tab.addEventListener('click', () => this.handleTabSwitch(tab)); }); // Tab switching
-		this.userStatus?.addEventListener('click', (e) => { e.stopPropagation(); this.toggle(this.overlayStatus); }); // Status overlay handling
-		this.userStatusOptions.forEach(statusOption => { statusOption.addEventListener('click', () => this.handleStatusChange(statusOption)); }); // Status options
-	}
+	async initialize() {
+		try {
+			const [username, friendUsers, blockedUsers, allUsers] = await Promise.all([
+				api.getUsername(),
+				api.getFriendUsers(),
+				api.getBlockedUsers(),
+				api.getAllUsers()
+			]);
 
-	cleanup() {
-		document.body.removeEventListener('keydown', this.handleKeyboardShortcutsBound);
-	}
+			this.data = { username, friendUsers, blockedUsers, allUsers };
 
-	toggle(overlay) {
-		if (overlay.classList.contains('d-none')) {
-			this.show(overlay);
-		} else {
-			this.hide(overlay);
+			this.overlayUsername.textContent = username;
+			this.setupFriendList();
+			this.setupEventListeners();
+		} catch (error) {
+			console.error('Failed to initialize OverlayManager:', error);
 		}
 	}
 
-	show(overlay) {
-		overlay.classList.remove('d-none');
+	setupEventListeners() {
+		this.notificationBtn?.addEventListener('click', () => this.toggle(this.overlay));
+		this.overlay.addEventListener('click', (e) => {
+			if (e.target === this.overlay) this.hide(this.overlay);
+		});
+
+		document.body.addEventListener('keydown', this.handleKeyboardShortcuts);
+
+		this.tabs.forEach(tab => {
+			tab.addEventListener('click', () => this.handleTabSwitch(tab));
+		});
+
+		this.userStatus?.addEventListener('click', (e) => {
+			e.stopPropagation();
+			this.toggle(this.overlayStatus);
+		});
+
+		this.userStatusOptions.forEach(statusOption => {
+			statusOption.addEventListener('click', () => this.handleStatusChange(statusOption));
+		});
 	}
 
-	hide(overlay) {
-		overlay.classList.add('d-none');
+	setupFriendList() {
+		const { friendUsers, blockedUsers, allUsers } = this.data;
+		const getUserInfo = username => allUsers.find(user => user.username === username);
+		const lists = {
+			online: this.generateOnlineList(friendUsers, getUserInfo),
+			all: this.generateFriendList(friendUsers, getUserInfo),
+			other: null,
+			blocked: this.generateBlockedList(blockedUsers, getUserInfo)
+		};
+
+		Object.entries(lists).forEach(([key, content]) => {
+			if (this.lists[key]) {
+				this.lists[key].innerHTML = content || this.getEmptyStateMessage(key);
+			}
+		});
+	}
+
+	generateOnlineList(friendUsers, getUserInfo) {
+		return friendUsers
+			.map(getUserInfo)
+			.filter(friend => friend?.status === 'Online')
+			.map(friend => this.createFriendElement(
+				friend.username,
+				friend.image_url?.avatar_url || '/media/default_avatar.png',
+				friend.status
+			))
+			.join('');
+	}
+
+	generateFriendList(friendUsers, getUserInfo) {
+		return friendUsers
+			.map(friendName => {
+				const friend = getUserInfo(friendName);
+				return friend ? this.createFriendElement(
+					friend.username,
+					friend.image_url?.avatar_url || '/media/default_avatar.png',
+					friend.status
+				) : '';
+			})
+			.join('');
+	}
+
+	generateBlockedList(blockedUsers, getUserInfo) {
+		return blockedUsers
+			.map(blockedName => {
+				const blocked = getUserInfo(blockedName);
+				return blocked ? this.createBlockedElement(
+					blocked.username,
+					blocked.image_url?.avatar_url || '/media/default_avatar.png'
+				) : '';
+			})
+			.join('');
+	}
+
+	getEmptyStateMessage(listType) {
+		const messages = {
+			online: 'No online friends',
+			all: 'No friends added',
+			other: 'No other users',
+			blocked: 'No blocked users'
+		};
+		return `<div class="pixel-font no-friends">${messages[listType]}</div>`;
+	}
+
+	createFriendElement(username, imageUrl, status) {
+		return `
+			<div class="friend-item">
+				<img src="${imageUrl}" alt="avatar" class="friend-avatar">
+				<span class="friend-name pixel-font">${username}</span>
+				<span class="friend-status">${status}</span>
+			</div>
+		`;
+	}
+
+	createBlockedElement(username, imageUrl) {
+		return `
+			<div class="friend-item">
+				<img src="${imageUrl}" alt="avatar" class="friend-avatar">
+				<span class="friend-name pixel-font">${username}</span>
+			</div>
+		`;
+	}
+
+	handleTabSwitch(selectedTab) {
+		this.tabs.forEach(tab => tab.classList.toggle('active', tab === selectedTab));
+
+		const selectedType = selectedTab.textContent.trim().toLowerCase();
+		Object.entries(this.lists).forEach(([type, list]) => {
+			if (list) {
+				list.classList.toggle('d-none', type !== selectedType);
+			}
+		});
+	}
+
+	handleStatusChange(statusOption) {
+		const newStatus = statusOption.dataset.status;
+		if (this.userStatus) {
+			this.userStatus.textContent = newStatus;
+			this.userStatus.className = `friend-status ${newStatus.toLowerCase()}`;
+		}
+		this.hide(this.overlayStatus);
 	}
 
 	handleKeyboardShortcuts(event) {
@@ -56,16 +185,19 @@ class overlayManager {
 		}
 	}
 
-	handleTabSwitch(selectedTab) {
-		this.tabs.forEach(tab => {
-			tab.classList.toggle('active', tab === selectedTab);
-		});
+	toggle(overlay) {
+		overlay?.classList.contains('d-none') ? this.show(overlay) : this.hide(overlay);
 	}
 
-	handleStatusChange(statusOption) {
-		const newStatus = statusOption.dataset.status;
-		this.userStatus.textContent = newStatus;
-		this.userStatus.className = `friend-status ${newStatus.toLowerCase()}`;
-		this.hide(this.overlayStatus);
+	show(overlay) {
+		overlay?.classList.remove('d-none');
+	}
+
+	hide(overlay) {
+		overlay?.classList.add('d-none');
+	}
+
+	cleanup() {
+		document.body.removeEventListener('keydown', this.handleKeyboardShortcuts);
 	}
 }

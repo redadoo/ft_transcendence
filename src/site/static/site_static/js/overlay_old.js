@@ -15,7 +15,7 @@ document.addEventListener('DOMContentLoaded', function () {
 	class FriendsWebSocket {
 		constructor() {
 			this.connect();
-			this.reconnectAttempts = 0;
+			this.reconnectAttempts = 5;
 			this.maxReconnectAttempts = 5;
 			this.reconnectDelay = 5000;
 		}

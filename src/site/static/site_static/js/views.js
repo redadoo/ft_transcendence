@@ -1,5 +1,4 @@
 const views = {
-	overlay: new overlayManager(),
 	// Auth views
 	async alreadyLoggedIn() {
 		return html.alreadyLoggedIn;
@@ -13,10 +12,6 @@ const views = {
 
 	async home() {
 		if (!await api.checkAuth()) { return router.navigateTo('/login'); }
-		document.getElementById('overlay').innerHTML = html.overlay;
-		document.getElementById('statusOverlay').innerHTML = html.statusOverlay;
-		document.getElementById('header').innerHTML = html.header;
-		this.overlay.initialize();
 		const data = await api.getHeaderInfo();
 		['profileBtn', 'notificationBtn'].forEach(id => document.getElementById(id).classList.remove('d-none'));
 		document.getElementById('headerUsername').textContent = data.username;
@@ -36,6 +31,7 @@ const views = {
 			e.preventDefault();
 			const res = await api.login(document.getElementById('username').value, document.getElementById('password').value);
 			if (res.success === 'true') {
+				router.overlay.initialize();
 				router.navigateTo('/');
 			}
 			else {
@@ -55,6 +51,7 @@ const views = {
 		document.getElementById('loginForm')?.addEventListener('submit', (e) => {
 			e.preventDefault();
 			window.location.href = '/42login';
+			router.overlay.initialize();
 		});
 	},
 
