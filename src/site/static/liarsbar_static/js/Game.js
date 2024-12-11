@@ -1,6 +1,6 @@
 import * as THREE from '../../lib/threejs/src/Three.js';
 import SceneManager from '../../common_static/js/SceneManager.js';
-import GameSocketManager from '../../common_static/js/GameSocketManager.js';
+import SocketManager from '../../common_static/js/SocketManager.js';
 
 class Game {
 	constructor() {
@@ -28,7 +28,7 @@ class Game {
 		
 		this.initLights();
 
-		this.gameSocket = new GameSocketManager();
+		this.gameSocket = new SocketManager();
 		this.gameSocket.initGameWebSocket(
 			'liarsbar',
 			'/api/multiplayer/liarsbar',

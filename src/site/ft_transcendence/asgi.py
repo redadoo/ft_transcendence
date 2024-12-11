@@ -7,12 +7,13 @@ from django.core.asgi import get_asgi_application
 
 from pong.routing import websocket_pong_urlpatterns
 from liarsbar.routing import websocket_liarsbar_urlpatterns
+from chat.routing import websocket_chat_urlpatterns
 
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'ft_transcendence.settings')
 
 django_asgi_app = get_asgi_application()
 
-websocket_urlpatterns = websocket_pong_urlpatterns + websocket_liarsbar_urlpatterns
+websocket_urlpatterns = websocket_pong_urlpatterns + websocket_liarsbar_urlpatterns + websocket_chat_urlpatterns
 
 application = ProtocolTypeRouter({
     "http": django_asgi_app,  # Handles HTTP requests

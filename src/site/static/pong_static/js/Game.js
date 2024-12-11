@@ -5,7 +5,7 @@ import Ball from './Scritps/Class/Ball.js';
 import PongPlayer from './Scritps/Class/PongPlayer.js';
 import Paddle from './Scritps/Class/Paddle.js';
 import Background from './Scritps/Class/Background.js';
-import GameSocketManager from '../../common_static/js/GameSocketManager.js';
+import SocketManager from '../../common_static/js/SocketManager.js';
 
 const CAMERA_SETTINGS = {
 	FOV: 75,
@@ -38,7 +38,7 @@ class Game {
 	init() 
 	{
 		this.initializeSceneManager();
-		const isSinglePlayer = GameSocketManager.getModeFromPath() === 'singleplayer';
+		const isSinglePlayer = SocketManager.getModeFromPath() === 'singleplayer';
 		isSinglePlayer ? this.initSinglePlayer() : this.setupMultiplayerUI();
 	}
 
@@ -56,7 +56,7 @@ class Game {
 
 	startMatchmaking() 
 	{
-		this.gameSocket = new GameSocketManager();
+		this.gameSocket = new SocketManager();
 		this.gameSocket.initWebSocket(
 			'multiplayer/pong/matchmaking',
 			this.handleMatchmakingSocketMessage.bind(this)
@@ -91,7 +91,7 @@ class Game {
 
 		this.gameSocket.close();
 		delete this.gameSocket;
-		this.gameSocket = new GameSocketManager();
+		this.gameSocket = new SocketManager();
 		this.gameSocket.initGameWebSocket(
 			'pong',
 			this.handleGameSocketMessage.bind(this),
@@ -110,7 +110,7 @@ class Game {
 	}
 
 	initSinglePlayer() {
-		this.gameSocket = new GameSocketManager();
+		this.gameSocket = new SocketManager();
 		this.gameSocket.initGameWebSocket(
 			'pong',
 			this.handleGameSocketMessage.bind(this),

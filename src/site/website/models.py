@@ -1,9 +1,14 @@
 from django.db import models
 from django.conf import settings
+from django.dispatch import receiver
 from pong.models import PongMatch
 from liarsbar.models import LiarsBarMatch
 from datetime import datetime
 from django.contrib.auth.models import AbstractUser, Group, Permission
+from django.db.models.signals import post_save
+from asgiref.sync import async_to_sync
+from channels.layers import get_channel_layer
+
 
 exp_for_level = [
 	766, 1568, 2390, 3232, 4095, 4981, 5894, 6835, 7808, 8814,
@@ -177,6 +182,35 @@ class Friendships(models.Model):
 			models.Index(fields=['first_user']),
 			models.Index(fields=['second_user']),
 		]
+
+@receiver(post_save, sender=Friendships)
+def notify_friendship_status_change(sender, instance, **kwargs):
+    """
+    Signal to notify when a Friendships status changes.
+    """
+    # Get the channel layer for Django Channels
+    channel_layer = get_channel_layer()
+    
+    # Define the notification payload
+    payload = {
+        'type': 'friendship_status_change',
+        'data': {
+            'id': instance.id,
+            'first_user': instance.first_user.username,
+            'second_user': instance.second_user.username,
+            'status': instance.get_status_display(),
+        },
+    }
+    
+    # Notify both users via their channels
+    async_to_sync(channel_layer.group_send)(
+        f"user_{instance.first_user.id}",  # Channel group for the first user
+        payload
+    )
+    async_to_sync(channel_layer.group_send)(
+        f"user_{instance.second_user.id}",  # Channel group for the second user
+        payload
+    )
 
 class UserImage(models.Model):
 

@@ -2,7 +2,7 @@
 /**
  * Manages WebSocket connections for the game.
  */
-export default class GameSocketManager {
+export default class SocketManager {
 	constructor() {
 		this.socket = undefined;
 	}
@@ -53,7 +53,7 @@ export default class GameSocketManager {
 		}
 		
 		try {
-			const mode = GameSocketManager.getModeFromPath();
+			const mode = SocketManager.getModeFromPath();
 			
 			const socketUrl = `ws://${window.location.host}/ws/${mode}/${gameName}/${roomName}`;
 			this.socket = new WebSocket(socketUrl);
