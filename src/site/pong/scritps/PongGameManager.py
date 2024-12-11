@@ -13,7 +13,7 @@ class PongGameManager:
 		self.ball = Ball()
 		
 		self.score = { 
-			"player": 0,
+			"player1": 0,
 			"player2": 0,
 		}
 
@@ -31,12 +31,40 @@ class PongGameManager:
 			color=constants.PADDLE_COLOR,
 		)
 
+	def update_player(self, data):
+		player_id = data.get("player_id") 
+		if player_id == None:
+			print(f"player_id is None when trying to get it from data")
+			return
+		
+		action_type = data.get("action_type")
+		key = data.get("key")
+		if action_type == None or key == None:
+			print(f"error when retrieve data for update player")
+			return
+		
+		if action_type == 'key_down':
+			if key == "KeyW":
+				self.players[player_id].isMovingUp = True
+			elif key == "KeyS":
+				self.players[player_id].isMovingDown = True
+			pass
+		elif action_type == 'key_up':
+			if key == "KeyW":
+				self.players[player_id].isMovingUp = False
+			elif key == "KeyS":
+				self.players[player_id].isMovingDown = False
+			pass
+
 	def player_disconnected(self, player_id):
 		try:
 			self.players[player_id].status = PongPlayer.PlayerConnectionState.DISCONNECTED
 		except Exception as e:
 			print(f"Error: {e} when search for disconnected player")
 			raise
+
+	async def game_loop(self):
+		pass
 
 	def to_dict(self):
 		"""

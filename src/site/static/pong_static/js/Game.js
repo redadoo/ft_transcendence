@@ -207,7 +207,6 @@ class Game {
 			console.log("Player initialized:", this.pongPlayer);
 			console.log("Opponent initialized:", this.pongOpponent);
 	
-			this.gameSocket.send(JSON.stringify({ type: 'ready', playerId: this.pongPlayer.playerId }));
 		} catch (error) {
 			console.error("An error occurred during game initialization:", error);
 		}

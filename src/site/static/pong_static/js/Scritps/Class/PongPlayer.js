@@ -41,7 +41,8 @@ export default class PongPlayer {
 				JSON.stringify
 				(
 					{ 
-						type: 'key_down', 
+						type: 'movement',
+						action_type: 'key_down',
 						key: this.input.controlKeys.up,
 						playerId : this.playerId
 					}
@@ -56,7 +57,8 @@ export default class PongPlayer {
 				JSON.stringify
 				(
 					{ 
-						type: 'key_down', 
+						type: 'movement',
+						action_type: 'key_down',
 						key: this.input.controlKeys.down,
 						playerId : this.playerId
 					}
@@ -74,7 +76,8 @@ export default class PongPlayer {
 				JSON.stringify
 				(
 					{ 
-						type: 'key_up', 
+						type: 'movement',
+						action_type: 'key_up',
 						key: this.input.controlKeys.up,
 						playerId : this.playerId
 					}
@@ -88,7 +91,8 @@ export default class PongPlayer {
 				JSON.stringify
 				(
 					{ 
-						type: 'key_up', 
+						type: 'movement',
+						action_type: 'key_up',
 						key: this.input.controlKeys.down,
 						playerId : this.playerId
 					}
