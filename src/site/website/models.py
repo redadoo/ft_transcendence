@@ -184,33 +184,42 @@ class Friendships(models.Model):
 		]
 
 @receiver(post_save, sender=Friendships)
-def notify_friendship_status_change(sender, instance, **kwargs):
-    """
-    Signal to notify when a Friendships status changes.
-    """
-    # Get the channel layer for Django Channels
-    channel_layer = get_channel_layer()
-    
-    # Define the notification payload
-    payload = {
-        'type': 'friendship_status_change',
-        'data': {
-            'id': instance.id,
-            'first_user': instance.first_user.username,
-            'second_user': instance.second_user.username,
-            'status': instance.get_status_display(),
-        },
-    }
-    
-    # Notify both users via their channels
-    async_to_sync(channel_layer.group_send)(
-        f"user_{instance.first_user.id}",  # Channel group for the first user
-        payload
-    )
-    async_to_sync(channel_layer.group_send)(
-        f"user_{instance.second_user.id}",  # Channel group for the second user
-        payload
-    )
+def notify_friend_status_change(sender, instance, **kwargs):
+	"""
+	Notify the user whose friend's status has changed.
+	"""
+	# Determine the affected user (the one NOT making the change)
+
+	actor = instance.first_user
+	if sender.username == instance.first_user:
+		actor = instance.second_user
+
+	print("sadsadsa")
+	
+	actor = instance.first_user  # Assume the actor initiated the change
+	recipient = instance.second_user
+
+	# Check if the status change needs to notify the other user
+	# (you can extend this logic based on who initiated the status update)
+
+	# Get the channel layer
+	channel_layer = get_channel_layer()
+
+	# Create a notification payload
+	payload = {
+		'type': 'friendship_status_change',
+		'data': {
+			'id': instance.id,
+			'friend_username': actor.username,  # Friend who changed their status
+			'status': instance.get_status_display(),  # New friendship status
+		},
+	}
+
+	# Notify the recipient only
+	async_to_sync(channel_layer.group_send)(
+		f"user_{recipient.id}",  # Notify only the recipient user
+		payload
+	)
 
 class UserImage(models.Model):
 
