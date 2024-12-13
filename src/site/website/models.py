@@ -1,6 +1,7 @@
 from django.db import models
 from django.conf import settings
 from django.dispatch import receiver
+from django.forms import ValidationError
 from pong.models import PongMatch
 from liarsbar.models import LiarsBarMatch
 from datetime import datetime
@@ -8,6 +9,7 @@ from django.contrib.auth.models import AbstractUser, Group, Permission
 from django.db.models.signals import post_save
 from asgiref.sync import async_to_sync
 from channels.layers import get_channel_layer
+from django.db.models import Q
 
 
 exp_for_level = [
@@ -76,6 +78,39 @@ class User(AbstractUser):
 		user = cls(username=username, email=email)
 		user.save()
 		return user
+
+@receiver(post_save, sender=User)
+def notify_friend_status_change(sender, instance, **kwargs):
+	"""
+	Notify the user whose friend's status has changed.
+	"""
+	# Determine the affected user (the one NOT making the change)
+
+	# Get the channel layer
+	channel_layer = get_channel_layer()
+
+	friends = Friendships.objects.filter(
+		Q(first_user=instance) | Q(second_user=instance)
+	)
+
+	for friendship in friends:
+		actor = friendship.first_user if friendship.second_user == instance else friendship.second_user
+		recipient = friendship.second_user if friendship.first_user == instance else friendship.first_user
+		
+		payload = {
+			'type': 'friendship_status_change',
+			'data': {
+				'id': instance.id,
+				'friend_username': actor.username,
+				'status': instance.get_status_display(),
+			},
+		}
+		
+		async_to_sync(channel_layer.group_send)(
+			f"user_{recipient.id}",  # Notify only the recipient user
+			payload
+		)
+
 
 class UserStats(models.Model):
 	user = models.OneToOneField(
@@ -148,7 +183,7 @@ class Friendships(models.Model):
 	first_user = models.ForeignKey(
 		settings.AUTH_USER_MODEL,
 		on_delete=models.CASCADE,
-		related_name="riendships_initiated",
+		related_name="friendships_initiated",
 		help_text="The user associated with the match history."
 	)
 
@@ -175,9 +210,14 @@ class Friendships(models.Model):
 		if self.first_user.id > self.second_user.id:
 			self.first_user, self.second_user = self.second_user, self.first_user
 		super(Friendships, self).save(*args, **kwargs)
-	
+
+	def clean(self):
+		if self.first_user == self.second_user:
+			raise ValidationError("A user cannot be friends with themselves.")
+
 	class Meta:
 		db_table = "Friendships"
+		unique_together = ('first_user', 'second_user')
 		
 		indexes = [
 			models.Index(fields=['status']),
@@ -185,47 +225,7 @@ class Friendships(models.Model):
 			models.Index(fields=['second_user']),
 		]
 
-@receiver(post_save, sender=Friendships)
-def notify_friend_status_change(sender, instance, **kwargs):
-	"""
-	Notify the user whose friend's status has changed.
-	"""
-	# Determine the affected user (the one NOT making the change)
 
-	actor = instance.first_user
-	recipient = instance.second_user
-
-	if sender.username == instance.first_user:
-		actor = instance.second_user
-		recipient = instance.first_user
-	else:
-		actor = instance.first_user
-		recipient = instance.second_user
-
-	print("sadsadsa")
-
-
-	# Check if the status change needs to notify the other user
-	# (you can extend this logic based on who initiated the status update)
-
-	# Get the channel layer
-	channel_layer = get_channel_layer()
-
-	# Create a notification payload
-	payload = {
-		'type': 'friendship_status_change',
-		'data': {
-			'id': instance.id,
-			'friend_username': actor.username,  # Friend who changed their status
-			'status': instance.get_status_display(),  # New friendship status
-		},
-	}
-
-	# Notify the recipient only
-	async_to_sync(channel_layer.group_send)(
-		f"user_{recipient.id}",  # Notify only the recipient user
-		payload
-	)
 
 class UserImage(models.Model):
 

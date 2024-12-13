@@ -19,6 +19,17 @@ class ChatConsumer(AsyncWebsocketConsumer):
 		"""
 		await self.channel_layer.group_discard(self.group_name, self.channel_name)
 
+	async def receive(self, text_data):
+			async with self.update_lock:
+				data = json.loads(text_data)
+				event_type = data.get("type")
+
+				match event_type:
+					case "":
+						pass
+					case _:
+						print(f"Unhandled event type: {event_type}")
+
 	async def friendship_status_change(self, event):
 		"""
 		Receive a friendship status change event.
