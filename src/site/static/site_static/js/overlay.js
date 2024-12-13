@@ -25,7 +25,6 @@ export default class overlayManager {
 		this.lists = {
 			online: document.getElementById('onlineList'),
 			all: document.getElementById('allList'),
-			other: document.getElementById('otherList'),
 			blocked: document.getElementById('blockedList')
 		};
 
@@ -100,7 +99,6 @@ export default class overlayManager {
 		const lists = {
 			online: this.generateOnlineList(friendUsers, getUserInfo),
 			all: this.generateFriendList(friendUsers, getUserInfo),
-			other: null,
 			blocked: this.generateBlockedList(blockedUsers, getUserInfo)
 		};
 
@@ -152,7 +150,6 @@ export default class overlayManager {
 		const messages = {
 			online: 'No online friends',
 			all: 'No friends added',
-			other: 'No other users',
 			blocked: 'No blocked users'
 		};
 		return `<div class="pixel-font no-friends">${messages[listType]}</div>`;
@@ -192,22 +189,20 @@ export default class overlayManager {
 		} catch (error) {
 			console.error('Error processing game WebSocket message:', error);
 		}
-
-		console.log('Received message:', event.data);
 	}
 
 	handleBlockUser(username) {
-
-		// this.data.socket.send(JSON.stringify({ 
-		// 	type: 'user_status_changed' 
-		// }));
-
 		if (!this.data.blockedUsers.includes(username)) {
 			this.data.blockedUsers.push(username);
 			this.data.friendUsers = this.data.friendUsers.filter(friend => friend !== username);
 
 			this.setupFriendList();
 		}
+
+		this.data.socket.send(JSON.stringify({
+			type: 'block_user',
+			content: username
+		}));
 	}
 
 	handleUnblockUser(username) {
@@ -216,6 +211,11 @@ export default class overlayManager {
 			this.data.blockedUsers = this.data.blockedUsers.filter(blocked => blocked !== username);
 			this.setupFriendList();
 		}
+
+		this.data.socket.send(JSON.stringify({
+			type: 'unblock_user',
+			content: username
+		}));
 	}
 
 	handleTabSwitch(selectedTab) {
@@ -236,6 +236,11 @@ export default class overlayManager {
 			this.userStatus.className = `friend-status ${newStatus.toLowerCase()}`;
 		}
 		this.hide(this.overlayStatus);
+
+		this.data.socket.send(JSON.stringify({
+			type: 'status_change',
+			new_status: newStatus
+		}));
 	}
 
 	handleKeyboardShortcuts(event) {

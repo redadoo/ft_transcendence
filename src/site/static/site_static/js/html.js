@@ -380,13 +380,11 @@ const html = {
 			<div class="friends-tabs pixel-font">
 				<span class="tab online active">ONLINE</span>
 				<span class="tab all">ALL</span>
-				<span class="tab other">OTHER</span>
 				<span class="tab blocked">BLOCKED</span>
 			</div>
 
 			<div class="friends-list" id="onlineList"></div>
 			<div class="friends-list d-none" id="allList"></div>
-			<div class="friends-list d-none" id="otherList"></div>
 			<div class="friends-list d-none" id="blockedList"></div>
 		</div>
 		<div class="notification-sidebar">
