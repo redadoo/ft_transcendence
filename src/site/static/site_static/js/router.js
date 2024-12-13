@@ -1,3 +1,7 @@
+import html from './html.js';
+import overlayManager from './overlay.js';
+import views from './views.js';
+
 const router = {
 	init: function() {
 		this.routes = {
@@ -70,7 +74,12 @@ const router = {
 				this.navigateTo(path);
 			}
 		});
-
-		// document.
 	},
 };
+
+document.addEventListener('DOMContentLoaded', () => {
+	router.init();
+	console.log('App initialized');
+});
+
+export default router;

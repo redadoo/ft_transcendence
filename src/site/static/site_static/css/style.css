@@ -558,6 +558,107 @@ label {
 	transition: opacity 0.3s ease;
 }
 
+/* Notification sidebar styles */
+
+.notification-sidebar {
+	position: fixed;
+	right: 0;
+	top: 0;
+	width: 30%;
+	height: 100vh;
+	background-color: rgba(0, 0, 0, 0.95);
+	border-left: 1px solid rgba(255, 255, 255, 0.1);
+	padding: 20px;
+	z-index: 10000;
+}
+
+/* Notification sidebar specific styles */
+.notification-header {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	color: #fff;
+	font-size: 20px;
+	margin-bottom: 20px;
+	padding: 10px 0;
+	border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.notification-count {
+	background-color: #de4f5d;
+	color: #fff;
+	padding: 2px 8px;
+	border-radius: 12px;
+	font-size: 12px;
+}
+
+.notification-list {
+	overflow-y: auto;
+	max-height: calc(100vh - 150px);
+}
+
+.notification-item {
+	display: flex;
+	align-items: center;
+	padding: 15px;
+	border-radius: 4px;
+	margin-bottom: 8px;
+	background-color: rgba(255, 255, 255, 0.05);
+	transition: background-color 0.2s ease;
+	cursor: pointer;
+}
+
+.notification-item:hover {
+	background-color: rgba(255, 255, 255, 0.1);
+}
+
+.notification-content {
+	flex-grow: 1;
+	margin-right: 10px;
+}
+
+.notification-title {
+	color: #fff;
+	font-size: 12px;
+	margin-bottom: 4px;
+}
+
+.notification-message {
+	color: rgba(255, 255, 255, 0.7);
+	font-size: 10px;
+}
+
+.notification-time {
+	color: rgba(255, 255, 255, 0.5);
+	font-size: 8px;
+	margin-top: 4px;
+}
+
+/* Notification types */
+.notification-item.unread {
+	border-left: 3px solid #de4f5d;
+}
+
+.notification-item.friend-request {
+	border-left: 3px solid #4ba644;
+}
+
+.notification-item.game-invite {
+	border-left: 3px solid #7881bf;
+}
+
+.notification-item.system-alert {
+	border-left: 3px solid #f79666;
+}
+
+/* Empty state */
+.notification-empty {
+	text-align: center;
+	padding: 20px;
+	color: rgba(255, 255, 255, 0.5);
+	font-size: 12px;
+}
+
 /* Friends sidebar styles */
 .friends-sidebar {
 	position: fixed;

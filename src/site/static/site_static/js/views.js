@@ -1,3 +1,8 @@
+import api from './api.js';
+import html from './html.js';
+import matchHistory from './matchHistory.js';
+import router from './router.js';
+
 const views = {
 	// Auth views
 	async alreadyLoggedIn() {
@@ -168,3 +173,4 @@ const views = {
 	},
 };
 
+export default views;

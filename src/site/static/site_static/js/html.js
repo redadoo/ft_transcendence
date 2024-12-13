@@ -389,6 +389,30 @@ const html = {
 			<div class="friends-list d-none" id="otherList"></div>
 			<div class="friends-list d-none" id="blockedList"></div>
 		</div>
+		<div class="notification-sidebar">
+			<div class="notification-header pixel-font" style="text-align: right;">
+				<span>NOTIFICATIONS</span>
+				<span class="notification-count" id="notificationCount">0</span>
+			</div>
+
+			<div class="notification-list" id="notifications">
+				<!-- Example notification items - replace with dynamic content -->
+				<div class="notification-item unread">
+					<div class="notification-content">
+						<div class="notification-title pixel-font">Friend Request</div>
+						<div class="notification-message pixel-font">Player1 wants to be your friend</div>
+						<div class="notification-time pixel-font">2m ago</div>
+					</div>
+				</div>
+				<div class="notification-item game-invite">
+					<div class="notification-content">
+						<div class="notification-title pixel-font">Game Invite</div>
+						<div class="notification-message pixel-font">Player2 invited you to play Pong</div>
+						<div class="notification-time pixel-font">5m ago</div>
+					</div>
+				</div>
+			</div>
+		</div>
 	`,
 
 	statusOverlay: `
@@ -492,3 +516,5 @@ const html = {
 		</div>
 	`,
 };
+
+export default html;

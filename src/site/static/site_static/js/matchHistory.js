@@ -77,3 +77,4 @@ const matchHistory = {
 	}
 };
 
+export default matchHistory;

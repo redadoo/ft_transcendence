@@ -1,7 +1,11 @@
-class overlayManager {
+import api from './api.js';
+import SocketManager from '../../common_static/js/SocketManager.js';
+
+export default class overlayManager {
 	constructor() {
 		this.initializeElements();
 		this.data = {
+			socket: new SocketManager(),
 			username: null,
 			friendUsers: [],
 			blockedUsers: [],
@@ -10,6 +14,8 @@ class overlayManager {
 	}
 
 	initializeElements() {
+		this.data.socket.initWebSocket('chat/', this.handleSocketMessage.bind(this));
+
 		this.overlay = document.getElementById('overlay');
 		this.overlayStatus = document.getElementById('statusOverlay');
 		this.notificationBtn = document.getElementById('notificationBtn');
@@ -172,6 +178,10 @@ class overlayManager {
 				<span class="friend-action" id="unblockUser">🔓</span>
 			</div>
 		`;
+	}
+
+	handleSocketMessage(event) {
+		console.log('Received message:', event.data);
 	}
 
 	handleBlockUser(username) {
