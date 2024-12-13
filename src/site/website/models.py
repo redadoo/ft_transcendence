@@ -191,13 +191,17 @@ def notify_friend_status_change(sender, instance, **kwargs):
 	# Determine the affected user (the one NOT making the change)
 
 	actor = instance.first_user
+	recipient = instance.second_user
+
 	if sender.username == instance.first_user:
 		actor = instance.second_user
+		recipient = instance.first_user
+	else:
+		actor = instance.first_user
+		recipient = instance.second_user
 
 	print("sadsadsa")
-	
-	actor = instance.first_user  # Assume the actor initiated the change
-	recipient = instance.second_user
+
 
 	# Check if the status change needs to notify the other user
 	# (you can extend this logic based on who initiated the status update)

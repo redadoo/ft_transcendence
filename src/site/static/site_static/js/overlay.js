@@ -3,7 +3,6 @@ import SocketManager from '../../common_static/js/SocketManager.js';
 
 export default class overlayManager {
 	constructor() {
-		this.initializeElements();
 		this.data = {
 			socket: new SocketManager(),
 			username: null,
@@ -11,6 +10,7 @@ export default class overlayManager {
 			blockedUsers: [],
 			allUsers: []
 		};
+		this.initializeElements();
 	}
 
 	initializeElements() {
@@ -181,10 +181,27 @@ export default class overlayManager {
 	}
 
 	handleSocketMessage(event) {
+		try {
+			const data = JSON.parse(event.data);
+			switch (data.type) {
+				case '':
+					break;
+				default:
+					console.log('Unhandled game socket event type.' + data.type);
+			}
+		} catch (error) {
+			console.error('Error processing game WebSocket message:', error);
+		}
+
 		console.log('Received message:', event.data);
 	}
 
 	handleBlockUser(username) {
+
+		// this.data.socket.send(JSON.stringify({ 
+		// 	type: 'user_status_changed' 
+		// }));
+
 		if (!this.data.blockedUsers.includes(username)) {
 			this.data.blockedUsers.push(username);
 			this.data.friendUsers = this.data.friendUsers.filter(friend => friend !== username);
