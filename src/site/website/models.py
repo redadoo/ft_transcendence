@@ -10,7 +10,7 @@ from django.db.models.signals import post_save
 from asgiref.sync import async_to_sync
 from channels.layers import get_channel_layer
 from django.db.models import Q
-
+from django.core.validators import MinLengthValidator, RegexValidator
 
 exp_for_level = [
 	766, 1568, 2390, 3232, 4095, 4981, 5894, 6835, 7808, 8814,
@@ -32,7 +32,15 @@ class User(AbstractUser):
 
 
 	id = models.AutoField(primary_key=True)
-	username = models.CharField(max_length=12, unique=True)
+	username = models.CharField(
+		max_length=12,
+		unique=True,
+		validators=[
+			MinLengthValidator(3),
+			RegexValidator(r'^[a-zA-Z0-9_.-]+$', 'Username can only contain letters, numbers, underscores, and periods.')
+		],
+		help_text="User's unique username."
+	)
 	email = models.EmailField(max_length=100, unique=True)
 	
 	status = models.IntegerField(
@@ -78,6 +86,9 @@ class User(AbstractUser):
 		user = cls(username=username, email=email)
 		user.save()
 		return user
+
+	class Meta:
+		db_table = "Users"
 
 @receiver(post_save, sender=User)
 def notify_friend_status_change(sender, instance, **kwargs):
