@@ -1,14 +1,16 @@
 import json
 from channels.generic.websocket import AsyncWebsocketConsumer
+from .scripts import SocialUser
 
-class ChatConsumer(AsyncWebsocketConsumer):
+class SocialConsumer(AsyncWebsocketConsumer):
 	async def connect(self):
 		"""
 		Add the user to a channel group when they connect.
 		"""
 		self.user_id = self.scope['user'].id  # Assuming authentication is set up
 		self.group_name = f"user_{self.user_id}"
-		
+		self.user = SocialUser()
+
 		# Add the user to the group
 		await self.channel_layer.group_add(self.group_name, self.channel_name)
 		await self.accept()
@@ -23,9 +25,9 @@ class ChatConsumer(AsyncWebsocketConsumer):
 			async with self.update_lock:
 				data = json.loads(text_data)
 				event_type = data.get("type")
-
 				match event_type:
 					case "status_change":
+						self.user.change_status(data)
 						pass
 					case _:
 						print(f"Unhandled event type: {event_type}")

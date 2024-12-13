@@ -12,7 +12,7 @@ export default class overlayManager {
 		this.initializeElements();
 	}
 	initializeElements() {
-		this.data.socket.initWebSocket('chat/', this.handleSocketMessage.bind(this));
+		this.data.socket.initWebSocket('social/', this.handleSocketMessage.bind(this));
 		this.overlay = document.getElementById('overlay');
 		this.overlayStatus = document.getElementById('statusOverlay');
 		this.notificationBtn = document.getElementById('notificationBtn');
