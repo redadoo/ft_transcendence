@@ -25,7 +25,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
 				event_type = data.get("type")
 
 				match event_type:
-					case "":
+					case "status_change":
 						pass
 					case _:
 						print(f"Unhandled event type: {event_type}")

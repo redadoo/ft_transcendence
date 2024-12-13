@@ -43,7 +43,7 @@ INSTALLED_APPS = [
 	'django.contrib.staticfiles',
     'rest_framework',
 	'authentication',
-    'chat',
+    'social',
 	'pong',
     'liarsbar',
 	'website',
