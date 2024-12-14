@@ -1,5 +1,3 @@
-
-
 class SocialUser:
 
 	def __init__(self, user) -> None:
@@ -7,4 +5,8 @@ class SocialUser:
 		pass
 
 	def change_status(data):
+		
 		pass
+
+	def to_dict(self):
+		return {}

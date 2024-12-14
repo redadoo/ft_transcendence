@@ -1,6 +1,6 @@
 import json
 from channels.generic.websocket import AsyncWebsocketConsumer
-from .scripts import SocialUser
+from social.scripts.SocialUser import SocialUser
 
 class SocialConsumer(AsyncWebsocketConsumer):
 	async def connect(self):
@@ -8,8 +8,7 @@ class SocialConsumer(AsyncWebsocketConsumer):
 		Add the user to a channel group when they connect.
 		"""
 		self.group_name = f"user_{self.scope['user'].id}"
-		print(type(self.scope["user"]))
-		# self.user = SocialUser(self.scope["user"])
+		self.user = SocialUser(self.scope["user"])
 
 		# Add the user to the group
 		await self.channel_layer.group_add(self.group_name, self.channel_name)
