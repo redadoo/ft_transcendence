@@ -12,7 +12,6 @@ export default class overlayManager {
 		this.initializeElements();
 	}
 	initializeElements() {
-		this.data.socket.initWebSocket('social/', this.handleSocketMessage.bind(this));
 		this.overlay = document.getElementById('overlay');
 		this.overlayStatus = document.getElementById('statusOverlay');
 		this.notificationBtn = document.getElementById('notificationBtn');
@@ -37,6 +36,7 @@ export default class overlayManager {
 			]);
 			this.data = { username, friendUsers, blockedUsers, allUsers };
 			this.overlayUsername.textContent = username;
+			this.data.socket.initWebSocket('social/', this.handleSocketMessage.bind(this));
 			this.setupFriendList();
 			this.setupEventListeners();
 		} catch (error) {
