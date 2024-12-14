@@ -3,7 +3,7 @@ import SocketManager from '../../common_static/js/SocketManager.js';
 export default class overlayManager {
 	constructor() {
 		this.data = {
-			socket: new SocketManager(),
+			socket: null,
 			username: null,
 			friendUsers: [],
 			blockedUsers: [],
@@ -36,6 +36,7 @@ export default class overlayManager {
 			]);
 			this.data = { username, friendUsers, blockedUsers, allUsers };
 			this.overlayUsername.textContent = username;
+			this.data.socket = new SocketManager()
 			this.data.socket.initWebSocket('social/', this.handleSocketMessage.bind(this));
 			this.setupFriendList();
 			this.setupEventListeners();

@@ -7,14 +7,15 @@ class SocialConsumer(AsyncWebsocketConsumer):
 		"""
 		Add the user to a channel group when they connect.
 		"""
-		self.user_id = self.scope['user'].id  # Assuming authentication is set up
-		self.group_name = f"user_{self.user_id}"
-		self.user = SocialUser()
+
+		print(type(self.scope["user"]))
+		# self.group_name = f"user_{self.scope['user'].id}"
+		# self.user = SocialUser(self.scope["user"])
 
 		# Add the user to the group
-		await self.channel_layer.group_add(self.group_name, self.channel_name)
-		await self.accept()
-	
+		# await self.channel_layer.group_add(self.group_name, self.channel_name)
+		# await self.accept()
+
 	async def disconnect(self, close_code):
 		"""
 		Remove the user from the channel group when they disconnect.
@@ -36,5 +37,11 @@ class SocialConsumer(AsyncWebsocketConsumer):
 		"""
 		Receive a friendship status change event.
 		"""
-		# Send the event data to the WebSocket
-		await self.send(text_data=json.dumps(event['data']))
+
+		await self.send(
+			text_data=json.dumps({
+				"type": "friend_status_change",
+				"friend_username" : "luca",
+				"new_status" : "online"
+			})
+		)
