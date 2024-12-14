@@ -2,6 +2,7 @@ import api from './api.js';
 import html from './html.js';
 import matchHistory from './matchHistory.js';
 import router from './router.js';
+// import overlayManager from './overlay.js';
 
 const views = {
 	// Auth views
@@ -37,6 +38,7 @@ const views = {
 			const res = await api.login(document.getElementById('username').value, document.getElementById('password').value);
 			if (res.success === 'true') {
 				router.overlay.initialize();
+				// router.overlay.handleFriendStatusChange('capiamo', 'away');
 				router.navigateTo('/');
 			}
 			else {

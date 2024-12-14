@@ -157,13 +157,21 @@ export default class overlayManager {
 		try {
 			const data = JSON.parse(event.data);
 			switch (data.type) {
-				case '':
+				case 'friend_status_change':
+					this.handleStatusChange(data.friend_username, data.new_status);
 					break;
 				default:
 					console.log('Unhandled game socket event type.' + data.type);
-			}
-		} catch (error) {
+				}
+			} catch (error) {
 			console.error('Error processing game WebSocket message:', error);
+		}
+	}
+	handleFriendStatusChange(username, newStatus) {
+		const friend = this.data.allUsers.find(user => user.username === username);
+		if (friend) {
+			friend.status = newStatus;
+			this.setupFriendList();
 		}
 	}
 	handleBlockUser(username) {
@@ -174,7 +182,7 @@ export default class overlayManager {
 		}
 		this.data.socket.send(JSON.stringify({
 			type: 'block_user',
-			content: username
+			username: username
 		}));
 	}
 	handleUnblockUser(username) {
@@ -185,7 +193,7 @@ export default class overlayManager {
 		}
 		this.data.socket.send(JSON.stringify({
 			type: 'unblock_user',
-			content: username
+			username: username
 		}));
 	}
 	handleTabSwitch(selectedTab) {
@@ -231,5 +239,6 @@ export default class overlayManager {
 	}
 	cleanup() {
 		document.body.removeEventListener('keydown', this.handleKeyboardShortcuts);
+		this.data.socket.close();
 	}
 }
