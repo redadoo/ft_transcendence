@@ -7,14 +7,13 @@ class SocialConsumer(AsyncWebsocketConsumer):
 		"""
 		Add the user to a channel group when they connect.
 		"""
-
+		self.group_name = f"user_{self.scope['user'].id}"
 		print(type(self.scope["user"]))
-		# self.group_name = f"user_{self.scope['user'].id}"
 		# self.user = SocialUser(self.scope["user"])
 
 		# Add the user to the group
-		# await self.channel_layer.group_add(self.group_name, self.channel_name)
-		# await self.accept()
+		await self.channel_layer.group_add(self.group_name, self.channel_name)
+		await self.accept()
 
 	async def disconnect(self, close_code):
 		"""
