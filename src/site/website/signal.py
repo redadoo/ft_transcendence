@@ -8,8 +8,10 @@ from .models import Friendships, User
 @receiver(post_save, sender=User)
 def notify_friend_status_change(sender, instance, **kwargs):
 	"""
-	Notify the user whose friend's status has changed.
+	Notify friends of user whose status has changed.
 	"""
+
+	print("si valetto")
 
 	# Get the channel layer
 	channel_layer = get_channel_layer()
@@ -17,6 +19,7 @@ def notify_friend_status_change(sender, instance, **kwargs):
 	friends = Friendships.objects.filter(
 		Q(first_user=instance) | Q(second_user=instance)
 	)
+
 
 	for friendship in friends:
 		actor = friendship.first_user if friendship.second_user == instance else friendship.second_user

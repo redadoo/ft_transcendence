@@ -5,13 +5,7 @@ from pong.models import PongMatch
 from liarsbar.models import LiarsBarMatch
 from datetime import datetime
 from django.contrib.auth.models import AbstractUser, Group, Permission
-from django.core.validators import MinLengthValidator, RegexValidator
-
-exp_for_level = [
-	766, 1568, 2390, 3232, 4095, 4981, 5894, 6835, 7808, 8814,
-	9855, 10932, 12048, 13203, 14399, 15635, 16912, 18231, 19593, 20996
-]
-
+from django.core.validators import MinLengthValidator, RegexValidator, MinValueValidator
 
 class User(AbstractUser):
 	"""
@@ -69,75 +63,103 @@ class User(AbstractUser):
 		"""
 		return f"{self.username}"
 	
-	@classmethod
-	def create_new_user(cls, username, email):
+	@staticmethod
+	def is_valid_status(input_status: str) -> bool:
 		"""
-		Class method to create a new user.
+		Static method to check if a given string is a valid status.
+		"""
+		return input_status in dict(User.UserStatus.choices).values()
+
+	@staticmethod
+	def get_status_key(input_status: str) -> int:
+		"""
+		Get the integer key corresponding to the status string.
+		"""
+		reverse_choices = {v: k for k, v in dict(User.UserStatus.choices).items()}
+		return reverse_choices.get(input_status)
+
+	@classmethod
+	def create_new_user(cls, username, email, password=None):
+		"""
+		Class method to create a new user with optional password.
 		"""
 		if cls.objects.filter(username=username).exists():
 			raise ValueError(f"User with username '{username}' already exists.")
 		if cls.objects.filter(email=email).exists():
 			raise ValueError(f"User with email '{email}' already exists.")
 		user = cls(username=username, email=email)
+		if password:
+			user.set_password(password)
 		user.save()
 		return user
+
 
 	class Meta:
 		db_table = "Users"
 
-
 class UserStats(models.Model):
-	user = models.OneToOneField(
-		settings.AUTH_USER_MODEL,
-		on_delete=models.CASCADE,
-		related_name='user_stat',
-		primary_key=True
-	)
-	
-	exp = models.IntegerField(default=0)
-	mmr = models.IntegerField(default=1000)
-	win = models.IntegerField(default=0)
-	lose = models.IntegerField(default=0)
-	longest_winstreak = models.IntegerField(default=0)
-	longest_losestreak = models.IntegerField(default=0)
-	total_points_scored = models.IntegerField(default=0)
-	longest_game = models.IntegerField(default=0)
-	time_on_site = models.IntegerField(default=0)
+    """
+    Model to track a user's statistics, including experience, match performance, and activity.
+    """
+    exp_for_level = [
+        766, 1568, 2390, 3232, 4095, 4981, 5894, 6835, 7808, 8814,
+        9855, 10932, 12048, 13203, 14399, 15635, 16912, 18231, 19593, 20996
+    ]
 
-	date_updated = models.DateTimeField(auto_now=True)
+    user = models.OneToOneField(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name='user_stat',
+        primary_key=True
+    )
 
-	def __str__(self):
-		return f"Stats for {self.user.username}"
+    exp = models.PositiveIntegerField(default=0, validators=[MinValueValidator(0)])
+    mmr = models.PositiveIntegerField(default=1000, validators=[MinValueValidator(0)])
+    win = models.PositiveIntegerField(default=0, validators=[MinValueValidator(0)])
+    lose = models.PositiveIntegerField(default=0, validators=[MinValueValidator(0)])
+    longest_winstreak = models.PositiveIntegerField(default=0, validators=[MinValueValidator(0)])
+    longest_losestreak = models.PositiveIntegerField(default=0, validators=[MinValueValidator(0)])
+    total_points_scored = models.PositiveIntegerField(default=0, validators=[MinValueValidator(0)])
+    longest_game = models.PositiveIntegerField(default=0, validators=[MinValueValidator(0)])  # Measured in seconds
+    time_on_site = models.PositiveIntegerField(default=0, validators=[MinValueValidator(0)])  # Measured in seconds
 
-	def get_level(self):
-		for index, value in enumerate(exp_for_level):
-			if self.exp < value:
-				return index + 1 
-		return len(exp_for_level) 
-	
-	def get_cap_exp(self):
-		value = 0
-		for index, value in enumerate(exp_for_level):
-			if (self.exp < value):
-				break
-		return value
-		
-	def get_percentage_next_level(self):
-		current_level = self.get_level() 
-		
-		previous_level_exp = exp_for_level[current_level - 2] if current_level > 1 else 0
-		next_level_exp = exp_for_level[current_level - 1]
+    date_updated = models.DateTimeField(auto_now=True)
 
-		progress = self.exp - previous_level_exp
-		level_range = next_level_exp - previous_level_exp
+    def __str__(self):
+        return f"Stats for {self.user.username}"
 
-		percentage = (progress / level_range) * 100 if level_range > 0 else 100
+    @property
+    def level(self):
+        """
+        Get the user's current level based on experience points.
+        """
+        return next((index + 1 for index, level_exp in enumerate(self.exp_for_level) if self.exp < level_exp), len(self.exp_for_level))
 
-		return f"{percentage:.2f}%"
+    @property
+    def cap_exp(self):
+        """
+        Get the experience required for the next level cap.
+        """
+        return next((level_exp for level_exp in self.exp_for_level if self.exp < level_exp), self.exp_for_level[-1])
 
-	class Meta:
-		verbose_name = "User Stat"
-		verbose_name_plural = "User Stats"
+    @property
+    def percentage_next_level(self):
+        """
+        Calculate the percentage of progress towards the next level.
+        """
+        current_level = self.level
+        previous_level_exp = self.exp_for_level[current_level - 2] if current_level > 1 else 0
+        next_level_exp = self.exp_for_level[current_level - 1]
+
+        progress = self.exp - previous_level_exp
+        level_range = next_level_exp - previous_level_exp
+
+        return f"{(progress / level_range) * 100:.2f}%" if level_range > 0 else "100.00%"
+
+    class Meta:
+        verbose_name = "User Stat"
+        verbose_name_plural = "User Stats"
+        db_table = "user_stats"
 
 class Friendships(models.Model):
 
@@ -198,8 +220,6 @@ class Friendships(models.Model):
 			models.Index(fields=['first_user']),
 			models.Index(fields=['second_user']),
 		]
-
-
 
 class UserImage(models.Model):
 

@@ -6,9 +6,9 @@ from liarsbar.serializers import LiarsBarMatchSerializer
 from pong.models import *
 
 class UserStatsSerializer(serializers.ModelSerializer):
-	level = serializers.SerializerMethodField()
-	cap_exp = serializers.SerializerMethodField()
-	percentage_next_level = serializers.SerializerMethodField()
+	level = serializers.ReadOnlyField()
+	cap_exp = serializers.ReadOnlyField()
+	percentage_next_level = serializers.ReadOnlyField()
 
 	class Meta:
 		model = UserStats
@@ -17,16 +17,9 @@ class UserStatsSerializer(serializers.ModelSerializer):
 			'total_points_scored', 'longest_game', 'time_on_site',
 			'level', 'cap_exp', 'percentage_next_level', 'date_updated'
 		]
-		read_only_fields = ['date_updated']
-
-	def get_level(self, obj):
-		return obj.get_level()
-
-	def get_cap_exp(self, obj):
-		return obj.get_cap_exp()
-
-	def get_percentage_next_level(self, obj):
-		return obj.get_percentage_next_level()
+		read_only_fields = [
+			'level', 'cap_exp', 'percentage_next_level', 'date_updated'
+		]
 
 class UserImageSerializer(serializers.ModelSerializer):
 	avatar_url = serializers.ImageField(source='user_avatar', read_only=True)

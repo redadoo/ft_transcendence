@@ -4,7 +4,6 @@ from rest_framework.response import Response
 from django.db.models import Q
 from .models import *
 from .serializers import *
-from rest_framework.permissions import IsAuthenticated
 
 @api_view(['GET'])
 def start_singleplayer_pong_game(request):
