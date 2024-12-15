@@ -29,7 +29,19 @@ class SocialConsumer(AsyncWebsocketConsumer):
 		match event_type:
 			case "status_change":
 				await self.user.change_status(data)
-			case "block":
+			case "block_user":
+				await self.user.block_user(data)
+			case "send_friend_request":
+				pass
+			case "remove_friend":
+				pass
+			case "retrieve_users_list":
+				pass
+			case "retrieve_chat":
+				pass
+			case "send_messagge":
+				pass
+			case "send_tournament_invite":
 				pass
 			case _:
 				print(f"Unhandled event type: {event_type}")
