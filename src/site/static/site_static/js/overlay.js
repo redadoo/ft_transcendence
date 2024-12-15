@@ -2,6 +2,7 @@ import api from './api.js';
 import SocketManager from '../../common_static/js/SocketManager.js';
 export default class overlayManager {
 	constructor() {
+		this.initialized = false;
 		this.data = {
 			socket: null,
 			username: null,
@@ -27,6 +28,7 @@ export default class overlayManager {
 		this.handleKeyboardShortcuts = this.handleKeyboardShortcuts.bind(this);
 	}
 	async initialize() {
+		if (this.initialized) return;
 		try {
 			const [username, friendUsers, blockedUsers, allUsers] = await Promise.all([
 				api.getUsername(),
@@ -40,6 +42,7 @@ export default class overlayManager {
 			this.data.socket.initWebSocket('social/', this.handleSocketMessage.bind(this));
 			this.setupFriendList();
 			this.setupEventListeners();
+			this.initialized = true;
 		} catch (error) {
 			console.error('Failed to initialize OverlayManager:', error);
 		}
@@ -97,7 +100,7 @@ export default class overlayManager {
 			.filter(friend => friend?.status === 'Online')
 			.map(friend => this.createFriendElement(
 				friend.username,
-				friend.image_url?.avatar_url || '/media/default_avatar.png',
+				friend.image_url.avatar_url,
 				friend.status
 			))
 			.join('');
@@ -108,7 +111,7 @@ export default class overlayManager {
 				const friend = getUserInfo(friendName);
 				return friend ? this.createFriendElement(
 					friend.username,
-					friend.image_url?.avatar_url || '/media/default_avatar.png',
+					friend.image_url.avatar_url,
 					friend.status
 				) : '';
 			})
@@ -120,7 +123,7 @@ export default class overlayManager {
 				const blocked = getUserInfo(blockedName);
 				return blocked ? this.createBlockedElement(
 					blocked.username,
-					blocked.image_url?.avatar_url || '/media/default_avatar.png'
+					blocked.image_url.avatar_url
 				) : '';
 			})
 			.join('');
@@ -139,7 +142,7 @@ export default class overlayManager {
 			<div class="friend-item" id="friendItem">
 				<img src="${imageUrl}" alt="avatar" class="friend-avatar">
 				<span class="friend-name pixel-font">${username}</span>
-				<span class="friend-status ${status}">${status}</span>
+				<span class="friend-status ${status.toLowerCase()}">${status}</span>
 				<span class="friend-action" id="openChat">💬</span>1
 				<span class="friend-action" id="blockUser">🔒 </span>
 			</div>
