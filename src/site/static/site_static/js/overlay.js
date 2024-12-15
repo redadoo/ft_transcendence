@@ -162,8 +162,14 @@ export default class overlayManager {
 		try {
 			const data = JSON.parse(event.data);
 			switch (data.type) {
-				case 'friend_status_change':
-					this.handleFriendStatusChange(data.friend_username, data.new_status);
+				case 'get_status_change':
+					this.getStatusChange(data.friend_username, data.new_status);
+					break;
+				case 'get_blocked':
+					this.getBlocked(data.username);
+					break;
+				case 'get_unblocked':
+					this.getUnblocked(data.username);
 					break;
 				default:
 					console.log('Unhandled game socket event type.' + data.type);
@@ -172,12 +178,20 @@ export default class overlayManager {
 			console.error('Error processing game WebSocket message:', error);
 		}
 	}
-	handleFriendStatusChange(username, newStatus) {
+	getStatusChange(username, newStatus) {
 		const friend = this.data.allUsers.find(user => user.username === username);
 		if (friend) {
 			friend.status = newStatus;
 			this.setupFriendList();
 		}
+	}
+	getBlocked(username) {
+		this.data.friendUsers = this.data.friendUsers.filter(friend => friend !== username);
+		this.setupFriendList();
+	}
+	getUnblocked(username) {
+		this.data.friendUsers.push(username);
+		this.setupFriendList();
 	}
 	handleBlockUser(username) {
 		if (!this.data.blockedUsers.includes(username)) {
