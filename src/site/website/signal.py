@@ -11,8 +11,6 @@ def notify_friend_status_change(sender, instance, **kwargs):
 	Notify friends of user whose status has changed.
 	"""
 
-	print("si valetto")
-
 	# Get the channel layer
 	channel_layer = get_channel_layer()
 

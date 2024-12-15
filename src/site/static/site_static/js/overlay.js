@@ -206,6 +206,7 @@ export default class overlayManager {
 		});
 	}
 	handleStatusChange(statusOption) {
+		console.log(statusOption);
 		const newStatus = statusOption.dataset.status;
 		if (this.userStatus) {
 			this.userStatus.textContent = newStatus;

@@ -136,7 +136,6 @@ const views = {
 	},
 
 	singleplayerPongScripts() {
-		console.log("stanco capo");
 		import('../../pong_static/js/Game.js')
 		.catch(e => console.error('Pong script error:', e));
 	},

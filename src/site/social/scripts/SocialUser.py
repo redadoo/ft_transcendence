@@ -11,31 +11,13 @@ class SocialUser:
 	def __init__(self, user) -> None:
 		self.user = user
 
-	async def notify_friends(self, channel_layer):
+	async def get_friends(self):
 		friends = await sync_to_async(list)(
 			Friendships.objects.filter(
 				Q(first_user__username=self.user.username) | Q(second_user__username=self.user.username)
 			)
 		)
-
-		for friendship in friends:
-			actor = friendship.first_user if friendship.second_user == self.user else friendship.second_user
-			recipient = friendship.second_user if friendship.first_user == self.user else friendship.first_user
-
-			payload = {
-				'type': 'friendship_status_change',
-				'data': {
-					'id': friendship.id,
-					'friend_username': actor.username,
-					'status': friendship.get_status_display(),
-				},
-			}
-
-			# Send the notification using channel layer
-			async_to_sync(channel_layer.group_send)(
-				f"user_{recipient.id}",
-				payload
-			)
+		return friends
 		
 
 	async def change_status(self, data):

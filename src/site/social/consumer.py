@@ -1,6 +1,7 @@
 import json
 from channels.generic.websocket import AsyncWebsocketConsumer
 from social.scripts.SocialUser import SocialUser
+from asgiref.sync import sync_to_async
 
 class SocialConsumer(AsyncWebsocketConsumer):
 	async def connect(self):
@@ -31,18 +32,39 @@ class SocialConsumer(AsyncWebsocketConsumer):
 		match event_type:
 			case "status_change":
 				await self.user.change_status(data)
+				friendships = await self.user.get_friends()
+				await self.notify_friends(friendships)
 			case _:
 				print(f"Unhandled event type: {event_type}")
+
+	async def notify_friends(self, friendships):
+
+		for friendship in friendships:
+
+			first_user = await sync_to_async(lambda: friendship.first_user)()
+			second_user = await sync_to_async(lambda: friendship.second_user)()
+			
+			actor = first_user if second_user == self.user else second_user
+			recipient = second_user if first_user == self.user else first_user
+
+			payload = {
+				'type': 'friendship_status_change',
+				"friend_username": actor.username,
+				"status": friendship.get_status_display()
+			}
+
+			await self.channel_layer.group_send(
+				f"user_{recipient.id}",payload
+			)
 
 	async def friendship_status_change(self, event):
 		"""
 		Receive a friendship status change event.
 		"""
-
 		await self.send(
 			text_data=json.dumps({
 				"type": "friend_status_change",
 				"friend_username" : event["friend_username"],
-				"new_status" : event["status"]
+				"status" : event["status"]
 			})
 		)
