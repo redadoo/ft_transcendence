@@ -14,17 +14,13 @@ class SocialConsumer(AsyncWebsocketConsumer):
 
 		await self.channel_layer.group_add(self.group_name, self.channel_name)
 		await self.accept()
-		await self.user.change_status({
-			"new_status": "Online"
-		})
+		await self.user.change_status({"new_status": "Online"})
 
 	async def disconnect(self, close_code):
 		"""
 		Remove the user from the channel group when they disconnect.
 		"""
-		await self.user.change_status({
-			"new_status": "Offline"
-		})
+		await self.user.change_status({"new_status": "Offline"})
 		await self.channel_layer.group_discard(self.group_name, self.channel_name)
 
 	async def receive(self, text_data):
@@ -33,34 +29,10 @@ class SocialConsumer(AsyncWebsocketConsumer):
 		match event_type:
 			case "status_change":
 				await self.user.change_status(data)
-				friendships = await self.user.get_friends()
-				await self.notify_friends(friendships)
+			case "block":
+				pass
 			case _:
 				print(f"Unhandled event type: {event_type}")
-
-	async def notify_friends(self, friendships):
-
-		for friendship in friendships:
-
-			first_user = await sync_to_async(lambda: friendship.first_user)()
-			second_user = await sync_to_async(lambda: friendship.second_user)()
-			
-			if first_user.username == self.user.get_name():
-				actor = first_user
-				recipient = second_user
-			else:
-				actor = second_user
-				recipient = first_user
-
-			payload = {
-				'type': 'friendship_status_change',
-				"friend_username": actor.username,
-				"status": User.get_status_name(actor.status)
-			}
-
-			await self.channel_layer.group_send(
-				f"user_{recipient.id}",payload
-			)
 
 	async def friendship_status_change(self, event):
 		"""
