@@ -18,7 +18,9 @@ class SocialUser:
 			)
 		)
 		return friends
-		
+	
+	def get_name(self):
+		return self.user.username
 
 	async def change_status(self, data):
 		"""
@@ -40,13 +42,8 @@ class SocialUser:
 			raise ValueError(f"Invalid status: {new_status}")
 
 		self.user.status = status_key
-
-		if self.user.status != status_key:
-			self.user.status = status_key
-			await sync_to_async(self.user.save)(update_fields=["status"])
-			print(f"Status updated for {self.user.username} to {new_status}")
-		else:
-			print(f"Status for {self.user.username} is already '{new_status}'")
+		await sync_to_async(self.user.save)(update_fields=["status"])
+		print(f"Status updated for {self.user.username} to {new_status}")
 
 	def to_dict(self):
 		return {}

@@ -2,6 +2,7 @@ import json
 from channels.generic.websocket import AsyncWebsocketConsumer
 from social.scripts.SocialUser import SocialUser
 from asgiref.sync import sync_to_async
+from website.models import User
 
 class SocialConsumer(AsyncWebsocketConsumer):
 	async def connect(self):
@@ -44,13 +45,17 @@ class SocialConsumer(AsyncWebsocketConsumer):
 			first_user = await sync_to_async(lambda: friendship.first_user)()
 			second_user = await sync_to_async(lambda: friendship.second_user)()
 			
-			actor = first_user if second_user == self.user else second_user
-			recipient = second_user if first_user == self.user else first_user
+			if first_user.username == self.user.get_name():
+				actor = first_user
+				recipient = second_user
+			else:
+				actor = second_user
+				recipient = first_user
 
 			payload = {
 				'type': 'friendship_status_change',
 				"friend_username": actor.username,
-				"status": friendship.get_status_display()
+				"status": User.get_status_name(actor.status)
 			}
 
 			await self.channel_layer.group_send(
@@ -61,10 +66,11 @@ class SocialConsumer(AsyncWebsocketConsumer):
 		"""
 		Receive a friendship status change event.
 		"""
+
 		await self.send(
 			text_data=json.dumps({
 				"type": "friend_status_change",
 				"friend_username" : event["friend_username"],
-				"status" : event["status"]
+				"new_status" : event["status"]
 			})
 		)

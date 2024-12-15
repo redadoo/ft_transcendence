@@ -77,6 +77,13 @@ class User(AbstractUser):
 		"""
 		reverse_choices = {v: k for k, v in dict(User.UserStatus.choices).items()}
 		return reverse_choices.get(input_status)
+	
+	@staticmethod
+	def get_status_name(key_input_status: int) -> str:
+		"""
+		Get the integer key corresponding to the status string.
+		"""
+		return User.UserStatus(key_input_status).label
 
 	@classmethod
 	def create_new_user(cls, username, email, password=None):

@@ -133,17 +133,19 @@ export default class overlayManager {
 		};
 		return `<div class="pixel-font no-friends">${messages[listType]}</div>`;
 	}
+
 	createFriendElement(username, imageUrl, status) {
 		return `
 			<div class="friend-item" id="friendItem">
 				<img src="${imageUrl}" alt="avatar" class="friend-avatar">
 				<span class="friend-name pixel-font">${username}</span>
-				<span class="friend-status">${status}</span>
-				<span class="friend-action" id="openChat">💬</span>
+				<span class="friend-status ${status}">${status}</span>
+				<span class="friend-action" id="openChat">💬</span>1
 				<span class="friend-action" id="blockUser">🔒 </span>
 			</div>
 		`;
 	}
+
 	createBlockedElement(username, imageUrl) {
 		return `
 			<div class="friend-item">
@@ -158,7 +160,7 @@ export default class overlayManager {
 			const data = JSON.parse(event.data);
 			switch (data.type) {
 				case 'friend_status_change':
-					this.handleStatusChange(data.friend_username, data.new_status);
+					this.handleFriendStatusChange(data.friend_username, data.new_status);
 					break;
 				default:
 					console.log('Unhandled game socket event type.' + data.type);
