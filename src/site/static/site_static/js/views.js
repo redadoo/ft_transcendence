@@ -18,6 +18,7 @@ const views = {
 
 	async home() {
 		if (!await api.checkAuth()) { return router.navigateTo('/login'); }
+		router.overlay.initialize();
 		const data = await api.getHeaderInfo();
 		['profileBtn', 'notificationBtn'].forEach(id => document.getElementById(id).classList.remove('d-none'));
 		document.getElementById('headerUsername').textContent = data.username;
@@ -37,8 +38,6 @@ const views = {
 			e.preventDefault();
 			const res = await api.login(document.getElementById('username').value, document.getElementById('password').value);
 			if (res.success === 'true') {
-				router.overlay.initialize();
-				// router.overlay.handleFriendStatusChange('capiamo', 'away');
 				router.navigateTo('/');
 			}
 			else {
@@ -58,7 +57,6 @@ const views = {
 		document.getElementById('loginForm')?.addEventListener('submit', (e) => {
 			e.preventDefault();
 			window.location.href = '/42login';
-			router.overlay.initialize();
 		});
 	},
 

@@ -69,8 +69,6 @@ const api = {
 			.filter(friendship => friendship.status_display === 'friends')
 			.map(friendship => friendship.other_user_username);
 
-			friendNames.push(response.username);
-
 			return friendNames;
 		} catch (error) {
 			console.error('Friendship info error:', error);
