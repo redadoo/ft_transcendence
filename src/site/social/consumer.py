@@ -69,8 +69,7 @@ class SocialConsumer(AsyncWebsocketConsumer):
 		await self.send(
 			text_data=json.dumps({
 				"type": "get_blocked",
-				"friend_username" : event["friend_username"],
-				"new_status" : event["status"]
+				"username" : event["username"]
 			})
 		)
 
@@ -82,7 +81,6 @@ class SocialConsumer(AsyncWebsocketConsumer):
 		await self.send(
 			text_data=json.dumps({
 				"type": "get_unblocked",
-				"friend_username" : event["friend_username"],
-				"new_status" : event["status"]
+				"username" : event["username"]
 			})
 		)

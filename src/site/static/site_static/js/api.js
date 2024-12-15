@@ -51,7 +51,8 @@ const api = {
 			const response = await this.fetchJson('/api/profile?include=friendships');
 
 			const blockedNames = response.friendships
-			.filter(friendship => friendship.status_display === 'block')
+			.filter(friendship => 
+				friendship.status_display === 'first_user_block' || friendship.status_display === 'second_user_block')
 			.map(friendship => friendship.other_user_username);
 
 			return blockedNames;

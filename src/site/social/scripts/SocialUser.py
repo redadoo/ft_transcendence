@@ -150,7 +150,7 @@ class SocialUser:
 		except Friendships.DoesNotExist:
 			raise ValueError(f"No friendship exists with user '{user_to_unblock}'.")
 
-		if friendship.status != Friendships.FriendshipsStatus.FIRST_USER_BLOCK or friendship.status != Friendships.FriendshipsStatus.SECOND_USER_BLOCK:
+		if friendship.status != Friendships.FriendshipsStatus.FIRST_USER_BLOCK and friendship.status != Friendships.FriendshipsStatus.SECOND_USER_BLOCK:
 			raise ValueError(f"User '{user_to_unblock}' is not blocked.")
 
 		friendship.status = Friendships.FriendshipsStatus.FRIENDS
