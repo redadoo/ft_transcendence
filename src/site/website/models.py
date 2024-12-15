@@ -173,9 +173,8 @@ class Friendships(models.Model):
 	class FriendshipsStatus(models.IntegerChoices):
 		PENDING = 1, "pending"
 		FRIENDS = 2, "friends"
-		BLOCK = 3, "block"
-		FIRST_USER_BLOCK = 4, "first_user_block"
-		SECOND_USER_BLOCK = 5, "second_user_block"
+		FIRST_USER_BLOCK = 3, "first_user_block"
+		SECOND_USER_BLOCK = 4, "second_user_block"
 
 	status = models.IntegerField(
 		choices=FriendshipsStatus.choices,

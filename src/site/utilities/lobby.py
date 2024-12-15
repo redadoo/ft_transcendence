@@ -1,3 +1,4 @@
+import asyncio
 from enum import Enum
 
 class Lobby:
@@ -13,12 +14,14 @@ class Lobby:
 		self.players_id = []
 		self.lobby_status = Lobby.LobbyStatus.TO_SETUP
 		self.game_manager = game_manager
+		self.update_lock = asyncio.Lock()
+
 
 	def add_player(self, data):
 		player_id = data.get("player_id") 
+
 		if player_id == None:
-			print(f"player_id is None when trying to get it from data")
-			return
+			raise ValueError(f"bad dict cant retrieve player_id")
 		
 		if player_id not in self.players_id:
 			self.players_id.append(player_id)

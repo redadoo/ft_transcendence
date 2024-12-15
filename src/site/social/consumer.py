@@ -31,13 +31,15 @@ class SocialConsumer(AsyncWebsocketConsumer):
 				await self.user.change_status(data)
 			case "block_user":
 				await self.user.block_user(data)
+			case "unblock_user":
+				await self.user.unblock_user(data)
 			case "send_friend_request":
 				pass
 			case "remove_friend":
 				pass
-			case "retrieve_users_list":
+			case "get_users_list":
 				pass
-			case "retrieve_chat":
+			case "get_chat":
 				pass
 			case "send_messagge":
 				pass
@@ -46,14 +48,40 @@ class SocialConsumer(AsyncWebsocketConsumer):
 			case _:
 				print(f"Unhandled event type: {event_type}")
 
-	async def friendship_status_change(self, event):
+	async def get_status_change(self, event):
 		"""
 		Receive a friendship status change event.
 		"""
 
 		await self.send(
 			text_data=json.dumps({
-				"type": "friend_status_change",
+				"type": "get_status_change",
+				"friend_username" : event["friend_username"],
+				"new_status" : event["status"]
+			})
+		)
+
+	async def get_blocked(self, event):
+		"""
+		Receive a friendship status change event.
+		"""
+
+		await self.send(
+			text_data=json.dumps({
+				"type": "get_blocked",
+				"friend_username" : event["friend_username"],
+				"new_status" : event["status"]
+			})
+		)
+
+	async def get_unblocked(self, event):
+		"""
+		Receive a friendship status change event.
+		"""
+
+		await self.send(
+			text_data=json.dumps({
+				"type": "get_unblocked",
 				"friend_username" : event["friend_username"],
 				"new_status" : event["status"]
 			})

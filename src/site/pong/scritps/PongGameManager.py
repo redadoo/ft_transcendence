@@ -68,7 +68,7 @@ class PongGameManager:
 
 	def to_dict(self):
 		"""
-		Converts the PongGameManger to a dictionary with current gamestatus and score.
+		Converts the PongGameManger to a dictionary.
 		"""
 
 		return {
