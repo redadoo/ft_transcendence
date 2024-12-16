@@ -2,7 +2,6 @@ import api from './api.js';
 import html from './html.js';
 import matchHistory from './matchHistory.js';
 import router from './router.js';
-// import overlayManager from './overlay.js';
 
 const views = {
 	// Auth views
@@ -18,7 +17,7 @@ const views = {
 
 	async home() {
 		if (!await api.checkAuth()) { return router.navigateTo('/login'); }
-		router.overlay.initialize();
+		await router.overlay.initialize();
 		const data = await api.getHeaderInfo();
 		['profileBtn', 'notificationBtn'].forEach(id => document.getElementById(id).classList.remove('d-none'));
 		document.getElementById('headerUsername').textContent = data.username;
@@ -90,7 +89,7 @@ const views = {
 	},
 
 	async logout() {
-		this.overlay.cleanup();
+		router.overlay.cleanup();
 		await api.logout();
 		['profileBtn', 'notificationBtn'].forEach(id => document.getElementById(id).classList.add('d-none'));
 		router.navigateTo('/login');
