@@ -73,7 +73,7 @@ export default class SocialOverlayManager {
 			option.addEventListener('click', () => this.updateUserStatus(option));
 		});
 
-		// Block/Unblock handlers
+		// User action handlers
 		document.addEventListener('click', (event) => {
 			const blockButton = event.target.closest('#blockUser');
 			if (blockButton) {
@@ -82,6 +82,7 @@ export default class SocialOverlayManager {
 				this.blockUser(targetUsername);
 			}
 		});
+
 		document.addEventListener('click', (event) => {
 			const unblockButton = event.target.closest('#unblockUser');
 			if (unblockButton) {
@@ -91,13 +92,85 @@ export default class SocialOverlayManager {
 			}
 		});
 
-		// Remove friend handler
 		document.addEventListener('click', (event) => {
 			const removeButton = event.target.closest('#removeFriend');
 			if (removeButton) {
 				const friendListItem = removeButton.closest('.friend-item');
 				const targetUsername = friendListItem.querySelector('.friend-name').textContent;
 				this.removeFriend(targetUsername);
+			}
+		});
+
+		document.addEventListener('click', (event) => {
+			const addButton = event.target.closest('#addFriend');
+			if (addButton) {
+				const friendListItem = addButton.closest('.friend-item');
+				const targetUsername = friendListItem.querySelector('.friend-name').textContent;
+				this.addFriend(targetUsername);
+			}
+		});
+
+		// Search handler
+		const searchInput = document.querySelector('.search-input');
+		searchInput?.addEventListener('input', (event) => {
+			this.handleUserSearch(event.target.value);
+		});
+	}
+
+	// Search functionality
+	handleUserSearch(searchTerm) {
+		if (!searchTerm) {
+			this.updateFriendLists();
+			return;
+		}
+
+		const searchResults = this.searchUsers(searchTerm);
+		this.displaySearchResults(searchResults);
+	}
+
+	searchUsers(searchTerm) {
+		const term = searchTerm.toLowerCase();
+		const { registeredUsers, activeFriends, blockedContacts } = this.socialData;
+
+		return registeredUsers
+			.filter(user => {
+				if (user.username === this.socialData.currentUsername) {
+					return false;
+				}
+
+				const matchesSearch = user.username.toLowerCase().includes(term);
+				const isFriend = activeFriends.includes(user.username);
+				const isBlocked = blockedContacts.includes(user.username);
+
+				user.isFriend = isFriend;
+				user.isBlocked = isBlocked;
+
+				return matchesSearch;
+			});
+	}
+
+	displaySearchResults(results) {
+		const searchResultsHTML = results.map(user => {
+			if (user.isBlocked) {
+				return this.createBlockedUserItem(user.username, user.image_url.avatar_url);
+			}
+			if (user.isFriend) {
+				return this.createFriendListItem(
+					user.username,
+					user.image_url.avatar_url,
+					user.status
+				);
+			}
+			return this.createSearchResultItem(
+				user.username,
+				user.image_url.avatar_url,
+				user.status
+			);
+		}).join('');
+
+		Object.values(this.friendLists).forEach(list => {
+			if (list) {
+				list.innerHTML = searchResultsHTML || this.getEmptyListMessage('search');
 			}
 		});
 	}
@@ -156,16 +229,6 @@ export default class SocialOverlayManager {
 			.join('');
 	}
 
-	// Empty state messages
-	getEmptyListMessage(listType) {
-		const messages = {
-			online: 'No online friends',
-			all: 'No friends added',
-			blocked: 'No blocked users'
-		};
-		return `<div class="pixel-font no-friends">${messages[listType]}</div>`;
-	}
-
 	// UI elements creation
 	createFriendListItem(username, avatarUrl, status) {
 		return `
@@ -189,6 +252,27 @@ export default class SocialOverlayManager {
 		`;
 	}
 
+	createSearchResultItem(username, avatarUrl, status) {
+		return `
+			<div class="friend-item" id="friendItem">
+				<img src="${avatarUrl}" alt="avatar" class="friend-avatar">
+				<span class="friend-name pixel-font">${username}</span>
+				<span class="friend-status ${status.toLowerCase()}">${status}</span>
+				<span class="friend-action" id="addFriend">❤️</span>
+			</div>
+		`;
+	}
+
+	getEmptyListMessage(listType) {
+		const messages = {
+			online: 'No online friends',
+			all: 'No friends added',
+			blocked: 'No blocked users',
+			search: 'No users found'
+		};
+		return `<div class="pixel-font no-friends">${messages[listType]}</div>`;
+	}
+
 	// WebSocket handling
 	handleSocketMessage(event) {
 		try {
@@ -210,7 +294,7 @@ export default class SocialOverlayManager {
 		}
 	}
 
-	// Data updates
+	// Status updates
 	handleFriendStatusUpdate(username, newStatus) {
 		const friend = this.socialData.registeredUsers.find(user => user.username === username);
 		if (friend) {
@@ -257,6 +341,14 @@ export default class SocialOverlayManager {
 			this.socialData.blockedContacts = this.socialData.blockedContacts.filter(blocked => blocked !== targetUsername);
 			this.updateFriendLists();
 			this.sendUnblockUserUpdate(targetUsername);
+		}
+	}
+
+	addFriend(targetUsername) {
+		if (!this.socialData.activeFriends.includes(targetUsername)) {
+			// this.socialData.activeFriends.push(targetUsername);
+			// this.updateFriendLists();
+			this.sendAddFriendUpdate(targetUsername);
 		}
 	}
 
@@ -314,7 +406,6 @@ export default class SocialOverlayManager {
 			}
 		});
 	}
-
 
 	handleKeyboardControls(event) {
 		switch (event.key) {
