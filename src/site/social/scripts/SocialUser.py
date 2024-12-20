@@ -9,33 +9,29 @@ class SocialUser:
 		self.user = user
 
 	async def notify_friends_status(self):
-
 		friendships = await sync_to_async(list)(
 			Friendships.objects.filter(
-				Q(first_user__username=self.user.username) | Q(second_user__username=self.user.username)
+				Q(first_user=self.user) | Q(second_user=self.user)
 			).select_related("first_user", "second_user")
 		)
 
 		channel_layer = get_channel_layer()
+		notifications = []
 		for friendship in friendships:
-			
-			first_user = await sync_to_async(lambda: friendship.first_user)()
-			second_user = await sync_to_async(lambda: friendship.second_user)()
-
-			if first_user.username == self.user.username:
-				actor = first_user
-				recipient = second_user
-			else:
-				actor = second_user
-				recipient = first_user
+			actor = self.user
+			recipient = friendship.second_user if friendship.first_user == self.user else friendship.first_user
 
 			payload = {
 				"type": "get_status_change",
 				"friend_username": actor.username,
 				"status": User.get_status_name(actor.status),
 			}
+			notifications.append((f"user_{recipient.id}", payload))
 
-			await channel_layer.group_send(f"user_{recipient.id}", payload)
+		# Batch send notifications
+		for group, payload in notifications:
+			await channel_layer.group_send(group, payload)
+
 	
 	async def change_status(self, data: dict):
 		"""
@@ -164,3 +160,39 @@ class SocialUser:
 
 		await channel_layer.group_send(f"user_{unblock_target.id}", payload)
 
+	async def send_friend_request(self, data: dict):
+		target_username = data.get("username")
+		if target_username is None:
+			raise ValueError("Invalid data: 'username' is required.")
+		
+		if target_username == self.user.username:
+			raise ValueError("Cannot send a friend request to yourself.")
+
+		try:
+			target_user = await sync_to_async(User.objects.get)(username=target_username)
+		except User.DoesNotExist:
+			raise ValueError(f"User '{target_username}' does not exist.")
+
+		existing_friendship = await sync_to_async(
+			lambda: Friendships.objects.filter(
+				Q(first_user=self.user, second_user=target_user) |
+				Q(first_user=target_user, second_user=self.user)
+			).exists()
+		)()
+
+		if existing_friendship:
+			raise ValueError(f"A friendship or pending request already exists with '{target_username}'.")
+
+		await sync_to_async(Friendships.objects.create)(
+			first_user=self.user,
+			second_user=target_user,
+			status=Friendships.FriendshipsStatus.PENDING
+		)
+
+		channel_layer = get_channel_layer()
+		payload = {
+			"type": "get_friend_request",
+			"username": self.user.username,
+		}
+
+		await channel_layer.group_send(f"user_{target_user.id}", payload)

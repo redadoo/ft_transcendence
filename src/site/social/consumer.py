@@ -33,8 +33,8 @@ class SocialConsumer(AsyncWebsocketConsumer):
 				await self.user.block_user(data)
 			case "unblock_user":
 				await self.user.unblock_user(data)
-			case "send_friend_request":
-				pass
+			case "add_friend":
+				await self.user.send_friend_request(data)
 			case "remove_friend":
 				pass
 			case "get_users_list":
@@ -81,6 +81,18 @@ class SocialConsumer(AsyncWebsocketConsumer):
 		await self.send(
 			text_data=json.dumps({
 				"type": "get_unblocked",
+				"username" : event["username"]
+			})
+		)
+
+	async def get_friend_request(self, event):
+		"""
+		Receive a friend request event.
+		"""
+
+		await self.send(
+			text_data=json.dumps({
+				"type": "get_friend_request",
 				"username" : event["username"]
 			})
 		)
