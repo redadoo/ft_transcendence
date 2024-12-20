@@ -3,7 +3,7 @@ import uuid
 import asyncio
 
 from channels.generic.websocket import AsyncWebsocketConsumer
-from pong.scritps.pong_player import PongPlayer
+from pong.scritps.PongPlayer import PongPlayer
 from pong.scritps.ai import PongAI
 from utilities.lobbies import Lobbies
 from pong.scritps import constants
@@ -16,7 +16,7 @@ lobbies = Lobbies()
 class PongMatchmaking(AsyncWebsocketConsumer):
 	matchmaking_queue = []
 	room_group_name = "pong_matchmaking"
-
+	
 	async def connect(self):
 		await self.channel_layer.group_add(self.room_group_name, self.channel_name)
 		await self.accept()
@@ -444,7 +444,6 @@ class PongMultiplayerConsumerV2(AsyncWebsocketConsumer):
 		self.room_name = self.scope["url_route"]["kwargs"]["room_name"]
 		self.room_group_name = f"pong_multiplayer_{self.room_name}"
 	
-		self.update_lock = asyncio.Lock()
 		self.lobby = lobbies._get_lobby(self.room_name) 
 		if self.lobby == None:
 			self.lobby = lobbies._create_lobby(self.room_name,  PongGameManager())
@@ -453,78 +452,52 @@ class PongMultiplayerConsumerV2(AsyncWebsocketConsumer):
 		await self.accept()
 
 	async def disconnect(self, close_code):
-		await self.broadcast_lobby("lobbyInfo")
+		await self.lobby.broadcast_lobby("lobby_state")
 		await self.channel_layer.group_discard(self.room_group_name, self.channel_name)
 
 	async def receive(self, text_data):
-		async with self.update_lock:
-			data = json.loads(text_data)
-			event_type = data.get("type")
+		data = json.loads(text_data)
+		await self.lobby.manage_event(data)
 
-			match event_type:
-				case "init_player":
-					self.lobby.add_player(data)
-					brodcast_event_type = "lobbyInfo"
-					if self.lobby.is_full() == True:
-						brodcast_event_type = "initGame"
-						asyncio.create_task(self.lobby.game_manager.game_loop())
-					else:
-						brodcast_event_type = "lobbyInfo"
-					await self.broadcast_lobby(brodcast_event_type)
-				case "movement":
-					self.lobby.game_manager.update_player(data)
-					pass
-				case _:
-					print(f"Unhandled event type: {event_type}")
-
-	async def broadcast_lobby(self, type):
-		await self.channel_layer.group_send(
-			self.room_group_name,
-			{
-				"type": "state_update",
-				"message_type": type,
-			}
-		)
-
-	async def state_update(self, event):
+	async def lobby_state(self, event: dict):
 		"""Aggiorna lo stato lato client."""
 
 		await self.send(
 			text_data=json.dumps({
-				"type": event["message_type"],
+				"type": event["type"],
 				"lobby": self.lobby.to_dict()
 			})
 		)
 
-	async def game_loop(self):
-		self.lobby.game_manager.ball.reset()
+	# async def game_loop(self):
+	# 	self.lobby.game_manager.ball.reset()
 
-		while self.lobby.is_full(): 
-			async with self.update_lock:
+	# 	while self.lobby.is_full(): 
+	# 		async with self.update_lock:
 
-				for player in self.lobby.game_manager.players.items():
-					player.update_player_position()
+	# 			for player in self.lobby.game_manager.players.items():
+	# 				player.update_player_position()
 
-				self.lobby.game_manager.ball.update_position()
+	# 			self.lobby.game_manager.ball.update_position()
 
-				for player in self.lobby.game_manager.players.items():
-					self.lobby.game_manager.ball.handle_paddle_collision(player)
+	# 			for player in self.lobby.game_manager.players.items():
+	# 				self.lobby.game_manager.ball.handle_paddle_collision(player)
 
-				# Controlla i punti
-				out_of_bounds = self.lobby.game_manager.ball.is_out_of_bounds()
-				if out_of_bounds == "right":
-					self.lobby.game_manager.scores["player1"] += 1
-					self.lobby.game_manager.ball.reset()
-				elif out_of_bounds == "left":
-					self.lobby.game_manager.scores["player2"] += 1
-					self.lobby.game_manager.ball.reset()
+	# 			# Controlla i punti
+	# 			out_of_bounds = self.lobby.game_manager.ball.is_out_of_bounds()
+	# 			if out_of_bounds == "right":
+	# 				self.lobby.game_manager.scores["player1"] += 1
+	# 				self.lobby.game_manager.ball.reset()
+	# 			elif out_of_bounds == "left":
+	# 				self.lobby.game_manager.scores["player2"] += 1
+	# 				self.lobby.game_manager.ball.reset()
 
-				# Controlla la vittoria
-				if self.lobby.game_manager.scores["player1"] >= 5 or self.lobby.game_manager.scores["player2"] >= 5:
-					winner = "player1" if self.lobby.game_manager.scores["player1"] >= 5 else "player2"
-					await self.broadcast_game_over(winner)
-					break
+	# 			# Controlla la vittoria
+	# 			if self.lobby.game_manager.scores["player1"] >= 5 or self.lobby.game_manager.scores["player2"] >= 5:
+	# 				winner = "player1" if self.lobby.game_manager.scores["player1"] >= 5 else "player2"
+	# 				await self.broadcast_game_over(winner)
+	# 				break
 
-			# Aggiorna lo stato della lobby
-			await self.broadcast_lobby()
-			await asyncio.sleep(1 / 60)  # 60 FPS
+	# 		# Aggiorna lo stato della lobby
+	# 		await self.lobby.broadcast_lobby("lobbyInfo")
+	# 		await asyncio.sleep(1 / 60)  # 60 FPS

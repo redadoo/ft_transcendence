@@ -212,7 +212,8 @@ class Game {
 		}
 	}
 	
-	updateGameState(data) {
+	updateGameState(data) 
+	{
 		if (data.ball) 
 			this.ball.updatePosition(data.ball);
 
@@ -240,14 +241,13 @@ class Game {
 			const data = JSON.parse(event.data);
 			console.log(data);
 			switch (data.type) {
-				case 'lobbyInfo':
-					console.log("ricevuto lobby info");
+				case 'lobby_state':
+					this.updateGameState(data);
 					break;
 				case 'initGame':
 					this.initGame(data);
 					break;
 				case 'stateUpdate':
-					this.updateGameState(data);
 					break;
 				case 'lobbyClosed':
 					this.cleanUp();

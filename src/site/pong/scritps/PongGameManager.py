@@ -1,23 +1,21 @@
-
+import asyncio
 from pong.scritps import constants
 from pong.scritps.ball import Ball
-from pong.scritps.pong_player import PongPlayer
+from pong.scritps.PongPlayer import PongPlayer
+from utilities.GameManager import GameManager
 
-class PongGameManager:
-
+class PongGameManager(GameManager):
 	def __init__(self) -> None:
-		self.max_players = 2
-		
-		self.players = {}
-		
+		super().__init__(2)
+
+	def init_player(self, players):
 		self.ball = Ball()
-		
-		self.score = { 
+		self.scores = {
 			"player1": 0,
 			"player2": 0,
 		}
-
-	def init_player(self, players):
+		if len(players) != 2 or len(set(players)) != 2:
+			raise ValueError("Two unique player IDs are required to initialize players.")
 
 		self.players[players[0]] = PongPlayer(
 			player_id=players[0],
@@ -31,49 +29,33 @@ class PongGameManager:
 			color=constants.PADDLE_COLOR,
 		)
 
+	def init_game_loop(self):
+		# self.game_loop_task = asyncio.create_task(self.game_loop())
+		print("init_game_loop")
+
 	def update_player(self, data):
-		player_id = data.get("player_id") 
-		if player_id == None:
-			print(f"player_id is None when trying to get it from data")
-			return
-		
-		action_type = data.get("action_type")
-		key = data.get("key")
-		if action_type == None or key == None:
-			print(f"error when retrieve data for update player")
-			return
-		
-		if action_type == 'key_down':
-			if key == "KeyW":
-				self.players[player_id].isMovingUp = True
-			elif key == "KeyS":
-				self.players[player_id].isMovingDown = True
-			pass
-		elif action_type == 'key_up':
-			if key == "KeyW":
-				self.players[player_id].isMovingUp = False
-			elif key == "KeyS":
-				self.players[player_id].isMovingDown = False
-			pass
+		print("update_player")
 
 	def player_disconnected(self, player_id):
-		try:
+		if player_id in self.players:
 			self.players[player_id].status = PongPlayer.PlayerConnectionState.DISCONNECTED
-		except Exception as e:
-			print(f"Error: {e} when search for disconnected player")
-			raise
+			print(f"Player {player_id} marked as disconnected.")
+		else:
+			print(f"Error: Player ID {player_id} not found in players.")
 
 	async def game_loop(self):
-		pass
+		print("game_loop")
 
 	def to_dict(self):
 		"""
-		Converts the PongGameManger to a dictionary.
+		Convert the current game state to a dictionary.
+		Includes ball, scores, and game bounds.
 		"""
 
-		return {
-			"scores": self.score,
+		base_dict = super().to_dict()
+		base_dict.update({
 			"ball": self.ball.to_dict(),
+			"scores": self.scores,
 			"bounds": constants.GAME_BOUNDS,
-			"players": {player_id: player.to_dict() for player_id, player in self.players.items()},
-		}
+		})
+		return base_dict

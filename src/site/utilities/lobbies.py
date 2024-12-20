@@ -1,4 +1,5 @@
 from .lobby import Lobby
+from utilities.GameManager import GameManager
 
 class Lobbies:
 	def __init__(self):
@@ -18,7 +19,7 @@ class Lobbies:
 			del self.lobbies[room_name]
 
 	#v2
-	def _create_lobby(self, room_name, game_manager):
+	def _create_lobby(self, room_name: str, game_manager: GameManager):
 		if room_name not in self.lobbies:
 			self._lobbies[room_name] = Lobby(game_manager)
 		return self._lobbies[room_name]
@@ -29,10 +30,9 @@ class Lobbies:
 		except:
 			raise Exception(f"error when add player to lobby")
 		
-	def _get_lobby(self, room_name):
+	def _get_lobby(self, room_name) -> Lobby:
 		return self._lobbies.get(room_name, None)
 	
 	def _remove_lobby(self, room_name):
 		if room_name in self.lobbies:
 			del self._lobbies[room_name]
-	

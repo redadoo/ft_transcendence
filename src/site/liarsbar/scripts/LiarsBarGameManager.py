@@ -2,27 +2,22 @@
 import random
 from .card import Card
 from .LiarsBarPlayer import LiarsBarPlayer
+from utilities.GameManager import GameManager
 
-class LiarsBarGameManager():
+class LiarsBarGameManager(GameManager):
 
 	def __init__(self):
+		super().__init__(4)
 		self.deck = self.init_cards()
-		self.players = {}
-		self.max_player = 4
 
-	def add_player(self, players):
+	def init_player(self, players: list[LiarsBarPlayer]) -> None:
 		for player in players:
-			self.players.update({f"{player.id}" : LiarsBarPlayer()})
-
-	def add_player(self, player):
-		self.players.update({f"{player.id}" : LiarsBarPlayer()})
-
-
-	def init_cards(self):
+			self.players[player.id] = LiarsBarPlayer(player.id)
+	
+	def init_cards(self) -> list[Card]:
 		"""
-		Initializes self.cards with Card instances for each CardSeed.
+		Initializes a shuffled deck of cards for the game.
 		"""
-
 		deck = []
 
 		for seed in [Card.CardSeed.ACE, Card.CardSeed.KING, Card.CardSeed.QUEEN]:
@@ -32,12 +27,19 @@ class LiarsBarGameManager():
 		random.shuffle(deck)
 		return deck
 
-	def to_dict(self):
+	def player_disconnected(self, player_id: str) -> None:
 		"""
-		Converts the game manager to a dictionary with current gamestatus and cards.
+		Handle logic when a player disconnects.
 		"""
+		if player_id in self.players:
+			del self.players[player_id]
+		else:
+			raise ValueError(f"Player {player_id} not found in the game.")
+		
+	async def game_loop(self) -> None:
+		...
 
-		return {
-			"deck": [card.to_dict() for card in self.deck],
-			"players": [player.to_dict() for player in self.players]
-		}
+	def to_dict(self) -> dict[str, any]:
+		base_dict = super().to_dict()
+		base_dict.update({"deck": [card.to_dict() for card in self.deck]})
+		return base_dict

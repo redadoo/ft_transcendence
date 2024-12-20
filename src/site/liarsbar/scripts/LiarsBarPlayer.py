@@ -1,15 +1,14 @@
-
 import random
 from enum import Enum
+from utilities.Player import Player
 
-class LiarsBarPlayer:
+class LiarsBarPlayer(Player):
 
 	class PlayerStatus(Enum):
 		LIVE = 0
 		DIED = 1
 
 	def __init__(self):
-
 		self.hand = []
 		self.status = LiarsBarPlayer.PlayerStatus.LIVE
 	
@@ -35,8 +34,9 @@ class LiarsBarPlayer:
 		return random.randint(1, 6) == 1
 	
 	def to_dict(self):
-
-		return {
+		base_dict = super().to_dict()
+		base_dict.update({
 			"status": self.status.name,
 			"cards": [card.to_dict() for card in self.cards]  
-		}
+		})
+		return base_dict

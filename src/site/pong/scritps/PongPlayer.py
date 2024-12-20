@@ -1,15 +1,10 @@
-from enum import Enum
 from pong.scritps import constants
+from utilities.Player import Player
 
-class PongPlayer:
+class PongPlayer(Player):
 
-	class PlayerConnectionState(Enum):
-		CONNECTED = 0
-		DISCONNECTED = 1
-
-	def __init__(self, player_id, x,  color):
-
-		self.status = PongPlayer.PlayerConnectionState.CONNECTED
+	def __init__(self, player_id, x, color):
+		super().__init__()
 		self.id = player_id
 		self.x = x
 		self.y = 0
@@ -23,6 +18,7 @@ class PongPlayer:
 
 
 	def update_player_position(self):
+		
 		# Muovi il giocatore verso l'alto, rispettando i limiti
 		if self.isMovingUp and self.y + self.speed + self.height / 2 < constants.GAME_BOUNDS["yMax"]:
 			self.y += self.speed
@@ -30,11 +26,19 @@ class PongPlayer:
 		if self.isMovingDown and self.y - self.speed - self.height / 2 > constants.GAME_BOUNDS["yMin"]:
 			self.y -= self.speed
 
+
+	def player_disconnection(self):
+		"""
+		Abstract method for handling player-specific disconnection logic.
+		Subclasses must implement this.
+		"""
+		pass
+
 	def to_dict(self):
 		"""Converte l'oggetto in un dizionario per il broadcasting."""
 		
-		return {
-			"status": self.status.name,
+		base_dict = super().to_dict()
+		base_dict.update({
 			"id": self.id,
 			"x": self.x,
 			"y": self.y,
@@ -45,4 +49,5 @@ class PongPlayer:
 			"color": self.color,
 			"isMovingUp": self.isMovingUp,
 			"isMovingDown": self.isMovingDown,
-		}
+		})
+		return base_dict
