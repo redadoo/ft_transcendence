@@ -18,12 +18,12 @@ export default class PongPlayer {
 
 	updatePosition(newY)
 	{
-	  this.newY = newY;
+		this.newY = newY;
 	}
   
 	syncPosition()
 	{
-	  this.paddle.mesh.position.y = this.newY;
+	  	this.paddle.mesh.position.y = this.newY;
 	}
 
 	setUpEvents()

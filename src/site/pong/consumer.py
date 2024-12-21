@@ -56,7 +56,6 @@ class PongMatchmaking(AsyncWebsocketConsumer):
 
 	async def send_match_found(self, event):
 		room_name = event["room_name"]
-		print(room_name)
 		await self.send(text_data=json.dumps({
 			"type": "setup_pong_lobby", 
 			"room_name": room_name
@@ -467,36 +466,3 @@ class PongMultiplayerConsumerV2(AsyncWebsocketConsumer):
 				"lobby": self.lobby.to_dict()
 			})
 		)
-
-	# async def game_loop(self):
-	# 	self.lobby.game_manager.ball.reset()
-
-	# 	while self.lobby.is_full(): 
-	# 		async with self.update_lock:
-
-	# 			for player in self.lobby.game_manager.players.items():
-	# 				player.update_player_position()
-
-	# 			self.lobby.game_manager.ball.update_position()
-
-	# 			for player in self.lobby.game_manager.players.items():
-	# 				self.lobby.game_manager.ball.handle_paddle_collision(player)
-
-	# 			# Controlla i punti
-	# 			out_of_bounds = self.lobby.game_manager.ball.is_out_of_bounds()
-	# 			if out_of_bounds == "right":
-	# 				self.lobby.game_manager.scores["player1"] += 1
-	# 				self.lobby.game_manager.ball.reset()
-	# 			elif out_of_bounds == "left":
-	# 				self.lobby.game_manager.scores["player2"] += 1
-	# 				self.lobby.game_manager.ball.reset()
-
-	# 			# Controlla la vittoria
-	# 			if self.lobby.game_manager.scores["player1"] >= 5 or self.lobby.game_manager.scores["player2"] >= 5:
-	# 				winner = "player1" if self.lobby.game_manager.scores["player1"] >= 5 else "player2"
-	# 				await self.broadcast_game_over(winner)
-	# 				break
-
-	# 		# Aggiorna lo stato della lobby
-	# 		await self.lobby.broadcast_lobby("lobbyInfo")
-	# 		await asyncio.sleep(1 / 60)  # 60 FPS

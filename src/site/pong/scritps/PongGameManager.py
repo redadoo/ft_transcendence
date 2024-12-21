@@ -3,6 +3,7 @@ from pong.scritps import constants
 from pong.scritps.ball import Ball
 from pong.scritps.PongPlayer import PongPlayer
 from utilities.GameManager import GameManager
+from channels.layers import get_channel_layer
 
 class PongGameManager(GameManager):
 	def __init__(self) -> None:
@@ -12,6 +13,7 @@ class PongGameManager(GameManager):
 			"player1": 0,
 			"player2": 0,
 		}
+		self.update_lock = asyncio.Lock()
 
 	def init_player(self, players):
 		if len(players) != 2 or len(set(players)) != 2:
@@ -29,12 +31,9 @@ class PongGameManager(GameManager):
 			color=constants.PADDLE_COLOR,
 		)
 
-	def init_game_loop(self):
-		self.game_loop_task = asyncio.create_task(self.game_loop())
-		print("init_game_loop")
-
 	def update_player(self, data):
-		print("update_player")
+		player_id = data.get("playerId")
+		self.players[player_id].update_player_data(data)
 
 	def player_disconnected(self, player_id):
 		if player_id in self.players:
@@ -44,7 +43,21 @@ class PongGameManager(GameManager):
 			print(f"Error: Player ID {player_id} not found in players.")
 
 	async def game_loop(self):
-		print("game_loop")
+		for _, player in self.players.items():
+			player.player_loop()
+
+		self.ball.update_position()
+
+		for _, player in self.players.items():
+			self.ball.handle_paddle_collision(player)
+
+		out_of_bounds = self.ball.is_out_of_bounds()
+		if out_of_bounds == "right":
+			self.scores["player1"] += 1
+			self.ball.reset()
+		elif out_of_bounds == "left":
+			self.scores["player2"] += 1
+			self.ball.reset()
 
 	def to_dict(self):
 		"""
@@ -59,3 +72,5 @@ class PongGameManager(GameManager):
 			"bounds": constants.GAME_BOUNDS,
 		})
 		return base_dict
+
+

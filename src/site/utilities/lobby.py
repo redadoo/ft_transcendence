@@ -7,28 +7,26 @@ class Lobby:
 
 	class LobbyStatus(Enum):
 		TO_SETUP = 0
-		READY = 1
-		PLAYING = 2
-		ENDED = 3
-		WAITING_PLAYER_RECONNECTION = 5
+		PLAYING = 1
+		ENDED = 2
+		WAITING_PLAYER_RECONNECTION = 3
 
 	def __init__(self, room_name: str, game_manager: GameManager) -> None:
 		self.room_group_name = f"pong_multiplayer_{room_name}"
 		self.players_id = []
 		self.game_manager = game_manager
-		self.update_lock = asyncio.Lock()
 		self.lobby_status = Lobby.LobbyStatus.TO_SETUP
+		self.update_lock = asyncio.Lock()
 
 	async def manage_event(self, data: dict):
 		event_type = data.get("type")
-		async with self.update_lock:
-			match event_type:
-				case "init_player":
-					await self.add_player(data)
-				case "update_player":
-					self.game_manager.update_player(data)
-				case _:
-					print(f"Unhandled event type: {event_type}")
+		match event_type:
+			case "init_player":
+				await self.add_player(data)
+			case "update_player":
+				self.game_manager.update_player(data)
+			case _:
+				print(f"Unhandled event type: {event_type}")
 
 	async def broadcast_lobby(self, type: str):
 		channel_layer = get_channel_layer()
@@ -43,9 +41,9 @@ class Lobby:
 		if player_id not in self.players_id:
 			self.players_id.append(player_id)
 			if len(self.players_id) == self.game_manager.max_players:
-				self.lobby_status = Lobby.LobbyStatus.READY
+				self.lobby_status = Lobby.LobbyStatus.PLAYING
 				self.game_manager.init_player(self.players_id)
-				self.game_manager.init_game_loop()
+				self.game_loop_task = asyncio.create_task(self.game_loop())
 
 			await self.broadcast_lobby("lobby_state")
 		else:
@@ -57,6 +55,13 @@ class Lobby:
 
 	def is_full(self):
 		return len(self.players_id) == self.game_manager.max_players
+
+	async def game_loop(self):
+		while self.is_full() == True:
+			async with self.update_lock:
+				await self.game_manager.game_loop()
+				await asyncio.sleep(1 / 60)
+				await self.broadcast_lobby("lobby_state")
 
 	def to_dict(self):
 		"""

@@ -25,7 +25,7 @@ class Ball:
 
 		speed_x = direction_x * math.cos(angle)
 		speed_y = math.sin(angle)
-				# Normalizzazione del vettore
+		# Normalizzazione del vettore
 		speed_magnitude = math.sqrt(speed_x**2 + speed_y**2)
 		if speed_magnitude != 0:
 			speed_x /= speed_magnitude

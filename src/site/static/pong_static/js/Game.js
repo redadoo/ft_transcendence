@@ -219,11 +219,10 @@ class Game {
 
 		if (data.players) {
 			Object.values(data.players).forEach(player => {
-				if (player.id === this.pongPlayer.playerId) {
+				if (player.player_id == this.pongPlayer.playerId)
 					this.pongPlayer.updatePosition(player.y);
-				} else if (player.id === this.pongOpponent.playerId) {
+				else if (player.player_id == this.pongOpponent.playerId)
 					this.pongOpponent.updatePosition(player.y);
-				}
 			});
 		}
 	}
@@ -239,17 +238,16 @@ class Game {
 	handleGameSocketMessage(event) {
 		try {
 			const data = JSON.parse(event.data);
-			console.log(data);
 			switch (data.lobby.current_lobby_status) 
 			{
-				case 'READY':
-					this.initGame(data.lobby);
-					break;
 				case 'PLAYING':
-					this.updateGameState(data.lobby);
+					if(this.pongPlayer == null)
+						this.initGame(data.lobby);
+					else
+						this.updateGameState(data.lobby);
 					break;
 				default:
-					console.log('Unhandled game socket event type' + data.lobby.current_lobby_status);
+					console.log('Unhandled game socket event type ' + data.lobby.current_lobby_status);
 			}
 		} catch (error) {
 			console.error('Error processing game WebSocket message:', error);

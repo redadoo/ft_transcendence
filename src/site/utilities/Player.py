@@ -11,6 +11,14 @@ class Player(ABC):
         self.player_id = player_id
         self.status = Player.PlayerConnectionState.CONNECTED
 
+    @abstractmethod
+    def update_player_data(self, data):
+        pass
+
+    @abstractmethod
+    def player_loop(self):
+        pass
+
     def disconnect(self):
         """
         Handles generic disconnection logic. Subclasses can override this

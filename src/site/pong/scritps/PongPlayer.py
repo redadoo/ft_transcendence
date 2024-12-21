@@ -15,16 +15,28 @@ class PongPlayer(Player):
 		self.isMovingUp = False
 		self.isMovingDown = False
 
+	def player_loop(self):
 
-	def update_player_position(self):
-		
-		# Muovi il giocatore verso l'alto, rispettando i limiti
 		if self.isMovingUp and self.y + self.speed + self.height / 2 < constants.GAME_BOUNDS["yMax"]:
 			self.y += self.speed
-		# Muovi il giocatore verso il basso, rispettando i limiti
+
 		if self.isMovingDown and self.y - self.speed - self.height / 2 > constants.GAME_BOUNDS["yMin"]:
 			self.y -= self.speed
 
+	def update_player_data(self, data: dict):
+		event_type = data.get("action_type")
+		key = data.get("key")
+
+		if event_type == "key_down":
+			if key == "KeyW":
+				self.isMovingUp = True
+			elif key == "KeyS":
+				self.isMovingDown = True
+		elif event_type == "key_up":
+			if key == "KeyW":
+				self.isMovingUp = False
+			elif key == "KeyS":
+				self.isMovingDown = False
 
 	def player_disconnection(self):
 		"""

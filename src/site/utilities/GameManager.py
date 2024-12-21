@@ -18,10 +18,6 @@ class GameManager(ABC):
         return len(self.players) >= self.max_players
     
     @abstractmethod
-    async def init_game_loop(self) -> None:
-        return
-
-    @abstractmethod
     async def game_loop(self) -> None:
         """
         Core game loop logic.
