@@ -30,7 +30,7 @@ class PongGameManager(GameManager):
 		)
 
 	def init_game_loop(self):
-		# self.game_loop_task = asyncio.create_task(self.game_loop())
+		self.game_loop_task = asyncio.create_task(self.game_loop())
 		print("init_game_loop")
 
 	def update_player(self, data):

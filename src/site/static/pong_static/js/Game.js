@@ -167,9 +167,9 @@ class Game {
 
 	initGame(data) {
 		try {
-			const bounds_data = data?.lobby?.game_manager?.bounds;
-			const ball_data = data?.lobby?.game_manager?.ball;
-			const players = data?.lobby?.game_manager?.players;
+			const bounds_data = data?.bounds;
+			const ball_data = data?.ball;
+			const players = data?.players;
 	
 			if (!bounds_data || !ball_data || !players) {
 				console.error("Game data is missing or incomplete:", data);

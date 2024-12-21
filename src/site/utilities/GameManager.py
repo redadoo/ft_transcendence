@@ -47,5 +47,5 @@ class GameManager(ABC):
         Convert the game manager state to a dictionary.
         """
         return {
-            "players": [player.to_dict() for player in self.players.values()],
+            "players": {player_id: player.to_dict() for player_id, player in self.players.items()},
         }

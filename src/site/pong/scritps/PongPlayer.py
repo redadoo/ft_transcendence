@@ -38,7 +38,6 @@ class PongPlayer(Player):
 		
 		base_dict = super().to_dict()
 		base_dict.update({
-			"id": self.player_id,
 			"x": self.x,
 			"y": self.y,
 			"height": self.height,
