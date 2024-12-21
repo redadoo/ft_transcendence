@@ -78,26 +78,23 @@ class UserProfileSerializer(serializers.ModelSerializer):
 			Friendships.objects
 			.filter(models.Q(first_user=obj) | models.Q(second_user=obj))
 			.select_related('first_user', 'second_user')
-			.annotate(
-				other_user=models.Case(
-					models.When(first_user=current_user, then=models.F('second_user')),
-					models.When(second_user=current_user, then=models.F('first_user')),
-					default=models.F('first_user'),  # Handle edge cases
-					output_field=models.ForeignKey(User, on_delete=models.CASCADE)
-				)
-			)
 		)
 
 		friendships_data = [
 			{
 				'status_display': friendship.get_status_display(),
-				'other_user_username': friendship.other_user.username,
+				'other_user_username': (
+					friendship.second_user.username 
+					if friendship.first_user == current_user 
+					else friendship.first_user.username
+				),
 			}
 			for friendship in friendships
 			if not (friendship.status == Friendships.FriendshipsStatus.PENDING and friendship.first_user == current_user)
 		]
 
 		return friendships_data
+
 
 
 	

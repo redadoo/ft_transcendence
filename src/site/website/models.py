@@ -206,12 +206,10 @@ class Friendships(models.Model):
 		return self.status == self.FriendshipsStatus.PENDING
 
 	def is_blocked(self):
-		return self.status == self.FriendshipsStatus.BLOCK
-
-	def save(self, *args, **kwargs):
-		if self.first_user.id > self.second_user.id:
-			self.first_user, self.second_user = self.second_user, self.first_user
-		super(Friendships, self).save(*args, **kwargs)
+		return self.status in (
+			self.FriendshipsStatus.FIRST_USER_BLOCK,
+			self.FriendshipsStatus.SECOND_USER_BLOCK
+		)
 
 	def clean(self):
 		if self.first_user == self.second_user:
