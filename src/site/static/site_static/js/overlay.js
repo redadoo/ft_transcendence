@@ -301,8 +301,8 @@ export default class SocialOverlayManager {
 				'get_unblocked': () => this.handleUserUnblocked(socketData.username),
 				'get_friend_request': () => this.handleFriendRequest(socketData.username),
 				'get_friend_request_accepted': () => this.handleFriendRequestAccepted(socketData.username),
-				// 'get_friend_request_declined': () => this.handleFriendRequest
-				'get_unfriended': () => this.handleUnfriended(socketData.username),
+				'get_friend_request_declined': () => this.handleFriendRequestDeclined(socketData.username),
+				'get_friend_removed': () => this.handleFriendRemoved(socketData.username),
 			};
 
 			const handler = messageHandlers[socketData.type];
@@ -372,8 +372,27 @@ export default class SocialOverlayManager {
 
 		this.addNotification({
 			type: 'friend_request',
-			title: 'Friend Request',
+			title: 'Friend Request Accepted',
 			message: `${username} accepted your friend request`
+		});
+	}
+
+	handleFriendRequestDeclined(username) {
+		this.addNotification({
+			type: 'friend_request',
+			title: 'Friend Request Declined',
+			message: `${username} declined your friend request`
+		});
+	}
+
+	handleFriendRemoved(username) {
+		this.socialData.activeFriends = this.socialData.activeFriends.filter(friend => friend !== username);
+		this.updateFriendLists();
+
+		this.addNotification({
+			type: 'friend_removed',
+			title: 'Friend Removed',
+			message: `${username} removed you as a friend`
 		});
 	}
 
@@ -470,6 +489,14 @@ export default class SocialOverlayManager {
 			username: targetUsername
 		}));
 	}
+
+	sendRemoveFriendUpdate(targetUsername) {
+		this.socialData.socket.send(JSON.stringify({
+			type: 'remove_friend',
+			username: targetUsername
+		}));
+	}
+
 	//Notification System methods
 	initializeNotificationSystem() {
 		this.notifications = [];
