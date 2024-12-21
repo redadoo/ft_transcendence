@@ -36,7 +36,7 @@ class SocialConsumer(AsyncWebsocketConsumer):
 			case "add_friend":
 				await self.user.send_friend_request(data)
 			case "remove_friend":
-				pass
+				await self.user.send_friend_request(data)
 			case "get_users_list":
 				pass
 			case "get_chat":
