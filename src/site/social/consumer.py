@@ -36,14 +36,10 @@ class SocialConsumer(AsyncWebsocketConsumer):
 			case "friend_request":
 				await self.user.send_friend_request(data)
 			case "remove_friend":
-				await self.user.send_friend_request(data)
-			case "get_users_list":
+				await self.user.remove_friend(data)
+			case "friend_request_accepted":
 				pass
-			case "get_chat":
-				pass
-			case "send_messagge":
-				pass
-			case "send_tournament_invite":
+			case "friend_request_declined":
 				pass
 			case _:
 				print(f"Unhandled event type: {event_type}")

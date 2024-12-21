@@ -27,20 +27,6 @@ class UserImageSerializer(serializers.ModelSerializer):
 		model = UserImage
 		fields = ['avatar_url']
 
-class FriendshipsSerializer(serializers.ModelSerializer):
-	status_display = serializers.CharField(source='get_status_display', read_only=True)
-	first_user_username = serializers.CharField(source='first_user.username', read_only=True)
-	second_user_username = serializers.CharField(source='second_user.username', read_only=True)
-
-	class Meta:
-		model = Friendships
-		fields = [
-			'status_display',
-			'first_user_username',
-			'second_user_username',
-		]
-		read_only_fields = ['date_created', 'date_updated']
-
 class MatchHistorySerializer(serializers.ModelSerializer):
     pong_matches = PongMatchSerializer(many=True, read_only=True)
     liarsbar_matches = LiarsBarMatchSerializer(many=True, read_only=True)
@@ -87,24 +73,32 @@ class UserProfileSerializer(serializers.ModelSerializer):
 
 	def get_friendships(self, obj):
 		current_user = self.context['request'].user
-		
-		friendships = Friendships.objects.filter(
-			models.Q(first_user=obj) | models.Q(second_user=obj)
+
+		friendships = (
+			Friendships.objects
+			.filter(models.Q(first_user=obj) | models.Q(second_user=obj))
+			.select_related('first_user', 'second_user')
+			.annotate(
+				other_user=models.Case(
+					models.When(first_user=current_user, then=models.F('second_user')),
+					models.When(second_user=current_user, then=models.F('first_user')),
+					default=models.F('first_user'),  # Handle edge cases
+					output_field=models.ForeignKey(User, on_delete=models.CASCADE)
+				)
+			)
 		)
 
-		friendships_data = []
-		for friendship in friendships:
-			if friendship.first_user == current_user:
-				other_user = friendship.second_user
-			else:
-				other_user = friendship.first_user
-			
-			friendships_data.append({
+		friendships_data = [
+			{
 				'status_display': friendship.get_status_display(),
-				'other_user_username': other_user.username,
-			})
+				'other_user_username': friendship.other_user.username,
+			}
+			for friendship in friendships
+			if not (friendship.status == Friendships.FriendshipsStatus.PENDING and friendship.first_user == current_user)
+		]
 
 		return friendships_data
+
 
 	
 class SimpleUserProfileSerializer(serializers.ModelSerializer):
