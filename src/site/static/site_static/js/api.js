@@ -51,7 +51,7 @@ const api = {
 			const response = await this.fetchJson('/api/profile?include=friendships');
 
 			const blockedNames = response.friendships
-			.filter(friendship => 
+			.filter(friendship =>
 				friendship.status_display === 'first_user_block' || friendship.status_display === 'second_user_block')
 			.map(friendship => friendship.other_user_username);
 
@@ -82,6 +82,21 @@ const api = {
 			return await this.fetchJson('/api/profile');
 		} catch (error) {
 			console.error('Header info error:', error);
+			return false;
+		}
+	},
+
+	async getPendingFriendRequests() {
+		try {
+			const response = await this.fetchJson('/api/profile?include=friendships');
+
+			const pendingNames = response.friendships
+			.filter(friendship => friendship.status_display === 'pending')
+			.map(friendship => friendship.other_user_username);
+
+			return pendingNames;
+		} catch (error) {
+			console.error('Pending requests error:', error);
 			return false;
 		}
 	},
