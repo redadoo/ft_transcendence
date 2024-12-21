@@ -9,7 +9,8 @@ export default class SocialOverlayManager {
 			currentUsername: null,
 			activeFriends: [],
 			blockedContacts: [],
-			registeredUsers: []
+			registeredUsers: [],
+			pendingFriendRequests: []
 		};
 		this.initializeUIElements();
 	}
@@ -35,18 +36,37 @@ export default class SocialOverlayManager {
 	async initialize() {
 		if (this.initialized) return;
 		try {
-			const [currentUsername, activeFriends, blockedContacts, registeredUsers] = await Promise.all([
+			this.initializeNotificationSystem();
+			const [currentUsername, activeFriends, blockedContacts, registeredUsers, pendingFriendRequests] = await Promise.all([
 				api.getUsername(),
 				api.getFriendUsers(),
 				api.getBlockedUsers(),
-				api.getAllUsers()
+				api.getAllUsers(),
+				api.getPendingFriendRequests()
 			]);
-			this.socialData = { currentUsername, activeFriends, blockedContacts, registeredUsers };
+
+			this.socialData = {
+				...this.socialData,
+				currentUsername,
+				activeFriends,
+				blockedContacts,
+				pendingFriendRequests,
+				registeredUsers
+			}
 			this.displayUsername.textContent = currentUsername;
 			this.socialData.socket = new SocketManager()
 			this.socialData.socket.initWebSocket('social/', this.handleSocketMessage.bind(this));
 			this.updateFriendLists();
 			this.setupEventHandlers();
+			this.socialData.pendingFriendRequests.forEach(username => { this.handleFriendRequest(username) });
+
+			window.handleNotificationAction = (notificationId, actionIndex) => {
+				const notification = this.notifications.find(notification => notification.id === notificationId);
+				if (notification && notification.actions && notification.actions[actionIndex]) {
+					notification.actions[actionIndex].handler();
+					this.removeNotification(notificationId);
+				}
+			};
 			this.initialized = true;
 		} catch (error) {
 			console.error('Failed to initialize Social Overlay:', error);
@@ -106,7 +126,7 @@ export default class SocialOverlayManager {
 			if (addButton) {
 				const friendListItem = addButton.closest('.friend-item');
 				const targetUsername = friendListItem.querySelector('.friend-name').textContent;
-				this.addFriend(targetUsername);
+				this.sendFriendRequest(targetUsername);
 			}
 		});
 
@@ -164,7 +184,6 @@ export default class SocialOverlayManager {
 			return this.createSearchResultItem(
 				user.username,
 				user.image_url.avatar_url,
-				user.status
 			);
 		}).join('');
 
@@ -252,12 +271,11 @@ export default class SocialOverlayManager {
 		`;
 	}
 
-	createSearchResultItem(username, avatarUrl, status) {
+	createSearchResultItem(username, avatarUrl) {
 		return `
 			<div class="friend-item" id="friendItem">
 				<img src="${avatarUrl}" alt="avatar" class="friend-avatar">
 				<span class="friend-name pixel-font">${username}</span>
-				<span class="friend-status ${status.toLowerCase()}">${status}</span>
 				<span class="friend-action" id="addFriend">❤️</span>
 			</div>
 		`;
@@ -281,6 +299,10 @@ export default class SocialOverlayManager {
 				'get_status_change': () => this.handleFriendStatusUpdate(socketData.friend_username, socketData.new_status),
 				'get_blocked': () => this.handleUserBlocked(socketData.username),
 				'get_unblocked': () => this.handleUserUnblocked(socketData.username),
+				'get_friend_request': () => this.handleFriendRequest(socketData.username),
+				'get_friend_request_accepted': () => this.handleFriendRequestAccepted(socketData.username),
+				// 'get_friend_request_declined': () => this.handleFriendRequest
+				'get_unfriended': () => this.handleUnfriended(socketData.username),
 			};
 
 			const handler = messageHandlers[socketData.type];
@@ -300,6 +322,11 @@ export default class SocialOverlayManager {
 		if (friend) {
 			friend.status = newStatus;
 			this.updateFriendLists();
+			this.addNotification({
+				type: 'status_update',
+				title: 'Friend Status Update',
+				message: `${username} is now ${newStatus}`
+			});
 		}
 	}
 
@@ -313,6 +340,41 @@ export default class SocialOverlayManager {
 			this.socialData.activeFriends.push(username);
 			this.updateFriendLists();
 		}
+	}
+
+	handleFriendRequest(username) {
+		if (!this.socialData.pendingFriendRequests.includes(username)) {
+			this.socialData.pendingFriendRequests.push(username);
+		}
+
+		this.addNotification({
+			type: 'friend_request',
+			title: 'Friend Request',
+			message: `${username} wants to be your friend`,
+			actions: [
+				{
+					label: 'Accept',
+					handler: () => this.acceptFriendRequest(username)
+				},
+				{
+					label: 'Decline',
+					handler: () => this.declineFriendRequest(username)
+				}
+			]
+		});
+	}
+
+	handleFriendRequestAccepted(username) {
+		if (!this.socialData.activeFriends.includes(username)) {
+			this.socialData.activeFriends.push(username);
+			this.updateFriendLists();
+		}
+
+		this.addNotification({
+			type: 'friend_request',
+			title: 'Friend Request',
+			message: `${username} accepted your friend request`
+		});
 	}
 
 	// User actions
@@ -344,20 +406,26 @@ export default class SocialOverlayManager {
 		}
 	}
 
-	addFriend(targetUsername) {
-		if (!this.socialData.activeFriends.includes(targetUsername)) {
-			// this.socialData.activeFriends.push(targetUsername);
-			// this.updateFriendLists();
-			this.sendAddFriendUpdate(targetUsername);
-		}
-	}
-
 	removeFriend(targetUsername) {
 		if (this.socialData.activeFriends.includes(targetUsername)) {
 			this.socialData.activeFriends = this.socialData.activeFriends.filter(friend => friend !== targetUsername);
 			this.updateFriendLists();
 			this.sendRemoveFriendUpdate(targetUsername);
 		}
+	}
+
+	acceptFriendRequest(username) {
+		this.socialData.pendingFriendRequests = this.socialData.pendingFriendRequests.filter(request => request !== username);
+		if (!this.socialData.activeFriends.includes(username)) {
+			this.socialData.activeFriends.push(username);
+			this.updateFriendLists();
+		}
+		this.sendFriendRequestAcceptedUpdate(username);
+	}
+
+	declineFriendRequest(username) {
+		this.socialData.pendingFriendRequests = this.socialData.pendingFriendRequests.filter(request => request !== username);
+		this.sendFriendRequestDeclinedUpdate(username);
 	}
 
 	// Socket messages
@@ -382,18 +450,81 @@ export default class SocialOverlayManager {
 		}));
 	}
 
-	sendAddFriendUpdate(targetUsername) {
+	sendFriendRequest(targetUsername) {
 		this.socialData.socket.send(JSON.stringify({
-			type: 'add_friend',
+			type: 'friend_request',
 			username: targetUsername
 		}));
 	}
 
-	sendRemoveFriendUpdate(targetUsername) {
+	sendFriendRequestAcceptedUpdate(targetUsername) {
 		this.socialData.socket.send(JSON.stringify({
-			type: 'remove_friend',
+			type: 'friend_request_accepted',
 			username: targetUsername
 		}));
+	}
+
+	sendFriendRequestDeclinedUpdate(targetUsername) {
+		this.socialData.socket.send(JSON.stringify({
+			type: 'friend_request_declined',
+			username: targetUsername
+		}));
+	}
+	//Notification System methods
+	initializeNotificationSystem() {
+		this.notifications = [];
+		this.notificationCount = 0;
+		this.notificationContainer = document.getElementById('notifications');
+		this.notificationCountDisplay = document.getElementById('notificationCount');
+	}
+
+	addNotification(notification) {
+		const notificationId = Date.now();
+		const notificationData = {
+			id: notificationId,
+			...notification
+		};
+
+		this.notifications.unshift(notificationData);
+		this.notificationCount++;
+		this.updateNotificationDisplay();
+
+		if (!notification.actions) {
+			setTimeout(() => this.removeNotification(notificationId), 5000);
+		}
+	}
+
+	removeNotification(notificationId) {
+		const index = this.notifications.findIndex(notification => notification.id === notificationId);
+		if (index !== -1) {
+			this.notifications.splice(index, 1);
+			this.notificationCount = Math.max(0, this.notificationCount - 1);
+			this.updateNotificationDisplay();
+		}
+	}
+
+	updateNotificationDisplay() {
+		this.notificationCountDisplay.textContent = this.notificationCount;
+
+		// Update notifications list
+		this.notificationContainer.innerHTML = this.notifications.map(notification => `
+			<div class="notification-item ${notification.type}" id="notification-${notification.id}">
+				<div class="notification-content">
+					<div class="notification-title pixel-font">${notification.title}</div>
+					<div class="notification-message pixel-font">${notification.message}</div>
+					${notification.actions ? `
+						<div class="notification-actions">
+							${notification.actions.map((action, index) => `
+								<button class="notification-action pixel-font"
+										onclick="window.handleNotificationAction(${notification.id}, ${index})">
+									${action.label}
+								</button>
+							`).join('')}
+						</div>
+					` : ''}
+				</div>
+			</div>
+		`).join('');
 	}
 
 	// UI handlers
