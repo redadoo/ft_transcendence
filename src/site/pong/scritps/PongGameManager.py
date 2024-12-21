@@ -7,13 +7,13 @@ from utilities.GameManager import GameManager
 class PongGameManager(GameManager):
 	def __init__(self) -> None:
 		super().__init__(2)
-
-	def init_player(self, players):
 		self.ball = Ball()
 		self.scores = {
 			"player1": 0,
 			"player2": 0,
 		}
+
+	def init_player(self, players):
 		if len(players) != 2 or len(set(players)) != 2:
 			raise ValueError("Two unique player IDs are required to initialize players.")
 

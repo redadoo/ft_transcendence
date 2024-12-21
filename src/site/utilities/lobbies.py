@@ -21,7 +21,7 @@ class Lobbies:
 	#v2
 	def _create_lobby(self, room_name: str, game_manager: GameManager):
 		if room_name not in self.lobbies:
-			self._lobbies[room_name] = Lobby(game_manager)
+			self._lobbies[room_name] = Lobby(room_name, game_manager)
 		return self._lobbies[room_name]
 
 	def _join_lobby(self, player, lobby):

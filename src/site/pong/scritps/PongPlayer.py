@@ -4,8 +4,7 @@ from utilities.Player import Player
 class PongPlayer(Player):
 
 	def __init__(self, player_id, x, color):
-		super().__init__()
-		self.id = player_id
+		super().__init__(player_id)
 		self.x = x
 		self.y = 0
 		self.height = constants.PADDLE_HEIGHT
@@ -39,7 +38,7 @@ class PongPlayer(Player):
 		
 		base_dict = super().to_dict()
 		base_dict.update({
-			"id": self.id,
+			"id": self.player_id,
 			"x": self.x,
 			"y": self.y,
 			"height": self.height,

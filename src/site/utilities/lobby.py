@@ -12,7 +12,8 @@ class Lobby:
 		ENDED = 3
 		WAITING_PLAYER_RECONNECTION = 5
 
-	def __init__(self, game_manager: GameManager) -> None:
+	def __init__(self, room_name: str, game_manager: GameManager) -> None:
+		self.room_group_name = f"pong_multiplayer_{room_name}"
 		self.players_id = []
 		self.game_manager = game_manager
 		self.update_lock = asyncio.Lock()
@@ -29,7 +30,7 @@ class Lobby:
 				case _:
 					print(f"Unhandled event type: {event_type}")
 
-	async def broadcast_lobby(self, type: str, message_type: str):
+	async def broadcast_lobby(self, type: str):
 		channel_layer = get_channel_layer()
 		await channel_layer.group_send(self.room_group_name,{"type": type})
 
@@ -62,9 +63,7 @@ class Lobby:
 		Converts the lobby to a dictionary.
 		"""
 
-		lobby_data =  {
-			"current_lobby_status": self.lobby_status.name,
-			"game_manager": self.game_manager.to_dict()
-		}
+		lobby_data =  {"current_lobby_status": self.lobby_status.name}
+		lobby_data.update(self.game_manager.to_dict())
 
 		return lobby_data
