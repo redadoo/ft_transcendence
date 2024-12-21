@@ -196,25 +196,47 @@ class SocialUser:
 
 		await channel_layer.group_send(f"user_{target_user.id}", payload)
 
-	async def remove_friend(self, data: dict):
+	async def remove_friend(self, data: dict, event_name: str):
+		"""
+		Remove a friend, deleting the friendship relationship.
+
+		Args:
+			data (dict): Data containing the username of the friend to remove.
+
+		Raises:
+			ValueError: If the username is not provided, the user doesn't exist, or no friendship exists.
+		"""
 		target_username = data.get("username")
+		
 		if target_username is None:
 			raise ValueError("Invalid data: 'username' is required.")
 		
 		if target_username == self.user.username:
-			raise ValueError("Cannot send a friend request to yourself.")
-
+			raise ValueError("Cannot remove yourself as a friend.")
+		
 		try:
 			target_user = await sync_to_async(User.objects.get)(username=target_username)
 		except User.DoesNotExist:
 			raise ValueError(f"User '{target_username}' does not exist.")
 		
-		existing_friendship = await sync_to_async(
-			lambda: Friendships.objects.filter(
+		try:
+			friendship = await sync_to_async(Friendships.objects.get)(
 				Q(first_user=self.user, second_user=target_user) |
 				Q(first_user=target_user, second_user=self.user)
-			).exists()
-		)()
+			)
+		except Friendships.DoesNotExist:
+			raise ValueError(f"No friendship exists between '{target_username}' and '{self.user.username}'.")
+		
+		await sync_to_async(friendship.delete)()
 
-		if  existing_friendship == None:
-			raise ValueError(f"A friendship not exist with '{target_username}' and '{self.user.username}'.")
+		channel_layer = get_channel_layer()
+		payload = {
+			"type": event_name,
+			"username": self.user.username,
+		}
+
+		await channel_layer.group_send(f"user_{target_user.id}", payload)
+		
+
+	async def accept_friend_request(self, data: dict):
+		pass

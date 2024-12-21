@@ -36,10 +36,10 @@ class SocialConsumer(AsyncWebsocketConsumer):
 			case "friend_request":
 				await self.user.send_friend_request(data)
 			case "remove_friend":
-				await self.user.remove_friend(data)
-			case "friend_request_accepted":
-				pass
+				await self.user.remove_friend(data,"get_friend_removed")
 			case "friend_request_declined":
+				await self.user.remove_friend(data,"get_friend_request_declined")
+			case "friend_request_accepted":
 				pass
 			case _:
 				print(f"Unhandled event type: {event_type}")
@@ -89,6 +89,22 @@ class SocialConsumer(AsyncWebsocketConsumer):
 		await self.send(
 			text_data=json.dumps({
 				"type": "get_friend_request",
+				"username" : event["username"]
+			})
+		)
+
+	async def get_friend_request_declined(self, event):
+		await self.send(
+			text_data=json.dumps({
+				"type": "get_friend_request_declined",
+				"username" : event["username"]
+			})
+		)
+
+	async def get_friend_removed(self, event):
+		await self.send(
+			text_data=json.dumps({
+				"type": "get_friend_removed",
 				"username" : event["username"]
 			})
 		)
