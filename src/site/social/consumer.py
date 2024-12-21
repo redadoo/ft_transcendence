@@ -40,6 +40,7 @@ class SocialConsumer(AsyncWebsocketConsumer):
 			case "friend_request_declined":
 				await self.user.remove_friend(data,"get_friend_request_declined")
 			case "friend_request_accepted":
+				await self.user.accept_friend_request(data)
 				pass
 			case _:
 				print(f"Unhandled event type: {event_type}")

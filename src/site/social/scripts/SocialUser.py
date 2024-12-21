@@ -239,4 +239,34 @@ class SocialUser:
 		
 
 	async def accept_friend_request(self, data: dict):
-		pass
+		target_username = data.get("username")
+
+		if target_username is None:
+			raise ValueError("Invalid data: 'username' is required.")
+
+		if target_username == self.user.username:
+			raise ValueError("Cannot remove yourself as a friend.")
+
+		try:
+			target_user = await sync_to_async(User.objects.get)(username=target_username)
+		except User.DoesNotExist:
+			raise ValueError(f"User '{target_username}' does not exist.")
+
+		try:
+			friendship = await sync_to_async(Friendships.objects.get)(
+				Q(first_user=self.user, second_user=target_user) |
+				Q(first_user=target_user, second_user=self.user)
+			)
+		except Friendships.DoesNotExist:
+			raise ValueError(f"No friendship exists between '{target_username}' and '{self.user.username}'.")
+
+		friendship.status = Friendships.FriendshipsStatus.FRIENDS
+		await sync_to_async(friendship.save)(update_fields=["status"])
+
+		channel_layer = get_channel_layer()
+		payload = {
+			"type": "get_friend_request_accepted",
+			"username": self.user.username,
+		}
+
+		await channel_layer.group_send(f"user_{target_user.id}", payload)
