@@ -109,3 +109,11 @@ class SocialConsumer(AsyncWebsocketConsumer):
 				"username" : event["username"]
 			})
 		)
+
+	async def get_friend_request_accepted(self, event):
+		await self.send(
+			text_data=json.dumps({
+				"type": "get_friend_request_accepted",
+				"username" : event["username"]
+			})
+		)
