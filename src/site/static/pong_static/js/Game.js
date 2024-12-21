@@ -240,18 +240,16 @@ class Game {
 		try {
 			const data = JSON.parse(event.data);
 			console.log(data);
-			switch (data.current_lobby_status) 
+			switch (data.lobby.current_lobby_status) 
 			{
 				case 'READY':
-					this.initGame(data);
+					this.initGame(data.lobby);
 					break;
-				case 'lobby_state':
-					this.updateGameState(data);
-					break;
-				case 'stateUpdate':
+				case 'PLAYING':
+					this.updateGameState(data.lobby);
 					break;
 				default:
-					console.log('Unhandled game socket event type.' + data.type);
+					console.log('Unhandled game socket event type' + data.lobby.current_lobby_status);
 			}
 		} catch (error) {
 			console.error('Error processing game WebSocket message:', error);
