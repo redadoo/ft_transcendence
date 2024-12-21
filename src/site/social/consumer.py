@@ -33,7 +33,7 @@ class SocialConsumer(AsyncWebsocketConsumer):
 				await self.user.block_user(data)
 			case "unblock_user":
 				await self.user.unblock_user(data)
-			case "add_friend":
+			case "friend_request":
 				await self.user.send_friend_request(data)
 			case "remove_friend":
 				await self.user.send_friend_request(data)
