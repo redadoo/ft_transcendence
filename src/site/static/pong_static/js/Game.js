@@ -240,17 +240,15 @@ class Game {
 		try {
 			const data = JSON.parse(event.data);
 			console.log(data);
-			switch (data.type) {
+			switch (data.current_lobby_status) 
+			{
+				case 'READY':
+					this.initGame(data);
+					break;
 				case 'lobby_state':
 					this.updateGameState(data);
 					break;
-				case 'initGame':
-					this.initGame(data);
-					break;
 				case 'stateUpdate':
-					break;
-				case 'lobbyClosed':
-					this.cleanUp();
 					break;
 				default:
 					console.log('Unhandled game socket event type.' + data.type);
