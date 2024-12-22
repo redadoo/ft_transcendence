@@ -14,9 +14,6 @@ class GameManager(ABC):
         """
         return
 
-    def is_game_full(self) -> bool:
-        return len(self.players) >= self.max_players
-    
     @abstractmethod
     async def game_loop(self) -> None:
         """
