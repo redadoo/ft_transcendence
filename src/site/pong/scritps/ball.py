@@ -61,7 +61,6 @@ class Ball:
 	def handle_paddle_collision(self, paddle):
 		"""Gestisce le collisioni con una paddle considerando l'intera superficie della palla."""
 
-		# Accedi agli attributi del paddle (PongPlayer)
 		paddle_x = paddle.x
 		paddle_y = paddle.y
 		paddle_width = paddle.width

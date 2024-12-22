@@ -68,7 +68,7 @@ class PongMultiplayerConsumer(AsyncWebsocketConsumer):
 	
 		self.lobby = lobbies._get_lobby(self.room_name) 
 		if self.lobby == None:
-			self.lobby = lobbies._create_lobby(self.room_name,  PongGameManager(False))
+			self.lobby = lobbies._create_lobby(self.room_name,  PongGameManager())
 
 		await self.channel_layer.group_add(self.lobby.room_group_name, self.channel_name)
 		await self.accept()
@@ -101,13 +101,11 @@ class PongSingleplayerConsumer(AsyncWebsocketConsumer):
 
 	async def connect(self):
 		self.room_name = self.generate_random_room_name()
-		self.lobby: Lobby = lobbies._create_lobby(self.room_name,  PongGameManager(True))
+		self.lobby: Lobby = lobbies._create_lobby(self.room_name,  PongGameManager())
 
 		await self.channel_layer.group_add(self.lobby.room_group_name, self.channel_name)
 		await self.accept()
-
-		self.lobby.add_player({"player_id" : 12})
-		self.lobby.add_player({"player_id" : 12})
+		await self.lobby.add_player({"player_id" : str(uuid.uuid4())}, True)
 
 	async def disconnect(self, close_code):
 		await self.lobby.broadcast_message({"type": "lobby_state"})

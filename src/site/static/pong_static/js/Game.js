@@ -6,6 +6,7 @@ import PongPlayer from './Scritps/Class/PongPlayer.js';
 import Paddle from './Scritps/Class/Paddle.js';
 import Background from './Scritps/Class/Background.js';
 import SocketManager from '../../common_static/js/SocketManager.js';
+import MatchmakingManager from  './Scritps/Matchmaking.js';
 
 const CAMERA_SETTINGS = {
 	FOV: 75,
@@ -17,7 +18,10 @@ const CAMERA_SETTINGS = {
 
 class Game {
 	constructor() {
+
+		//manager
 		this.sceneManager = null;
+		this.matchmakingManager = null;
 
 		// Lights
 		this.ambientLight = null;
@@ -31,66 +35,46 @@ class Game {
 		this.background = null;
 		this.player_id = null;
 
-		// Networking
+		// socket
 		this.gameSocket = null;
 	}
 
-	init() 
+	initializeSceneManager() 
 	{
-		this.initializeSceneManager();
-		const isSinglePlayer = SocketManager.getModeFromPath() === 'singleplayer';
-		isSinglePlayer ? this.initSinglePlayer() : this.setupMultiplayerUI();
-	}
-
-	initializeSceneManager() {
 		this.sceneManager = new SceneManager(true);
 		Object.assign(this.sceneManager, CAMERA_SETTINGS);
 		this.sceneManager.initialize();
-	}
 
-	setupMultiplayerUI() {
-		const matchmakingButton = document.getElementById('startMatchmaking');
-		if (matchmakingButton) 
-			matchmakingButton.addEventListener('click', () => this.startMatchmaking());
 	}
-
-	startMatchmaking() 
+	
+	async setPlayerId()
 	{
-		this.gameSocket = new SocketManager();
-		this.gameSocket.initWebSocket(
-			'multiplayer/pong/matchmaking',
-			this.handleMatchmakingSocketMessage.bind(this)
-		);
-		this.gameSocket.socket.onopen = () => {
-			this.gameSocket.send(JSON.stringify({ action: 'join_matchmaking' }));
-		};
+		const response = await fetch("/api/profile?include=id");
+		const json_response = await response.json();
+		this.player_id = json_response["id"];
 	}
 
-	handleMatchmakingSocketMessage(event) 
+	async init() 
 	{
-		try 
+		await this.setPlayerId();
+
+		this.initializeSceneManager();
+		
+		if (SocketManager.getModeFromPath() === 'singleplayer')
+			this.setupSinglePlayerSocket();
+		else
 		{
-			const data = JSON.parse(event.data);
-			if (data.type === 'setup_pong_lobby')
-				this.setupMultiplayerPongSocket(data);
-			else 
-				console.log('Unhandled matchmaking event type.' + data.type);
-		} 
-		catch (error) {
-			console.error('Error processing matchmaking WebSocket message:', error);
-		}
+			this.matchmakingManager = new MatchmakingManager();
+			this.matchmakingManager.on('setupLobby', async data => {
+				await this.setupMultiplayerPongSocket(data);
+			});
+		}	
+		
+		this.initGameEnvironment();
 	}
 
 	async setupMultiplayerPongSocket(data) 
 	{
-		document.getElementById('pong-container')?.remove();
-		
-		const response = await fetch("/api/profile?include=id");
-		const json_response = await response.json();
-		this.player_id = json_response["id"];
-
-		this.gameSocket.close();
-		delete this.gameSocket;
 		this.gameSocket = new SocketManager();
 		this.gameSocket.initGameWebSocket(
 			'pong',
@@ -98,6 +82,22 @@ class Game {
 			data.room_name
 		);
 
+		this.gameSocket.socket.onopen = () => {
+			this.gameSocket.send(JSON.stringify({ 
+				type: 'init_player', 
+				player_id: this.player_id
+			}));
+		};
+	}
+
+	setupSinglePlayerSocket() 
+	{
+		this.gameSocket = new SocketManager();
+		this.gameSocket.initGameWebSocket(
+			'pong',
+			this.handleGameSocketMessage.bind(this),
+			''
+		);
 
 		this.gameSocket.socket.onopen = () => {
 			this.gameSocket.send(JSON.stringify({ 
@@ -105,18 +105,6 @@ class Game {
 				player_id: this.player_id
 			}));
 		};
-		
-		this.initGameEnvironment();
-	}
-
-	initSinglePlayer() {
-		this.gameSocket = new SocketManager();
-		this.gameSocket.initGameWebSocket(
-			'pong',
-			this.handleGameSocketMessage.bind(this),
-			''
-		);
-		this.initGameEnvironment();
 	}
 
 	initGameEnvironment() {
@@ -194,7 +182,7 @@ class Game {
 			console.log(`opponent player id is ${opponentId} my id is ${this.player_id}`);
 
 			const opponentData = players[opponentId];
-			this.pongOpponent = new PongPlayer(null, null, this.gameSocket, opponentId, opponentData);
+			this.pongOpponent = new PongPlayer(null, null, null, opponentId, opponentData);
 	
 			this.ball = new Ball(ball_data.radius);
 	
@@ -256,5 +244,5 @@ class Game {
 }
 
 const game = new Game();
-game.init();
+await game.init();
 game.sceneManager.animate();

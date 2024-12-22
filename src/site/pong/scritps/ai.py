@@ -3,21 +3,20 @@ import asyncio
 from pong.scritps import constants
 
 # TODO need to be refactored
-class PongAI:
-	"""
-	AI for controlling a Pong player.
+class PongAI():
 
-	The PongAI class allows a player controlled by the AI to move and track the ball. 
-	The AI makes decisions based on the ball's position and speed, and it reacts with delays to mimic human behavior.
-	"""
-	def __init__(self, player):
-		"""
-		Initializes the PongAI object.
+	def __init__(self, players_id, ball, x, color):
+		self.x = x
+		self.y = 0
+		self.height = constants.PADDLE_HEIGHT
+		self.width = constants.PADDLE_WIDTH
+		self.speed = constants.PADDLE_SPEED
+		self.depth = constants.PADDLE_DEPTH
+		self.color = color
 
-		Args:
-			TODO
-		"""
-		self.player = player
+		self.ball = ball
+		self.player_id = players_id
+
 		self.current_target = None
 		self.last_decision_time = 0
 		self.decision_delay = 1
@@ -25,7 +24,8 @@ class PongAI:
 		self.returning_to_center = False
 		self.waiting = False
 
-	def update_position(self, ball):
+
+	def player_loop(self):
 		"""
 		Updates the position of the AI-controlled player based on the ball's position.
 
@@ -35,26 +35,20 @@ class PongAI:
 		Args:
 			ball (Ball): The ball object, used to determine the ball's position and speed.
 		"""
+		
 		current_time = asyncio.get_event_loop().time()
-		paddle_y = self.player.y
-		paddle_speed = self.player.speed
-		paddle_height = self.player.height
-
-		ball_y = ball.y
-		ball_speed_x = ball.speed_x
-		ball_speed_y = ball.speed_y
 		
 		# Calculate the Y-axis limits reachable by the paddle
-		min_y_reachable = constants.GAME_BOUNDS["yMin"] + paddle_height / 2
-		max_y_reachable = constants.GAME_BOUNDS["yMax"] - paddle_height / 2
+		min_y_reachable = constants.GAME_BOUNDS["yMin"] + self.height / 2
+		max_y_reachable = constants.GAME_BOUNDS["yMax"] - self.height / 2
 
 		# Move towards the current target (if set)
 		if self.current_target is not None:
-			distance_to_target = self.current_target - paddle_y
-			move = min(abs(distance_to_target), paddle_speed)
-			self.player.y += move * (1 if distance_to_target > 0 else -1)
+			distance_to_target = self.current_target - self.y
+			move = min(abs(distance_to_target), self.speed)
+			self.y += move * (1 if distance_to_target > 0 else -1)
 
-			if abs(distance_to_target) <= paddle_speed:
+			if abs(distance_to_target) <= self.speed:
 				self.waiting = True
 				self.current_target = None
 				self.tracking_ball = False
@@ -67,27 +61,27 @@ class PongAI:
 		self.last_decision_time = current_time
 
 		# Ensure the paddle stays within bounds
-		self.player.y = max(min_y_reachable, min(max_y_reachable, self.player.y))
+		self.y = max(min_y_reachable, min(max_y_reachable, self.y))
 
 		# Reset the waiting state when necessary
-		if ball_speed_x > 0 and self.waiting and not self.tracking_ball:
+		if self.ball.speed_x > 0 and self.waiting and not self.tracking_ball:
 			self.waiting = False
-		elif ball_speed_x < 0 and self.waiting and not self.returning_to_center:
+		elif self.ball.speed_x < 0 and self.waiting and not self.returning_to_center:
 			self.waiting = False
 
 		# Determine new target position based on ball's position and direction
 		if not self.waiting:
-			if ball_speed_x > 0 and not self.tracking_ball:
+			if self.ball.speed_x > 0 and not self.tracking_ball:
 				self.tracking_ball = True
 				self.returning_to_center = False
-			elif ball_speed_x < 0 and not self.returning_to_center:
+			elif self.ball.speed_x < 0 and not self.returning_to_center:
 				self.tracking_ball = False
 				self.returning_to_center = True
 
 			if self.tracking_ball and self.current_target is None:
 				# Calculate the time it will take for the ball to reach the paddle
-				time_to_reach_paddle = abs((self.player.x - ball.x) / (ball_speed_x * ball.speed_multiplier))
-				predicted_y = ball_y + ball_speed_y * time_to_reach_paddle
+				time_to_reach_paddle = abs((self.x - self.ball.x) / (self.ball.speed_x * self.ball.speed_multiplier))
+				predicted_y = self.ball.y + self.ball.speed_y * time_to_reach_paddle
 
 				# Simulate vertical bounces with more accuracy
 				num_bounces = 0
@@ -111,3 +105,21 @@ class PongAI:
 				center_target = (constants.GAME_BOUNDS["yMax"] + constants.GAME_BOUNDS["yMin"]) / 2
 				offset = random.uniform(-2, 2) # Add some randomness to the center
 				self.current_target = max(min_y_reachable, min(max_y_reachable, center_target + offset))
+
+	def to_dict(self) -> dict:
+		"""
+		Converts the PongPlayer object to a dictionary for broadcasting.
+
+		:return: A dictionary containing the player's state and attributes.
+		"""
+		base_dict = {
+			"player_id": self.player_id,
+			"x": self.x,
+			"y": self.y,
+			"height": self.height,
+			"width": self.width,
+			"depth": self.depth,
+			"speed": self.speed,
+			"color": self.color,
+		}
+		return base_dict

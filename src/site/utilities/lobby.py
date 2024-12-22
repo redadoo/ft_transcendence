@@ -14,7 +14,6 @@ class Lobby:
 
 	def __init__(self, room_name: str, game_manager: GameManager) -> None:
 		self.room_group_name = f"pong_multiplayer_{room_name}"
-		self.players_id = []
 		self.game_manager = game_manager
 		self.lobby_status = Lobby.LobbyStatus.TO_SETUP
 		self.update_lock = asyncio.Lock()
@@ -38,14 +37,14 @@ class Lobby:
 		
 		match event_type:
 			case "init_player":
-				await self.add_player(data)
+				await self.add_player(data, False)
 			case "update_player":
 				self.game_manager.update_player(data)
 			case _:
 				print(f"Unhandled event type: {event_type}. Full data: {data}")
 
 
-	async def add_player(self, data: dict):
+	async def add_player(self, data: dict, is_bot: bool):
 		"""
 		Adds a player to the lobby. Broadcasts the lobby state when players are added.
 		"""
@@ -53,14 +52,10 @@ class Lobby:
 		if not player_id:
 			raise ValueError("Invalid data: 'player_id' is required.")
 		
-		if player_id in self.players_id:
-			print(f"Player {player_id} already exists in the lobby.")
-			return
+		self.game_manager.add_player(player_id, is_bot)
 
-		self.players_id.append(player_id)
-		if len(self.players_id) == self.game_manager.max_players:
+		if len(self.game_manager.players) == self.game_manager.max_players:
 			self.lobby_status = Lobby.LobbyStatus.PLAYING
-			self.game_manager.init_players(self.players_id)
 			self.game_loop_task = asyncio.create_task(self.game_loop())
 
 		await self.broadcast_message({"type": "lobby_state"})
@@ -73,7 +68,7 @@ class Lobby:
 			while self.is_full():
 				async with self.update_lock:
 					await self.game_manager.game_loop()
-					await asyncio.sleep(1 / 60)  # 60 FPS
+					await asyncio.sleep(1 / 60)
 					await self.broadcast_message({"type": "lobby_state"})
 		except asyncio.CancelledError:
 			print("Game loop task was cancelled.")
@@ -89,7 +84,7 @@ class Lobby:
 		"""
 		Checks whether the lobby has reached the maximum player count.
 		"""
-		return len(self.players_id) == self.game_manager.max_players
+		return len(self.game_manager.players) == self.game_manager.max_players
 
 	def to_dict(self) -> dict:
 		"""

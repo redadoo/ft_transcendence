@@ -43,9 +43,9 @@ class PongPlayer(Player):
 		:return: True if movement is possible; otherwise, False.
 		"""
 		if direction == "up":
-			return self.y + self.speed + self.height / 2 < constants.GAME_BOUNDS["yMax"]
+			return self.isMovingUp and self.y + self.speed + self.height / 2 < constants.GAME_BOUNDS["yMax"]
 		elif direction == "down":
-			return self.y - self.speed - self.height / 2 > constants.GAME_BOUNDS["yMin"]
+			return self.isMovingDown and self.y - self.speed - self.height / 2 > constants.GAME_BOUNDS["yMin"]
 		return False
 
 	def update_player_data(self, data: dict):
@@ -72,9 +72,9 @@ class PongPlayer(Player):
 
 			is_pressed = event_type == "key_down"
 			if key == "KeyW":
-				self.is_moving_up = is_pressed
+				self.isMovingUp = is_pressed
 			elif key == "KeyS":
-				self.is_moving_down = is_pressed
+				self.isMovingDown = is_pressed
 
 		except (TypeError, ValueError) as e:
 			print(f"Error in update_player_data: {e}")

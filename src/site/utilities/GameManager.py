@@ -8,28 +8,28 @@ class GameManager(ABC):
         self.players: dict[int, Player] = {}
 
     @abstractmethod
-    def init_players(self, players: list[Player]) -> None:
+    def add_player(self, player_id: int):
         """
         Initialize players and add them to the game.
         """
         return
 
     @abstractmethod
-    async def game_loop(self) -> None:
+    async def game_loop(self):
         """
         Core game loop logic.
         """
         return
 
     @abstractmethod
-    def update_player(self, data: dict) -> None:
+    def update_player(self, data: dict):
         """
         update player data
         """
         return
 
     @abstractmethod
-    def player_disconnected(self, player_id: int) -> None:
+    def player_disconnected(self, player_id: int):
         """
         Handle logic when a player disconnects.
         """
