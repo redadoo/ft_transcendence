@@ -8,7 +8,7 @@ class GameManager(ABC):
         self.players: dict[int, Player] = {}
 
     @abstractmethod
-    def init_player(self, players: list[Player]) -> None:
+    def init_players(self, players: list[Player]) -> None:
         """
         Initialize players and add them to the game.
         """

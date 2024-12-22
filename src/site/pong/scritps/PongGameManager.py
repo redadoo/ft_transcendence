@@ -6,7 +6,7 @@ from utilities.GameManager import GameManager
 from channels.layers import get_channel_layer
 
 class PongGameManager(GameManager):
-	def __init__(self):
+	def __init__(self, is_singleplayer: bool):
 		"""
 		Initialize the Pong game manager with a maximum of 2 players, ball, and score tracking.
 		"""
@@ -14,8 +14,9 @@ class PongGameManager(GameManager):
 		self.ball = Ball()
 		self.scores = {"player1": 0, "player2": 0}
 		self.update_lock = asyncio.Lock()
+		self.is_singleplayer = is_singleplayer
 
-	def init_player(self, players: list[int]):
+	def init_players(self, players: list[int]):
 		"""
 		Initialize players with unique IDs and assign them to the game.
 

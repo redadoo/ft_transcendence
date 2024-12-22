@@ -10,7 +10,7 @@ class LiarsBarGameManager(GameManager):
 		super().__init__(4)
 		self.deck = self.init_cards()
 
-	def init_player(self, players: list[LiarsBarPlayer]) -> None:
+	def init_players(self, players: list[LiarsBarPlayer]) -> None:
 		for player in players:
 			self.players[player.id] = LiarsBarPlayer(player.id)
 	

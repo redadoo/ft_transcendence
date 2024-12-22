@@ -56,11 +56,11 @@ class Lobby:
 		if player_id in self.players_id:
 			print(f"Player {player_id} already exists in the lobby.")
 			return
-		
+
 		self.players_id.append(player_id)
 		if len(self.players_id) == self.game_manager.max_players:
 			self.lobby_status = Lobby.LobbyStatus.PLAYING
-			self.game_manager.init_player(self.players_id)
+			self.game_manager.init_players(self.players_id)
 			self.game_loop_task = asyncio.create_task(self.game_loop())
 
 		await self.broadcast_message({"type": "lobby_state"})
