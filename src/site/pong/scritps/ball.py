@@ -2,6 +2,7 @@ import random
 import math
 from pong.scritps import constants
 
+# TODO need to be refactored
 class Ball:
 	def __init__(self):
 		self.x = constants.BALL_POSITION[0]
