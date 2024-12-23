@@ -1,6 +1,5 @@
 from rest_framework import serializers
 from .models import Chat, ChatMessage
-from website.serializers import UserProfileSerializer
 from website.models import User
 
 class UserSerializer(serializers.ModelSerializer):
