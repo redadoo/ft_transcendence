@@ -14,9 +14,14 @@ class ChatView(APIView):
         """
         Retrieve all chats associated with the authenticated user.
         """
-        # Fetch all chats that involve the authenticated user
-        chats = Chat.objects.filter(users=request.user)
 
-        # Serialize the chats with the ChatSerializer
+        include: list[str] = request.query_params.getlist('with')
+
+
+        if len(include) != 0:
+            chats = Chat.objects.filter(users__username__in=include)
+        else:
+            chats = Chat.objects.filter(users=request.user)
+
         serializer = ChatSerializer(chats, many=True)
         return Response(serializer.data)
