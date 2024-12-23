@@ -1,19 +1,12 @@
 import random
 import asyncio
 from pong.scritps import constants
+from pong.scritps.Paddle import Paddle
 
-# TODO need to be refactored
 class PongAI():
 
 	def __init__(self, players_id, ball, x, color):
-		self.x = x
-		self.y = 0
-		self.height = constants.PADDLE_HEIGHT
-		self.width = constants.PADDLE_WIDTH
-		self.speed = constants.PADDLE_SPEED
-		self.depth = constants.PADDLE_DEPTH
-		self.color = color
-
+		self.paddle = Paddle(color, x)
 		self.ball = ball
 		self.player_id = players_id
 
@@ -39,16 +32,16 @@ class PongAI():
 		current_time = asyncio.get_event_loop().time()
 		
 		# Calculate the Y-axis limits reachable by the paddle
-		min_y_reachable = constants.GAME_BOUNDS["yMin"] + self.height / 2
-		max_y_reachable = constants.GAME_BOUNDS["yMax"] - self.height / 2
+		min_y_reachable = constants.GAME_BOUNDS["yMin"] + self.paddle.height / 2
+		max_y_reachable = constants.GAME_BOUNDS["yMax"] - self.paddle.height / 2
 
 		# Move towards the current target (if set)
 		if self.current_target is not None:
-			distance_to_target = self.current_target - self.y
-			move = min(abs(distance_to_target), self.speed)
-			self.y += move * (1 if distance_to_target > 0 else -1)
+			distance_to_target = self.current_target - self.paddle.y
+			move = min(abs(distance_to_target), self.paddle.speed)
+			self.paddle.y += move * (1 if distance_to_target > 0 else -1)
 
-			if abs(distance_to_target) <= self.speed:
+			if abs(distance_to_target) <= self.paddle.speed:
 				self.waiting = True
 				self.current_target = None
 				self.tracking_ball = False
@@ -61,7 +54,7 @@ class PongAI():
 		self.last_decision_time = current_time
 
 		# Ensure the paddle stays within bounds
-		self.y = max(min_y_reachable, min(max_y_reachable, self.y))
+		self.paddle.y = max(min_y_reachable, min(max_y_reachable, self.paddle.y))
 
 		# Reset the waiting state when necessary
 		if self.ball.speed_x > 0 and self.waiting and not self.tracking_ball:
@@ -80,7 +73,7 @@ class PongAI():
 
 			if self.tracking_ball and self.current_target is None:
 				# Calculate the time it will take for the ball to reach the paddle
-				time_to_reach_paddle = abs((self.x - self.ball.x) / (self.ball.speed_x * self.ball.speed_multiplier))
+				time_to_reach_paddle = abs((self.paddle.x - self.ball.x) / (self.ball.speed_x * self.ball.speed_multiplier))
 				predicted_y = self.ball.y + self.ball.speed_y * time_to_reach_paddle
 
 				# Simulate vertical bounces with more accuracy
@@ -112,14 +105,7 @@ class PongAI():
 
 		:return: A dictionary containing the player's state and attributes.
 		"""
-		base_dict = {
-			"player_id": self.player_id,
-			"x": self.x,
-			"y": self.y,
-			"height": self.height,
-			"width": self.width,
-			"depth": self.depth,
-			"speed": self.speed,
-			"color": self.color,
-		}
+
+		base_dict = {"player_id": self.player_id}
+		base_dict.update(self.paddle.to_dict())
 		return base_dict

@@ -79,7 +79,7 @@ class PongGameManager(GameManager):
 			self.ball.update_position()
 
 			for player in self.players.values():
-				self.ball.handle_paddle_collision(player)
+				self.ball.handle_paddle_collision(player.paddle)
 
 			out_of_bounds = self.ball.is_out_of_bounds()
 			if out_of_bounds == "right":

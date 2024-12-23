@@ -1,5 +1,6 @@
 from pong.scritps import constants
 from utilities.Player import Player
+from pong.scritps.Paddle import Paddle
 
 class PongPlayer(Player):
 	"""
@@ -15,13 +16,7 @@ class PongPlayer(Player):
         :param color: The color of the paddle.
         """
 		super().__init__(player_id)
-		self.x = x
-		self.y = 0
-		self.height = constants.PADDLE_HEIGHT
-		self.width = constants.PADDLE_WIDTH
-		self.depth = constants.PADDLE_DEPTH
-		self.speed = constants.PADDLE_SPEED
-		self.color = color
+		self.paddle = Paddle(color,x)
 		self.isMovingUp = False
 		self.isMovingDown = False
 
@@ -31,9 +26,9 @@ class PongPlayer(Player):
 		Ensures the paddle remains within the game bounds.
 		"""
 		if self.can_move("up"):
-			self.y += self.speed
+			self.paddle.y += self.paddle.speed
 		if self.can_move("down"):
-			self.y -= self.speed
+			self.paddle.y -= self.paddle.speed
 
 	def can_move(self, direction: str) -> bool:
 		"""
@@ -43,9 +38,9 @@ class PongPlayer(Player):
 		:return: True if movement is possible; otherwise, False.
 		"""
 		if direction == "up":
-			return self.isMovingUp and self.y + self.speed + self.height / 2 < constants.GAME_BOUNDS["yMax"]
+			return self.isMovingUp and self.paddle.y + self.paddle.speed + self.paddle.height / 2 < constants.GAME_BOUNDS["yMax"]
 		elif direction == "down":
-			return self.isMovingDown and self.y - self.speed - self.height / 2 > constants.GAME_BOUNDS["yMin"]
+			return self.isMovingDown and self.paddle.y - self.paddle.speed - self.paddle.height / 2 > constants.GAME_BOUNDS["yMin"]
 		return False
 
 	def update_player_data(self, data: dict):
@@ -80,7 +75,7 @@ class PongPlayer(Player):
 			print(f"Error in update_player_data: {e}")
 
 	def player_disconnection(self):
-		pass
+		super().player_disconnection()
 
 	def to_dict(self) -> dict:
 		"""
@@ -89,14 +84,8 @@ class PongPlayer(Player):
 		:return: A dictionary containing the player's state and attributes.
 		"""
 		base_dict = super().to_dict()
+		base_dict.update(self.paddle.to_dict())
 		base_dict.update({
-			"x": self.x,
-			"y": self.y,
-			"height": self.height,
-			"width": self.width,
-			"depth": self.depth,
-			"speed": self.speed,
-			"color": self.color,
 			"isMovingUp": self.isMovingUp,
 			"isMovingDown": self.isMovingDown,
 		})
