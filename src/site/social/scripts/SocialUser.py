@@ -2,6 +2,7 @@ from asgiref.sync import sync_to_async
 from django.db.models import Q
 from website.models import Friendships, User
 from channels.layers import get_channel_layer
+from social.models import Chat, ChatMessage
 
 class SocialUser:
 
@@ -269,3 +270,35 @@ class SocialUser:
 		}
 
 		await channel_layer.group_send(f"user_{target_user.id}", payload)
+	
+	async def send_message(self, data: dict):
+		target_username = data.get("username")
+
+		if target_username is None:
+			raise ValueError("Invalid data: 'username' is required.")
+		
+		message = data.get("message")
+
+		if message is None:
+			raise ValueError("Invalid data: 'message' is required.")
+		
+		try:
+			retrieved_chat = await sync_to_async(Chat.objects.get)(users__username__in=[self.user.username, target_username])
+		except Chat.DoesNotExist:
+			target_user = await sync_to_async(User.objects.get)(username=target_username)
+			retrieved_chat = await sync_to_async(Chat.objects.create)(users=[self.user,target_user])
+
+
+		await sync_to_async(ChatMessage.objects.create)(
+			chat=retrieved_chat,
+			sender=self.user,
+			message_text=message)
+
+		channel_layer = get_channel_layer()
+		payload = {
+			"type": "get_message",
+			"username": self.user.username,
+		}
+		
+		await channel_layer.group_send(f"user_{target_username}", payload)
+

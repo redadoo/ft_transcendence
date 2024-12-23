@@ -9,7 +9,7 @@ class SocialConsumer(AsyncWebsocketConsumer):
 		"""
 		Add the user to a channel group when they connect.
 		"""
-		self.group_name = f"user_{self.scope['user'].id}"
+		self.group_name = f"user_{self.scope['user'].username}"
 		self.user = SocialUser(self.scope["user"])
 
 		await self.channel_layer.group_add(self.group_name, self.channel_name)
@@ -41,7 +41,8 @@ class SocialConsumer(AsyncWebsocketConsumer):
 				await self.user.remove_friend(data,"get_friend_request_declined")
 			case "friend_request_accepted":
 				await self.user.accept_friend_request(data)
-				pass
+			case "send_message":
+				await self.user.send_message(data)
 			case _:
 				print(f"Unhandled event type: {event_type}")
 
@@ -114,6 +115,14 @@ class SocialConsumer(AsyncWebsocketConsumer):
 		await self.send(
 			text_data=json.dumps({
 				"type": "get_friend_request_accepted",
+				"username" : event["username"]
+			})
+		)
+
+	async def get_message(self, event):
+		await self.send(
+			text_data=json.dumps({
+				"type": "get_message",
 				"username" : event["username"]
 			})
 		)

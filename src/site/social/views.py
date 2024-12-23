@@ -15,8 +15,7 @@ class ChatView(APIView):
         Retrieve all chats associated with the authenticated user.
         """
 
-        include: list[str] = request.query_params.getlist('with')
-
+        include = request.query_params.getlist('with')
 
         if len(include) != 0:
             chats = Chat.objects.filter(users__username__in=include)
