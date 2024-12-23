@@ -19,5 +19,4 @@ class ChatView(APIView):
 
         # Serialize the chats with the ChatSerializer
         serializer = ChatSerializer(chats, many=True)
-        print(serializer.data)
         return Response(serializer.data)
