@@ -237,7 +237,6 @@ class SocialUser:
 
 		await channel_layer.group_send(f"user_{target_user.id}", payload)
 		
-
 	async def accept_friend_request(self, data: dict):
 		target_username = data.get("username")
 
