@@ -1,5 +1,7 @@
 
 import random
+import asyncio
+
 from .card import Card
 from .LiarsBarPlayer import LiarsBarPlayer
 from utilities.GameManager import GameManager
@@ -7,8 +9,15 @@ from utilities.GameManager import GameManager
 class LiarsBarGameManager(GameManager):
 
 	def __init__(self):
-		super().__init__(4)
+		super().__init__(max_players=4)
+		self.update_lock = asyncio.Lock()
 		self.deck = self.init_cards()
+
+	def add_player(self, players_id: int):
+		if len(self.players) > 2:
+			raise ValueError("Two unique player IDs are required to initialize players.")
+
+		self.players[players_id] = LiarsBarPlayer(player_id=players_id)
 
 	def init_players(self, players: list[LiarsBarPlayer]) -> None:
 		for player in players:

@@ -8,9 +8,16 @@ class LiarsBarPlayer(Player):
 		LIVE = 0
 		DIED = 1
 
-	def __init__(self):
+	def __init__(self, player_id: int):
+		super().__init__(player_id)
 		self.hand = []
 		self.status = LiarsBarPlayer.PlayerStatus.LIVE
+	
+	def player_loop(self):
+		pass
+
+	def update_player_data(self, data: dict):
+		pass
 	
 	def add_cards_to_hand(self, cards):
 		"""Add multiple cards to the player's hand."""
