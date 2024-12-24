@@ -1,12 +1,10 @@
 from rest_framework.views import APIView
 from django.shortcuts import render
-from rest_framework.viewsets import ViewSet
 from rest_framework.permissions import IsAuthenticated
 
 from website.models import User
 from .serializers import UserProfileSerializer, SimpleUserProfileSerializer
 from rest_framework.response import Response
-from rest_framework.decorators import action
 
 def main_page(request, unused_path=None):
 	return render(request,'main.html')
@@ -49,3 +47,5 @@ class UsersView(APIView):
         users = User.objects.all()
         serializer = SimpleUserProfileSerializer(users, many=True)
         return Response(serializer.data)
+	
+	

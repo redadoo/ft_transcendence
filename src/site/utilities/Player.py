@@ -7,7 +7,7 @@ class Player(ABC):
 	An abstract base class for representing a player in a game. 
 	This class defines the interface and core functionality that all player types must implement.
 	"""
-	
+
 	class PlayerConnectionState(Enum):
 		"""
         Enum to represent the connection status of a player.

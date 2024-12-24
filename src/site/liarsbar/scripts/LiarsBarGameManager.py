@@ -19,7 +19,7 @@ class LiarsBarGameManager(GameManager):
 
 		self.players[players_id] = LiarsBarPlayer(player_id=players_id)
 
-	def init_players(self, players: list[LiarsBarPlayer]) -> None:
+	def init_players(self, players: list[LiarsBarPlayer]):
 		for player in players:
 			self.players[player.id] = LiarsBarPlayer(player.id)
 	
@@ -36,7 +36,7 @@ class LiarsBarGameManager(GameManager):
 		random.shuffle(deck)
 		return deck
 
-	def player_disconnected(self, player_id: str) -> None:
+	def player_disconnected(self, player_id: str):
 		"""
 		Handle logic when a player disconnects.
 		"""
@@ -45,7 +45,7 @@ class LiarsBarGameManager(GameManager):
 		else:
 			raise ValueError(f"Player {player_id} not found in the game.")
 		
-	async def game_loop(self) -> None:
+	async def game_loop(self):
 		...
 
 	def to_dict(self) -> dict[str, any]:

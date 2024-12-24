@@ -6,7 +6,7 @@ from social.models import Chat, ChatMessage
 
 class SocialUser:
 
-	def __init__(self, user) -> None:
+	def __init__(self, user):
 		self.user = user
 
 	async def notify_friends_status(self):

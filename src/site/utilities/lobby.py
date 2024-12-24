@@ -12,7 +12,7 @@ class Lobby:
 		ENDED = "ended"
 		WAITING_PLAYER_RECONNECTION = "waiting_player_reconnection"
 
-	def __init__(self, room_name: str, game_manager: GameManager) -> None:
+	def __init__(self, room_name: str, game_manager: GameManager):
 		self.room_group_name = f"pong_multiplayer_{room_name}"
 		self.game_manager = game_manager
 		self.lobby_status = Lobby.LobbyStatus.TO_SETUP
