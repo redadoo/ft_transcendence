@@ -1,9 +1,9 @@
 import asyncio
-from pong.scritps import constants
-from pong.scritps.ball import Ball
-from pong.scritps.PongPlayer import PongPlayer
+from pong.scripts import constants
+from pong.scripts.ball import Ball
+from pong.scripts.PongPlayer import PongPlayer
 from utilities.GameManager import GameManager
-from pong.scritps.ai import PongAI
+from pong.scripts.ai import PongAI
 
 class PongGameManager(GameManager):
 	def __init__(self):

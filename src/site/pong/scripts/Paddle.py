@@ -1,4 +1,4 @@
-from pong.scritps import constants
+from pong.scripts import constants
 
 
 class Paddle:

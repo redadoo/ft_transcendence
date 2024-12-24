@@ -1,7 +1,7 @@
 import random
 import asyncio
-from pong.scritps import constants
-from pong.scritps.Paddle import Paddle
+from pong.scripts import constants
+from pong.scripts.Paddle import Paddle
 
 class PongAI():
 

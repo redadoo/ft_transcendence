@@ -1,6 +1,6 @@
-from pong.scritps import constants
+from pong.scripts import constants
 from utilities.Player import Player
-from pong.scritps.Paddle import Paddle
+from pong.scripts.Paddle import Paddle
 
 class PongPlayer(Player):
 	"""

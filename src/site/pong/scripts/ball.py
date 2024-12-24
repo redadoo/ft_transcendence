@@ -1,6 +1,6 @@
 import random
 import math
-from pong.scritps import constants
+from pong.scripts import constants
 
 # TODO need to be refactored
 class Ball:

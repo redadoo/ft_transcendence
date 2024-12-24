@@ -2,7 +2,7 @@ import json
 import uuid
 
 from channels.generic.websocket import AsyncWebsocketConsumer
-from pong.scritps.PongGameManager import PongGameManager
+from pong.scripts.PongGameManager import PongGameManager
 from utilities.lobbies import Lobbies
 from utilities.lobby import Lobby
 
