@@ -1,4 +1,3 @@
-import asyncio
 import json
 
 from channels.generic.websocket import AsyncWebsocketConsumer
@@ -12,9 +11,9 @@ class  liarsBarConsumer(AsyncWebsocketConsumer):
 	async def connect(self):
 		self.room_name = self.scope["url_route"]["kwargs"]["room_name"]
 	
-		self.lobby = lobbies._get_lobby(self.room_name) 
+		self.lobby = lobbies.get_lobby(self.room_name) 
 		if self.lobby == None:
-			self.lobby = lobbies._create_lobby(self.room_name,  LiarsBarGameManager())
+			self.lobby = lobbies.create_lobby(self.room_name,  LiarsBarGameManager())
 
 		await self.channel_layer.group_add(self.lobby.room_group_name, self.channel_name)
 		await self.accept()

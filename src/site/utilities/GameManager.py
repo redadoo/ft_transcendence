@@ -1,4 +1,3 @@
-from enum import Enum
 from abc import ABC, abstractmethod
 from utilities.Player import Player
 

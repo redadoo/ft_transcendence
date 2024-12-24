@@ -1,8 +1,6 @@
 import json
 from channels.generic.websocket import AsyncWebsocketConsumer
 from social.scripts.SocialUser import SocialUser
-from asgiref.sync import sync_to_async
-from website.models import User
 
 class SocialConsumer(AsyncWebsocketConsumer):
 	async def connect(self):

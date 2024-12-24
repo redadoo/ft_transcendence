@@ -1,4 +1,3 @@
-import uuid
 from .models import *
 from .serializers import *
 from django.db.models import Q

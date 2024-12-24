@@ -1,16 +1,11 @@
 import json
 import uuid
-import asyncio
 
 from channels.generic.websocket import AsyncWebsocketConsumer
-from pong.scritps.PongPlayer import PongPlayer
-from pong.scritps.ai import PongAI
-from utilities.lobbies import Lobbies
-from pong.scritps import constants
-from pong.scritps.ball import Ball
 from pong.scritps.PongGameManager import PongGameManager
 from utilities.lobbies import Lobbies
 from utilities.lobby import Lobby
+
 lobbies = Lobbies()
 
 class PongMatchmaking(AsyncWebsocketConsumer):
@@ -66,9 +61,9 @@ class PongMultiplayerConsumer(AsyncWebsocketConsumer):
 	async def connect(self):
 		self.room_name = self.scope["url_route"]["kwargs"]["room_name"]
 	
-		self.lobby = lobbies._get_lobby(self.room_name) 
+		self.lobby = lobbies.get_lobby(self.room_name) 
 		if self.lobby == None:
-			self.lobby = lobbies._create_lobby(self.room_name,  PongGameManager())
+			self.lobby = lobbies.create_lobby(self.room_name,  PongGameManager())
 
 		await self.channel_layer.group_add(self.lobby.room_group_name, self.channel_name)
 		await self.accept()
@@ -101,7 +96,7 @@ class PongSingleplayerConsumer(AsyncWebsocketConsumer):
 
 	async def connect(self):
 		self.room_name = self.generate_random_room_name()
-		self.lobby: Lobby = lobbies._create_lobby(self.room_name,  PongGameManager())
+		self.lobby: Lobby = lobbies.create_lobby(self.room_name,  PongGameManager())
 
 		await self.channel_layer.group_add(self.lobby.room_group_name, self.channel_name)
 		await self.accept()
