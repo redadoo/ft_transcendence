@@ -9,6 +9,24 @@ class SocialUser:
 	def __init__(self, user):
 		self.user = user
 
+	async def _validate_user(self, username):
+		if username == self.user.username:
+			raise ValueError("Cannot perform this operation on yourself.")
+		try:
+			return await sync_to_async(User.objects.get)(username=username)
+		except User.DoesNotExist:
+			raise ValueError(f"User '{username}' does not exist.")
+		
+	async def _get_friendship(self, target_user):
+		try:
+			friendship = await sync_to_async(Friendships.objects.get)(
+				Q(first_user=self.user, second_user=target_user) |
+				Q(first_user=target_user, second_user=self.user)
+			) 
+		except Friendships.DoesNotExist:
+			raise ValueError(f"a relationship between '{self.user.username}' and '{target_user.username}' does not exist")
+		return friendship
+
 	async def notify_friends_status(self):
 		friendships = await sync_to_async(list)(
 			Friendships.objects.filter(
@@ -29,7 +47,6 @@ class SocialUser:
 			}
 			notifications.append((f"user_{recipient.id}", payload))
 
-		# Batch send notifications
 		for group, payload in notifications:
 			await channel_layer.group_send(group, payload)
 	
@@ -69,20 +86,12 @@ class SocialUser:
 		Raises:
 		ValueError: If the username is not provided, the user doesn't exist, or there is no existing block relationship.
 		"""
-
-		user_to_block = data.get("username")
-
-		if user_to_block is None:
-			raise ValueError(f"bad dict cant retrieve user_to_block")
-		
-		if user_to_block == self.user.username:
-			raise ValueError("Cannot block yourself.")
+		user_to_block = await self._validate_user(data.get("username"))
 
 		try:
 			block_target = await sync_to_async(User.objects.get)(username=user_to_block)
 		except User.DoesNotExist:
 			raise ValueError(f"User '{user_to_block}' does not exist.")
-		
 
 		try:
 			friendship = await sync_to_async(Friendships.objects.get)(
@@ -123,20 +132,12 @@ class SocialUser:
 		Raises:
 			ValueError: If the username is not provided or the user doesn't exist.
 		"""
-
-		user_to_unblock = data.get("username")
-
-		if user_to_unblock is None:
-			raise ValueError(f"bad dict cant retrieve user_to_block")
-		
-		if user_to_unblock == self.user.username:
-			raise ValueError("Cannot unblock yourself.")
+		user_to_unblock = await self._validate_user(data.get("username"))
 		
 		try:
 			unblock_target = await sync_to_async(User.objects.get)(username=user_to_unblock)
 		except User.DoesNotExist:
 			raise ValueError(f"User '{user_to_unblock}' does not exist.")
-		
 
 		try:
 			friendship = await sync_to_async(Friendships.objects.get)(
@@ -161,12 +162,7 @@ class SocialUser:
 		await channel_layer.group_send(f"user_{unblock_target.id}", payload)
 
 	async def send_friend_request(self, data: dict):
-		target_username = data.get("username")
-		if target_username is None:
-			raise ValueError("Invalid data: 'username' is required.")
-		
-		if target_username == self.user.username:
-			raise ValueError("Cannot send a friend request to yourself.")
+		target_username = await self._validate_user(data.get("username"))
 
 		try:
 			target_user = await sync_to_async(User.objects.get)(username=target_username)
@@ -207,14 +203,9 @@ class SocialUser:
 		Raises:
 			ValueError: If the username is not provided, the user doesn't exist, or no friendship exists.
 		"""
-		target_username = data.get("username")
-		
-		if target_username is None:
-			raise ValueError("Invalid data: 'username' is required.")
-		
-		if target_username == self.user.username:
-			raise ValueError("Cannot remove yourself as a friend.")
-		
+
+		target_username = await self._validate_user(data.get("username"))
+
 		try:
 			target_user = await sync_to_async(User.objects.get)(username=target_username)
 		except User.DoesNotExist:
@@ -239,13 +230,7 @@ class SocialUser:
 		await channel_layer.group_send(f"user_{target_user.id}", payload)
 		
 	async def accept_friend_request(self, data: dict):
-		target_username = data.get("username")
-
-		if target_username is None:
-			raise ValueError("Invalid data: 'username' is required.")
-
-		if target_username == self.user.username:
-			raise ValueError("Cannot remove yourself as a friend.")
+		target_username = await self._validate_user(data.get("username"))
 
 		try:
 			target_user = await sync_to_async(User.objects.get)(username=target_username)
@@ -272,10 +257,7 @@ class SocialUser:
 		await channel_layer.group_send(f"user_{target_user.id}", payload)
 	
 	async def send_message(self, data: dict):
-		target_username = data.get("username")
-
-		if target_username is None:
-			raise ValueError("Invalid data: 'username' is required.")
+		target_username = await self._validate_user(data.get("username"))
 		
 		message = data.get("message")
 
