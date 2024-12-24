@@ -6,6 +6,8 @@ from website.models import User
 from .serializers import UserProfileSerializer, SimpleUserProfileSerializer
 from rest_framework.response import Response
 
+# TODO change view from APIView to ViewSet
+
 def main_page(request, unused_path=None):
 	return render(request,'main.html')
 
