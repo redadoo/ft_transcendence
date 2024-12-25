@@ -4,6 +4,7 @@ from pong.scripts.ball import Ball
 from pong.scripts.PongPlayer import PongPlayer
 from utilities.GameManager import GameManager
 from pong.scripts.ai import PongAI
+from utilities.Player import Player
 
 class PongGameManager(GameManager):
 	def __init__(self):
@@ -63,7 +64,7 @@ class PongGameManager(GameManager):
 		"""
 		player = self.players.get(player_id)
 		if player:
-			player.status = PongPlayer.PlayerConnectionState.DISCONNECTED
+			player.status = Player.PlayerConnectionState.DISCONNECTED
 			print(f"Player {player_id} marked as disconnected.")
 		else:
 			print(f"Error: Player ID {player_id} not found in players.")
