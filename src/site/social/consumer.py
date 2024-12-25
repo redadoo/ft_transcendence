@@ -21,7 +21,7 @@ class SocialConsumer(AsyncWebsocketConsumer):
 		await self.user.change_status({"new_status": "Offline"})
 		await self.channel_layer.group_discard(self.group_name, self.channel_name)
 
-	async def receive(self, text_data):
+	async def receive(self, text_data: dict):
 		data = json.loads(text_data)
 		event_type = data.get("type")
 		match event_type:
@@ -44,7 +44,7 @@ class SocialConsumer(AsyncWebsocketConsumer):
 			case _:
 				print(f"Unhandled event type: {event_type}")
 
-	async def get_status_change(self, event):
+	async def get_status_change(self, event: dict):
 		"""
 		Receive a friendship status change event.
 		"""
@@ -57,7 +57,7 @@ class SocialConsumer(AsyncWebsocketConsumer):
 			})
 		)
 
-	async def get_blocked(self, event):
+	async def get_blocked(self, event: dict):
 		"""
 		Receive a friendship status change event.
 		"""
@@ -69,7 +69,7 @@ class SocialConsumer(AsyncWebsocketConsumer):
 			})
 		)
 
-	async def get_unblocked(self, event):
+	async def get_unblocked(self, event: dict):
 		"""
 		Receive a friendship status change event.
 		"""
@@ -81,7 +81,7 @@ class SocialConsumer(AsyncWebsocketConsumer):
 			})
 		)
 
-	async def get_friend_request(self, event):
+	async def get_friend_request(self, event: dict):
 		"""
 		Receive a friend request event.
 		"""
@@ -93,7 +93,7 @@ class SocialConsumer(AsyncWebsocketConsumer):
 			})
 		)
 
-	async def get_friend_request_declined(self, event):
+	async def get_friend_request_declined(self, event: dict):
 		await self.send(
 			text_data=json.dumps({
 				"type": "get_friend_request_declined",
@@ -101,7 +101,7 @@ class SocialConsumer(AsyncWebsocketConsumer):
 			})
 		)
 
-	async def get_friend_removed(self, event):
+	async def get_friend_removed(self, event: dict):
 		await self.send(
 			text_data=json.dumps({
 				"type": "get_friend_removed",
@@ -109,7 +109,7 @@ class SocialConsumer(AsyncWebsocketConsumer):
 			})
 		)
 
-	async def get_friend_request_accepted(self, event):
+	async def get_friend_request_accepted(self, event: dict):
 		await self.send(
 			text_data=json.dumps({
 				"type": "get_friend_request_accepted",
@@ -117,7 +117,7 @@ class SocialConsumer(AsyncWebsocketConsumer):
 			})
 		)
 
-	async def get_message(self, event):
+	async def get_message(self, event: dict):
 		await self.send(
 			text_data=json.dumps({
 				"type": "get_message",
