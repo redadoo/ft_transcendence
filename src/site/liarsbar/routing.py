@@ -6,6 +6,6 @@ websocket_liarsbar_urlpatterns = [
 		r"ws/multiplayer/liarsbar/(?P<room_name>[\w\-]+)$", liarsBarConsumer.as_asgi()
 	),
 	re_path(
-		r"ws/multiplayer/pong/matchmaking", LiarsBarGameManager.as_asgi()
+		r"ws/multiplayer/pong/matchmaking", LiarsBarMatchmaking.as_asgi()
 	),
 ]
