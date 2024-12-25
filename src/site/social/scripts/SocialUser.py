@@ -49,7 +49,7 @@ class SocialUser:
 
 		for group, payload in notifications:
 			await channel_layer.group_send(group, payload)
-	
+
 	async def change_status(self, data: dict):
 		"""
 		Block a user, preventing further interaction.
