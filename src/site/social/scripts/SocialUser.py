@@ -232,7 +232,7 @@ class SocialUser:
 	async def send_message(self, data: dict):
 		target_username = await self._validate_user(data.get("username"))
 		
-		message = data.get("message")
+		message: str = data.get("message")
 
 		if message is None:
 			raise ValueError("Invalid data: 'message' is required.")
@@ -252,6 +252,7 @@ class SocialUser:
 		channel_layer = get_channel_layer()
 		payload = {
 			"type": "get_message",
+			"message": message,
 			"username": self.user.username,
 		}
 		
