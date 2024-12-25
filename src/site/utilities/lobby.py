@@ -61,7 +61,6 @@ class Lobby:
 			case _:
 				print(f"Unhandled event type: {event_type}. Full data: {data}")
 
-
 	async def add_player(self, data: dict, is_bot: bool):
 		"""
 		Adds a player to the lobby. If the lobby is full, starts the game loop.

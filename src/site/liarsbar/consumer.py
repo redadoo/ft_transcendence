@@ -33,11 +33,10 @@ class LiarsBarMatchmaking(AsyncWebsocketConsumer):
 
 			for player in players:
 				await self.channel_layer.send(
-					player["channel"],
+					player,
 					{
 						"type": "send.match.found",
 						"room_name": room_name,
-						"player_ids": [p["player_id"] for p in players],
 					}
 				)
 
@@ -45,9 +44,7 @@ class LiarsBarMatchmaking(AsyncWebsocketConsumer):
 		await self.send(text_data=json.dumps({
 			"type": "setup_pong_lobby",
 			"room_name": event["room_name"],
-			"players": event["player_ids"]
 		}))
-
 
 class  liarsBarConsumer(AsyncWebsocketConsumer):
 
