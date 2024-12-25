@@ -46,7 +46,7 @@ class LiarsBarMatchmaking(AsyncWebsocketConsumer):
 			"room_name": event["room_name"],
 		}))
 
-class  liarsBarConsumer(AsyncWebsocketConsumer):
+class LiarsBarConsumer(AsyncWebsocketConsumer):
 
 	async def connect(self):
 		self.room_name = self.scope["url_route"]["kwargs"]["room_name"]
