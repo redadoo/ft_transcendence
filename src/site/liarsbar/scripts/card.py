@@ -1,25 +1,42 @@
 from enum import Enum
 
 class Card:
-	class CardSeed(Enum):
-		ACE = 1
-		KING = 2
-		QUEEN = 3
-		JOLLY = 4
+    """
+    Represents a card in the game with a specific seed (type).
 
+    """
+    
+    class CardSeed(Enum):
+        """
+        Enum representing the possible types (seeds) of cards in the game.
+        """
+        ACE = 1
+        KING = 2
+        QUEEN = 3
+        JOLLY = 4
 
-	def __init__(self, seed: CardSeed):
-		"""
-		Initializes a card with a specific seed (CardSeed).
-		"""
+    def __init__(self, seed: CardSeed):
+        """
+        Initializes a card with a specific seed.
 
-		if not isinstance(seed, Card.CardSeed):
-			raise ValueError("Invalid card seed")
-		
-		self.seed = seed
+        Args:
+            seed (CardSeed): The type of the card, as defined in the CardSeed Enum.
 
-	def to_dict(self):
+        Raises:
+            ValueError: If the provided seed is not a valid CardSeed.
+        """
+        if not isinstance(seed, Card.CardSeed):
+            raise ValueError("Invalid card seed")
+        
+        self.seed = seed
 
-		return {
-			"card" : self.seed.name
-		}
+    def to_dict(self) -> dict:
+        """
+        Converts the card to a dictionary representation.
+
+        Returns:
+            dict: A dictionary with the card's seed name.
+        """
+        return {
+            "card": self.seed.name
+        }

@@ -17,10 +17,10 @@ class ChatView(APIView):
 
         include = request.query_params.getlist('with')
 
-        if len(include) != 0:
+        if include:
             chats = Chat.objects.filter(users__username__in=include)
         else:
             chats = Chat.objects.filter(users=request.user)
 
-        serializer = ChatSerializer(chats, many=True)
+        serializer = ChatSerializer(chats, many=True, context={'request': request})
         return Response(serializer.data)

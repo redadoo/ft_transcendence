@@ -49,7 +49,7 @@ class SocialUser:
 
 		for group, payload in notifications:
 			await channel_layer.group_send(group, payload)
-	
+
 	async def change_status(self, data: dict):
 		"""
 		Block a user, preventing further interaction.
@@ -87,21 +87,13 @@ class SocialUser:
 		ValueError: If the username is not provided, the user doesn't exist, or there is no existing block relationship.
 		"""
 		user_to_block = await self._validate_user(data.get("username"))
+		friendship = await self._get_friendship(user_to_block)
 
 		try:
 			block_target = await sync_to_async(User.objects.get)(username=user_to_block)
 		except User.DoesNotExist:
 			raise ValueError(f"User '{user_to_block}' does not exist.")
 
-		try:
-			friendship = await sync_to_async(Friendships.objects.get)(
-				first_user=min(self.user, block_target, key=lambda u: u.id),
-				second_user=max(self.user, block_target, key=lambda u: u.id),
-			)
-		except Friendships.DoesNotExist:
-			raise ValueError(f"No friendship exists with user '{user_to_block}'.")
-
-			
 		if friendship.status == Friendships.FriendshipsStatus.FIRST_USER_BLOCK or friendship.status == Friendships.FriendshipsStatus.SECOND_USER_BLOCK:
 			raise ValueError(f"User '{user_to_block}' is already blocked.")
 		
@@ -133,19 +125,12 @@ class SocialUser:
 			ValueError: If the username is not provided or the user doesn't exist.
 		"""
 		user_to_unblock = await self._validate_user(data.get("username"))
-		
+		friendship =  await self._get_friendship(user_to_unblock)
+
 		try:
 			unblock_target = await sync_to_async(User.objects.get)(username=user_to_unblock)
 		except User.DoesNotExist:
 			raise ValueError(f"User '{user_to_unblock}' does not exist.")
-
-		try:
-			friendship = await sync_to_async(Friendships.objects.get)(
-			first_user=min(self.user, unblock_target, key=lambda u: u.id),
-			second_user=max(self.user, unblock_target, key=lambda u: u.id),
-			)
-		except Friendships.DoesNotExist:
-			raise ValueError(f"No friendship exists with user '{user_to_unblock}'.")
 
 		if friendship.status != Friendships.FriendshipsStatus.FIRST_USER_BLOCK and friendship.status != Friendships.FriendshipsStatus.SECOND_USER_BLOCK:
 			raise ValueError(f"User '{user_to_unblock}' is not blocked.")
@@ -205,19 +190,13 @@ class SocialUser:
 		"""
 
 		target_username = await self._validate_user(data.get("username"))
+		friendship =  await self._get_friendship(target_username)
+
 
 		try:
 			target_user = await sync_to_async(User.objects.get)(username=target_username)
 		except User.DoesNotExist:
 			raise ValueError(f"User '{target_username}' does not exist.")
-		
-		try:
-			friendship = await sync_to_async(Friendships.objects.get)(
-				Q(first_user=self.user, second_user=target_user) |
-				Q(first_user=target_user, second_user=self.user)
-			)
-		except Friendships.DoesNotExist:
-			raise ValueError(f"No friendship exists between '{target_username}' and '{self.user.username}'.")
 		
 		await sync_to_async(friendship.delete)()
 
@@ -231,19 +210,13 @@ class SocialUser:
 		
 	async def accept_friend_request(self, data: dict):
 		target_username = await self._validate_user(data.get("username"))
+		friendship =  await self._get_friendship(target_username)
+
 
 		try:
 			target_user = await sync_to_async(User.objects.get)(username=target_username)
 		except User.DoesNotExist:
 			raise ValueError(f"User '{target_username}' does not exist.")
-
-		try:
-			friendship = await sync_to_async(Friendships.objects.get)(
-				Q(first_user=self.user, second_user=target_user) |
-				Q(first_user=target_user, second_user=self.user)
-			)
-		except Friendships.DoesNotExist:
-			raise ValueError(f"No friendship exists between '{target_username}' and '{self.user.username}'.")
 
 		friendship.status = Friendships.FriendshipsStatus.FRIENDS
 		await sync_to_async(friendship.save)(update_fields=["status"])
@@ -259,7 +232,7 @@ class SocialUser:
 	async def send_message(self, data: dict):
 		target_username = await self._validate_user(data.get("username"))
 		
-		message = data.get("message")
+		message: str = data.get("message")
 
 		if message is None:
 			raise ValueError("Invalid data: 'message' is required.")
@@ -279,6 +252,7 @@ class SocialUser:
 		channel_layer = get_channel_layer()
 		payload = {
 			"type": "get_message",
+			"message": message,
 			"username": self.user.username,
 		}
 		

@@ -31,8 +31,9 @@ class Game {
 		this.gameSocket = new SocketManager();
 		this.gameSocket.initGameWebSocket(
 			'liarsbar',
-			'/api/multiplayer/liarsbar',
-			this.handleSocketMessage.bind(this));
+			this.handleSocketMessage.bind(this),
+			'test',
+		);
 
 		this.sceneManager.initModelLoader();
 		this.sceneManager.initTextVar();
