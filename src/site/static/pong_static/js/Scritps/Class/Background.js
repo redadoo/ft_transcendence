@@ -2,15 +2,15 @@ import * as THREE from '../../../../lib/threejs/src/Three.js';
 
 export default class Background {
     constructor(scene, width = 10, height = 6) {
-        
         this.scene = scene;
-        
+
         if (!(this.scene instanceof THREE.Scene)) {
             console.error("this.scene is not a valid THREE.Scene instance.");
         }
 
         this.width = width;  // Larghezza del campo
         this.height = height; // Altezza del campo
+
         this.createDottedCenterLine();
     }
 
@@ -35,4 +35,5 @@ export default class Background {
         const line = new THREE.LineSegments(geometry, material);
         this.scene.add(line);
     }
+
 }

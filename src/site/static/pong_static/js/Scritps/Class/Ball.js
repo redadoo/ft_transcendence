@@ -7,11 +7,16 @@ export default class Ball
 	this.newPosX = 0;
 	this.newPosY = 0;
 
-	const geometry = new THREE.SphereGeometry(radius, 32, 32);
-	const material = new THREE.MeshStandardMaterial({ color: 'white' });
+		const geometry = new THREE.SphereGeometry(radius, 32, 32);
+		
+		const material = new THREE.MeshStandardMaterial({ 
+			color: 'white', 
+			
+		});
 
-	this.mesh = new THREE.Mesh(geometry, material);
-	this.mesh.position.set(0, 0, 0);
+		this.mesh = new THREE.Mesh(geometry, material);
+		this.mesh.position.set(0, 0, 0);
+		
 	}
 
 	updatePosition(newPos)

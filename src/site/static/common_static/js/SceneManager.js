@@ -276,6 +276,14 @@ export default class SceneManager {
 				path,
 				(gltfScene) => {
 					this.modelsLoaded[modelName] = gltfScene;
+
+					gltfScene.scene.traverse((child) => {
+					if (child.isMesh) {
+						child.castShadow = true; 
+						child.receiveShadow = true;
+					}
+					});
+					console.log(`Model ${modelName} loaded, applying shadows.`);
 					resolve();
 				},
 				undefined,

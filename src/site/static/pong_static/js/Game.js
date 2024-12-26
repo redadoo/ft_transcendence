@@ -25,7 +25,10 @@ class Game {
 
 		// Lights
 		this.ambientLight = null;
-		this.directionalLight = null;
+		this.pointLightMagenta = null;
+		this.pointLightBlue = undefined;
+		this.lightHelper = undefined;
+		this.screenLight = null;
 
 		// Game entities
 		this.bounds = null;
@@ -128,13 +131,60 @@ class Game {
 	}
 
 	initializeLights() {
-		this.ambientLight = new THREE.AmbientLight(0xb0e0e6, 0.9);
-		this.directionalLight = new THREE.DirectionalLight(0xffffff, 2);
-		this.directionalLight.position.set(0, 32, 64);
+			this.ambientLight = new THREE.AmbientLight(0xA2C2E9, 0.2); 
+			this.pointLightMagenta = new THREE.SpotLight(0xD56BE3, 600000, 600);
+			this.pointLightMagenta.position.set(100, 300, 300);
+			this.pointLightMagenta.target.position.set(0, -1000, 0);
+		
+			this.pointLightMagenta.castShadow = true;
+			this.pointLightMagenta.shadow.camera.near = 1;
+			this.pointLightMagenta.shadow.camera.far = 500;
+			this.pointLightMagenta.shadow.camera.left = -200;
+			this.pointLightMagenta.shadow.camera.right = 200;
+			this.pointLightMagenta.shadow.camera.top = 200;
+			this.pointLightMagenta.shadow.camera.bottom = -200;
+			this.pointLightMagenta.shadow.mapSize.width = 2048;
+			this.pointLightMagenta.shadow.mapSize.height = 2048;
+		
+			this.pointLightMagenta.shadow.mapSize.set(512 * 2, 512 * 2);
+			this.pointLightMagenta.shadow.normalBias = 0.1;
+			this.pointLightMagenta.shadow.bias = -0.0001;
+		
+			this.pointLightBlue = new THREE.SpotLight(0x3D84FF, 600000, 600); 
+			this.pointLightBlue.position.set(-100, 300, 300);
+			this.pointLightBlue.target.position.set(0, -1000, 0);
+		
+			this.pointLightBlue.castShadow = true;
+			this.pointLightBlue.shadow.camera.near = 1;
+			this.pointLightBlue.shadow.camera.far = 500;
+			this.pointLightBlue.shadow.camera.left = -200;
+			this.pointLightBlue.shadow.camera.right = 200;
+			this.pointLightBlue.shadow.camera.top = 200;
+			this.pointLightBlue.shadow.camera.bottom = -200;
+			this.pointLightBlue.shadow.mapSize.width = 2048;
+			this.pointLightBlue.shadow.mapSize.height = 2048;
+		
+			this.pointLightBlue.shadow.mapSize.set(512 * 2, 512 * 2);
+			this.pointLightBlue.shadow.normalBias = 0.1;
+			this.pointLightBlue.shadow.bias = -0.0001;
+		
+			
+			this.screenLight = new THREE.PointLight(0xffffff, 1000, 500);
+			this.screenLight.position.set(0, 28, 1);
 
-		this.sceneManager.scene.add(this.ambientLight);
-		this.sceneManager.scene.add(this.directionalLight);
-	}
+			this.sceneManager.scene.add(this.ambientLight);
+			this.sceneManager.scene.add(this.pointLightMagenta);
+			this.sceneManager.scene.add(this.pointLightBlue);
+			this.sceneManager.scene.add(this.screenLight);
+
+			// this.lightHelperMagenta = new THREE.SpotLightHelper(this.pointLightMagenta, 1);
+			// this.lightHelperBlue = new THREE.SpotLightHelper(this.pointLightBlue, 1);
+			this.lightHelper = new THREE.PointLightHelper(this.screenLight, 5);
+
+			// this.sceneManager.scene.add(this.lightHelperMagenta);
+			// this.sceneManager.scene.add(this.lightHelperBlue);
+			this.sceneManager.scene.add(this.lightHelper);
+		}	
 
 	initPaddles() {
 		this.pongOpponent = new Paddle(0.7, 4, 1.2, 0xffffff);
@@ -185,7 +235,7 @@ class Game {
 			this.pongOpponent = new PongPlayer(null, null, null, opponentId, opponentData);
 	
 			this.ball = new Ball(ball_data.radius);
-	
+			
 			this.background = new Background(this.sceneManager.scene, this.bounds.xMax * 2, this.bounds.yMax * 2);
 	
 			this.sceneManager.scene.add(this.ball.mesh);
