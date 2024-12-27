@@ -367,6 +367,7 @@ const html = {
 	`,
 
 	overlay: `
+		<div class="chat-sidebar d-none"></div>
 		<div class="friends-sidebar">
 			<div class="friends-header pixel-font" style="text-align: right;">
 				<span id="overlayUsername"></span>
@@ -398,22 +399,6 @@ const html = {
 			</div>
 		</div>
 	`,
-
-	// <!-- Example notification items - replace with dynamic content -->
-	// <div class="notification-item unread">
-	// 	<div class="notification-content">
-	// 		<div class="notification-title pixel-font">Friend Request</div>
-	// 		<div class="notification-message pixel-font">Player1 wants to be your friend</div>
-	// 		<div class="notification-time pixel-font">2m ago</div>
-	// 	</div>
-	// </div>
-	// <div class="notification-item game-invite">
-	// 	<div class="notification-content">
-	// 		<div class="notification-title pixel-font">Game Invite</div>
-	// 		<div class="notification-message pixel-font">Player2 invited you to play Pong</div>
-	// 		<div class="notification-time pixel-font">5m ago</div>
-	// 	</div>
-	// </div>
 
 	statusOverlay: `
 		<div class="row h-100">

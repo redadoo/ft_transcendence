@@ -10,13 +10,11 @@ const views = {
 	},
 
 	async alreadyLoggedInScripts() {
-		if (!await api.checkAuth()) { return router.navigateTo('/login'); }
 		const data = await api.getProfileInfo();
 		document.getElementById('alreadyLoggedInUsername').textContent = "You are already logged in as " + data.username;
 	},
 
 	async home() {
-		if (!await api.checkAuth()) { return router.navigateTo('/login'); }
 		await router.overlay.initialize();
 		const data = await api.getHeaderInfo();
 		['profileBtn', 'notificationBtn'].forEach(id => document.getElementById(id).classList.remove('d-none'));
@@ -98,32 +96,26 @@ const views = {
 	// Game views
 
 	async multiplayer() {
-		if (!await api.checkAuth()) { router.navigateTo('/login'); }
 		return html.multiplayer;
 	},
 
 	async pongSelection() {
-		if (!await api.checkAuth()) { router.navigateTo('/login'); }
 		return html.pongSelection;
 	},
 
 	async singleplayer() {
-		if (!await api.checkAuth()) { router.navigateTo('/login'); }
 		return html.singleplayer;
 	},
 
 	async pong() {
-		if (!await api.checkAuth()) { router.navigateTo('/login'); }
 		return html.pong;
 	},
 
 	async singleplayerPong() {
-		if (!await api.checkAuth()) { router.navigateTo('/login'); }
 		return html.singleplayerPong;
 	},
 
 	async liarsbar() {
-		if (!await api.checkAuth()) { router.navigateTo('/login'); }
 		return html.liarsbar;
 	},
 
@@ -148,7 +140,6 @@ const views = {
 	},
 
 	async profileScripts() {
-		if (!await api.checkAuth()) { return router.navigateTo('/login'); }
 		const data = await api.getProfileInfo();
 		const updateElement = (id, value) => document.getElementById(id).textContent = value;
 
