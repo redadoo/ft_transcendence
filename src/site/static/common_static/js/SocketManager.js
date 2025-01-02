@@ -209,7 +209,6 @@ export default class SocketManager
 	}
 
 	close()
-	close()
 	{
 		if (this.socket) {
 			this.socket.close();
