@@ -29,9 +29,9 @@ class PongGameManager(GameManager):
 		if is_bot:
 			self.players[players_id] = PongAI(players_id, self.ball, constants.GAME_BOUNDS["xMax"] - 1, constants.PADDLE_COLOR)
 		else:
-			pos_x = constants.GAME_BOUNDS["xMin"] + 1
+			pos_x = constants.GAME_BOUNDS["xMax"] - 1
 			if len(self.players) == 0:
-				pos_x = constants.GAME_BOUNDS["xMax"] - 1
+				pos_x = constants.GAME_BOUNDS["xMin"] + 1
 
 			self.players[players_id] = PongPlayer(
 				player_id=players_id,

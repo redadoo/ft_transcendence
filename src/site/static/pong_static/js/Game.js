@@ -264,7 +264,7 @@ class Game
 	{
 		if (this.bounds == null) this.initGameEnvironment(data);
 
-		if (this.pongOpponent != null && this.pongPlayer != null) 
+		if (this.pongOpponent != null && this.pongPlayer != null)
 			this.gameSocket.send(JSON.stringify({ type: 'lobby setuped' }));
 		else
 		{
@@ -311,7 +311,7 @@ class Game
 			}
 		} catch (error) {
 			console.error("Error processing WebSocket message:", error);
-			console.log("data: ", data);
+			console.log("error data: ", data);
 		}
 	}
 }
