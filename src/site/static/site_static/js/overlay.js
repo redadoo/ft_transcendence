@@ -1,3 +1,8 @@
+// SocialOverlayManager.js
+import ChatManager from './ChatManager.js';
+import NotificationManager from './NotificationManager.js';
+import FriendListManager from './FriendListManager.js';
+import SocketHandler from './SocketHandler.js';
 import api from './api.js';
 import SocketManager from '../../common_static/js/SocketManager.js';
 
@@ -12,38 +17,44 @@ export default class SocialOverlayManager {
 			registeredUsers: [],
 			pendingFriendRequests: []
 		};
+		this.userActions = {
+			block: this.blockUser.bind(this),
+			unblock: this.unblockUser.bind(this),
+			remove: this.removeFriend.bind(this),
+			accept: this.acceptFriendRequest.bind(this),
+			decline: this.declineFriendRequest.bind(this),
+			chat: this.openChat.bind(this)
+		}
 		this.initializeUIElements();
+		this.notificationManager = new NotificationManager();
+		this.friendListManager = new FriendListManager();
+		this.chatManager = new ChatManager(this);
 	}
 
-	// DOM Elements
 	initializeUIElements() {
 		this.socialOverlay = document.getElementById('overlay');
 		this.statusOverlay = document.getElementById('statusOverlay');
 		this.notificationButton = document.getElementById('notificationBtn');
 		this.currentUserStatus = document.getElementById('userStatus');
 		this.displayUsername = document.getElementById('overlayUsername');
-		this.friendLists = {
-			online: document.getElementById('onlineList'),
-			all: document.getElementById('allList'),
-			blocked: document.getElementById('blockedList')
-		};
 		this.navigationTabs = document.querySelectorAll('.tab');
 		this.statusOptions = document.querySelectorAll('.nav-link-right.user-status');
 		this.handleKeyboardControls = this.handleKeyboardControls.bind(this);
 	}
 
-	// Setup initial data and connections
 	async initialize() {
 		if (this.initialized) return;
 		try {
-			this.initializeNotificationSystem();
-			const [currentUsername, activeFriends, blockedContacts, registeredUsers, pendingFriendRequests] = await Promise.all([
-				api.getUsername(),
-				api.getFriendUsers(),
-				api.getBlockedUsers(),
-				api.getAllUsers(),
-				api.getPendingFriendRequests()
-			]);
+			await this.chatManager.initialize();
+
+			const [currentUsername, activeFriends, blockedContacts, registeredUsers, pendingFriendRequests] =
+				await Promise.all([
+					api.getUsername(),
+					api.getFriendUsers(),
+					api.getBlockedUsers(),
+					api.getAllUsers(),
+					api.getPendingFriendRequests()
+				]);
 
 			this.socialData = {
 				...this.socialData,
@@ -52,34 +63,48 @@ export default class SocialOverlayManager {
 				blockedContacts,
 				pendingFriendRequests,
 				registeredUsers
-			}
-			this.displayUsername.textContent = currentUsername;
-			this.socialData.socket = new SocketManager()
-			this.socialData.socket.initWebSocket('social/', this.handleSocketMessage.bind(this));
-			this.updateFriendLists();
-			this.setupEventHandlers();
-			this.socialData.pendingFriendRequests.forEach(username => { this.handleFriendRequest(username) });
-
-			window.handleNotificationAction = (notificationId, actionIndex) => {
-				const notification = this.notifications.find(notification => notification.id === notificationId);
-				if (notification && notification.actions && notification.actions[actionIndex]) {
-					notification.actions[actionIndex].handler();
-					this.removeNotification(notificationId);
-				}
 			};
+
+			this.chatManager.currentUsername = currentUsername;
+
+			this.displayUsername.textContent = currentUsername;
+			this.socialData.socket = new SocketManager();
+
+			this.socketHandler = new SocketHandler(
+				this.socialData,
+				this.userActions,
+				this.notificationManager,
+				this.friendListManager
+			);
+
+			this.socialData.socket.initWebSocket(
+				'social/',
+				this.socketHandler.handleSocketMessage.bind(this.socketHandler)
+			);
+
+			this.chatManager.initialize();
+
+			this.friendListManager.updateFriendLists(this.socialData);
+			this.setupEventHandlers();
+
+			this.socialData.pendingFriendRequests.forEach(username => {
+				this.socketHandler.handleFriendRequest(username);
+			});
+
+			document.body.addEventListener('keydown', this.handleKeyboardControls);
+
 			this.initialized = true;
 		} catch (error) {
 			console.error('Failed to initialize Social Overlay:', error);
 		}
 	}
 
-	// Event listeners
 	setupEventHandlers() {
 		this.notificationButton?.addEventListener('click', () => this.toggleOverlay(this.socialOverlay));
+
 		this.socialOverlay.addEventListener('click', (event) => {
 			if (event.target === this.socialOverlay) this.hideOverlay(this.socialOverlay);
 		});
-		document.body.addEventListener('keydown', this.handleKeyboardControls);
 
 		this.navigationTabs.forEach(tab => {
 			tab.addEventListener('click', () => this.switchActiveTab(tab));
@@ -89,11 +114,36 @@ export default class SocialOverlayManager {
 			event.stopPropagation();
 			this.toggleOverlay(this.statusOverlay);
 		});
+
 		this.statusOptions.forEach(option => {
 			option.addEventListener('click', () => this.updateUserStatus(option));
 		});
 
-		// User action handlers
+		this.setupUserActions();
+		this.setupSearch();
+	}
+
+	setupStatusHandlers() {
+		this.currentUserStatus?.addEventListener('click', (event) => {
+			event.stopPropagation();
+			this.toggleOverlay(this.statusOverlay);
+		});
+
+		this.statusOptions.forEach(option => {
+			option.addEventListener('click', () => this.updateUserStatus(option));
+		});
+	}
+
+	setupUserActions() {
+		document.addEventListener('click', (event) => {
+			const chatButton = event.target.closest('#openChat');
+			if (chatButton) {
+				const friendItem = chatButton.closest('.friend-item');
+				const username = friendItem.querySelector('.friend-name').textContent;
+				this.openChat(username);
+			}
+		});
+
 		document.addEventListener('click', (event) => {
 			const blockButton = event.target.closest('#blockUser');
 			if (blockButton) {
@@ -129,23 +179,30 @@ export default class SocialOverlayManager {
 				this.sendFriendRequest(targetUsername);
 			}
 		});
+	}
 
-		// Search handler
+	openChat(username) {
+		if (this.chatManager) {
+			this.chatManager.openChat(username);
+		}
+	}
+
+
+	setupSearch() {
 		const searchInput = document.querySelector('.search-input');
 		searchInput?.addEventListener('input', (event) => {
 			this.handleUserSearch(event.target.value);
 		});
 	}
 
-	// Search functionality
 	handleUserSearch(searchTerm) {
 		if (!searchTerm) {
-			this.updateFriendLists();
+			this.friendListManager.updateFriendLists(this.socialData);
 			return;
 		}
 
 		const searchResults = this.searchUsers(searchTerm);
-		this.displaySearchResults(searchResults);
+		this.friendListManager.displaySearchResults(searchResults, this.socialData);
 	}
 
 	searchUsers(searchTerm) {
@@ -169,234 +226,6 @@ export default class SocialOverlayManager {
 			});
 	}
 
-	displaySearchResults(results) {
-		const searchResultsHTML = results.map(user => {
-			if (user.isBlocked) {
-				return this.createBlockedUserItem(user.username, user.image_url.avatar_url);
-			}
-			if (user.isFriend) {
-				return this.createFriendListItem(
-					user.username,
-					user.image_url.avatar_url,
-					user.status
-				);
-			}
-			return this.createSearchResultItem(
-				user.username,
-				user.image_url.avatar_url,
-			);
-		}).join('');
-
-		Object.values(this.friendLists).forEach(list => {
-			if (list) {
-				list.innerHTML = searchResultsHTML || this.getEmptyListMessage('search');
-			}
-		});
-	}
-
-	// Friends list rendering
-	updateFriendLists() {
-		const { activeFriends, blockedContacts, registeredUsers } = this.socialData;
-		const findUserDetails = username => registeredUsers.find(user => user.username === username);
-		const listContents = {
-			online: this.createOnlineFriendsList(activeFriends, findUserDetails),
-			all: this.createCompleteFriendsList(activeFriends, findUserDetails),
-			blocked: this.createBlockedUsersList(blockedContacts, findUserDetails)
-		};
-		Object.entries(listContents).forEach(([listType, content]) => {
-			if (this.friendLists[listType]) {
-				this.friendLists[listType].innerHTML = content || this.getEmptyListMessage(listType);
-			}
-		});
-	}
-
-	// Generate lists
-	createOnlineFriendsList(activeFriends, findUserDetails) {
-		return activeFriends
-			.map(findUserDetails)
-			.filter(friend => friend?.status === 'Online')
-			.map(friend => this.createFriendListItem(
-				friend.username,
-				friend.image_url.avatar_url,
-				friend.status
-			))
-			.join('');
-	}
-
-	createCompleteFriendsList(activeFriends, findUserDetails) {
-		return activeFriends
-			.map(friendName => {
-				const friendDetails = findUserDetails(friendName);
-				return friendDetails ? this.createFriendListItem(
-					friendDetails.username,
-					friendDetails.image_url.avatar_url,
-					friendDetails.status
-				) : '';
-			})
-			.join('');
-	}
-
-	createBlockedUsersList(blockedContacts, findUserDetails) {
-		return blockedContacts
-			.map(blockedName => {
-				const userDetails = findUserDetails(blockedName);
-				return userDetails ? this.createBlockedUserItem(
-					userDetails.username,
-					userDetails.image_url.avatar_url
-				) : '';
-			})
-			.join('');
-	}
-
-	// UI elements creation
-	createFriendListItem(username, avatarUrl, status) {
-		return `
-			<div class="friend-item" id="friendItem">
-				<img src="${avatarUrl}" alt="avatar" class="friend-avatar">
-				<span class="friend-name pixel-font">${username}</span>
-				<span class="friend-status ${status.toLowerCase()}">${status}</span>
-				<span class="friend-action" id="blockUser">🔒</span>
-				<span class="friend-action" id="removeFriend">💔</span>
-			</div>
-		`;
-	}
-
-	createBlockedUserItem(username, avatarUrl) {
-		return `
-			<div class="friend-item">
-				<img src="${avatarUrl}" alt="avatar" class="friend-avatar">
-				<span class="friend-name pixel-font">${username}</span>
-				<span class="friend-action" id="unblockUser">🔓</span>
-			</div>
-		`;
-	}
-
-	createSearchResultItem(username, avatarUrl) {
-		return `
-			<div class="friend-item" id="friendItem">
-				<img src="${avatarUrl}" alt="avatar" class="friend-avatar">
-				<span class="friend-name pixel-font">${username}</span>
-				<span class="friend-action" id="addFriend">❤️</span>
-			</div>
-		`;
-	}
-
-	getEmptyListMessage(listType) {
-		const messages = {
-			online: 'No online friends',
-			all: 'No friends added',
-			blocked: 'No blocked users',
-			search: 'No users found'
-		};
-		return `<div class="pixel-font no-friends">${messages[listType]}</div>`;
-	}
-
-	// WebSocket handling
-	handleSocketMessage(event) {
-		try {
-			const socketData = JSON.parse(event.data);
-			const messageHandlers = {
-				'get_status_change': () => this.handleFriendStatusUpdate(socketData.friend_username, socketData.new_status),
-				'get_blocked': () => this.handleUserBlocked(socketData.username),
-				'get_unblocked': () => this.handleUserUnblocked(socketData.username),
-				'get_friend_request': () => this.handleFriendRequest(socketData.username),
-				'get_friend_request_accepted': () => this.handleFriendRequestAccepted(socketData.username),
-				'get_friend_request_declined': () => this.handleFriendRequestDeclined(socketData.username),
-				'get_friend_removed': () => this.handleFriendRemoved(socketData.username),
-			};
-
-			const handler = messageHandlers[socketData.type];
-			if (handler) {
-				handler();
-			} else {
-				console.log('Unhandled WebSocket message:', socketData);
-			}
-		} catch (error) {
-			console.error('Error processing WebSocket message:', error);
-		}
-	}
-
-	// Status updates
-	handleFriendStatusUpdate(username, newStatus) {
-		const friend = this.socialData.registeredUsers.find(user => user.username === username);
-		if (friend) {
-			friend.status = newStatus;
-			this.updateFriendLists();
-			this.addNotification({
-				type: 'status_update',
-				title: 'Friend Status Update',
-				message: `${username} is now ${newStatus}`
-			});
-		}
-	}
-
-	handleUserBlocked(username) {
-		this.socialData.activeFriends = this.socialData.activeFriends.filter(friend => friend !== username);
-		this.updateFriendLists();
-	}
-
-	handleUserUnblocked(username) {
-		if (!this.socialData.activeFriends.includes(username)) {
-			this.socialData.activeFriends.push(username);
-			this.updateFriendLists();
-		}
-	}
-
-	handleFriendRequest(username) {
-		if (!this.socialData.pendingFriendRequests.includes(username)) {
-			this.socialData.pendingFriendRequests.push(username);
-		}
-
-		this.addNotification({
-			type: 'friend_request',
-			title: 'Friend Request',
-			message: `${username} wants to be your friend`,
-			actions: [
-				{
-					label: 'Accept',
-					handler: () => this.acceptFriendRequest(username)
-				},
-				{
-					label: 'Decline',
-					handler: () => this.declineFriendRequest(username)
-				}
-			]
-		});
-	}
-
-	handleFriendRequestAccepted(username) {
-		if (!this.socialData.activeFriends.includes(username)) {
-			this.socialData.activeFriends.push(username);
-			this.updateFriendLists();
-		}
-
-		this.addNotification({
-			type: 'friend_request',
-			title: 'Friend Request Accepted',
-			message: `${username} accepted your friend request`
-		});
-	}
-
-	handleFriendRequestDeclined(username) {
-		this.addNotification({
-			type: 'friend_request',
-			title: 'Friend Request Declined',
-			message: `${username} declined your friend request`
-		});
-	}
-
-	handleFriendRemoved(username) {
-		this.socialData.activeFriends = this.socialData.activeFriends.filter(friend => friend !== username);
-		this.updateFriendLists();
-
-		this.addNotification({
-			type: 'friend_removed',
-			title: 'Friend Removed',
-			message: `${username} removed you as a friend`
-		});
-	}
-
-	// User actions
 	updateUserStatus(statusOption) {
 		const newStatus = statusOption.dataset.status;
 		if (this.currentUserStatus) {
@@ -407,11 +236,12 @@ export default class SocialOverlayManager {
 		this.sendStatusUpdate(newStatus);
 	}
 
+	// User actions
 	blockUser(targetUsername) {
 		if (!this.socialData.blockedContacts.includes(targetUsername)) {
 			this.socialData.blockedContacts.push(targetUsername);
 			this.socialData.activeFriends = this.socialData.activeFriends.filter(friend => friend !== targetUsername);
-			this.updateFriendLists();
+			this.friendListManager.updateFriendLists(this.socialData);
 			this.sendBlockUserUpdate(targetUsername);
 		}
 	}
@@ -420,7 +250,7 @@ export default class SocialOverlayManager {
 		if (this.socialData.blockedContacts.includes(targetUsername)) {
 			this.socialData.activeFriends.push(targetUsername);
 			this.socialData.blockedContacts = this.socialData.blockedContacts.filter(blocked => blocked !== targetUsername);
-			this.updateFriendLists();
+			this.friendListManager.updateFriendLists(this.socialData);
 			this.sendUnblockUserUpdate(targetUsername);
 		}
 	}
@@ -428,7 +258,7 @@ export default class SocialOverlayManager {
 	removeFriend(targetUsername) {
 		if (this.socialData.activeFriends.includes(targetUsername)) {
 			this.socialData.activeFriends = this.socialData.activeFriends.filter(friend => friend !== targetUsername);
-			this.updateFriendLists();
+			this.friendListManager.updateFriendLists(this.socialData);
 			this.sendRemoveFriendUpdate(targetUsername);
 		}
 	}
@@ -437,7 +267,8 @@ export default class SocialOverlayManager {
 		this.socialData.pendingFriendRequests = this.socialData.pendingFriendRequests.filter(request => request !== username);
 		if (!this.socialData.activeFriends.includes(username)) {
 			this.socialData.activeFriends.push(username);
-			this.updateFriendLists();
+			this.friendListManager.updateFriendLists(this.socialData);
+			console.log('Friend request accepted:', username);
 		}
 		this.sendFriendRequestAcceptedUpdate(username);
 	}
@@ -447,15 +278,17 @@ export default class SocialOverlayManager {
 		this.sendFriendRequestDeclinedUpdate(username);
 	}
 
-	// Socket messages
+	// Socket message senders
 	sendStatusUpdate(newStatus) {
 		this.socialData.socket.send(JSON.stringify({
 			type: 'status_change',
 			new_status: newStatus
 		}));
+		console.log('📡 Sending status update:', newStatus);
 	}
 
 	sendBlockUserUpdate(targetUsername) {
+		console.log('🚫 Blocking user:', targetUsername);
 		this.socialData.socket.send(JSON.stringify({
 			type: 'block_user',
 			username: targetUsername
@@ -476,6 +309,13 @@ export default class SocialOverlayManager {
 		}));
 	}
 
+	sendRemoveFriendUpdate(targetUsername) {
+		this.socialData.socket.send(JSON.stringify({
+			type: 'remove_friend',
+			username: targetUsername
+		}));
+	}
+
 	sendFriendRequestAcceptedUpdate(targetUsername) {
 		this.socialData.socket.send(JSON.stringify({
 			type: 'friend_request_accepted',
@@ -490,75 +330,11 @@ export default class SocialOverlayManager {
 		}));
 	}
 
-	sendRemoveFriendUpdate(targetUsername) {
-		this.socialData.socket.send(JSON.stringify({
-			type: 'remove_friend',
-			username: targetUsername
-		}));
-	}
-
-	//Notification System methods
-	initializeNotificationSystem() {
-		this.notifications = [];
-		this.notificationCount = 0;
-		this.notificationContainer = document.getElementById('notifications');
-		this.notificationCountDisplay = document.getElementById('notificationCount');
-	}
-
-	addNotification(notification) {
-		const notificationId = Date.now();
-		const notificationData = {
-			id: notificationId,
-			...notification
-		};
-
-		this.notifications.unshift(notificationData);
-		this.notificationCount++;
-		this.updateNotificationDisplay();
-
-		if (!notification.actions) {
-			setTimeout(() => this.removeNotification(notificationId), 5000);
-		}
-	}
-
-	removeNotification(notificationId) {
-		const index = this.notifications.findIndex(notification => notification.id === notificationId);
-		if (index !== -1) {
-			this.notifications.splice(index, 1);
-			this.notificationCount = Math.max(0, this.notificationCount - 1);
-			this.updateNotificationDisplay();
-		}
-	}
-
-	updateNotificationDisplay() {
-		this.notificationCountDisplay.textContent = this.notificationCount;
-
-		// Update notifications list
-		this.notificationContainer.innerHTML = this.notifications.map(notification => `
-			<div class="notification-item ${notification.type}" id="notification-${notification.id}">
-				<div class="notification-content">
-					<div class="notification-title pixel-font">${notification.title}</div>
-					<div class="notification-message pixel-font">${notification.message}</div>
-					${notification.actions ? `
-						<div class="notification-actions">
-							${notification.actions.map((action, index) => `
-								<button class="notification-action pixel-font"
-										onclick="window.handleNotificationAction(${notification.id}, ${index})">
-									${action.label}
-								</button>
-							`).join('')}
-						</div>
-					` : ''}
-				</div>
-			</div>
-		`).join('');
-	}
-
 	// UI handlers
 	switchActiveTab(selectedTab) {
 		this.navigationTabs.forEach(tab => tab.classList.toggle('active', tab === selectedTab));
 		const selectedListType = selectedTab.textContent.trim().toLowerCase();
-		Object.entries(this.friendLists).forEach(([listType, list]) => {
+		Object.entries(this.friendListManager.friendLists).forEach(([listType, list]) => {
 			if (list) {
 				list.classList.toggle('d-none', listType !== selectedListType);
 			}
@@ -592,6 +368,10 @@ export default class SocialOverlayManager {
 
 	cleanup() {
 		document.body.removeEventListener('keydown', this.handleKeyboardControls);
-		this.socialData.socket.close();
+
+		if (this.socialData && this.socialData.socket) {
+			this.socialData.socket.close();
+		}
+		this.initialized = false;
 	}
 }

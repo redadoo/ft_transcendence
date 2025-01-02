@@ -62,6 +62,15 @@ const api = {
 		}
 	},
 
+	async getChatMessages() {
+		try {
+			return await this.fetchJson('/api/chat');
+		} catch (error) {
+			console.error('Chat messages error:', error);
+			return false;
+		}
+	},
+
 	async getFriendUsers() {
 		try {
 			const response = await this.fetchJson('/api/profile?include=friendships');

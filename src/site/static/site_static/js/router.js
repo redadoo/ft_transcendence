@@ -1,3 +1,4 @@
+import api from './api.js';
 import html from './html.js';
 import overlayManager from './overlay.js';
 import views from './views.js';
@@ -24,18 +25,21 @@ const router = {
 			'/singleplayer/pong': 'singleplayerPong',
 		};
 
+		this.firstLoad = true;
+
 		document.getElementById('overlay').innerHTML = html.overlay;
 		document.getElementById('statusOverlay').innerHTML = html.statusOverlay;
 		document.getElementById('header').innerHTML = html.header;
 
 		this.overlay = new overlayManager();
 		this.setupEventListeners();
-		this.handleLocation();
+		this.navigateTo(window.location.pathname);
 	},
 
 	async handleLocation() {
 		const path = window.location.pathname;
 		const route = this.routes[path] || 'notFound';
+
 
 		if (!views[route]) {
 			console.error(`View "${route}" not found`);
@@ -53,12 +57,26 @@ const router = {
 		}
 	},
 
-	navigateTo: function(url) {
+	navigateTo: async function(url) {
 		if (window.location.pathname !== url) {
 			history.pushState(null, null, url);
 		} else {
 			history.replaceState(null, null, url);
 		}
+
+
+		if (!await api.checkAuth() && url !== '/login' && url !== '/register' && url !== '/login42') {
+			console.log('Not authenticated, redirecting to login');
+			this.navigateTo('/login');
+			return;
+		}
+
+		if (this.firstLoad) {
+			this.firstLoad = false;
+			this.navigateTo('/');
+			return;
+		}
+
 		this.handleLocation();
 	},
 

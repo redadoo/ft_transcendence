@@ -33,7 +33,7 @@ export default class SocketManager
 				if (onSocketOpen) 
 					onSocketOpen();
 			};
-		
+
 			this.socket.onclose = () => {
 				console.log('WebSocket connection closed');
 				this.connected = false;
@@ -41,7 +41,7 @@ export default class SocketManager
 				if (onSocketClose)
 					onSocketClose();
 			};
-		
+
 			this.socket.onerror = (error) => {
 				console.error('WebSocket error:', error);
 	
@@ -68,10 +68,10 @@ export default class SocketManager
 			console.warn('WebSocket is already connected.');
 			return;
 		}
-		
+
 		try {
 			const mode = SocketManager.getModeFromPath();
-			
+
 			const socketUrl = `ws://${window.location.host}/ws/${mode}/${gameName}/${roomName}`;
 			this.socket = new WebSocket(socketUrl);
 
@@ -82,7 +82,7 @@ export default class SocketManager
 				if (onSocketOpen) 
 					onSocketOpen();
 			};
-		
+
 			this.socket.onclose = () => {
 				console.log('WebSocket connection closed');
 				this.connected = false;
@@ -90,14 +90,14 @@ export default class SocketManager
 				if (onSocketClose)
 					onSocketClose();
 			};
-		
+
 			this.socket.onerror = (error) => {
 				console.error('WebSocket error:', error);
 	
 				if (onSocketError)
 					onSocketError(error);
 			};
-			
+
 			this.socket.onmessage = handleSocketMessage;
 		} catch (error) {
 			console.error('Failed to initialize WebSocket:', error.message);
@@ -208,6 +208,7 @@ export default class SocketManager
 		this.socket.send(data);
 	}
 
+	close()
 	close()
 	{
 		if (this.socket) {
