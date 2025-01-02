@@ -12,7 +12,7 @@ class Lobbies:
         """
 		self.lobbies = {}
 
-	def create_lobby(self, room_name: str, game_manager: GameManager):
+	def create_lobby(self, game_name: str, room_name: str, game_manager: GameManager):
 		"""
         Creates a new lobby with the given room name and GameManager instance, if it doesn't already exist.
 
@@ -24,7 +24,7 @@ class Lobbies:
             Lobby: The created or retrieved Lobby instance.
         """
 		if room_name not in self.lobbies:
-			self.lobbies[room_name] = Lobby(room_name, game_manager)
+			self.lobbies[room_name] = Lobby(game_name, room_name, game_manager)
 		return self.lobbies[room_name]
 
 	def get_lobby(self, room_name: str) -> Lobby:

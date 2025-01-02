@@ -36,7 +36,7 @@ class LiarsBarGameManager(GameManager):
 		random.shuffle(deck)
 		return deck
 
-	def add_player(self, players_id: int):
+	def add_player(self, players_id: int, is_bot: bool):
 		"""
 		Adds a new player to the game using their unique ID.
 

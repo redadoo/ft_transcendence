@@ -53,10 +53,14 @@ class LiarsBarConsumer(AsyncWebsocketConsumer):
 	
 		self.lobby = lobbies.get_lobby(self.room_name) 
 		if self.lobby == None:
-			self.lobby = lobbies.create_lobby(self.room_name,  LiarsBarGameManager())
+			self.lobby = lobbies.create_lobby("liarsbar", self.room_name,  LiarsBarGameManager())
 
 		await self.channel_layer.group_add(self.lobby.room_group_name, self.channel_name)
 		await self.accept()
+
+		await self.lobby.add_player_to_lobby({"player_id": "123"}, True)
+		await self.lobby.add_player_to_lobby({"player_id": "124"}, True)
+		await self.lobby.add_player_to_lobby({"player_id": "125"}, True)
 
 	async def disconnect(self, close_code):
 		await self.lobby.broadcast_message({"type": "lobby_state"})
@@ -69,9 +73,8 @@ class LiarsBarConsumer(AsyncWebsocketConsumer):
 	async def lobby_state(self, event: dict):
 		"""Aggiorna lo stato lato client."""
 
-		await self.send(
-			text_data=json.dumps({
-				"type": event["type"],
-				"lobby": self.lobby.to_dict()
-			})
-		)
+		data_to_send = {
+			"event_info": event,
+			"lobby_info": self.lobby.to_dict()
+		}
+		await self.send(text_data=json.dumps(data_to_send))

@@ -63,7 +63,7 @@ class PongMultiplayerConsumer(AsyncWebsocketConsumer):
 	
 		self.lobby = lobbies.get_lobby(self.room_name) 
 		if self.lobby == None:
-			self.lobby = lobbies.create_lobby(self.room_name,  PongGameManager())
+			self.lobby = lobbies.create_lobby("pong", self.room_name,  PongGameManager())
 
 		await self.channel_layer.group_add(self.lobby.room_group_name, self.channel_name)
 		await self.accept()
@@ -79,12 +79,11 @@ class PongMultiplayerConsumer(AsyncWebsocketConsumer):
 	async def lobby_state(self, event: dict):
 		"""Aggiorna lo stato lato client."""
 
-		await self.send(
-			text_data=json.dumps({
-				"type": event["type"],
-				"lobby": self.lobby.to_dict()
-			})
-		)
+		data_to_send = {
+			"event_info": event,
+			"lobby_info": self.lobby.to_dict()
+		}
+		await self.send(text_data=json.dumps(data_to_send))
 
 class PongSingleplayerConsumer(AsyncWebsocketConsumer):
 
@@ -96,11 +95,10 @@ class PongSingleplayerConsumer(AsyncWebsocketConsumer):
 
 	async def connect(self):
 		self.room_name = self.generate_random_room_name()
-		self.lobby: Lobby = lobbies.create_lobby(self.room_name,  PongGameManager())
+		self.lobby: Lobby = lobbies.create_lobby("pong", self.room_name,  PongGameManager())
 
 		await self.channel_layer.group_add(self.lobby.room_group_name, self.channel_name)
 		await self.accept()
-		await self.lobby.add_player({"player_id" : str(uuid.uuid4())}, True)
 
 	async def disconnect(self, close_code):
 		await self.lobby.broadcast_message({"type": "lobby_state"})
@@ -108,14 +106,15 @@ class PongSingleplayerConsumer(AsyncWebsocketConsumer):
 
 	async def receive(self, text_data):
 		data = json.loads(text_data)
+		if data.get("type") == "init_player":
+			await self.lobby.add_player_to_lobby({"player_id" : "bot"}, True)
 		await self.lobby.manage_event(data)
 
 	async def lobby_state(self, event: dict):
 		"""Aggiorna lo stato lato client."""
 
-		await self.send(
-			text_data=json.dumps({
-				"type": event["type"],
-				"lobby": self.lobby.to_dict()
-			})
-		)
+		data_to_send = {
+			"event_info": event,
+			"lobby_info": self.lobby.to_dict()
+		}
+		await self.send(text_data=json.dumps(data_to_send))

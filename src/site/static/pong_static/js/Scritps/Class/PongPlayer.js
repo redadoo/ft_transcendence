@@ -4,7 +4,7 @@ import PongInput from './PongInput.js';
 export default class PongPlayer {
 	constructor(upKey, downKey, socket, playerId, data) 
 	{
-		this.playerId = playerId;
+		this.playerId = parseInt(playerId);
 		this.socket = socket;
 		this.paddle = new Paddle(data.width, data.height, data.depth, data.color);
 		this.input = new PongInput(upKey, downKey);

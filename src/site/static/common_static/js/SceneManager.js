@@ -1,355 +1,211 @@
-const ThreejsPath = "../../lib/threejs";
-
 import * as THREE from '../../lib/threejs/src/Three.js';
 import { OrbitControls } from '../../lib/threejs/examples/jsm/controls/OrbitControls.js';
 import Stats from '../../lib/threejs/examples/jsm/libs/stats.module.js';
-import { TextGeometry } from '../../lib/threejs/examples/jsm/geometries/TextGeometry.js';
-import { FontLoader } from '../../lib/threejs/examples/jsm/loaders/FontLoader.js';
-import { GLTFLoader } from '../../lib/threejs/examples/jsm/loaders/GLTFLoader.js';
+import ModelManager from './ModelManager.js';
+import AudioManager from './AudioManager.js';
 
-export default class SceneManager {
-  
-  constructor(needOrbital = true) {
-	
-	//font variable
-	this.fontPath = "/static/lib/threejs/examples/fonts/";
-	this.fontName = 'optimer', 
-	this.fontWeight = 'bold';
+/**
+ * SceneManager is a class to manage a 3D scene using Three.js. It handles
+ * initialization of the scene, camera, renderer, and controls, as well as
+ * managing animations and interactions.
+ *
+ * @export
+ * @class SceneManager
+ */
+export default class SceneManager 
+{
+    /**
+     * Creates an instance of SceneManager.
+     * @param {boolean} needOrbital - Whether to use orbital controls for the scene.
+     */
+    constructor(needOrbital) {
+        this.scene = null;
+        this.camera = null;
+        this.renderer = null;
+        this.clock = null;
+        this.stats = null;
+        this.controls = null;
 
-	this.group = undefined; 
-	this.textMesh1 = undefined; 
-	this.materials = undefined;
+        this.ambientLight = null;
+        this.pointLight = null;
+        this.directionalLight = null;
 
-	this.bevelEnabled = true,
-	this.font = undefined,
+        this.modelManager = null;
+        this.audioManager = null;
 
-	this.depth = 20,
-	this.size = 70,
-	this.hover = 30,
-	this.curveSegments = 4,
-	this.bevelThickness = 2,
-	this.bevelSize = 1.5;
+        this.fov = 45;
+        this.nearPlane = 1;
+        this.farPlane = 1000;
 
+        this.needOrbital = needOrbital;
+        this.accumulatedTime = 0;
+        this.fixedTimeStep = 1 / 60;
 
-	this.fontMap = {
-	  'helvetiker': 0,
-	  'optimer': 1,
-	  'gentilis': 2,
-	  'droid/droid_sans': 3,
-	  'droid/droid_serif': 4
+        this.externalFunction = null;
+    }
 
-	};
-
-	this.weightMap = {
-
-	  'regular': 0,
-	  'bold': 1
-
-	};
-
-	this.reverseFontMap = [];
-	this.reverseWeightMap = [];
-	this.fontIndex = 1;
-
-	//
-	this.gltfLoader = undefined;
-	this.loadingPromises = [];
-	this.modelsLoaded = {};
-
-	this.scene = undefined;
-	this.camera = undefined;
-	this.renderer = undefined;
-
-	this.clock = undefined;
-	this.stats = undefined;
-	this.controls = undefined;
-
-	this.ambientLight = undefined;
-	this.pointLight = undefined;
-	this.directionalLight = undefined;
-
-	this.externalFunction = null;
-	this.lightHelper = undefined;
-	this.needOrbital = needOrbital;
-
-	this.fov = 45;
-	this.nearPlane = 1;
-	this.farPlane = 1000;
-
-	this.accumulatedTime = 0;
-	this.fixedTimeStep = 1 / 60;
-
-	//audio
-	this.audio = undefined;
-	this.listener = undefined;
-	this.audioLoader = undefined;
-	this.audioContext = undefined;
-
-  }
-
-	setCameraValue(fov, nearPlane, farPlane)
+    /**
+     * Sets an external function to be called during the animation loop.
+     * @param {Function} func - The function to set.
+     */
+    setExternalFunction(func) 
 	{
-		this.fov = fov;
-		this.nearPlane = nearPlane;
-		this.farPlane = farPlane;
-	}
+        if (typeof func === "function")
+            this.externalFunction = func;
+        else
+            console.warn("setExternalFunction expects a valid function.");
+    }
 
-	setCameraTransform(position, rotation, target) 
+    /**
+     * Configures the camera properties.
+     * @param {Object} config - The camera configuration.
+     * @param {number} [config.fov] - The field of view.
+     * @param {number} [config.nearPlane] - The near clipping plane.
+     * @param {number} [config.farPlane] - The far clipping plane.
+     */
+    setCameraConfig({ fov, nearPlane, farPlane }) 
 	{
-	if (this.needOrbital && target) 
-		this.controls.target.copy(target);
-	else if (!this.needOrbital && target) 
-		throw new Error("An orbital camera is required to set a target.");
+        this.fov = fov || this.fov;
+        this.nearPlane = nearPlane || this.nearPlane;
+        this.farPlane = farPlane || this.farPlane;
+    }
 
-	this.camera.position.copy(position);
-	this.camera.rotation.set(rotation.x, rotation.y, rotation.z);
-	}
-
-	setCameraState(position, quaternion, target) 
+    /**
+     * Sets the state of the camera.
+     * @param {Object} state - The camera state.
+     * @param {THREE.Vector3} state.position - The camera position.
+     * @param {THREE.Quaternion} state.quaternion - The camera rotation.
+     * @param {THREE.Vector3} [state.target] - The target position for controls.
+     * @throws {Error} If the camera is not initialized.
+     */
+    setCameraState(position, quaternion, target ) 
 	{
-	if (!this.camera)
-		throw new Error("Camera must be initialized before setting its state.");
+        if (!this.camera) throw new Error("Camera must be initialized.");
 
-	this.camera.position.copy(position);
-	this.camera.quaternion.copy(quaternion);
+        this.camera.position.copy(position);
+        this.camera.quaternion.copy(quaternion);
 
-	if (this.controls && target) 
-		this.controls.target.copy(target);
-	}
+        if (this.controls && target) this.controls.target.copy(target);
+    }
 
-	setExternalFunction(func) 
+    /**
+     * Initializes the scene manager components.
+     * @param {boolean} [needModelManager=false] - Whether to initialize a model manager.
+     * @param {boolean} [needAudioManager=false] - Whether to initialize an audio manager.
+     */
+    initialize(needModelManager = false, needAudioManager = false) 
 	{
-	if (typeof func === "function") 
-		this.externalFunction = func;
-	else 
-		console.warn("setExternalFunction expects a valid function.");
-	}
+        this.initializeScene();
+        this.initializeRenderer(THREE.PCFSoftShadowMap);
+        this.initializeCamera();
+        this.initializeStats();
 
-	initialize() 
+        if (this.needOrbital) this.controls = new OrbitControls(this.camera, this.renderer.domElement);
+        if (needModelManager) this.modelManager = new ModelManager();
+        if (needAudioManager) this.audioManager = new AudioManager(this.camera);
+
+        window.addEventListener("resize", this.onWindowResize.bind(this));
+    }
+
+    /**
+     * Initializes the scene and clock.
+     */
+    initializeScene() 
 	{
-		this.scene = new THREE.Scene();
-		this.clock = new THREE.Clock();
+        this.scene = new THREE.Scene();
+        this.clock = new THREE.Clock();
+    }
 
-		this.renderer = new THREE.WebGLRenderer({ antialias: true });
-		this.renderer.setSize(window.innerWidth, window.innerHeight);
-		this.renderer.shadowMap.enabled = true;
-			this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
-
-		this.camera = new THREE.PerspectiveCamera(
-			this.fov,
-			window.innerWidth / window.innerHeight,
-			this.nearPlane,
-			this.farPlane
-		);
-
-		this.camera.position.z = 48;
-		this.stats = Stats();
-
-		document.body.appendChild(this.stats.dom);
-		document.body.appendChild(this.renderer.domElement);
-
-		if (this.needOrbital)
-			this.controls = new OrbitControls(this.camera, this.renderer.domElement);
-
-		window.addEventListener("resize", () => this.onWindowResize(), false);
-	}
-
-	animate() {
-	window.requestAnimationFrame(this.animate.bind(this));
-
-	const deltaTime = this.clock.getDelta();
-	this.accumulatedTime += deltaTime;
-
-	while (this.accumulatedTime >= this.fixedTimeStep) 
+    /**
+     * Initializes the renderer with shadow mapping.
+     * @param {Object} options - Renderer options.
+     * @param {number} options.shadowMapType - Shadow map type.
+     */
+    initializeRenderer(shadowMapType) 
 	{
-		if (this.externalFunction) 
-		this.externalFunction(this.fixedTimeStep);
-		this.accumulatedTime -= this.fixedTimeStep;
-	}
+        this.renderer = new THREE.WebGLRenderer({ antialias: true });
+        this.renderer.setSize(window.innerWidth, window.innerHeight);
+        this.renderer.shadowMap.enabled = true;
+        this.renderer.shadowMap.type = shadowMapType;
+        document.body.appendChild(this.renderer.domElement);
+    }
 
-	this.render();
-	this.stats.update();
-
-	if (this.needOrbital)
-		this.controls.update();
-	}
-
-	render() 
+    /**
+     * Initializes the camera with perspective settings.
+     */
+    initializeCamera() 
 	{
-	this.renderer.render(this.scene, this.camera);
-	}
+        this.camera = new THREE.PerspectiveCamera(
+            this.fov,
+            window.innerWidth / window.innerHeight,
+            this.nearPlane,
+            this.farPlane
+        );
+        this.camera.position.z = 48;
+    }
 
-	onWindowResize() {
-	this.renderer.setSize(window.innerWidth, window.innerHeight);
-	this.camera.updateProjectionMatrix();
-	this.camera.aspect = window.innerWidth / window.innerHeight;
-	}
-
-	initTextVar()
+    /**
+     * Initializes performance stats for the scene.
+     */
+    initializeStats() 
 	{
-	if (this.scene == undefined || this.scene == null)
-		throw new Error("scene need to be initialized");
+        this.stats = Stats();
+        document.body.appendChild(this.stats.dom);
+    }
 
-	this.materials = [
-		new THREE.MeshPhongMaterial( { color: 0xffffff, flatShading: true } ), // front
-		new THREE.MeshPhongMaterial( { color: 0xffffff } ) // side
-	];
-
-	this.group = new THREE.Group();
-	this.group.position.y = 100;
-
-	this.scene.add( this.group );
-
-	this.loadFont()
-	}
-
-	loadFont() {
-	this.fontLoader = new FontLoader();
-	this.fontLoader.load(
-		this.fontPath + this.fontName + "_" + this.fontWeight + ".typeface.json",
-		(response) => {
-		this.font = response;
-		this.refreshText();
-		},
-		undefined,
-		(error) => {
-		console.error("Error loading font:", error);
-		}
-	);
-	}
-
-
-	refreshText() {
-	this.group.remove(this.textMesh1);
-
-	if (!this.text) return;
-
-	this.createText();
-	}
-
-	createText(text, position, rotation) 
+    /**
+     * Starts the animation loop.
+     */
+    animate() 
 	{
-	textGeo = new TextGeometry( text, {
+        const animateLoop = () => {
+            const deltaTime = this.clock.getDelta();
+            this.accumulatedTime += deltaTime;
 
-		font: this.font,
+            while (this.accumulatedTime >= this.fixedTimeStep) 
+			{
+                if (this.externalFunction) this.externalFunction(this.fixedTimeStep);
+                this.accumulatedTime -= this.fixedTimeStep;
+            }
 
-		size: this.size,
-		depth: this.depth,
-		curveSegments: this.curveSegments,
+            this.render();
+            this.stats.update();
+            if (this.needOrbital) this.controls.update();
 
-		bevelThickness: this.bevelThickness,
-		bevelSize: this.bevelSize,
-		bevelEnabled: this.bevelEnabled
+            window.requestAnimationFrame(animateLoop);
+        };
 
-	});
+        animateLoop();
+    }
 
-	textGeo.computeBoundingBox();
-
-	const centerOffset = - 0.5 * ( textGeo.boundingBox.max.x - textGeo.boundingBox.min.x );
-
-	textMesh1 = new THREE.Mesh( textGeo, this.materials );
-
-	textMesh1.position.copy(position);
-	textMesh1.position.copy(rotation);
-
-	this.group.add( textMesh1 );
-	}
-
-	initModelLoader()
+    /**
+     * Renders the scene using the camera.
+     */
+    render() 
 	{
-	this.gltfLoader = new GLTFLoader();
-	}
+        this.renderer.render(this.scene, this.camera);
+    }
 
-	loadModel(models)
+    /**
+     * Adjusts the camera and renderer on window resize.
+     */
+    onWindowResize() 
 	{
-		for (const [key, value] of Object.entries(models)) {
-			this.loadingPromises.push(this._loadModel(key, value)
-			);
-		}
-		return Promise.all(this.loadingPromises);
-	}
+        if (!this.camera || !this.renderer) return;
 
-	_loadModel(path, modelName) 
+        this.camera.aspect = window.innerWidth / window.innerHeight;
+        this.camera.updateProjectionMatrix();
+        this.renderer.setSize(window.innerWidth, window.innerHeight);
+    }
+
+    /**
+     * Disposes resources and removes event listeners.
+     */
+    dispose() 
 	{
-		return new Promise((resolve, reject) => {
-			this.gltfLoader.load(
-				path,
-				(gltfScene) => {
-					this.modelsLoaded[modelName] = gltfScene;
-
-					gltfScene.scene.traverse((child) => {
-					if (child.isMesh) {
-						child.castShadow = true; 
-						child.receiveShadow = true;
-					}
-					});
-					console.log(`Model ${modelName} loaded, applying shadows.`);
-					resolve();
-				},
-				undefined,
-				(error) => {
-					console.error(`Error loading model ${modelName}:`, error);
-					reject(error);
-				}
-			);
-		});
-	}
-
-	initAudioVar()
-	{
-		this.audioLoader = new THREE.AudioLoader();
-		this.listener = new THREE.AudioListener();
-		this.audioContext = new (window.AudioContext || window.webkitAudioContext)({ latencyHint: 'interactive' });
-		THREE.AudioContext.setContext(this.audioContext);
-		this.audio = new THREE.Audio(this.listener);
-		this.camera.add(this.listener);
-	}
-
-	playAudio(audioPath) 
-	{
-		const loadAndPlayAudio = () => {
-			this.audioLoader.load(audioPath, (buffer) => {
-				if (buffer) {
-					this.audio.setBuffer(buffer);
-					this.audio.setLoop(true);
-					this.audio.setVolume(1.0);
-					this.audio.play();
-					console.log("Audio playback started.");
-				} else {
-					console.error("Audio buffer not loaded.");
-				}
-			});
-		};
-
-		const resumeAudioContext = () => {
-			if (this.audioContext.state === 'suspended') {
-				this.audioContext.resume().then(() => {
-					console.log("AudioContext resumed.");
-					loadAndPlayAudio(); 
-				}).catch((error) => {
-					console.error("Error resuming AudioContext:", error);
-				});
-			} else {
-				loadAndPlayAudio(); 
-			}
-		};
-
-		document.addEventListener('click', resumeAudioContext, { once: true });
-
-		// Loading and playing the audio
-		this.audioLoader.load(audioPath, (buffer) => {
-			if (buffer) {
-				this.audio.setBuffer(buffer);
-				this.audio.setLoop(true);
-				this.audio.setVolume(0);
-				this.audio.play();
-				console.log("Audio autoplay (muted) started.");
-				setTimeout(() => this.audio.setVolume(1.0), 1);
-			}
-			else {
-				console.error("Audio buffer not loaded.");
-			}
-		});
-	}
-
+        if (this.renderer) this.renderer.dispose();
+        if (this.controls) this.controls.dispose();
+        if (this.stats) document.body.removeChild(this.stats.dom);
+        window.removeEventListener("resize", this.onWindowResize);
+    }
 }
