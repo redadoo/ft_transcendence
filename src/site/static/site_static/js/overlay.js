@@ -187,7 +187,6 @@ export default class SocialOverlayManager {
 		}
 	}
 
-
 	setupSearch() {
 		const searchInput = document.querySelector('.search-input');
 		searchInput?.addEventListener('input', (event) => {
@@ -327,6 +326,14 @@ export default class SocialOverlayManager {
 		this.socialData.socket.send(JSON.stringify({
 			type: 'friend_request_declined',
 			username: targetUsername
+		}));
+	}
+
+	sendChatMessage(user ,message) {
+		this.socialData.socket.send(JSON.stringify({
+			type: 'send_message',
+			username: user,
+			message: message
 		}));
 	}
 

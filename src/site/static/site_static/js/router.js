@@ -1,4 +1,5 @@
 import api from './api.js';
+import {HeaderText, FooterText}  from './HeaderFooterText.js';
 import html from './html.js';
 import overlayManager from './overlay.js';
 import views from './views.js';
@@ -48,8 +49,11 @@ const router = {
 		}
 
 		const view = await views[route]();
+		console.log('Rendering view:', route);
 		if (view) {
 			document.getElementById('app').innerHTML = view;
+			document.getElementById('header_text').innerText = HeaderText[route];
+			document.getElementById('footer').innerText = FooterText[route];
 
 			if (views[route + 'Scripts']) {
 				views[route + 'Scripts']();

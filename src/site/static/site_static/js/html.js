@@ -21,35 +21,35 @@ const html = {
 								<span class="pixel-font multiplayer">MP </span>
 								<div class="column-text">
 									<span class="hundin-font multiplayer text-up">MULTIPLAYER</span>
-									<span class="hundin-font multiplayer text-down">PLAY WITH FRIENDS AND FOES</span>
+									<span class="hundin-font multiplayer text-down">PLAY WITH FRIENDS AND FOES.</span>
 								</div>
 							</div>
 							<div class="nav-link-right singleplayer" data-link="/singleplayer">
 								<span class="pixel-font singleplayer">SP </span>
 								<div class="column-text">
 									<span class="hundin-font singleplayer text-up">SINGLEPLAYER</span>
-									<span class="hundin-font singleplayer text-down">DA CAPIRE</span>
+									<span class="hundin-font singleplayer text-down">SOLO MODE. SHOW YOUR SKILLS.</span>
 								</div>
 							</div>
 							<div class="nav-link-right leaderboard" data-link="/leaderboard">
 								<span class="pixel-font leaderboard">LDB</span>
 								<div class="column-text">
 									<span class="hundin-font leaderboard text-up">LEADERBOARD</span>
-									<span class="hundin-font leaderboard text-down">DA CAPIRE ZIO PERA</span>
+									<span class="hundin-font leaderboard text-down">TOP PLAYERS. THINK YOU CAN BEAT THEM?</span>
 								</div>
 							</div>
 							<div class="nav-link-right config" data-link="/config">
 								<span class="pixel-font config">CFG</span>
 								<div class="column-text">
 									<span class="hundin-font config text-up">CONFIG</span>
-									<span class="hundin-font config text-down">DA CAPIRE QUESTION MARK</span>
+									<span class="hundin-font config text-down">CUSTOMIZE YOUR EXPERIENCE.</span>
 								</div>
 							</div>
 							<div class="nav-link-right about" data-link="/about">
 								<span class="pixel-font about">ABT</span>
 								<div class="column-text">
 									<span class="hundin-font about text-up">ABOUT</span>
-									<span class="hundin-font about text-down">ALL ABOUT TRANSCENDENCE</span>
+									<span class="hundin-font about text-down">EVERYTHING ABOUT TRANSCENDENCE.</span>
 								</div>
 							</div>
 						</div>
@@ -455,28 +455,28 @@ const html = {
 								<span class="pixel-font tournament">TMT</span>
 								<div class="column-text">
 									<span class="hundin-font tournament text-up">TOURNAMENT</span>
-									<span class="hundin-font tournament text-down">KINGDOM HEARTS PROPAGANDA</span>
+									<span class="hundin-font tournament text-down">BATTLE FOR THE TOP SPOT</span>
 								</div>
 							</a>
 							<a class="nav-link-right ranked" data-link="/multiplayer/pong_ranked">
 								<span class="pixel-font ranked">RNK</span>
 								<div class="column-text">
 									<span class="hundin-font ranked text-up">RANKED</span>
-									<span class="hundin-font ranked text-down">KINGDOM HEARTS PROPAGANDA</span>
+									<span class="hundin-font ranked text-down">CLIMB THE LEADERBOARD</span>
 								</div>
 							</a>
 							<a class="nav-link-right unranked" data-link="/multiplayer/pong_unranked">
 								<span class="pixel-font unranked">UNK</span>
 								<div class="column-text">
 									<span class="hundin-font unranked text-up">UNRANKED</span>
-									<span class="hundin-font unranked text-down">KINGDOM HEARTS PROPAGANDA</span>
+									<span class="hundin-font unranked text-down">RELAX AND PLAY</span>
 								</div>
 							</a>
 							<a class="nav-link-right lobby" data-link="/">
 								<span class="pixel-font lobby">LBY</span>
 								<div class="column-text">
 									<span class="hundin-font lobby text-up">LOBBY</span>
-									<span class="hundin-font lobby text-down">KINGDOM HEARTS PROPAGANDA</span>
+									<span class="hundin-font lobby text-down">GATHER BEFORE THE GAME</span>
 								</div>
 							</a>
 						</div>

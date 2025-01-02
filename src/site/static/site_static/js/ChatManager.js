@@ -130,8 +130,6 @@ export default class ChatManager {
 
 	createMessageHTML(msg) {
 		const messageType = msg.sender.username === this.currentUsername ? 'sent' : 'received';
-		console.log('msg', msg);
-		console.log('this.currentUsername', this.currentUsername);
 		return `
 			<div class="message ${messageType}">
 				<div class="message-content">
@@ -158,6 +156,8 @@ export default class ChatManager {
 			sender: { username: this.currentUsername },
 			message_text: message
 		}, this.activeChat);
+
+		this.socialOverlay.sendChatMessage(this.activeChat, message);
 
 		messageInput.value = '';
 	}
