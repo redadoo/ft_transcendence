@@ -160,6 +160,10 @@ const views = {
 
 		matchHistory.renderMatchHistory(data.history, data.username);
 	},
+
+	async about() {
+		return html.about;
+	}
 };
 
 export default views;

@@ -994,3 +994,240 @@ label {
 .chat-messages::-webkit-scrollbar-thumb:hover {
 	background: #444;
 }
+
+
+.about-scroll-container {
+	height: calc(100vh - 119px);
+	overflow-y: auto;
+	scrollbar-width: thin;
+	scrollbar-color: #4ba644 #2a2a2a;
+}
+
+.about-scroll-container::-webkit-scrollbar {
+	width: 8px;
+}
+
+.about-scroll-container::-webkit-scrollbar-track {
+	background: #2a2a2a;
+}
+
+.about-scroll-container::-webkit-scrollbar-thumb {
+	background: #4ba644;
+	border-radius: 4px;
+}
+
+.about-container {
+	background-color: #222222;
+	border-radius: 10px;
+	border: 1px solid rgba(104, 104, 104, 0.2);
+	margin: 1rem 0;
+}
+
+.title-text {
+	font-family: 'cr', monospace;
+	color: #686868;
+	font-size: 2.5rem;
+	letter-spacing: 2px;
+	text-shadow: 4px 4px 8px rgba(0, 0, 0, 0.3);
+}
+
+.section-title {
+	font-family: 'pfw', sans-serif;
+	color: #b5b3d9;
+	font-size: 1.5rem;
+	margin-bottom: 1.5rem;
+	letter-spacing: 1px;
+	border-bottom: 2px solid #404040;
+	padding-bottom: 0.5rem;
+}
+
+.section-text {
+	font-family: 'ind', sans-serif;
+	color: #a0a0a0;
+	line-height: 1.6;
+	font-size: 1.1rem;
+}
+
+.team-card {
+	background-color: #2a2a2a;
+	padding: 1.5rem;
+	border-radius: 8px;
+	border: 1px solid #404040;
+	height: 100%;
+	text-align: center;
+	transition: transform 0.3s ease;
+}
+
+.team-card:hover {
+	transform: translateY(-5px);
+}
+
+.member-photo {
+	width: 150px;
+	height: 150px;
+	margin: 0 auto 1rem;
+	border-radius: 50%;
+	overflow: hidden;
+	border: 3px solid #404040;
+	background-size: cover;
+	background-position: center;
+	background-repeat: no-repeat;
+}
+.member-photo.franco { background-image: url("../media/img/franco.jpg"); }
+.member-photo.edoardo { background-image: url("../media/img/edoardo.jpg"); }
+.member-photo.francesco { background-image: url("../media/img/francesco.jpg"); }
+
+.member-photo img {
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+}
+
+.member-name {
+	font-family: 'cb', monospace;
+	font-size: 1.5rem;
+	margin: 1rem 0;
+	letter-spacing: 1px;
+}
+
+.member-name.red { color: #de4f5d; }
+.member-name.green { color: #4ba644; }
+.member-name.blue { color: #7881bf; }
+
+.team-realname {
+	font-family: 'ind', sans-serif;
+	color: #a0a0a0;
+	margin-bottom: 0.5rem;
+	font-size: 1.1rem;
+}
+
+.team-role {
+	font-family: 'ind', sans-serif;
+	color: #8f8f8f;
+	font-size: 1rem;
+	margin-bottom: 1rem;
+}
+
+.member-contributions {
+	list-style: none;
+	padding: 0;
+	margin: 0;
+	text-align: left;
+}
+
+.member-contributions li {
+	font-family: 'ind', sans-serif;
+	color: #a0a0a0;
+	font-size: 0.9rem;
+	margin-bottom: 0.5rem;
+	padding-left: 1rem;
+	position: relative;
+}
+
+.member-contributions li::before {
+	content: "•";
+	position: absolute;
+	left: 0;
+	color: #4ba644;
+}
+
+.game-card {
+	background-color: #2a2a2a;
+	padding: 1.5rem;
+	border-radius: 8px;
+	border: 1px solid #404040;
+	height: 100%;
+}
+
+.game-title {
+	font-family: 'cb', monospace;
+	font-size: 1.8rem;
+	margin-bottom: 1rem;
+	text-align: center;
+}
+.game-title.white { color: #e0e0e0; }
+.game-title.yellow { color: #e0b91f; }
+
+.game-description {
+	font-family: 'ind', sans-serif;
+	color: #a0a0a0;
+	line-height: 1.6;
+	font-size: 1rem;
+}
+
+.module-section {
+	background-color: #2a2a2a;
+	border-radius: 8px;
+	border: 1px solid #404040;
+	padding: 1.5rem;
+	margin-bottom: 1rem;
+}
+
+.module-title {
+	font-family: 'pfw', sans-serif;
+	color: #8f8f8f;
+	font-size: 1.2rem;
+	margin-bottom: 1rem;
+}
+
+.module-grid {
+	display: grid;
+	grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+	gap: 1rem;
+}
+
+.module-item {
+	font-family: 'ind', sans-serif;
+	color: #a0a0a0;
+	background-color: #222222;
+	padding: 0.8rem 1rem;
+	border-radius: 6px;
+	border: 1px solid #404040;
+	font-size: 0.95rem;
+}
+
+.special-thanks {
+	margin-top: 3rem;
+}
+
+.thanks-card {
+	background-color: #2a2a2a;
+	padding: 1.5rem;
+	border-radius: 8px;
+	border: 1px solid #404040;
+	display: flex;
+	align-items: center;
+	gap: 2rem;
+}
+
+.thanks-photo {
+	width: 100px;
+	height: 100px;
+	border-radius: 50%;
+	overflow: hidden;
+	border: 2px solid #404040;
+	background-image: url("../media/img/michele.jpg");
+	background-size: cover;
+	background-position: center;
+	background-repeat: no-repeat;
+	flex-shrink: 0;
+}
+
+.thanks-content {
+	flex-grow: 1;
+}
+
+.thanks-name {
+	font-family: 'cb', monospace;
+	color: #4ba644;
+	font-size: 1.3rem;
+	margin-bottom: 0.5rem;
+}
+
+.thanks-contribution {
+	font-family: 'ind', sans-serif;
+	color: #a0a0a0;
+	font-size: 1rem;
+	line-height: 1.5;
+	margin: 0;
+}

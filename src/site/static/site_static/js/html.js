@@ -500,6 +500,158 @@ const html = {
 			</div>
 		</div>
 	`,
+
+	about: `
+		<div class="container-fluid game-container">
+		<div class="row h-100">
+			<div class="col-2 px-0">
+			<nav class="nav-wrapper">
+				<div class="d-flex flex-column">
+				<a class="nav-link-left back" data-link="/">
+					<span class="hundin-font back">BACK</span>
+				</a>
+				</div>
+			</nav>
+			</div>
+
+			<div class="col-10 px-4">
+			<div class="about-scroll-container">
+				<div class="about-container p-4">
+				<h1 class="title-text text-center mb-5">ABOUT TRANSCENDENCE</h1>
+
+				<div class="mb-5">
+					<h2 class="section-title">PROJECT OVERVIEW</h2>
+					<p class="section-text">
+					ft_transcendence enhances the classic Pong game with modern features and adds Liar's Bar, our original social deduction game.
+					Built with Django backend, Bootstrap frontend, and PostgreSQL database, our platform offers rich multiplayer experiences with
+					real-time gameplay, user authentication, and advanced 3D graphics.
+					</p>
+				</div>
+
+				<div class="mb-5">
+					<h2 class="section-title">OUR TEAM</h2>
+
+					<div class="row g-4">
+					<div class="col-md-4">
+						<div class="team-card">
+						<div class="member-photo franco">
+						</div>
+						<h3 class="member-name red">FURSINI</h3>
+						<p class="team-realname">Franco Ursini</p>
+						<p class="team-role">Frontend Development & UI/UX Design</p>
+						<ul class="member-contributions">
+							<li>Bootstrap Integration</li>
+							<li>User Interface Design</li>
+							<li>Frontend Architecture</li>
+						</ul>
+						</div>
+					</div>
+
+					<div class="col-md-4">
+						<div class="team-card">
+						<div class="member-photo edoardo">
+						</div>
+						<h3 class="member-name green">EVOCATUR</h3>
+						<p class="team-realname">Edoardo Vocaturo</p>
+						<p class="team-role">Backend Development</p>
+						<ul class="member-contributions">
+							<li>Django Framework</li>
+							<li>Database Management</li>
+							<li>Authentication Systems</li>
+						</ul>
+						</div>
+					</div>
+
+					<div class="col-md-4">
+						<div class="team-card">
+						<div class="member-photo francesco">
+						</div>
+						<h3 class="member-name blue">FBORROTO</h3>
+						<p class="team-realname">Francesco Borroto</p>
+						<p class="team-role">Game Logic & Systems</p>
+						<ul class="member-contributions">
+							<li>Game Mechanics</li>
+							<li>AI Implementation</li>
+							<li>3D Graphics</li>
+						</ul>
+						</div>
+					</div>
+					</div>
+				</div>
+
+				<div class="mb-5">
+					<h2 class="section-title">FEATURES & GAMES</h2>
+					<div class="row g-4">
+					<div class="col-md-6">
+						<div class="game-card">
+						<h3 class="game-title white">PONG</h3>
+						<p class="game-description">
+							The classic arcade game reimagined with modern features, including 3D graphics,
+							AI opponents, and real-time multiplayer capabilities.
+						</p>
+						</div>
+					</div>
+					<div class="col-md-6">
+						<div class="game-card">
+						<h3 class="game-title yellow">LIAR'S BAR</h3>
+						<p class="game-description">
+							Our original social deduction game where players navigate through deception and
+							strategy in a unique bar setting. Features custom matchmaking and live chat.
+						</p>
+						</div>
+					</div>
+					</div>
+				</div>
+
+				<div class="mb-5">
+					<h2 class="section-title">IMPLEMENTED MODULES</h2>
+					<div class="row g-3">
+					<div class="col-12">
+						<div class="module-section">
+						<h3 class="module-title">Major Modules</h3>
+						<div class="module-grid">
+							<div class="module-item">Django Backend Framework</div>
+							<div class="module-item">User Management & Authentication</div>
+							<div class="module-item">Remote Authentication (OAuth)</div>
+							<div class="module-item">Remote Players System</div>
+							<div class="module-item">Liar's Bar Integration</div>
+							<div class="module-item">Live Chat System</div>
+							<div class="module-item">AI Opponent</div>
+							<div class="module-item">3D Graphics Implementation</div>
+						</div>
+						</div>
+					</div>
+					<div class="col-12">
+						<div class="module-section">
+						<h3 class="module-title">Minor Modules</h3>
+						<div class="module-grid">
+							<div class="module-item">Bootstrap Frontend</div>
+							<div class="module-item">PostgreSQL Database</div>
+							<div class="module-item">Server-Side Rendering</div>
+						</div>
+						</div>
+					</div>
+					</div>
+				</div>
+
+				<div class="special-thanks">
+					<h2 class="section-title">SPECIAL THANKS</h2>
+					<div class="thanks-card">
+					<div class="thanks-photo">
+						<img src="" />
+					</div>
+					<div class="thanks-content">
+						<h3 class="thanks-name">Michele Lania</h3>
+						<p class="thanks-contribution">For his outstanding contribution to our project through the creation of amazing 3D models that enhanced our game's visual experience.</p>
+					</div>
+					</div>
+				</div>
+				</div>
+			</div>
+			</div>
+		</div>
+		</div>
+	`,
 };
 
 export default html;

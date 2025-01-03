@@ -19,7 +19,7 @@ const HeaderText = {
 
 const FooterText = {
 	home: 'Welcome to Transcendence – play, chat, and connect with friends.',
-	about: 'Discover more about Transcendence and its mission.',
+	about: 'Discover more about Transcendence.',
 	alreadyLoggedIn: 'You’re logged in. Explore games and chat with friends.',
 	config: 'Customize your settings for a personalized experience.',
 	leaderboard: 'See where you rank against other players.',
