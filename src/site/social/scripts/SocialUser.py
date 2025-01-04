@@ -37,6 +37,10 @@ class SocialUser:
 		channel_layer = get_channel_layer()
 		notifications = []
 		for friendship in friendships:
+			
+			if friendship.status != Friendships.FriendshipsStatus.FRIENDS:
+				continue
+			
 			actor = self.user
 			recipient = friendship.second_user if friendship.first_user == self.user else friendship.first_user
 
@@ -89,13 +93,14 @@ class SocialUser:
 		user_to_block = await self._validate_user(data.get("username"))
 		friendship = await self._get_friendship(user_to_block)
 
+		if friendship.status != Friendships.FriendshipsStatus.FRIENDS:
+			raise ValueError(f"User '{user_to_block}' isnt friend with '{self.user.username}'.")
+
 		try:
 			block_target = await sync_to_async(User.objects.get)(username=user_to_block)
 		except User.DoesNotExist:
 			raise ValueError(f"User '{user_to_block}' does not exist.")
 
-		if friendship.status == Friendships.FriendshipsStatus.FIRST_USER_BLOCK or friendship.status == Friendships.FriendshipsStatus.SECOND_USER_BLOCK:
-			raise ValueError(f"User '{user_to_block}' is already blocked.")
 
 		first_user = await sync_to_async(lambda: friendship.first_user)()
 
@@ -126,14 +131,15 @@ class SocialUser:
 		"""
 		user_to_unblock = await self._validate_user(data.get("username"))
 		friendship =  await self._get_friendship(user_to_unblock)
+		
+		if friendship.status != Friendships.FriendshipsStatus.FIRST_USER_BLOCK and friendship.status != Friendships.FriendshipsStatus.SECOND_USER_BLOCK:
+			raise ValueError(f"User '{user_to_unblock}' is not blocked.")
 
 		try:
 			unblock_target = await sync_to_async(User.objects.get)(username=user_to_unblock)
 		except User.DoesNotExist:
 			raise ValueError(f"User '{user_to_unblock}' does not exist.")
 
-		if friendship.status != Friendships.FriendshipsStatus.FIRST_USER_BLOCK and friendship.status != Friendships.FriendshipsStatus.SECOND_USER_BLOCK:
-			raise ValueError(f"User '{user_to_unblock}' is not blocked.")
 
 		friendship.status = Friendships.FriendshipsStatus.FRIENDS
 		await sync_to_async(friendship.save)(update_fields=["status"])
@@ -192,6 +198,8 @@ class SocialUser:
 		target_username = await self._validate_user(data.get("username"))
 		friendship =  await self._get_friendship(target_username)
 
+		if friendship.status != Friendships.FriendshipsStatus.FRIENDS:
+			raise ValueError(f"Friendship status with user '{target_username}' and '{self.user.username}'isnt Friends.")
 
 		try:
 			target_user = await sync_to_async(User.objects.get)(username=target_username)
@@ -212,6 +220,8 @@ class SocialUser:
 		target_username = await self._validate_user(data.get("username"))
 		friendship =  await self._get_friendship(target_username)
 
+		if friendship.status != Friendships.FriendshipsStatus.PENDING:
+			raise ValueError(f"Friendship status with user '{target_username}' and '{self.user.username}'isnt Pending.")
 
 		try:
 			target_user = await sync_to_async(User.objects.get)(username=target_username)
@@ -232,12 +242,15 @@ class SocialUser:
 	async def send_message(self, data: dict):
 		target_username = await self._validate_user(data.get("username"))
 
+		_friendship =  await self._get_friendship(target_username)
+
+		if _friendship.status != Friendships.FriendshipsStatus.FRIENDS:
+			raise ValueError(f"User '{target_username}' isnt friend with {self.user.username}.")
+
 		message: str = data.get("message")
 
 		if message is None:
 			raise ValueError("Invalid data: 'message' is required.")
-
-		_friendship =  await self._get_friendship(target_username)
 
 		await sync_to_async(ChatMessage.objects.create)(
 			friendship=_friendship,
