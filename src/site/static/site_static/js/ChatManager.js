@@ -117,12 +117,14 @@ export default class ChatManager {
 	}
 
 	displayMessages(username) {
+		console.log('📚 Displaying messages for:', username);
 		const messageList = document.getElementById('messageList');
 		if (!messageList) return;
 
 		const chat = this.chats.get(username);
 		if (!chat) return;
 
+		console.log('msgs:', chat.messages);
 		const messagesHTML = chat.messages.map(msg => this.createMessageHTML(msg)).join('');
 		messageList.innerHTML = messagesHTML;
 		messageList.scrollTop = messageList.scrollHeight;
@@ -152,10 +154,7 @@ export default class ChatManager {
 		const message = messageInput.value.trim();
 		if (!message || !this.activeChat) return;
 
-		this.addMessage({
-			sender: { username: this.currentUsername },
-			message_text: message
-		}, this.activeChat);
+		this.addMessage(message, this.currentUsername);
 
 		this.socialOverlay.sendChatMessage(this.activeChat, message);
 
@@ -163,6 +162,7 @@ export default class ChatManager {
 	}
 
 	addMessage(message, username) {
+		console.log('📩 Adding message:', message, 'to:', username);
 		if (!username) return;
 
 		// Create chat if it doesn't exist
@@ -170,9 +170,21 @@ export default class ChatManager {
 			this.chats.set(username, { messages: [], unreadCount: 0 });
 		}
 
-		const chat = this.chats.get(username);
-		chat.messages.push(message);
+		if (username === this.currentUsername) {
+			const chat = this.chats.get(this.activeChat);
+			chat.messages.push({
+				sender: { username: this.currentUsername },
+				message_text: message
+			});
+			this.displayMessages(this.activeChat);
+			return;
+		}
 
+		const chat = this.chats.get(username);
+		chat.messages.push({
+			sender: { username: username },
+			message_text: message
+		});
 		// Update unread count if not active chat
 		if (username !== this.activeChat) {
 			chat.unreadCount++;

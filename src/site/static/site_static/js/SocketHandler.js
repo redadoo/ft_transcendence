@@ -1,9 +1,10 @@
 export default class SocketHandler {
-	constructor(socialData, userActions, notificationManager, friendListManager) {
+	constructor(socialData, userActions, notificationManager, friendListManager, chatManager) {
 		this.socialData = socialData;
 		this.userActions = userActions;
 		this.notificationManager = notificationManager;
 		this.friendListManager = friendListManager;
+		this.chatManager = chatManager;
 		console.log('🔌 SocketHandler initialized');
 	}
 
@@ -20,6 +21,7 @@ export default class SocketHandler {
 				'get_friend_request_accepted': () => this.handleFriendRequestAccepted(socketData.username),
 				'get_friend_request_declined': () => this.handleFriendRequestDeclined(socketData.username),
 				'get_friend_removed': () => this.handleFriendRemoved(socketData.username),
+				'get_message': () => this.handleIncomingMessage(socketData),
 			};
 
 			const handler = messageHandlers[socketData.type];
@@ -131,6 +133,17 @@ export default class SocketHandler {
 			type: 'friend_request',
 			title: 'Friend Removed',
 			message: `${username} removed you as a friend`
+		});
+	}
+
+	handleIncomingMessage(messageData) {
+		console.log('💬 Handling incoming message:', messageData);
+		this.chatManager.addMessage(messageData.message, messageData.username);
+
+		this.notificationManager.addNotification({
+			type: 'chat_message',
+			title: `New message from ${messageData.username}`,
+			message: messageData.message.message_text
 		});
 	}
 }

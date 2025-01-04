@@ -74,7 +74,8 @@ export default class SocialOverlayManager {
 				this.socialData,
 				this.userActions,
 				this.notificationManager,
-				this.friendListManager
+				this.friendListManager,
+				this.chatManager
 			);
 
 			this.socialData.socket.initWebSocket(

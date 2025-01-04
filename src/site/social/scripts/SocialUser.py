@@ -16,13 +16,13 @@ class SocialUser:
 			return await sync_to_async(User.objects.get)(username=username)
 		except User.DoesNotExist:
 			raise ValueError(f"User '{username}' does not exist.")
-		
+
 	async def _get_friendship(self, target_user):
 		try:
 			friendship = await sync_to_async(Friendships.objects.get)(
 				Q(first_user=self.user, second_user=target_user) |
 				Q(first_user=target_user, second_user=self.user)
-			) 
+			)
 		except Friendships.DoesNotExist:
 			raise ValueError(f"a relationship between '{self.user.username}' and '{target_user.username}' does not exist")
 		return friendship
@@ -45,7 +45,7 @@ class SocialUser:
 				"friend_username": actor.username,
 				"status": User.get_status_name(actor.status),
 			}
-			notifications.append((f"user_{recipient.id}", payload))
+			notifications.append((f"user_{recipient.username}", payload))
 
 		for group, payload in notifications:
 			await channel_layer.group_send(group, payload)
@@ -96,23 +96,23 @@ class SocialUser:
 
 		if friendship.status == Friendships.FriendshipsStatus.FIRST_USER_BLOCK or friendship.status == Friendships.FriendshipsStatus.SECOND_USER_BLOCK:
 			raise ValueError(f"User '{user_to_block}' is already blocked.")
-		
+
 		first_user = await sync_to_async(lambda: friendship.first_user)()
-		
+
 		if first_user.username == self.user.username:
 			friendship.status = Friendships.FriendshipsStatus.FIRST_USER_BLOCK
 		else:
 			friendship.status = Friendships.FriendshipsStatus.SECOND_USER_BLOCK
 
 		await sync_to_async(friendship.save)(update_fields=["status"])
-		
+
 		channel_layer = get_channel_layer()
 
 		payload = {
 			"type": "get_blocked",
 			"username": self.user.username,
 		}
-		await channel_layer.group_send(f"user_{block_target.id}", payload)
+		await channel_layer.group_send(f"user_{block_target.username}", payload)
 
 	async def unblock_user(self, data: dict):
 		"""
@@ -144,7 +144,7 @@ class SocialUser:
 			"username": self.user.username,
 		}
 
-		await channel_layer.group_send(f"user_{unblock_target.id}", payload)
+		await channel_layer.group_send(f"user_{unblock_target.username}", payload)
 
 	async def send_friend_request(self, data: dict):
 		target_username = await self._validate_user(data.get("username"))
@@ -176,7 +176,7 @@ class SocialUser:
 			"username": self.user.username,
 		}
 
-		await channel_layer.group_send(f"user_{target_user.id}", payload)
+		await channel_layer.group_send(f"user_{target_user.username}", payload)
 
 	async def remove_friend(self, data: dict, event_name: str):
 		"""
@@ -197,7 +197,7 @@ class SocialUser:
 			target_user = await sync_to_async(User.objects.get)(username=target_username)
 		except User.DoesNotExist:
 			raise ValueError(f"User '{target_username}' does not exist.")
-		
+
 		await sync_to_async(friendship.delete)()
 
 		channel_layer = get_channel_layer()
@@ -206,8 +206,8 @@ class SocialUser:
 			"username": self.user.username,
 		}
 
-		await channel_layer.group_send(f"user_{target_user.id}", payload)
-		
+		await channel_layer.group_send(f"user_{target_user.username}", payload)
+
 	async def accept_friend_request(self, data: dict):
 		target_username = await self._validate_user(data.get("username"))
 		friendship =  await self._get_friendship(target_username)
@@ -227,16 +227,16 @@ class SocialUser:
 			"username": self.user.username,
 		}
 
-		await channel_layer.group_send(f"user_{target_user.id}", payload)
-	
+		await channel_layer.group_send(f"user_{target_user.username}", payload)
+
 	async def send_message(self, data: dict):
 		target_username = await self._validate_user(data.get("username"))
-		
+
 		message: str = data.get("message")
 
 		if message is None:
 			raise ValueError("Invalid data: 'message' is required.")
-		
+
 		_friendship =  await self._get_friendship(target_username)
 
 		await sync_to_async(ChatMessage.objects.create)(
@@ -247,6 +247,7 @@ class SocialUser:
 
 		# Send a message to the target user's WebSocket group
 		channel_layer = get_channel_layer()
+		print("Sending message")
 		payload = {
 			"type": "get_message",
 			"message": message,
