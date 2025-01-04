@@ -61,6 +61,8 @@ class Lobby:
 				await self.start_game()
 			case "update_player":
 				self.game_manager.update_player(data)
+			case "quit_game":
+				pass
 			case _:
 				print(f"Unhandled event type: {event_type}. Full data: {data}")
 

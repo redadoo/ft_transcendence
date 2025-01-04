@@ -1,8 +1,9 @@
 from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
-from .serializers import ChatSerializer
-from .models import Chat
+from website.models import Friendships
+from django.db.models import Q
+from .serializers import FriendshipSerializer
 
 class ChatView(APIView):
     """
@@ -14,13 +15,10 @@ class ChatView(APIView):
         """
         Retrieve all chats associated with the authenticated user.
         """
+        user = request.user
+        chats = Friendships.objects.filter(
+            Q(first_user=user) | Q(second_user=user)
+        ).prefetch_related('messages__sender')
 
-        include = request.query_params.getlist('with')
-
-        if include:
-            chats = Chat.objects.filter(users__username__in=include)
-        else:
-            chats = Chat.objects.filter(users=request.user)
-
-        serializer = ChatSerializer(chats, many=True, context={'request': request})
+        serializer = FriendshipSerializer(chats, many=True, context={'request': request})
         return Response(serializer.data)

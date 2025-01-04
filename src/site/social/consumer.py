@@ -121,6 +121,7 @@ class SocialConsumer(AsyncWebsocketConsumer):
 		await self.send(
 			text_data=json.dumps({
 				"type": "get_message",
-				"username" : event["username"]
+				"username" : event["username"],
+				"message": event["message"]
 			})
 		)

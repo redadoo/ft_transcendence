@@ -14,7 +14,6 @@ class PongGameManager(GameManager):
 		super().__init__(max_players=2)
 		self.ball = Ball()
 		self.scores = {"player1": 0, "player2": 0}
-		self.update_lock = asyncio.Lock()
 
 	def add_player(self, players_id: int, is_bot: bool):
 		"""
@@ -73,22 +72,21 @@ class PongGameManager(GameManager):
 		"""
 		Core game loop that updates the state of the players, ball, and handles collisions.
 		"""
-		async with self.update_lock:
-			for player in self.players.values():
-				player.player_loop()
+		for player in self.players.values():
+			player.player_loop()
 
-			self.ball.update_position()
+		self.ball.update_position()
 
-			for player in self.players.values():
-				self.ball.handle_paddle_collision(player.paddle)
+		for player in self.players.values():
+			self.ball.handle_paddle_collision(player.paddle)
 
-			out_of_bounds = self.ball.is_out_of_bounds()
-			if out_of_bounds == "right":
-				self.scores["player1"] += 1
-				self.ball.reset()
-			elif out_of_bounds == "left":
-				self.scores["player2"] += 1
-				self.ball.reset()
+		out_of_bounds = self.ball.is_out_of_bounds()
+		if out_of_bounds == "right":
+			self.scores["player1"] += 1
+			self.ball.reset()
+		elif out_of_bounds == "left":
+			self.scores["player2"] += 1
+			self.ball.reset()
 
 	def to_dict(self) -> dict:
 		"""

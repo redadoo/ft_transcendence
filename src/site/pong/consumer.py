@@ -61,15 +61,15 @@ class PongMultiplayerConsumer(AsyncWebsocketConsumer):
 	async def connect(self):
 		self.room_name = self.scope["url_route"]["kwargs"]["room_name"]
 	
-		self.lobby = lobbies.get_lobby(self.room_name) 
+		self.lobby = lobbies.get_lobby(self.room_name)
 		if self.lobby == None:
 			self.lobby = lobbies.create_lobby("pong", self.room_name,  PongGameManager())
+		self.id = self.lobby
 
 		await self.channel_layer.group_add(self.lobby.room_group_name, self.channel_name)
 		await self.accept()
 
 	async def disconnect(self, close_code):
-		await self.lobby.broadcast_message({"type": "lobby_state"})
 		await self.channel_layer.group_discard(self.lobby.room_group_name, self.channel_name)
 
 	async def receive(self, text_data):

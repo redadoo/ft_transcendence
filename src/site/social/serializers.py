@@ -1,6 +1,6 @@
 from rest_framework import serializers
-from .models import Chat, ChatMessage
-from website.models import User
+from .models import ChatMessage
+from website.models import User, Friendships
 
 class UserSerializer(serializers.ModelSerializer):
 	username = serializers.ReadOnlyField()
@@ -18,17 +18,20 @@ class ChatMessageSerializer(serializers.ModelSerializer):
 		fields = ['sender', 'message_text']
 
 
-class ChatSerializer(serializers.ModelSerializer):
+class FriendshipSerializer(serializers.ModelSerializer):
 	users = serializers.SerializerMethodField()
 	messages = ChatMessageSerializer(many=True, read_only=True)
 
 	class Meta:
-		model = Chat
-		fields = ("users", "messages")
+		model = Friendships
+		fields = ['id', 'status', 'users', 'messages', 'date_created']
 
 	def get_users(self, obj):
-		request = self.context.get('request')
-		if request and hasattr(request, 'user'):
-			filtered_users = obj.users.exclude(username=request.user.username)
-			return UserSerializer(filtered_users, many=True).data
-		return UserSerializer(obj.users, many=True).data
+		# Get the requesting user from the serializer context
+		request_user = self.context['request'].user
+		
+		# Filter out the requesting user
+		other_user = [user for user in [obj.first_user, obj.second_user] if user != request_user]
+		
+		# Serialize the other user
+		return UserSerializer(other_user, many=True).data
