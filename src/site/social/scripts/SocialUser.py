@@ -117,7 +117,7 @@ class SocialUser:
 			"type": "get_blocked",
 			"username": self.user.username,
 		}
-		await channel_layer.group_send(f"user_{block_target.username}", payload)
+		await channel_layer.group_send(f"user_{block_target.id}", payload)
 
 	async def unblock_user(self, data: dict):
 		"""
@@ -150,7 +150,7 @@ class SocialUser:
 			"username": self.user.username,
 		}
 
-		await channel_layer.group_send(f"user_{unblock_target.username}", payload)
+		await channel_layer.group_send(f"user_{unblock_target.id}", payload)
 
 	async def send_friend_request(self, data: dict):
 		target_username = await self._validate_user(data.get("username"))
@@ -182,7 +182,7 @@ class SocialUser:
 			"username": self.user.username,
 		}
 
-		await channel_layer.group_send(f"user_{target_user.username}", payload)
+		await channel_layer.group_send(f"user_{target_user.id}", payload)
 
 	async def remove_friend(self, data: dict, event_name: str):
 		"""
@@ -214,7 +214,7 @@ class SocialUser:
 			"username": self.user.username,
 		}
 
-		await channel_layer.group_send(f"user_{target_user.username}", payload)
+		await channel_layer.group_send(f"user_{target_user.id}", payload)
 
 	async def accept_friend_request(self, data: dict):
 		target_username = await self._validate_user(data.get("username"))
@@ -237,11 +237,16 @@ class SocialUser:
 			"username": self.user.username,
 		}
 
-		await channel_layer.group_send(f"user_{target_user.username}", payload)
+		await channel_layer.group_send(f"user_{target_user.id}", payload)
 
 	async def send_message(self, data: dict):
 		target_username = await self._validate_user(data.get("username"))
 
+		try:
+			target_user = await sync_to_async(User.objects.get)(username=target_username)
+		except User.DoesNotExist:
+			raise ValueError(f"User '{target_username}' does not exist.")
+		
 		_friendship =  await self._get_friendship(target_username)
 
 		if _friendship.status != Friendships.FriendshipsStatus.FRIENDS:
@@ -266,6 +271,6 @@ class SocialUser:
 			"message": message,
 			"username": self.user.username,
 		}
-		await channel_layer.group_send(f"user_{target_username}", payload)
+		await channel_layer.group_send(f"user_{target_user.id}", payload)
 
 
