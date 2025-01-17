@@ -49,7 +49,7 @@ class SocialUser:
 				"friend_username": actor.username,
 				"status": User.get_status_name(actor.status),
 			}
-			notifications.append((f"user_{recipient.username}", payload))
+			notifications.append((f"user_{recipient.id}", payload))
 
 		for group, payload in notifications:
 			await channel_layer.group_send(group, payload)
