@@ -84,10 +84,8 @@ class Auth42(View):
 	def get(self, request, *args, **kwargs):
 		"""Handle both login initiation and callback."""
 		if request.path == "/42login":
-			print("ok")
 			return self.user_42login()
 		elif request.path == "/oauth_callback":
-			print("strano")
 			return self.handle_callback(request)
 		else:
 			return HttpResponseBadRequest("Invalid path.")

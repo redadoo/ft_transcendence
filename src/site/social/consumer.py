@@ -118,7 +118,6 @@ class SocialConsumer(AsyncWebsocketConsumer):
 		)
 
 	async def get_message(self, event: dict):
-		print("get_message")
 		await self.send(
 			text_data=json.dumps({
 				"type": "get_message",

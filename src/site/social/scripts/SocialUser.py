@@ -265,7 +265,6 @@ class SocialUser:
 
 		# Send a message to the target user's WebSocket group
 		channel_layer = get_channel_layer()
-		print("Sending message")
 		payload = {
 			"type": "get_message",
 			"message": message,
