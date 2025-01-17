@@ -1,3 +1,4 @@
+import os
 import secrets
 import requests
 
@@ -14,6 +15,7 @@ from .serializers import UserSerializer
 from rest_framework.response import Response
 from rest_framework.decorators import action
 from django.shortcuts import redirect, render
+
 
 class UserViewSet(viewsets.ModelViewSet):
 	serializer_class = UserSerializer
@@ -59,6 +61,7 @@ class UserViewSet(viewsets.ModelViewSet):
 			return Response({"success": "true"})
 		return Response({"success": "false"})
 
+#TODO refact
 class Auth42(View):
 	state = secrets.token_urlsafe(32)
 
@@ -74,15 +77,17 @@ class Auth42(View):
 		self.params_token = {
 			"grant_type": "authorization_code",
 			"client_id": "u-s4t2ud-7913cbc4cbaed9a2d5e9b33fcd888a0d3c5d00ba256b7844ef00714c3e9580cf",
-			"client_secret": "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",
+			"client_secret": str(os.environ.get("42_AUTH_CLIENT_SECRET")),
 			"redirect_uri": self.params_auth["redirect_uri"]
 		}
 
 	def get(self, request, *args, **kwargs):
 		"""Handle both login initiation and callback."""
 		if request.path == "/42login":
+			print("ok")
 			return self.user_42login()
 		elif request.path == "/oauth_callback":
+			print("strano")
 			return self.handle_callback(request)
 		else:
 			return HttpResponseBadRequest("Invalid path.")
