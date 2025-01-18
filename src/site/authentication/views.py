@@ -15,7 +15,7 @@ from .serializers import UserSerializer
 from rest_framework.response import Response
 from rest_framework.decorators import action
 from django.shortcuts import redirect, render
-
+from django.urls import resolve
 
 class UserViewSet(viewsets.ModelViewSet):
 	serializer_class = UserSerializer
@@ -69,7 +69,7 @@ class Auth42(View):
 		super().__init__(**kwargs)
 		self.params_auth = {
 			"client_id": "u-s4t2ud-7913cbc4cbaed9a2d5e9b33fcd888a0d3c5d00ba256b7844ef00714c3e9580cf",
-			"redirect_uri": "http://127.0.0.1:8000/oauth_callback",
+			"redirect_uri": "oauth_callback",
 			"response_type": "code",
 			"state": self.state
 		}
@@ -83,15 +83,25 @@ class Auth42(View):
 
 	def get(self, request, *args, **kwargs):
 		"""Handle both login initiation and callback."""
+
+		base_url = request.build_absolute_uri('/')
+		print(f"base_url {base_url}")
+		self.params_auth["redirect_uri"] = base_url + self.params_auth["redirect_uri"]
+		test = self.params_auth["redirect_uri"]
+		print(f"self.params_auth {test}")
+		self.params_token["redirect_uri"] = self.params_auth["redirect_uri"]
+		test = self.params_token["redirect_uri"]
+		print(f"self.params_token {test}")
+
 		if request.path == "/42login":
-			return self.user_42login()
+			return self.user_42login(request)
 		elif request.path == "/oauth_callback":
 			return self.handle_callback(request)
 		else:
 			return HttpResponseBadRequest("Invalid path.")
 
 
-	def user_42login(self):
+	def user_42login(self, request):
 		"""Redirect to 42's OAuth login page."""
 		base_uri = "https://api.intra.42.fr/oauth/authorize"
 		query_string = "&".join(f"{key}={value}" for key, value in self.params_auth.items())
