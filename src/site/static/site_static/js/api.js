@@ -38,7 +38,7 @@ const api = {
 
 	async getAllUsers() {
 		try {
-			return await this.fetchJson('/api/all_user/');
+			return await this.fetchJson('/api/users');
 
 		} catch (error) {
 			console.error('Users error:', error);

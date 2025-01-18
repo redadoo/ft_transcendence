@@ -1,7 +1,7 @@
 from rest_framework.views import APIView
 from django.shortcuts import render
 from rest_framework.permissions import IsAuthenticated
-
+from rest_framework import status
 from website.models import User
 from .serializers import UserProfileSerializer, SimpleUserProfileSerializer
 from rest_framework.response import Response
@@ -34,20 +34,31 @@ class UserProfileView(APIView):
 		return Response(serializer.data)
 	
 class UsersView(APIView):
-    """
-    A view to retrieve profiles of all users with selected fields.
-    """
+	"""
+	A view to retrieve profiles of users with selected fields.
+	"""
 
-    permission_classes = [IsAuthenticated]
+	permission_classes = [IsAuthenticated]
 
-    def get(self, request, *args, **kwargs):
-        """
-        Retrieve all user info with specific fields.
-        """
+	def get(self, request, *args, **kwargs):
+		"""
+		Retrieve user profiles.
+		If no name is provided in the query parameters, return all users.
+		"""
 
-        # Fetch all users and serialize with specific fields
-        users = User.objects.all()
-        serializer = SimpleUserProfileSerializer(users, many=True)
-        return Response(serializer.data)
+		names = request.query_params.getlist('name')
+		
+		if names:
+			users = User.objects.filter(username__in=names)
+			if not users.exists():
+				return Response(
+					{"detail": "No users found for the provided names."}, 
+					status=status.HTTP_404_NOT_FOUND
+				)
+		else:
+			users = User.objects.all()
+		
+		serializer = SimpleUserProfileSerializer(users, many=True)
+		return Response(serializer.data, status=status.HTTP_200_OK)
 	
 	
