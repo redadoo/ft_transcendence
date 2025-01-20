@@ -11,6 +11,7 @@ const router = {
 			'/about': 'about',
 			'/already-logged-in': 'alreadyLoggedIn',
 			'/config': 'config',
+			'/friends-profile': 'friendsProfile',
 			'/leaderboard': 'leaderboard',
 			'/login': 'login',
 			'/login42': 'login42',
@@ -27,6 +28,7 @@ const router = {
 		};
 
 		this.firstLoad = true;
+		this.friendProfile = null;
 
 		document.getElementById('overlay').innerHTML = html.overlay;
 		document.getElementById('statusOverlay').innerHTML = html.statusOverlay;
@@ -93,6 +95,10 @@ const router = {
 				e.preventDefault();
 				const path = link.getAttribute('data-link');
 				console.log('Navigating to:', path);
+				if (path === '/friends-profile') {
+					this.friendProfile = link.getAttribute('data-username');
+				}
+
 				this.navigateTo(path);
 			}
 		});

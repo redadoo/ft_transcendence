@@ -652,6 +652,68 @@ const html = {
 		</div>
 		</div>
 	`,
+
+	friendsProfile: `
+				<div class="container-fluid game-container">
+			<div class="row">
+				<div class="col-5 nav-wrapper">
+					<div class="profile-container">
+						<div class="profile-image-container mb-4"><img src="" alt="Profile" class="profile-image" id="profilePageImage"></div>
+						<div class="mb-2"><span class="pixel-font profile-name" id="profilePageName"></span></div>
+						<div class="mb-2"><span class="pixel-font profile-level" id="profilePageLevel">LV. </span></div>
+						<div class="exp-container mb-2"><div class="exp-bar" style="" id="profilePagePercent"></div></div>
+						<div class="exp-text mb-4"><span class="pixel-font profile-level" id="currentExp"></span></div>
+						<div>
+							<div class="stat-item d-flex justify-content-between mb-2">
+								<span class="pixel-font profile-stat">RANK POINTS</span>
+								<span class="pixel-font profile-value" id="profilePageMmr"></span>
+							</div>
+							<div class="stat-item d-flex justify-content-between mb-2">
+								<span class="pixel-font profile-stat">WINS</span>
+								<span class="pixel-font profile-win" id="profilePageWin"></span>
+							</div>
+							<div class="stat-item d-flex justify-content-between mb-2">
+								<span class="pixel-font profile-stat">LOSSES</span>
+								<span class="pixel-font profile-lose" id="profilePageLose"></span>
+							</div>
+							<div class="stat-item d-flex justify-content-between mb-2">
+								<span class="pixel-font profile-stat">WIN STREAK</span>
+								<span class="pixel-font profile-value" id="profilePageStreak"></span>
+							</div>
+							<div class="stat-item d-flex justify-content-between mb-2">
+								<span class="pixel-font profile-stat">TOTAL POINTS</span>
+								<span class="pixel-font profile-value" id="profilePagePoint"></span>
+							</div>
+							<div class="stat-item d-flex justify-content-between mb-2">
+								<span class="pixel-font profile-stat">LONGEST GAME</span>
+								<span class="pixel-font profile-value" id="profilePageLongestGame"></span>
+							</div>
+							<div class="stat-item d-flex justify-content-between mb-2">
+								<span class="pixel-font profile-stat">TIME PLAYED</span>
+								<span class="pixel-font profile-value" id="profilePageTime"></span>
+							</div>
+							<div class="stat-item d-flex justify-content-between">
+								<span class="pixel-font profile-stat">MEMBER SINCE</span>
+								<span class="pixel-font profile-value" id="profilePageCreated"></span>
+							</div>
+						</div>
+					</div>
+					<div class="d-flex flex-column">
+						<div class="nav-link-left back" data-link="/"><span class="hundin-font back">BACK</span></div>
+					</div>
+				</div>
+
+				<div class="col-7 nav-wrapper">
+					<div class="match-history-container">
+						<div class="mb-2">
+							<span class="pixel-font match-history">MATCH HISTORY</span>
+						</div>
+						<div id="matchHistoryContent"></div>
+					</div>
+				</div>
+			</div>
+		</div>
+	`,
 };
 
 export default html;

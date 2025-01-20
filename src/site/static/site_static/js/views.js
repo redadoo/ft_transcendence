@@ -135,6 +135,34 @@ const views = {
 	},
 
 	// Profile views
+	async friendsProfile() {
+
+		return html.friendsProfile;
+	},
+
+	async friendsProfileScripts() {
+		const username = router.friendProfile;
+		const data = await api.getUserProfile(username);
+		const updateElement = (id, value) => document.getElementById(id).textContent = value;
+
+		document.getElementById('profilePageImage').src = data.image_url.avatar_url;
+		document.getElementById('profilePagePercent').style.width = data.stat.percentage_next_level;
+
+		updateElement('profilePageName', data.username);
+		updateElement('profilePageLevel', "LV." + data.stat.level);
+		updateElement('currentExp', `${data.stat.exp} / ${data.stat.cap_exp}XP`);
+		updateElement('profilePageMmr', data.stat.mmr);
+		updateElement('profilePageWin', data.stat.win);
+		updateElement('profilePageLose', data.stat.lose);
+		updateElement('profilePageStreak', data.stat.longest_winstreak);
+		updateElement('profilePagePoint', data.stat.total_points_scored);
+		updateElement('profilePageLongestGame', data.stat.longest_game);
+		updateElement('profilePageTime', data.stat.time_on_site);
+		updateElement('profilePageCreated', data.created_at);
+
+		matchHistory.renderMatchHistory(data.history, data.username);
+	},
+
 	async profile() {
 		return html.profile;
 	},

@@ -38,7 +38,7 @@ const api = {
 
 	async getAllUsers() {
 		try {
-			return await this.fetchJson('/api/users');
+			return await this.fetchJson('/api/users?type=simple');
 
 		} catch (error) {
 			console.error('Users error:', error);
@@ -120,9 +120,19 @@ const api = {
 		}
 	},
 
+	async getUserProfile(username) {
+		try {
+			const data = await this.fetchJson(`/api/users?type=full&name=${username}`);
+			return data[0];
+		} catch (error) {
+			console.error('User profile error:', error);
+			return false;
+		}
+	},
+
 	async getUsers() {
 		try {
-			return await this.fetchJson('/api/users');
+			return await this.fetchJson('/api/users?type=simple');
 		} catch (error) {
 			console.error('Users error:', error);
 			return false;
