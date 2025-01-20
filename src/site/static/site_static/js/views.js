@@ -159,6 +159,7 @@ const views = {
 		updateElement('profilePageLongestGame', data.stat.longest_game);
 		updateElement('profilePageTime', data.stat.time_on_site);
 		updateElement('profilePageCreated', data.created_at);
+		updateElement('header_text', `${username}\'s Profile`);
 
 		matchHistory.renderMatchHistory(data.history, data.username);
 	},
