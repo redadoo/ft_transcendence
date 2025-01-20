@@ -46,19 +46,23 @@ class UsersView(APIView):
 		If no name is provided in the query parameters, return all users.
 		"""
 
+		type = request.query_params.get('type')
 		names = request.query_params.getlist('name')
 		
 		if names:
 			users = User.objects.filter(username__in=names)
 			if not users.exists():
-				return Response(
-					{"detail": "No users found for the provided names."}, 
-					status=status.HTTP_404_NOT_FOUND
-				)
+				return Response({"detail": "No users found for the provided names."}, status=status.HTTP_404_NOT_FOUND)
 		else:
 			users = User.objects.all()
+		if type == "simple":
+			serializer = SimpleUserProfileSerializer(users, many=True)
+			return Response(serializer.data, status=status.HTTP_200_OK)
+		elif type == "full" :
+			fields = ['username', 'image_url', 'stat', 'status', 'created_at', 'history']
+			serializer = UserProfileSerializer(users, many=True, fields=fields,context={'request': request})
+			return Response(serializer.data, status=status.HTTP_200_OK)
 		
-		serializer = SimpleUserProfileSerializer(users, many=True)
-		return Response(serializer.data, status=status.HTTP_200_OK)
+		return Response({"detail": "No users found for the provided names."}, status=status.HTTP_400_BAD_REQUEST)
 	
 	
