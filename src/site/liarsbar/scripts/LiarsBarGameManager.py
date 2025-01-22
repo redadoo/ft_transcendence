@@ -17,7 +17,6 @@ class LiarsBarGameManager(GameManager):
 		and mechanisms for tracking the game state and winner.
 		"""
 		super().__init__(max_players=4)
-		self.update_lock = asyncio.Lock()
 		self.deck = self.init_cards()
 
 	def init_cards(self) -> list[Card]:
@@ -90,9 +89,8 @@ class LiarsBarGameManager(GameManager):
 
 		This method acquires a lock to ensure thread-safe updates to the game state.
 		"""
-		async with self.update_lock:
-			for player in self.players.values():
-				player.player_loop()
+		for player in self.players.values():
+			player.player_loop()
 
 	def to_dict(self) -> dict[str, any]:
 		"""

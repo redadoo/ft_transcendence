@@ -59,8 +59,13 @@ class LiarsBarConsumer(AsyncWebsocketConsumer):
 		await self.accept()
 
 		await self.lobby.add_player_to_lobby({"player_id": "123"}, True)
+		await self.lobby.start_game()
 		await self.lobby.add_player_to_lobby({"player_id": "124"}, True)
+		await self.lobby.start_game()
 		await self.lobby.add_player_to_lobby({"player_id": "125"}, True)
+		await self.lobby.start_game()
+		await self.lobby.start_game()
+
 
 	async def disconnect(self, close_code):
 		await self.lobby.broadcast_message({"type": "lobby_state"})
