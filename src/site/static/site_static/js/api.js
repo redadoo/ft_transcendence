@@ -141,7 +141,7 @@ const api = {
 
 	async getProfileInfo() {
 		try {
-			return await this.fetchJson('/api/profile?include=created_at&include=history');
+			return await this.fetchJson('/api/profile?include=created_at&include=history&include=email');
 		} catch (error) {
 			console.error('Profile info error:', error);
 			return false;

@@ -2,6 +2,7 @@ import api from './api.js';
 import html from './html.js';
 import matchHistory from './matchHistory.js';
 import router from './router.js';
+import setupConfigEventListeners from './Config.js';
 
 const views = {
 	// Auth views
@@ -136,7 +137,6 @@ const views = {
 
 	// Profile views
 	async friendsProfile() {
-
 		return html.friendsProfile;
 	},
 
@@ -192,6 +192,14 @@ const views = {
 
 	async about() {
 		return html.about;
+	},
+
+	async config() {
+		return html.config;
+	},
+
+	async configScripts() {
+		setupConfigEventListeners();
 	}
 };
 

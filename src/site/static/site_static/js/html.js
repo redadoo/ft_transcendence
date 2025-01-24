@@ -714,6 +714,83 @@ const html = {
 			</div>
 		</div>
 	`,
+
+	config: `
+		<div class="container-fluid game-container">
+			<div class="row h-100">
+				<div class="col-2 px-0">
+				<nav class="nav-wrapper">
+					<div class="d-flex flex-column">
+					<a class="nav-link-left back" data-link="/">
+						<span class="hundin-font back">BACK</span>
+					</a>
+					</div>
+				</nav>
+				</div>
+
+				<div class="col-10 px-4">
+				<div class="config-scroll-container">
+					<div class="config-container p-4">
+					<h1 class="title-text mb-5">USER SETTINGS</h1>
+
+					<!-- Profile Image Section -->
+					<div class="config-section mb-5">
+						<h2 class="section-title">PROFILE IMAGE</h2>
+						<div class="profile-image-section">
+						<div class="current-image">
+							<img src="/api/placeholder/200/200" alt="Current Profile" id="currentProfileImage" />
+						</div>
+						<div class="image-controls">
+							<label for="profileImageInput" class="custom-file-upload" id="fileUploadLabel">
+							Choose New Image
+							</label>
+							<input type="file" id="profileImageInput" accept="image/*" class="d-none" />
+							<button class="config-button" id="uploadImageBtn">Update Image</button>
+						</div>
+						</div>
+					</div>
+
+					<!-- Username Section -->
+					<div class="config-section mb-5">
+						<h2 class="section-title">USERNAME</h2>
+						<div class="input-group">
+						<input type="text" id="usernameInput" class="config-input" placeholder="Enter new username" />
+						<button class="config-button" id="updateUsernameBtn">Update Username</button>
+						</div>
+					</div>
+
+					<!-- Email Section -->
+					<div class="config-section mb-5">
+						<h2 class="section-title">EMAIL</h2>
+						<div class="input-group">
+						<input type="email" id="emailInput" class="config-input" placeholder="Enter new email" />
+						<button class="config-button" id="updateEmailBtn">Update Email</button>
+						</div>
+					</div>
+
+					<!-- Password Section -->
+					<div class="config-section">
+						<h2 class="section-title">PASSWORD</h2>
+						<div class="password-fields">
+						<div class="mb-3">
+							<input type="password" id="currentPassword" class="config-input" placeholder="Current password" />
+						</div>
+						<div class="mb-3">
+							<input type="password" id="newPassword" class="config-input" placeholder="New password" />
+						</div>
+						<div class="mb-3">
+							<input type="password" id="confirmPassword" class="config-input" placeholder="Confirm new password" />
+						</div>
+						<button class="config-button" id="updatePasswordBtn">Update Password</button>
+						</div>
+					</div>
+					</div>
+				</div>
+				</div>
+			</div>
+		</div>
+	`,
 };
+
 
 export default html;

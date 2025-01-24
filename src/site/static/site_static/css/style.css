@@ -1232,3 +1232,128 @@ label {
 	line-height: 1.5;
 	margin: 0;
 }
+
+.config-scroll-container {
+	height: calc(100vh - 119px);
+	overflow-y: auto;
+	scrollbar-width: thin;
+	scrollbar-color: #4ba644 #2a2a2a;
+}
+
+.config-scroll-container::-webkit-scrollbar {
+	width: 8px;
+}
+
+.config-scroll-container::-webkit-scrollbar-track {
+	background: #2a2a2a;
+}
+
+.config-scroll-container::-webkit-scrollbar-thumb {
+	background: #4ba644;
+	border-radius: 4px;
+}
+
+.config-container {
+	background-color: #222222;
+	border-radius: 10px;
+	border: 1px solid rgba(104, 104, 104, 0.2);
+	margin: 1rem 0;
+}
+
+.title-text {
+	font-family: 'cr', monospace;
+	color: #686868;
+	font-size: 2.5rem;
+	letter-spacing: 2px;
+}
+
+.section-title {
+	font-family: 'pfw', sans-serif;
+	color: #b5b3d9;
+	font-size: 1.2rem;
+	margin-bottom: 1.5rem;
+	letter-spacing: 1px;
+}
+
+.config-section {
+	background-color: #2a2a2a;
+	padding: 1.5rem;
+	border-radius: 8px;
+	border: 1px solid #404040;
+}
+
+.profile-image-section {
+	display: flex;
+	align-items: center;
+	gap: 2rem;
+}
+
+.current-image {
+	width: 200px;
+	height: 200px;
+	border-radius: 8px;
+	overflow: hidden;
+	border: 2px solid #404040;
+}
+
+.current-image img {
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+}
+
+.image-controls {
+	display: flex;
+	flex-direction: column;
+	gap: 1rem;
+}
+
+.custom-file-upload {
+	font-family: 'ind', sans-serif;
+	background-color: #1a1a1a;
+	color: #a0a0a0;
+	padding: 0.8rem 1.5rem;
+	border-radius: 4px;
+	cursor: pointer;
+	text-align: center;
+	transition: background-color 0.3s;
+}
+
+.custom-file-upload:hover {
+	background-color: #333333;
+}
+
+.config-input {
+	font-family: 'ind', sans-serif;
+	background-color: #1a1a1a;
+	border: 1px solid #404040;
+	color: #a0a0a0;
+	padding: 0.8rem 1rem;
+	border-radius: 4px;
+	width: 100%;
+	margin-bottom: 1rem;
+}
+
+.config-input:focus {
+	outline: none;
+	border-color: #4ba644;
+}
+
+.config-button {
+	font-family: 'ind', sans-serif;
+	background-color: #4ba644;
+	color: #ffffff;
+	padding: 0.8rem 1.5rem;
+	border: none;
+	border-radius: 4px;
+	cursor: pointer;
+	transition: background-color 0.3s;
+}
+
+.config-button:hover {
+	background-color: #3d8836;
+}
+
+.password-fields {
+	max-width: 400px;
+}
