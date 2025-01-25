@@ -23,11 +23,21 @@ class UserProfileView(APIView):
 		Update the profile of the currently authenticated user.
 		"""
 		user = request.user
-		serializer = UserProfileSerializer(user, data=request.data, partial=True, context={'request': request})
 		
+		serializer = UserProfileSerializer(
+			user,
+			data=request.data,
+			partial=True,
+			context={'request': request}
+		)
+
 		if serializer.is_valid():
 			serializer.save()
-			return Response({"message": "Profile updated successfully", "data": serializer.data}, status=200)
+			return Response(
+				{"message": "Profile updated successfully", "data": serializer.data},
+				status=200,
+			)
+		
 		return Response({"error": serializer.errors}, status=400)
 
 	def get(self, request, *args, **kwargs):

@@ -59,7 +59,7 @@ class UserProfileSerializer(serializers.ModelSerializer):
 	class Meta:
 		model = User
 		fields = ['id', 'username', 'email', 'created_at', 'status','image_url', 'stat', 'friendships', 'history']
-		read_only_fields = ['id', 'username', 'email', 'created_at', 'status','image_url', 'stat', 'friendships', 'history']
+		read_only_fields = ['id', 'created_at']
 
 	def __init__(self, *args, **kwargs):
 		fields = kwargs.pop('fields', None)
