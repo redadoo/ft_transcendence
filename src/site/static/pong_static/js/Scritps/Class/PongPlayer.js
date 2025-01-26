@@ -1,9 +1,10 @@
+import BaseInput from '../../../../common_static/js/BaseInput.js';
 import Paddle from './Paddle.js';
-import PongInput from './PongInput.js';
 
 export default class PongPlayer {
 	constructor(socket, playerId, data) 
 	{
+		this.BaseBotId = '-1';
 		this.playerId = parseInt(playerId);
 		this.socket = socket;
 		this.paddle = new Paddle(data.width, data.height, data.depth, data.color);
@@ -13,7 +14,7 @@ export default class PongPlayer {
 		this.newY = data.y;
 		this.paddle.mesh.position.y = data.y;
 		this.paddle.mesh.position.x = data.x;
-		
+
 		this.setUpKeys();
 	}
 
@@ -29,88 +30,42 @@ export default class PongPlayer {
 
 	setUpKeys()
 	{
-		//if is not a bot
-		if (this.playerId != '-1')
+		if (this.playerId != this.BaseBotId)
 		{
-			this.input = new PongInput('KeyW', 'KeyS');
-			this.input.addEvent('keydown', this.handleKeyDown.bind(this));
-			this.input.addEvent('keyup', this.handleKeyUp.bind(this));
+			this.controlKeys = {
+				up: 'KeyW',
+				down: 'KeyS',
+			};
+
+			this.input = new BaseInput();
+			this.input.addEvent('keydown', this.handleKey.bind(this, 'key_down'));
+			this.input.addEvent('keyup', this.handleKey.bind(this, 'key_up'));
 		}
 	}
 
-	handleKeyDown(event) 
+	handleKey(actionType, event) 
 	{
-		if(this.socket != null)
+		if (this.socket) 
 		{
-			if (event.code === this.input.controlKeys.up) 
-				{
-					this.socket.send
-					(
-						JSON.stringify
-						(
-							{ 
-								type: 'update_player',
-								action_type: 'key_down',
-								key: this.input.controlKeys.up,
-								playerId : this.playerId
-							}
-						)
-					);
-				}
-				
-			if (event.code === this.input.controlKeys.down) 
+			const key = Object.keys(this.controlKeys).find(
+				(k) => this.controlKeys[k] === event.code
+			);
+
+			if (key) 
 			{
 				this.socket.send
 				(
 					JSON.stringify
 					(
-						{ 
+						{
 							type: 'update_player',
-							action_type: 'key_down',
-							key: this.input.controlKeys.down,
-							playerId : this.playerId
+							action_type: actionType,
+							key: this.controlKeys[key],
+							playerId: this.playerId,
 						}
 					)
 				);
 			}
 		}
 	}
-
-	handleKeyUp(event) 
-	{
-		if(this.socket != null)
-		{
-			if (event.code === this.input.controlKeys.up) 
-				{
-					this.socket.send
-					(
-						JSON.stringify
-						(
-							{ 
-								type: 'update_player',
-								action_type: 'key_up',
-								key: this.input.controlKeys.up,
-								playerId : this.playerId
-							}
-						)
-					);
-				}
-			if (event.code === this.input.controlKeys.down) 
-			{
-				this.socket.send
-				(
-					JSON.stringify
-					(
-						{ 
-							type: 'update_player',
-							action_type: 'key_up',
-							key: this.input.controlKeys.down,
-							playerId : this.playerId
-						}
-					)
-				);
-			}
-		}
-	}
-
 }
