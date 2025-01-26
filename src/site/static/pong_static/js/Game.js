@@ -42,25 +42,20 @@ class Game
 		// socket
 		this.gameSocket = null;
 		
-		window.onbeforeunload = function(){
-			this.onGameExit();
-			return 'Are you sure you want to leave?';
-		};
-
-		history.pushState(null, document.title, location.href);
-		window.addEventListener('popstate', function (event)
-		{
-			const leavePage = confirm("you want to go ahead ?");
-			if (leavePage) 
+        history.pushState(null, document.title, location.href);
+        window.addEventListener('popstate', (event) => {
+            const leavePage = confirm("Do you want to leave?");
+            if (leavePage) 
 			{
-				this.onGameExit();
-				history.back(); 
-			} 
+                this.onGameExit();
+                history.back();
+                console.log("Leaving the game...");
+            } 
 			else 
 			{
-				history.pushState(null, document.title, location.href);
-			}  
-		});
+                history.pushState(null, document.title, location.href);
+            }
+        });
 	}
 	
 	onGameExit()
@@ -71,7 +66,9 @@ class Game
 				type: 'quitting lobby',
 				player_id: this.player_id
 			}))
+			this.gameSocket.close();
 		}
+		this.sceneManager.dispose();
 	}
 
 	onSocketOpen() 
