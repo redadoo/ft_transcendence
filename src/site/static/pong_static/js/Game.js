@@ -242,7 +242,7 @@ class Game
 				console.log("client player already init");
 				return;
 			}
-			this.pongPlayer = new PongPlayer('KeyW', 'KeyS', this.gameSocket, this.player_id, playerData);
+			this.pongPlayer = new PongPlayer(this.gameSocket, this.player_id, playerData);
 			this.sceneManager.scene.add(this.pongPlayer.paddle.mesh);
 			console.log("player initialized:", this.pongPlayer);
 		}
@@ -253,7 +253,7 @@ class Game
 				console.log("opponent player already init");
 				return;
 			}
-			this.pongOpponent = new PongPlayer(null, null, null, newPlayer_id, playerData);
+			this.pongOpponent = new PongPlayer(null, newPlayer_id, playerData);
 			this.sceneManager.scene.add(this.pongOpponent.paddle.mesh);
 			console.log("new player initialized:", this.pongOpponent);
 		}

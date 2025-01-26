@@ -2,18 +2,19 @@ import Paddle from './Paddle.js';
 import PongInput from './PongInput.js';
 
 export default class PongPlayer {
-	constructor(upKey, downKey, socket, playerId, data) 
+	constructor(socket, playerId, data) 
 	{
 		this.playerId = parseInt(playerId);
 		this.socket = socket;
 		this.paddle = new Paddle(data.width, data.height, data.depth, data.color);
-		this.input = new PongInput(upKey, downKey);
+		
+		this.input = null;
 		
 		this.newY = data.y;
 		this.paddle.mesh.position.y = data.y;
 		this.paddle.mesh.position.x = data.x;
 		
-		this.setUpEvents();
+		this.setUpKeys();
 	}
 
 	updatePosition(newY)
@@ -26,10 +27,15 @@ export default class PongPlayer {
 	  	this.paddle.mesh.position.y = this.newY;
 	}
 
-	setUpEvents()
+	setUpKeys()
 	{
-		this.input.addEvent('keydown', this.handleKeyDown.bind(this));
-		this.input.addEvent('keyup', this.handleKeyUp.bind(this));
+		//if is not a bot
+		if (this.playerId != '-1')
+		{
+			this.input = new PongInput('KeyW', 'KeyS');
+			this.input.addEvent('keydown', this.handleKeyDown.bind(this));
+			this.input.addEvent('keyup', this.handleKeyUp.bind(this));
+		}
 	}
 
 	handleKeyDown(event) 
