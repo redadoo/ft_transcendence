@@ -1,10 +1,12 @@
 import BaseInput from '../../../../common_static/js/BaseInput.js';
 import Paddle from './Paddle.js';
 
-export default class PongPlayer {
+export default class PongPlayer 
+{
 	constructor(socket, playerId, data) 
 	{
 		this.BaseBotId = '-1';
+		
 		this.playerId = parseInt(playerId);
 		this.socket = socket;
 		this.paddle = new Paddle(data.width, data.height, data.depth, data.color);

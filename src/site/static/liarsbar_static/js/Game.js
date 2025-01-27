@@ -151,7 +151,10 @@ class Game
 		this.sceneManager.scene.add(userLobbyModel);
 		
 		const joinedPlayerId = data.event_info.player_id;
-		this.players[joinedPlayerId] = new LiarsBarPlayer(joinedPlayerId);
+		if (this.player_id == joinedPlayerId)
+			this.players[joinedPlayerId] = new LiarsBarPlayer(this.gameSocket, joinedPlayerId);
+		else
+			this.players[joinedPlayerId] = new LiarsBarPlayer(null, joinedPlayerId);
 		if (Object.keys(this.players).length === 4) 
 			this.gameSocket.send(JSON.stringify({ type: 'lobby setuped' }));
 	}
