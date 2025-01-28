@@ -117,5 +117,5 @@ class SimpleUserProfileSerializer(serializers.ModelSerializer):
 
 
 class ChangePasswordSerializer(serializers.Serializer):
-    current_password = CharField(required=True)
-    new_password = CharField(required=True)
+    current_password = serializers.CharField(write_only=True)
+    new_password = serializers.CharField(write_only=True)

@@ -11,7 +11,6 @@ def main_page(request, unused_path=None):
 	csrf_token = get_token(request)
 	return render(request,'main.html', {'csrf_token': csrf_token})
 
-
 class ChangePasswordView(APIView):
 	"""
 	A view to allow authenticated users to change their password securely.

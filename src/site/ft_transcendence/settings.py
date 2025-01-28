@@ -60,9 +60,9 @@ MIDDLEWARE = [
 ]
 
 ROOT_URLCONF = 'ft_transcendence.urls'
-
-CSRF_TRUSTED_ORIGINS = ["http://localhost:1337"]
-
+CSRF_COOKIE_HTTPONLY = False
+CSRF_TRUSTED_ORIGINS=["http://localhost:1337", "http://localhost:8000"]
+CSRF_COOKIE_NAME = 'csrftoken'
 TEMPLATES = [
 	{
 		'BACKEND': 'django.template.backends.django.DjangoTemplates',
