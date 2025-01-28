@@ -1,10 +1,13 @@
 const api = {
 	async fetchJson(url, options = {}) {
 		try {
+			const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+
 			const defaultOpts = {
 				headers: {
 					'Accept': 'application/json',
-					'X-Requested-With': 'XMLHttpRequest'
+					'X-Requested-With': 'XMLHttpRequest',
+					'X-CSRFToken': csrfToken
 				},
 				credentials: 'include'
 			};

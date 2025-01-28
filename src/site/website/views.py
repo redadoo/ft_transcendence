@@ -5,11 +5,11 @@ from rest_framework import status
 from website.models import User
 from .serializers import UserProfileSerializer, SimpleUserProfileSerializer
 from rest_framework.response import Response
-
-# TODO change view from APIView to ViewSet
+from django.middleware.csrf import get_token
 
 def main_page(request, unused_path=None):
-	return render(request,'main.html')
+	csrf_token = get_token(request)
+	return render(request,'main.html', {'csrf_token': csrf_token})
 
 class UserProfileView(APIView):
 	"""

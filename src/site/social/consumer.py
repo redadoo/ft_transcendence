@@ -44,84 +44,33 @@ class SocialConsumer(AsyncWebsocketConsumer):
 			case _:
 				print(f"Unhandled event type: {event_type}")
 
-	async def get_status_change(self, event: dict):
-		"""
-		Receive a friendship status change event.
-		"""
 
-		await self.send(
-			text_data=json.dumps({
-				"type": "get_status_change",
-				"friend_username" : event["friend_username"],
-				"new_status" : event["status"]
-			})
-		)
+	async def send_event(self, event_type: str, **kwargs):
+		"""
+		Generic method to send events to the WebSocket.
+		"""
+		await self.send(text_data=json.dumps({"type": event_type, **kwargs}))
+
+	async def get_status_change(self, event: dict):
+		await self.send_event("get_status_change", friend_username=event["friend_username"], new_status=event["status"])
 
 	async def get_blocked(self, event: dict):
-		"""
-		Receive a friendship status change event.
-		"""
-
-		await self.send(
-			text_data=json.dumps({
-				"type": "get_blocked",
-				"username" : event["username"]
-			})
-		)
+		await self.send_event("get_blocked", username=event["username"])
 
 	async def get_unblocked(self, event: dict):
-		"""
-		Receive a friendship status change event.
-		"""
-
-		await self.send(
-			text_data=json.dumps({
-				"type": "get_unblocked",
-				"username" : event["username"]
-			})
-		)
+		await self.send_event("get_unblocked", username=event["username"])
 
 	async def get_friend_request(self, event: dict):
-		"""
-		Receive a friend request event.
-		"""
-
-		await self.send(
-			text_data=json.dumps({
-				"type": "get_friend_request",
-				"username" : event["username"]
-			})
-		)
+		await self.send_event("get_friend_request", username=event["username"])
 
 	async def get_friend_request_declined(self, event: dict):
-		await self.send(
-			text_data=json.dumps({
-				"type": "get_friend_request_declined",
-				"username" : event["username"]
-			})
-		)
+		await self.send_event("get_friend_request_declined", username=event["username"])
 
 	async def get_friend_removed(self, event: dict):
-		await self.send(
-			text_data=json.dumps({
-				"type": "get_friend_removed",
-				"username" : event["username"]
-			})
-		)
+		await self.send_event("get_friend_removed", username=event["username"])
 
 	async def get_friend_request_accepted(self, event: dict):
-		await self.send(
-			text_data=json.dumps({
-				"type": "get_friend_request_accepted",
-				"username" : event["username"]
-			})
-		)
+		await self.send_event("get_friend_request_accepted", username=event["username"])
 
 	async def get_message(self, event: dict):
-		await self.send(
-			text_data=json.dumps({
-				"type": "get_message",
-				"username" : event["username"],
-				"message": event["message"]
-			})
-		)
+		await self.send_event("get_message", username=event["username"], message=event["message"])
