@@ -24,27 +24,24 @@ class SocialConsumer(AsyncWebsocketConsumer):
 	async def receive(self, text_data: dict):
 		data = json.loads(text_data)
 		event_type = data.get("type")
-		match event_type:
-			case "status_change":
-				await self.user.change_status(data)
-			case "block_user":
-				await self.user.block_user(data)
-			case "unblock_user":
-				await self.user.unblock_user(data)
-			case "friend_request":
-				await self.user.send_friend_request(data)
-			case "remove_friend":
-				await self.user.remove_friend(data,"get_friend_removed")
-			case "friend_request_declined":
-				await self.user.remove_friend(data,"get_friend_request_declined")
-			case "friend_request_accepted":
-				await self.user.accept_friend_request(data)
-			case "send_message":
-				await self.user.send_message(data)
-			case _:
-				print(f"Unhandled event type: {event_type}")
+		
+		handler = {
+			"status_change": self.user.change_status,
+			"block_user": self.user.block_user,
+			"unblock_user": self.user.unblock_user,
+			"friend_request": self.user.send_friend_request,
+			"remove_friend": lambda d: self.user.remove_friend(d, "get_friend_removed"),
+			"friend_request_declined": lambda d: self.user.remove_friend(d, "get_friend_request_declined"),
+			"friend_request_accepted": self.user.accept_friend_request,
+			"send_message": self.user.send_message
+		}.get(event_type, self.handle_unhandled_event)
 
+		await handler(data)
 
+	async def handle_unhandled_event(self, data):
+		event_type = data.get("type")
+		print(f"Unhandled event type: {event_type}")
+		
 	async def send_event(self, event_type: str, **kwargs):
 		"""
 		Generic method to send events to the WebSocket.

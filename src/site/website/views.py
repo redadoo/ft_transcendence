@@ -3,7 +3,7 @@ from django.shortcuts import render
 from rest_framework.permissions import IsAuthenticated
 from rest_framework import status
 from website.models import User
-from .serializers import UserProfileSerializer, SimpleUserProfileSerializer
+from .serializers import UserProfileSerializer, SimpleUserProfileSerializer, ChangePasswordSerializer
 from rest_framework.response import Response
 from django.middleware.csrf import get_token
 
@@ -11,6 +11,31 @@ def main_page(request, unused_path=None):
 	csrf_token = get_token(request)
 	return render(request,'main.html', {'csrf_token': csrf_token})
 
+
+class ChangePasswordView(APIView):
+	"""
+	A view to allow authenticated users to change their password securely.
+	"""
+	permission_classes = [IsAuthenticated]
+
+	def post(self, request, *args, **kwargs):
+		user = request.user
+		serializer = ChangePasswordSerializer(data=request.data)
+
+		if serializer.is_valid():
+			current_password = serializer.validated_data['current_password']
+			new_password = serializer.validated_data['new_password']
+
+			if not user.check_password(current_password):
+				return Response({"error": "Current password is incorrect"}, status=400)
+
+			user.set_password(new_password)
+			user.save()
+
+			return Response({"message": "Password updated successfully"}, status=200)
+
+		return Response({"error": serializer.errors}, status=400)
+	
 class UserProfileView(APIView):
 	"""
 	A view to retrieve the profile of the logged-in user.
@@ -90,5 +115,3 @@ class UsersView(APIView):
 			)
 
 		return Response(serializer.data, status=status.HTTP_200_OK)
-	
-	
