@@ -44,6 +44,36 @@ const api = {
 		}
 	},
 
+	async updateEmail(newEmail) {
+		try {
+			return await this.fetchJson('/api/profile', {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json'
+				},
+				body: JSON.stringify({ email: newEmail })
+			});
+		} catch (error) {
+			console.error('Email change error:', error);
+			return false;
+		}
+	},
+
+	async updatePassword(currentPassword, newPassword) {
+		try {
+			return await this.fetchJson('/api/change_password', {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json'
+				},
+				body: JSON.stringify({ current_password: currentPassword, new_password: newPassword})
+			});
+		} catch (error) {
+			console.error('Password change error:', error);
+			return false;
+		}
+	},
+
 	async checkAuth() {
 		try {
 			const data = await this.fetchJson('/api/users/is_logged_in/');
