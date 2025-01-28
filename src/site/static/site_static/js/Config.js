@@ -55,9 +55,8 @@ const setupConfigEventListeners = async () => {
 				return;
 			}
 			try {
-				// TODO: Implement API call
-				// await api.updateUsername(newUsername);
-					alert('Username update functionality will be implemented');
+				await api.updateUsername(newUsername);
+				alert('Username updated successfully');
 			} catch (error) {
 					console.error('Error updating username:', error);
 					alert('Error updating username');

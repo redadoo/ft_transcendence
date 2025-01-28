@@ -26,6 +26,21 @@ const api = {
 		}
 	},
 
+	async updateUsername(newUsername) {
+		try {
+			return await this.fetchJson('/api/profile', {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json'
+				},
+				body: JSON.stringify({ username: newUsername })
+			});
+		} catch (error) {
+			console.error('Username change error:', error);
+			return false;
+		}
+	},
+
 	async checkAuth() {
 		try {
 			const data = await this.fetchJson('/api/users/is_logged_in/');
