@@ -2,7 +2,8 @@ from rest_framework.views import APIView
 from django.shortcuts import render
 from rest_framework.permissions import IsAuthenticated
 from rest_framework import status
-from website.models import User
+from website.models import User, UserImage
+from website.form import UserImageForm
 from .serializers import UserProfileSerializer, SimpleUserProfileSerializer, ChangePasswordSerializer
 from rest_framework.response import Response
 from django.middleware.csrf import get_token
@@ -11,6 +12,22 @@ def main_page(request, unused_path=None):
 	csrf_token = get_token(request)
 	return render(request,'main.html', {'csrf_token': csrf_token})
 
+class UploadUserImageView(APIView):
+	permission_classes = [IsAuthenticated]
+
+	def post(self, request, *args, **kwargs):
+		user = request.user
+		
+		user_image = UserImage.objects.get(user=user)
+		form = UserImageForm(request.FILES)
+		
+		if form.is_valid():
+			user_image.user_avatar = form.cleaned_data['user_avatar']
+			user_image.save()
+			return Response({"message": "Image uploaded successfully", "image_url": user_image.user_avatar.url}, status=200)
+		
+		return Response({"error": form.errors}, status=400)
+	
 class ChangePasswordView(APIView):
 	"""
 	A view to allow authenticated users to change their password securely.
