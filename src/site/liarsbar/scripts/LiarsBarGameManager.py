@@ -1,10 +1,12 @@
 import random
 import asyncio
+import time
 
 from .card import Card
 from .LiarsBarPlayer import LiarsBarPlayer
 from utilities.GameManager import GameManager
 from utilities.Player import Player
+
 
 class LiarsBarGameManager(GameManager):
 	"""
@@ -18,6 +20,10 @@ class LiarsBarGameManager(GameManager):
 		"""
 		super().__init__(max_players=4)
 		self.deck = self.init_cards()
+		self.started = False
+		self.current_time_stamp = time.time()
+		self.player_turn_index = 0
+		self.players_alive = 4
 
 	def init_cards(self) -> list[Card]:
 		"""
@@ -33,6 +39,8 @@ class LiarsBarGameManager(GameManager):
 
 		deck.extend([Card(Card.CardSeed.JOLLY)] * 2)
 		random.shuffle(deck)
+  
+		self.turn_assigned = False
 		return deck
 
 	def add_player(self, players_id: int, is_bot: bool):
@@ -48,7 +56,7 @@ class LiarsBarGameManager(GameManager):
 		if len(self.players) > 4 and players_id in self.players:
 			raise ValueError("Two unique player IDs are required to initialize players.")
 
-		self.players[players_id] = LiarsBarPlayer(player_id=players_id)
+		self.players[len(self.players)] = LiarsBarPlayer(player_id=players_id)
 
 	def update_player(self, data: dict):
 		"""
@@ -62,10 +70,9 @@ class LiarsBarGameManager(GameManager):
 		"""
 		try:
 			player_id = data.get("playerId")
-			if player_id not in self.players:
-				raise KeyError(f"Player ID {player_id} not found.")
-
-			self.players[player_id].update_player_data(data)
+			for index in self.players:
+				if self.players[index].player_id == player_id:
+					self.players[index].update_player_data(data)
 		except (KeyError, ValueError) as e:
 			print(f"Error updating player data: {e}")
 
@@ -83,14 +90,96 @@ class LiarsBarGameManager(GameManager):
 		else:
 			print(f"Error: Player ID {player_id} not found in players.")
 
+	def init_round(self):
+		"""
+		Handles the start of a round.
+
+		Args:
+			player_id (int): The ID of the player to mark as disconnected.
+		"""
+		print("card dealing")
+		self.deck = self.init_cards()
+		HAND_SIZE = 5
+		for player in self.players.values():
+			cards_to_deal = self.deck[:HAND_SIZE]
+			self.deck = self.deck[HAND_SIZE:]
+			player.hand.clear()
+			player.player_turn = False
+			player.add_cards_to_hand(cards_to_deal)
+			card_names = [card.to_dict() for card in player.hand]
+			print(f"Player {player.player_id} has the following cards: {card_names}")
+	
+	
+	def handle_palyer_turn(self, player: LiarsBarPlayer):
+		print(player.player_id)
+		print(player.status.name)
+		if player.status == LiarsBarPlayer.PlayerStatus.ALIVE:
+			player.player_turn = True
+			self.turn_start = time.time()
+			player.card_sent = False
+			player.doubting = False
+			player.selected_cards.clear()
+			card_names = [card.to_dict() for card in player.hand]
+			print(f"Player {player.player_id} has the following cards: {card_names}")
+		else:
+			self.player_turn_index += 1
+			if self.player_turn_index > 3:
+					print("fix index")
+					self.player_turn_index = 0
+			player.player_turn = False
+			
+		
+  
 	async def game_loop(self):
 		"""
 		Executes the core game loop, managing player turns and game state.
 
 		This method acquires a lock to ensure thread-safe updates to the game state.
 		"""
-		for player in self.players.values():
-			player.player_loop()
+		
+		if self.players_alive == 1:
+			print("mi blocco qua?")
+			for player in self.players.values():
+				if player.status == LiarsBarPlayer.PlayerStatus.ALIVE:
+					print(player.player_id)
+			return
+		if(self.started != True):
+			self.init_round()
+			self.started = True
+		if self.players[self.player_turn_index].player_turn == False:
+			print("turn handle")
+			self.handle_palyer_turn(self.players[self.player_turn_index])
+		elif not self.players[self.player_turn_index].card_sent and self.players[self.player_turn_index].status == LiarsBarPlayer.PlayerStatus.ALIVE:
+			if time.time() - self.turn_start > 5:
+				print("timeout")
+				if self.players[self.player_turn_index].shoot_yourself():
+					self.players[self.player_turn_index].status = LiarsBarPlayer.PlayerStatus.DIED
+					self.players_alive -= 1
+					print("morto")
+					self.started = False
+				else:
+					self.started = False
+				print("round gone")
+				self.player_turn_index += 1
+				print(self.player_turn_index)
+				if self.player_turn_index > 3:
+					print("fix index")
+					self.player_turn_index = 0
+			elif self.players[self.player_turn_index].doubting: #aggiungi controllo primo turno
+				print("passo di qua")
+				self.players[self.player_turn_index].doubting = False
+				for i in range(1, 4):
+					check_index = (self.player_turn_index - i) % 4
+					if self.players[check_index].LiarsBarPlayer.PlayerStatus.ALIVE:
+						break
+				#check delle sent cards del previus player alive con la required card
+		if self.players[self.player_turn_index].card_sent:
+			self.players[self.player_turn_index] = False
+			self.player_turn_index += 1
+
+			
+		
+		
 
 	def to_dict(self) -> dict[str, any]:
 		"""
