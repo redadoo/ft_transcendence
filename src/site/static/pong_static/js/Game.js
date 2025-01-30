@@ -3,7 +3,6 @@ import SceneManager from '../../common_static/js/SceneManager.js';
 import Bounds from './Scritps/Bounds.js';
 import Ball from './Scritps/Class/Ball.js';
 import PongPlayer from './Scritps/Class/PongPlayer.js';
-import Paddle from './Scritps/Class/Paddle.js';
 import Background from './Scritps/Class/Background.js';
 import SocketManager from '../../common_static/js/SocketManager.js';
 import MatchmakingManager from  '../../common_static/js/MatchmakingManager.js';
@@ -27,8 +26,8 @@ class Game
 		// Lights
 		this.ambientLight = null;
 		this.pointLightMagenta = null;
-		this.pointLightBlue = undefined;
-		this.lightHelper = undefined;
+		this.pointLightBlue = null;
+		this.lightHelper = null;
 		this.screenLight = null;
 
 		// Game entities
@@ -42,41 +41,33 @@ class Game
 		// socket
 		this.gameSocket = null;
 		
-        history.pushState(null, document.title, location.href);
-        window.addEventListener('popstate', (event) => {
-            const leavePage = confirm("Do you want to leave?");
-            if (leavePage) 
-			{
-                this.onGameExit();
-                history.back();
-                console.log("Leaving the game...");
-            } 
-			else 
-			{
-                history.pushState(null, document.title, location.href);
-            }
-        });
+		this.manageWindowClose();
 	}
 	
-	onGameExit()
+	manageWindowClose()
 	{
-		if (this.gameSocket != null)
-		{
-			this.gameSocket.send(JSON.stringify({
-				type: 'quitting lobby',
-				player_id: this.player_id
-			}))
-			this.gameSocket.close();
-		}
-		this.sceneManager.dispose();
-	}
-
-	onSocketOpen() 
-	{
-		this.gameSocket.send(JSON.stringify({ 
-			type: 'init_player', 
-			player_id: this.player_id
-		}));
+		history.pushState(null, document.title, location.href);
+		window.addEventListener('popstate', (event) => {
+			const leavePage = confirm("Do you want to leave?");
+			if (leavePage)
+			{
+				if (this.gameSocket != null)
+				{
+					this.gameSocket.send(JSON.stringify({
+						type: 'quitting lobby',
+						player_id: this.player_id
+					}))
+					this.gameSocket.close();
+				}
+				this.sceneManager.dispose();
+				window.location.href = "/";
+				console.log("Leaving the game...");
+			} 
+			else 
+			{
+				history.pushState(null, document.title, location.href);
+			}
+		});
 	}
 
 	async setPlayerId()
@@ -103,12 +94,63 @@ class Game
 		this.configureCamera();
 		this.initializeLights();
 
-		if (SocketManager.getModeFromPath() === 'singleplayer')
-			this.setupSinglePlayerSocket();
-		else
-			this.matchmakingManager = new MatchmakingManager("pong", this.setupMultiplayerPongSocket.bind(this));
+		if (!this.player_id) 
+		{
+			console.error("Failed to set player ID. Aborting initialization.");
+			return;
+		}
+
+		switch (SocketManager.getModeFromPath()) 
+		{
+			case 'singleplayer':
+				this.setupSinglePlayerSocket();
+				break;
+			case 'multiplayer':
+				this.matchmakingManager = new MatchmakingManager("pong", this.setupMultiplayerPongSocket.bind(this));
+				break;
+			case 'tournament':
+				this.setupPongTournament();
+				break;
+			case 'lobby':
+				this.setupPrivateLobby();
+				break;
+			default:
+				console.error("Invalid game mode");
+		}
 
 		this.sceneManager.setExternalFunction(() => this.fixedUpdate());
+	}
+
+	setupPrivateLobby()
+	{
+		this.gameSocket = new SocketManager();
+		
+		this.gameSocket.initGameWebSocket(
+			'pong',
+			this.handleGameSocketMessage.bind(this),
+			crypto.randomUUID(),
+			this.onSocketOpen.bind(this)
+		);
+	}
+
+	setupPongTournament()
+	{
+		this.gameSocket = new SocketManager();
+		
+		this.gameSocket.initGameWebSocket(
+			'pong',
+			this.handleGameSocketMessage.bind(this),
+			crypto.randomUUID(),
+			this.onSocketOpen.bind(this)
+		);
+	}
+
+	onSocketOpen() 
+	{
+		this.gameSocket.send(JSON.stringify({ 
+			type: 'init_player', 
+			player_id: this.player_id
+		}));
 	}
 
 	setupMultiplayerPongSocket(data) 
@@ -267,8 +309,9 @@ class Game
 			const bounds_data = data?.lobby_info?.bounds;
 			const ball_data = data?.lobby_info?.ball;
 	
-			if (!bounds_data || !ball_data) {
-				console.error("Game data is missing or incomplete:");
+			if (!bounds_data || !ball_data) 
+			{
+				console.error("Game data is missing or incomplete:", { bounds_data, ball_data });
 				return;
 			}
 	
