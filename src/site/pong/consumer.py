@@ -60,7 +60,7 @@ class PongMultiplayerConsumer(AsyncWebsocketConsumer):
 
 	async def connect(self):
 		self.room_name = self.scope["url_route"]["kwargs"]["room_name"]
-	
+		print(self.room_name)
 		self.lobby = lobbies.get_lobby(self.room_name)
 		if self.lobby == None:
 			self.lobby = lobbies.create_lobby("pong", self.room_name,  PongGameManager())

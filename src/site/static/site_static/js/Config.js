@@ -55,9 +55,8 @@ const setupConfigEventListeners = async () => {
 				return;
 			}
 			try {
-				// TODO: Implement API call
-				// await api.updateUsername(newUsername);
-					alert('Username update functionality will be implemented');
+				await api.updateUsername(newUsername);
+				alert('Username updated successfully. Go to the homepage to see changes');
 			} catch (error) {
 					console.error('Error updating username:', error);
 					alert('Error updating username');
@@ -75,9 +74,8 @@ const setupConfigEventListeners = async () => {
 			}
 
 			try {
-				// TODO: Implement API call
-				// await api.updateEmail(newEmail);
-				alert('Email update functionality will be implemented');
+				await api.updateEmail(newEmail);
+				alert('Email updated successfully. Go to the homepage to see changes');
 			} catch (error) {
 				console.error('Error updating email:', error);
 				alert('Error updating email');
@@ -108,9 +106,8 @@ const setupConfigEventListeners = async () => {
 			}
 
 			try {
-				// TODO: Implement API call
-				// await api.updatePassword(currentPassword, newPassword);
-				alert('Password update functionality will be implemented');
+				await api.updatePassword(currentPassword, newPassword);
+				alert('Password updated successfully');
 				document.getElementById('currentPassword').value = '';
 				document.getElementById('newPassword').value = '';
 				document.getElementById('confirmPassword').value = '';

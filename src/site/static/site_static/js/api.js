@@ -1,10 +1,27 @@
+
+function getCookie(name) {
+	let cookieValue = null;
+	if (document.cookie && document.cookie !== '') {
+		const cookies = document.cookie.split(';');
+		for (let i = 0; i < cookies.length; i++) {
+			const cookie = cookies[i].trim();
+			if (cookie.substring(0, name.length + 1) === (name + '=')) {
+				cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+				break;
+			}
+		}
+	}
+	return cookieValue;
+}
 const api = {
 	async fetchJson(url, options = {}) {
 		try {
+			const csrftoken = getCookie('csrftoken');
 			const defaultOpts = {
 				headers: {
 					'Accept': 'application/json',
-					'X-Requested-With': 'XMLHttpRequest'
+					'X-Requested-With': 'XMLHttpRequest',
+					'X-CSRFToken': csrftoken
 				},
 				credentials: 'include'
 			};
@@ -23,6 +40,51 @@ const api = {
 			return await response.json();
 		} catch (error) {
 			throw error;
+		}
+	},
+
+	async updateUsername(newUsername) {
+		try {
+			return await this.fetchJson('/api/profile', {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json'
+				},
+				body: JSON.stringify({ username: newUsername })
+			});
+		} catch (error) {
+			console.error('Username change error:', error);
+			return false;
+		}
+	},
+
+	async updateEmail(newEmail) {
+		try {
+			return await this.fetchJson('/api/profile', {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json'
+				},
+				body: JSON.stringify({ email: newEmail })
+			});
+		} catch (error) {
+			console.error('Email change error:', error);
+			return false;
+		}
+	},
+
+	async updatePassword(currentPassword, newPassword) {
+		try {
+			return await this.fetchJson('/api/change_password', {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json'
+				},
+				body: JSON.stringify({ current_password: currentPassword, new_password: newPassword})
+			});
+		} catch (error) {
+			console.error('Password change error:', error);
+			return false;
 		}
 	},
 

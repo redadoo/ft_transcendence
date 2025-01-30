@@ -1,3 +1,4 @@
+from django.forms import CharField
 from rest_framework import serializers
 from .models import Friendships, UserStats, UserImage, MatchHistory, User
 from rest_framework import serializers
@@ -28,27 +29,27 @@ class UserImageSerializer(serializers.ModelSerializer):
 		fields = ['avatar_url']
 
 class MatchHistorySerializer(serializers.ModelSerializer):
-    pong_matches = PongMatchSerializer(many=True, read_only=True)
-    liarsbar_matches = LiarsBarMatchSerializer(many=True, read_only=True)
-    all_matches = serializers.SerializerMethodField()
+	pong_matches = PongMatchSerializer(many=True, read_only=True)
+	liarsbar_matches = LiarsBarMatchSerializer(many=True, read_only=True)
+	all_matches = serializers.SerializerMethodField()
 
-    class Meta:
-        model = MatchHistory
-        fields = ['user', 'pong_matches', 'liarsbar_matches', 'all_matches']
-        read_only_fields = ['all_matches']
+	class Meta:
+		model = MatchHistory
+		fields = ['user', 'pong_matches', 'liarsbar_matches', 'all_matches']
+		read_only_fields = ['all_matches']
 
-    def get_all_matches(self, obj):
-        matches = obj.get_all_matches()
-        return [
-            {
-                'type': 'Pong Match' if isinstance(match, PongMatch) else 'Liars Bar Match',
-                'details': (
-                    PongMatchSerializer(match).data
-                    if isinstance(match, PongMatch) else LiarsBarMatchSerializer(match).data
-                ),
-            }
-            for match in matches
-        ]
+	def get_all_matches(self, obj):
+		matches = obj.get_all_matches()
+		return [
+			{
+				'type': 'Pong Match' if isinstance(match, PongMatch) else 'Liars Bar Match',
+				'details': (
+					PongMatchSerializer(match).data
+					if isinstance(match, PongMatch) else LiarsBarMatchSerializer(match).data
+				),
+			}
+			for match in matches
+		]
 
 class UserProfileSerializer(serializers.ModelSerializer):
 	image_url = UserImageSerializer(source='user_image', read_only=True)
@@ -59,7 +60,7 @@ class UserProfileSerializer(serializers.ModelSerializer):
 	class Meta:
 		model = User
 		fields = ['id', 'username', 'email', 'created_at', 'status','image_url', 'stat', 'friendships', 'history']
-		read_only_fields = ['id', 'created_at', 'friendships', 'history', 'stat']
+		read_only_fields = ['id', 'created_at', 'status', 'friendships', 'history', 'stat']
 
 	def __init__(self, *args, **kwargs):
 		fields = kwargs.pop('fields', None)
@@ -95,24 +96,26 @@ class UserProfileSerializer(serializers.ModelSerializer):
 
 		return friendships_data
 
-
-
-	
 class SimpleUserProfileSerializer(serializers.ModelSerializer):
-    image_url = UserImageSerializer(source='user_image', read_only=True)
-    status = serializers.CharField(source='get_status_display', read_only=True)
+	image_url = UserImageSerializer(source='user_image', read_only=True)
+	status = serializers.CharField(source='get_status_display', read_only=True)
 	
-    class Meta:
-        model = User
-        fields = ['username', 'image_url', 'status']
-        read_only_fields = ['username', 'image_url', 'status']
+	class Meta:
+		model = User
+		fields = ['username', 'image_url', 'status']
+		read_only_fields = ['username', 'image_url', 'status']
 
-    def __init__(self, *args, **kwargs):
-        fields = kwargs.pop('fields', None)
-        super().__init__(*args, **kwargs)
-        
-        if fields:
-            allowed = set(fields)
-            existing = set(self.fields)
-            for field_name in existing - allowed:
-                self.fields.pop(field_name)
+	def __init__(self, *args, **kwargs):
+		fields = kwargs.pop('fields', None)
+		super().__init__(*args, **kwargs)
+		
+		if fields:
+			allowed = set(fields)
+			existing = set(self.fields)
+			for field_name in existing - allowed:
+				self.fields.pop(field_name)
+
+
+class ChangePasswordSerializer(serializers.Serializer):
+    current_password = serializers.CharField(write_only=True)
+    new_password = serializers.CharField(write_only=True)

@@ -2,15 +2,56 @@ from rest_framework.views import APIView
 from django.shortcuts import render
 from rest_framework.permissions import IsAuthenticated
 from rest_framework import status
-from website.models import User
-from .serializers import UserProfileSerializer, SimpleUserProfileSerializer
+from website.models import User, UserImage
+from website.form import UserImageForm
+from .serializers import UserProfileSerializer, SimpleUserProfileSerializer, ChangePasswordSerializer
 from rest_framework.response import Response
-
-# TODO change view from APIView to ViewSet
+from django.middleware.csrf import get_token
 
 def main_page(request, unused_path=None):
-	return render(request,'main.html')
+	csrf_token = get_token(request)
+	return render(request,'main.html', {'csrf_token': csrf_token})
 
+class UploadUserImageView(APIView):
+	permission_classes = [IsAuthenticated]
+
+	def post(self, request, *args, **kwargs):
+		user = request.user
+		
+		user_image = UserImage.objects.get(user=user)
+		form = UserImageForm(request.FILES)
+		
+		if form.is_valid():
+			user_image.user_avatar = form.cleaned_data['user_avatar']
+			user_image.save()
+			return Response({"message": "Image uploaded successfully", "image_url": user_image.user_avatar.url}, status=200)
+		
+		return Response({"error": form.errors}, status=400)
+	
+class ChangePasswordView(APIView):
+	"""
+	A view to allow authenticated users to change their password securely.
+	"""
+	permission_classes = [IsAuthenticated]
+
+	def post(self, request, *args, **kwargs):
+		user = request.user
+		serializer = ChangePasswordSerializer(data=request.data)
+
+		if serializer.is_valid():
+			current_password = serializer.validated_data['current_password']
+			new_password = serializer.validated_data['new_password']
+
+			if not user.check_password(current_password):
+				return Response({"error": "Current password is incorrect"}, status=400)
+
+			user.set_password(new_password)
+			user.save()
+
+			return Response({"message": "Password updated successfully"}, status=200)
+
+		return Response({"error": serializer.errors}, status=400)
+	
 class UserProfileView(APIView):
 	"""
 	A view to retrieve the profile of the logged-in user.
@@ -90,5 +131,3 @@ class UsersView(APIView):
 			)
 
 		return Response(serializer.data, status=status.HTTP_200_OK)
-	
-	
