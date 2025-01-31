@@ -1,0 +1,10 @@
+__pycache__/
+/__pycache__/*
+/__pycache__/
+**/__pycache__/*
+__pycache__/*
+.git
+*.pyc
+__pycache__
+node_modules
+*.log

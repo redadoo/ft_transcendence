@@ -61,10 +61,8 @@ RUN chmod +x entrypoint.sh
 
 # copy project
 COPY media/. mediafiles/
-COPY . $APP_HOME
+COPY --chown=app:app . $APP_HOME
 
-# chown all the files to the app user
-RUN chown -R app:app $APP_HOME
 
 # create the appropriate directories
 RUN mkdir -p /var/log/gunicorn

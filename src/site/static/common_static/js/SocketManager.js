@@ -23,7 +23,7 @@ export default class SocketManager
 		}
 
 		try {
-			const socketUrl = `ws://${window.location.host}/ws/${finalSocketUrl}`;
+			const socketUrl = `wss://${window.location.host}/ws/${finalSocketUrl}`;
 			this.socket = new WebSocket(socketUrl);
 
 			this.socket.onopen = () => {
@@ -72,7 +72,7 @@ export default class SocketManager
 		try {
 			const mode = SocketManager.getModeFromPath();
 
-			const socketUrl = `ws://${window.location.host}/ws/${mode}/${gameName}/${roomName}`;
+			const socketUrl = `wss://${window.location.host}/ws/${mode}/${gameName}/${roomName}`;
 			this.socket = new WebSocket(socketUrl);
 
 			this.socket.onopen = () => {
@@ -128,7 +128,7 @@ export default class SocketManager
 		let attempt = 0;
 		while (attempt < retries) {
 			try {
-				const socketUrl = `ws://${window.location.host}/ws/${finalSocketUrl}`;
+				const socketUrl = `wss://${window.location.host}/ws/${finalSocketUrl}`;
 				this.socket = new WebSocket(socketUrl);
 				this.socket.onmessage = handleSocketMessage;
 				this.socket.onopen = () => {
