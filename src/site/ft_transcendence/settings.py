@@ -115,6 +115,22 @@ CHANNEL_LAYERS = {
     }
 }
 
+if DEBUG != True:
+	CHANNEL_LAYERS = {
+		"default": {
+			"BACKEND": "channels_redis.core.RedisChannelLayer",
+			"CONFIG": {
+				"hosts": [("redis", 6379)],
+			},
+		},
+	}
+
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels.layers.InMemoryChannelLayer"
+    }
+}
+
 LANGUAGE_CODE = 'en-us'
 
 TIME_ZONE = 'UTC'

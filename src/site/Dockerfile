@@ -66,8 +66,13 @@ COPY . $APP_HOME
 # chown all the files to the app user
 RUN chown -R app:app $APP_HOME
 
+# create the appropriate directories
+RUN mkdir -p /var/log/gunicorn
+RUN mkdir -p /var/run/gunicorn
+RUN chown -R app:app /var/log/gunicorn
+RUN chown -R app:app /var/run/gunicorn
+
 # change to the app user
 USER app
 
-# run entrypoint.prod.sh
 ENTRYPOINT ["./entrypoint.sh"]

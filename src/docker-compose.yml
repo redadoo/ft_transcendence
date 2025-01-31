@@ -14,16 +14,19 @@ services:
       - static_volume:/home/app/ft_transcendence/staticfiles
       - media_volume:/home/app/ft_transcendence/mediafiles
     ports:
-      - 1337:80
+      - 1337:443
     depends_on:
       - ft_transcendence-site
     restart: always
+  redis:
+    image: redis:7
+    expose:
+      - 6379
   ft_transcendence-site:
     container_name: ft_transcendence-site
     build:
       context: site/
       dockerfile: Dockerfile
-    command: python3 manage.py runserver 0.0.0.0:8000
     volumes:
       - static_volume:/home/app/ft_transcendence/staticfiles
       - media_volume:/home/app/ft_transcendence/mediafiles
@@ -33,6 +36,7 @@ services:
       - path: site/env/.env.backend
     depends_on:
       - ft_transcendence-postgres
+      - redis
     restart: always
 
 volumes:

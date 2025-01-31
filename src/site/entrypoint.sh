@@ -31,5 +31,6 @@ EOF
 echo "Collecting static files..."
 python manage.py collectstatic --noinput
 
-# Run the command passed to the container
-exec "$@"
+# Run Gunicorn
+echo "Starting Gunicorn..."
+gunicorn -c config/gunicorn/dev.py
