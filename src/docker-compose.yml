@@ -1,46 +1,82 @@
 services:
-  ft_transcendence-postgres:
-    container_name: db
-    env_file:
-      - path: database/env/.env.prod.db
-    image: postgres:15
-    volumes:
-    - pg_data:/var/lib/postgresql/data
+  postgres:
+    build: postgres/
+    image: postgres
+    container_name: postgres
+    env_file: postgres/env/.env.prod.db
     restart: always
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+    networks: 
+      - backend
+  redis:
+    build: redis/
+    image: redis
+    container_name: redis
+    restart: always
+    networks: 
+      - backend
+  gunicorn:
+    build: site/
+    image: gunicorn
+    container_name: gunicorn
+    env_file: site/env/.env.backend
+    restart: always
+    networks: 
+      - backend
+    volumes:
+      - static_volume:/home/app/ft_transcendence/staticfiles
+      - media_volume:/home/app/ft_transcendence/media
+    depends_on:
+      - postgres
+      - redis
   nginx:
     container_name: nginx
+    image: nginx
     build: nginx/
-    volumes:
-      - static_volume:/home/app/ft_transcendence/staticfiles
-      - media_volume:/home/app/ft_transcendence/mediafiles
-    ports:
+    ports: 
       - 1337:443
-    depends_on:
-      - ft_transcendence-site
     restart: always
-  redis:
-    image: redis:7.2-alpine
-    expose:
-      - 6379
-    restart: always
-  ft_transcendence-site:
-    container_name: ft_transcendence-site
-    build:
-      context: site/
-      dockerfile: Dockerfile
+    networks: 
+      - backend
+    depends_on: 
+      - gunicorn
     volumes:
       - static_volume:/home/app/ft_transcendence/staticfiles
-      - media_volume:/home/app/ft_transcendence/mediafiles
-    expose:
-      - 8000
-    env_file:
-      - path: site/env/.env.backend
-    depends_on:
-      - ft_transcendence-postgres
-      - redis
+      - media_volume:/home/app/ft_transcendence/media
+  daphne:
+    image: daphne
+    build:
+      context: ./
+      dockerfile: daphne/Dockerfile
+    container_name: daphne
+    env_file: site/env/.env.backend
     restart: always
-
+    networks: 
+      - backend
+    depends_on: 
+      - gunicorn
+  
 volumes:
   pg_data:
+    driver: local
+    driver_opts:
+      type: none
+      device: /home/data/pg_data
+      o: bind
   static_volume:
+    driver: local
+    driver_opts:
+      type: none
+      device: /home/data/static_volume
+      o: bind
   media_volume:
+      driver: local
+      driver_opts:
+        type: none
+        device: /home/data/media_volume
+        o: bind
+
+networks:
+  backend:
+    driver: bridge

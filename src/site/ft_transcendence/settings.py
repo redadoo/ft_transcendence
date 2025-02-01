@@ -21,7 +21,7 @@ load_dotenv(os.path.join(BASE_DIR, "env/.env.local"))
 
 SECRET_KEY = os.environ.get("SECRET_KEY")
 
-DEBUG = bool(os.environ.get("DEBUG", default=0))
+DEBUG = bool(int(os.environ.get("DEBUG", default=0)))
 
 ALLOWED_HOSTS = os.environ.get("DJANGO_ALLOWED_HOSTS").split(" ")
 
@@ -61,7 +61,7 @@ MIDDLEWARE = [
 
 ROOT_URLCONF = 'ft_transcendence.urls'
 CSRF_COOKIE_HTTPONLY = False
-CSRF_TRUSTED_ORIGINS=["http://localhost:1337", "http://localhost:8000"]
+CSRF_TRUSTED_ORIGINS=["https://localhost:1337", "http://localhost:8000"]
 CSRF_COOKIE_NAME = 'csrftoken'
 TEMPLATES = [
 	{

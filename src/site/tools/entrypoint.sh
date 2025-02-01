@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 # Exit on any error
 set -e
 
@@ -31,6 +31,5 @@ EOF
 echo "Collecting static files..."
 python manage.py collectstatic --noinput
 
-# Run Gunicorn
 echo "Starting Gunicorn..."
-gunicorn -c config/gunicorn/dev.py
+exec gunicorn -c config/gunicorn/dev.py

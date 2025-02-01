@@ -18,6 +18,7 @@ const views = {
 	async home() {
 		await router.overlay.initialize();
 		const data = await api.getHeaderInfo();
+		console.log("Header info data:", data);
 		['profileBtn', 'notificationBtn'].forEach(id => document.getElementById(id).classList.remove('d-none'));
 		document.getElementById('headerUsername').textContent = data.username;
 		document.getElementById('headerLevel').textContent = "LV." + data.stat.level;

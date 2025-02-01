@@ -16,6 +16,16 @@ function getCookie(name) {
 const api = {
 	async fetchJson(url, options = {}) {
 		try {
+			// Ensure the URL uses HTTPS.
+			if (url.startsWith('http://')) {
+			// Replace http:// with https://
+			url = url.replace('http://', 'https://');
+			} 
+			else if (!url.startsWith('https://')) {
+			// If no protocol is provided, assume a relative URL and prepend https:// and the current host.
+			url = `https://${window.location.host}${url}`;
+			}
+
 			const csrftoken = getCookie('csrftoken');
 			const defaultOpts = {
 				headers: {

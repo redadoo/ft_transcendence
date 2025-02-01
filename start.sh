@@ -22,8 +22,8 @@ DOCKER_PRODUCTION_COMPOSE_FILE="src/docker-compose.yml"
 DJANGO_ENV_PATH="src/site/env"
 DJANGO_ENV_FILE="src/site/env/.env.local"
 
-DB_ENV_PATH="src/database/env"
-DB_ENV_FILE="src/database/env/.env.prod.db"
+DB_ENV_PATH="src/postgres/env"
+DB_ENV_FILE="src/postgres/env/.env.prod.db"
 
 # Function to display the banner
 banner() {
@@ -274,6 +274,19 @@ clean() {
 	docker system prune -af
 }
 
+clean_restart()
+{
+	prod_down 
+	clean
+	prod
+}
+
+restart()
+{
+	prod_down 
+	prod
+}
+
 # Main entry point
 case "$1" in
 	"test") spinner$$  ;;
@@ -286,6 +299,8 @@ case "$1" in
 	"logs_dev") logs_dev ;;
 	"logs_prod") logs_prod ;;
 	"clean") clean ;;
+	"restart") restart ;;
+	"clean_restart") clean_restart ;;
 	"local") local ;;
 	*) echo -e "${YELLOW}Usage: $0 {dev|dev_down|prod|prod_down|dev_restart|prod_restart|logs_dev|logs_prod|clean|local}${NONE}" ;;
 esac

@@ -53,3 +53,5 @@ read [Subject](https://github.com/redadoo/ft_transcendence/blob/master/en.subjec
 [threejs  tutorial](https://github.com/SuboptimalEng/three-js-tutorials/tree/main)
 [client-side-prediction](https://www.gabrielgambetta.com/client-side-prediction-server-reconciliation.html)
 [improving-database-accessibility](https://dev.to/slavkus/django-41-improving-database-accessibility-4hbh)
+
+[dockerignore](https://docs.docker.com/build/concepts/context/#dockerignore-files)

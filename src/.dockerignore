@@ -1,0 +1,8 @@
+*/__pycache__*
+site/requirements.txt
+site/.dockerignore
+site/env
+site/venv
+site/gunicorn.log
+site/Dockerfile
+site/entrypoint.sh
