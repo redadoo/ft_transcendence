@@ -34,8 +34,9 @@ services:
     container_name: nginx
     image: nginx
     build: nginx/
-    ports: 
-      - 1337:443
+    ports:
+      - 80:80
+      - 443:443
     restart: always
     networks: 
       - backend

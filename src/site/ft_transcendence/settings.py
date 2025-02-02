@@ -17,7 +17,7 @@ from dotenv import load_dotenv
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-load_dotenv(os.path.join(BASE_DIR, "env/.env.local"))
+load_dotenv(os.path.join(BASE_DIR, "env/.env.backend"))
 
 SECRET_KEY = os.environ.get("SECRET_KEY")
 
@@ -31,7 +31,7 @@ STATIC_URL = os.environ.get("DJANGO_STATIC_URL")
 STATIC_ROOT = BASE_DIR / os.environ.get("DJANGO_STATIC_ROOT")
 
 MEDIA_URL = os.environ.get("DJANGO_MEDIA_URL")
-MEDIA_ROOT = BASE_DIR / os.environ.get("DJANGO_MEDIA_ROOT")
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 INSTALLED_APPS = [
 	'daphne',
@@ -61,8 +61,9 @@ MIDDLEWARE = [
 
 ROOT_URLCONF = 'ft_transcendence.urls'
 CSRF_COOKIE_HTTPONLY = False
-CSRF_TRUSTED_ORIGINS=["https://localhost:1337", "http://localhost:8000"]
+CSRF_TRUSTED_ORIGINS=["https://transcendence", "https://localhost", "https://localhost:443", "https://localhost:1337", "http://localhost:8000"]
 CSRF_COOKIE_NAME = 'csrftoken'
+
 TEMPLATES = [
 	{
 		'BACKEND': 'django.template.backends.django.DjangoTemplates',
@@ -108,6 +109,11 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 ASGI_APPLICATION = "ft_transcendence.asgi.application"
+
+# Allow secure WebSockets
+# SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+# SESSION_COOKIE_SECURE = True
+# CSRF_COOKIE_SECURE = True
 
 CHANNEL_LAYERS = {
     "default": {

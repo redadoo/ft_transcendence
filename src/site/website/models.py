@@ -234,7 +234,7 @@ class UserImage(models.Model):
 		primary_key=True
 	)
 
-	user_avatar = models.ImageField(upload_to="media/",default='media/default_avatar.png')
+	user_avatar = models.ImageField(upload_to="avatars/", default="avatars/default_avatar.png")
 	date_created = models.DateTimeField(auto_now_add=True)
 	date_updated = models.DateTimeField(auto_now=True)
 
