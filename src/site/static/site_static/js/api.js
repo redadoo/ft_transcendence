@@ -16,15 +16,10 @@ function getCookie(name) {
 const api = {
 	async fetchJson(url, options = {}) {
 		try {
-			// Ensure the URL uses HTTPS.
-			if (url.startsWith('http://')) {
-			// Replace http:// with https://
-			url = url.replace('http://', 'https://');
-			} 
-			else if (!url.startsWith('https://')) {
-			// If no protocol is provided, assume a relative URL and prepend https:// and the current host.
-			url = `https://${window.location.host}${url}`;
-			}
+			const protocol = window.location.protocol === 'https:' ? 'https' : 'http';
+
+			if (protocol == 'https://')  
+				url = `${protocol}//${window.location.host}${url}`;
 
 			const csrftoken = getCookie('csrftoken');
 			const defaultOpts = {
@@ -46,7 +41,9 @@ const api = {
 			};
 
 			const response = await fetch(url, mergedOptions);
-			if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+
+			if (!response.ok) 
+				throw new Error(`HTTP error! status: ${response.status}`);
 			return await response.json();
 		} catch (error) {
 			throw error;

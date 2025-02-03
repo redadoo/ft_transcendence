@@ -35,9 +35,10 @@ services:
     image: nginx
     build: nginx/
     ports:
-      - 80:80
       - 443:443
     restart: always
+    expose:
+      - 80
     networks: 
       - backend
     depends_on: 

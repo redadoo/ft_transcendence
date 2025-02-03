@@ -23,7 +23,13 @@ export default class SocketManager
 		}
 
 		try {
-			const socketUrl = `wss://${window.location.host}/ws/${finalSocketUrl}`;
+			
+			var wsProtocol = 'ws:/';
+
+			if (window.location.protocol == 'https:') 
+				wsProtocol = 'wss:/';
+
+			const socketUrl = `${wsProtocol}/${window.location.host}/ws/${finalSocketUrl}`;
 			this.socket = new WebSocket(socketUrl);
 
 			this.socket.onopen = () => {
@@ -70,9 +76,13 @@ export default class SocketManager
 		}
 
 		try {
+			var wsProtocol = 'ws:/';
+			
+			if (window.location.protocol == 'https:') 
+				wsProtocol = 'wss:/';
+			
 			const mode = SocketManager.getModeFromPath();
-
-			const socketUrl = `wss://${window.location.host}/ws/${mode}/${gameName}/${roomName}`;
+			const socketUrl = `${wsProtocol}/${window.location.host}/ws/${mode}/${gameName}/${roomName}`;
 			this.socket = new WebSocket(socketUrl);
 
 			this.socket.onopen = () => {
@@ -128,7 +138,12 @@ export default class SocketManager
 		let attempt = 0;
 		while (attempt < retries) {
 			try {
-				const socketUrl = `wss://${window.location.host}/ws/${finalSocketUrl}`;
+				var wsProtocol = 'ws:/';
+			
+				if (window.location.protocol == 'https:') 
+					wsProtocol = 'wss:/';
+
+				const socketUrl = `${wsProtocol}/${window.location.host}/ws/${finalSocketUrl}`;
 				this.socket = new WebSocket(socketUrl);
 				this.socket.onmessage = handleSocketMessage;
 				this.socket.onopen = () => {
