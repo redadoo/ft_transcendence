@@ -3,6 +3,9 @@ from django.db.models import Q
 from website.models import Friendships, User
 from channels.layers import get_channel_layer
 from social.models import ChatMessage
+from django.utils.html import escape
+
+MAX_MESSAGE_LENGTH = 500
 
 class SocialUser:
 
@@ -256,6 +259,11 @@ class SocialUser:
 
 		if message is None:
 			raise ValueError("Invalid data: 'message' is required.")
+
+		message = escape(message)
+
+		if len(message) > MAX_MESSAGE_LENGTH:
+			raise ValueError("Message is too long.")
 
 		await sync_to_async(ChatMessage.objects.create)(
 			friendship=_friendship,
