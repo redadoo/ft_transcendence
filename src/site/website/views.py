@@ -27,7 +27,7 @@ class UploadUserImageView(APIView):
 		if form.is_valid():
 			user_image.user_avatar = form.cleaned_data['user_avatar']
 			user_image.save()
-			return Response({"message": "Image uploaded successfully", "image_url": user_image.user_avatar.url}, status=200)
+			return Response({"message": "Image uploaded successfully", "image_url": user_image.user_avatar.url}, status=status.HTTP_200_OK)
 		
 		return Response({"error": form.errors}, status=status.HTTP_400_BAD_REQUEST)
 	
