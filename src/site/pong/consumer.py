@@ -5,7 +5,6 @@ from channels.generic.websocket import AsyncWebsocketConsumer
 from pong.scripts.PongGameManager import PongGameManager
 from utilities.lobbies import Lobbies
 from utilities.lobby import Lobby
-
 lobbies = Lobbies()
 
 class PongMatchmaking(AsyncWebsocketConsumer):
@@ -59,6 +58,9 @@ class PongMatchmaking(AsyncWebsocketConsumer):
 class PongMultiplayerConsumer(AsyncWebsocketConsumer):
 
 	async def connect(self):
+		self.user_id = self.scope["user"].id
+		
+		#get or create a lobby
 		self.room_name = self.scope["url_route"]["kwargs"]["room_name"]
 		self.lobby = lobbies.get_lobby(self.room_name)
 		if self.lobby == None:
@@ -66,6 +68,15 @@ class PongMultiplayerConsumer(AsyncWebsocketConsumer):
 
 		await self.channel_layer.group_add(self.lobby.room_group_name, self.channel_name)
 		await self.accept()
+		
+		#send room_name to social consumer to send lobby invites
+		await self.channel_layer.group_send(
+			f"user_{self.user_id}",  
+			{
+				"type": "send_pong_lobby",
+				"room_name": self.room_name,
+			}
+		)
 
 	async def disconnect(self, close_code):
 		await self.channel_layer.group_discard(self.lobby.room_group_name, self.channel_name)
@@ -117,3 +128,14 @@ class PongSingleplayerConsumer(AsyncWebsocketConsumer):
 			"lobby_info": self.lobby.to_dict()
 		}
 		await self.send(text_data=json.dumps(data_to_send))
+
+# class PongTournament(AsyncWebsocketConsumer):
+	
+# 	async def connect(self):
+# 		pass
+	
+	# async def disconnect(self, close_code):
+
+	# async def receive(self, text_data):
+
+	# async def lobby_state(self, event: dict):

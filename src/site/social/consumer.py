@@ -24,7 +24,7 @@ class SocialConsumer(AsyncWebsocketConsumer):
 	async def receive(self, text_data: dict):
 		data = json.loads(text_data)
 		event_type = data.get("type")
-		
+
 		handler = {
 			"status_change": self.user.change_status,
 			"block_user": self.user.block_user,
@@ -33,7 +33,8 @@ class SocialConsumer(AsyncWebsocketConsumer):
 			"remove_friend": lambda d: self.user.remove_friend(d, "get_friend_removed"),
 			"friend_request_declined": lambda d: self.user.remove_friend(d, "get_friend_request_declined"),
 			"friend_request_accepted": self.user.accept_friend_request,
-			"send_message": self.user.send_message
+			"send_message": self.user.send_message,
+			"get_lobby_room_name": self.get_lobby_room_name
 		}.get(event_type, self.handle_unhandled_event)
 
 		await handler(data)
@@ -71,3 +72,12 @@ class SocialConsumer(AsyncWebsocketConsumer):
 
 	async def get_message(self, event: dict):
 		await self.send_event("get_message", username=event["username"], message=event["message"])
+
+	async def send_pong_lobby(self, event):
+		"""
+		Handles the event when a user joins a Pong lobby and notifies the social chat.
+		"""
+		self.lobby_room_name = event["room_name"]
+	
+	async def get_lobby_room_name(self):
+		await self.send_event("get_lobby_room_name", lobby_room_name=self.lobby_room_name)

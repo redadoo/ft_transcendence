@@ -279,5 +279,3 @@ class SocialUser:
 			"username": self.user.username,
 		}
 		await channel_layer.group_send(f"user_{target_user.id}", payload)
-
-
