@@ -68,6 +68,7 @@ class Lobby:
 
 		if self.client_ready == self.game_manager.max_players:
 			self.lobby_status = Lobby.LobbyStatus.PLAYING
+			self.game_manager.start_game()
 			self.game_loop_task = asyncio.create_task(self.game_loop())
 			data_to_send = {
 				"type": "lobby_state",
@@ -116,7 +117,7 @@ class Lobby:
 		This method is responsible for updating the game state and broadcasting it to all players.
 		"""
 		try:
-			while self.is_full():
+			while self.game_manager.game_loop_is_active:
 				async with self.update_lock:
 					await self.game_manager.game_loop()
 					await asyncio.sleep(1 / 60)
@@ -136,15 +137,6 @@ class Lobby:
 		"""
 		self.lobby_status = Lobby.LobbyStatus.WAITING_PLAYER_RECONNECTION
 		self.game_manager.player_disconnected(player_id)
-
-	def is_full(self) -> bool:
-		"""
-		Checks whether the lobby has reached the maximum number of players.
-
-		Returns:
-			bool: True if the lobby is full, otherwise False.
-		"""
-		return len(self.game_manager.players) == self.game_manager.max_players
 
 	def to_dict(self) -> dict:
 		"""

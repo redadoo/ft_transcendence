@@ -1,10 +1,13 @@
-import asyncio
+import time
+from asgiref.sync import sync_to_async
 from pong.scripts import constants
+from pong.models import *
 from pong.scripts.ball import Ball
 from pong.scripts.PongPlayer import PongPlayer
 from utilities.GameManager import GameManager
 from pong.scripts.ai import PongAI
 from utilities.Player import Player
+from website.models import User, MatchHistory
 
 class PongGameManager(GameManager):
 	def __init__(self):
@@ -14,6 +17,37 @@ class PongGameManager(GameManager):
 		super().__init__(max_players=2)
 		self.ball = Ball()
 		self.scores = {"player1": 0, "player2": 0}
+
+	def start_game(self):
+		"""Marks the game as started."""
+		self.start_match_timestamp = time.time()
+		self.game_loop_is_active = True
+
+	async def clear_and_save(self):
+		"""Saves the match results and updates players' match history."""
+		self.game_loop_is_active = False
+
+		players_list = list(self.players.keys())
+		if len(players_list) < 2:
+			print("Not enough players to save the match.")
+			return
+		
+		first_player = await sync_to_async(User.objects.get)(id=players_list[0])
+		second_player = await sync_to_async(User.objects.get)(id=players_list[1])
+
+		match = await sync_to_async(PongMatch.objects.create)(
+			first_user=first_player,
+			second_user=second_player,
+			first_user_score=self.scores["player1"],
+			second_user_score=self.scores["player2"],
+			first_user_mmr_gain=0,
+			second_user_mmr_gain=0,
+			start_date=self.start_match_timestamp
+		)
+
+		for player in (first_player, second_player):
+			history, _ = await sync_to_async(MatchHistory.objects.get_or_create)(user=player)
+			await sync_to_async(history.pong_matches.add)(match)
 
 	def add_player(self, players_id: int, is_bot: bool):
 		"""
@@ -54,7 +88,6 @@ class PongGameManager(GameManager):
 		except (KeyError, ValueError) as e:
 			print(f"Error updating player data: {e}")
 
-
 	def player_disconnected(self, player_id: int):
 		"""
 		Handle logic for when a player disconnects.
@@ -72,21 +105,25 @@ class PongGameManager(GameManager):
 		"""
 		Core game loop that updates the state of the players, ball, and handles collisions.
 		"""
-		for player in self.players.values():
+		players = self.players.values()
+
+		for player in players:
 			player.player_loop()
 
 		self.ball.update_position()
 
-		for player in self.players.values():
+		for player in players:
 			self.ball.handle_paddle_collision(player.paddle)
 
 		out_of_bounds = self.ball.is_out_of_bounds()
-		if out_of_bounds == "right":
-			self.scores["player1"] += 1
+		if out_of_bounds in {"right", "left"}:
+			scoring_player = "player1" if out_of_bounds == "right" else "player2"
+			self.scores[scoring_player] += 1
 			self.ball.reset()
-		elif out_of_bounds == "left":
-			self.scores["player2"] += 1
-			self.ball.reset()
+
+		if any(score >= constants.MAX_SCORE for score in self.scores.values()):
+			await self.clear_and_save()
+			return
 
 	def to_dict(self) -> dict:
 		"""

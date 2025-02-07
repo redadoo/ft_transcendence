@@ -21,3 +21,6 @@ GAME_BOUNDS = {
     "yMin": -15,            # Lower limit for the Y axis
     "yMax": 15,             # Upper limit for the Y axis
 }
+
+# game data
+MAX_SCORE = 5

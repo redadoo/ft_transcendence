@@ -15,6 +15,7 @@ class GameManager(ABC):
 		"""
 		self.max_players: int = max_players
 		self.players: dict[int, Player] = {}
+		self.game_loop_is_active = False
 
 	@abstractmethod
 	def add_player(self, player_id: int):

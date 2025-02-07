@@ -48,7 +48,8 @@ class PongMatch(models.Model):
 	end_date = models.DateTimeField(
 		null=True,
 		blank=True,
-		help_text="Timestamp when the match ended."
+		help_text="Timestamp when the match ended.",
+		auto_now=True
 	)
 
 	def get_winner(self):

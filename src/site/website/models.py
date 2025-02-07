@@ -269,6 +269,25 @@ class MatchHistory(models.Model):
 		help_text="The Liars Bar matches associated with this user."
 	)
 
+	def add_pong_match(self, match):
+		"""
+		Adds a PongMatch to the user's match history if not already added.
+		
+		Args:
+			match (PongMatch): The match to be added.
+		
+		Returns:
+			bool: True if the match was added, False if it was already in the history.
+		"""
+		if not isinstance(match, PongMatch):
+			raise ValueError("Expected a PongMatch instance.")
+
+		if self.pong_matches.filter(id=match.id).exists():
+			return False
+
+		self.pong_matches.add(match)
+		return True
+
 	def get_all_matches(self):
 		"""
 		Combines and sorts all matches by start date.
