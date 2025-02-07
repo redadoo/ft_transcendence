@@ -280,7 +280,6 @@ class SocialUser:
 		}
 		await channel_layer.group_send(f"user_{target_user.id}", payload)
 
-
 	async def send_lobby_invite(self, data: dict):
 		target_username = await self._validate_user(data.get("username"))
 

@@ -1,11 +1,13 @@
 import json
 import uuid
 
-from channels.generic.websocket import AsyncWebsocketConsumer
-from pong.scripts.PongGameManager import PongGameManager
-from utilities.MatchManager import MatchManager
+from website.models import User
 from utilities.lobby import Lobby
+from asgiref.sync import sync_to_async
 from utilities.Tournament import Tournament
+from utilities.MatchManager import MatchManager
+from pong.scripts.PongGameManager import PongGameManager
+from channels.generic.websocket import AsyncWebsocketConsumer
 
 match_manager = MatchManager()
 
@@ -139,6 +141,15 @@ class PongLobbyConsumer(AsyncWebsocketConsumer):
 
 		if self.room_name is None:
 			self.room_name = str(uuid.uuid4())
+		
+			#send room_name to social consumer to send lobby invites
+			await self.channel_layer.group_send(
+				f"user_{self.user_id}",  
+				{
+					"type": "send_pong_lobby",
+					"room_name": self.room_name,
+				}
+			)
 		self.lobby = match_manager.get_match(self.room_name)
 		if self.lobby == None:
 			self.lobby = match_manager.create_match("pong", self.room_name,  PongGameManager(), "lobby")
@@ -146,15 +157,6 @@ class PongLobbyConsumer(AsyncWebsocketConsumer):
 		await self.channel_layer.group_add(self.lobby.room_group_name, self.channel_name)
 		await self.accept()
 		
-		#send room_name to social consumer to send lobby invites
-		await self.channel_layer.group_send(
-			f"user_{self.user_id}",  
-			{
-				"type": "send_pong_lobby",
-				"room_name": self.room_name,
-			}
-		)
-
 	async def disconnect(self, close_code):
 		await self.channel_layer.group_discard(self.lobby.room_group_name, self.channel_name)
 
@@ -169,6 +171,22 @@ class PongLobbyConsumer(AsyncWebsocketConsumer):
 			"event_info": event,
 			"lobby_info": self.lobby.to_dict()
 		}
+
+		event_name: str = event.get("event_name", None) 
+		player_id: str = event.get("player_id", None) 
+		
+		if event_name == 'player_join' and player_id is not None:
+
+			username = await sync_to_async(User.objects.get)(id=int(player_id))
+			
+			await self.channel_layer.group_send(
+				f"user_{self.user_id}",  
+				{
+					"type": "user_join_Lobby",
+					"player_id": username,
+				}
+			)
+			
 		await self.send(text_data=json.dumps(data_to_send))
 
 class PongTournament(AsyncWebsocketConsumer):
