@@ -3,6 +3,8 @@ import html from './html.js';
 import matchHistory from './matchHistory.js';
 import router from './router.js';
 import setupConfigEventListeners from './Config.js';
+import SocialOverlayManager from './overlay.js';
+import SocketHandler from './SocketHandler.js';
 
 const views = {
 	// Auth views
@@ -219,7 +221,10 @@ const views = {
 		import('../../pong_static/js/Game.js')
 		.catch(e => console.error('Pong script error:', e));
 
-		lobbyCode.textContent = '1234567890ABCDEF';
+		await new Promise(r => setTimeout(r, 5000));
+
+		console.log("room_name:", Window.localStorage['room_name']);
+		lobbyCode.textContent = Window.localStorage['room_name'];
 		api.getProfileInfo().then(data => {
 			player1Name.textContent = data.username;
 			player1Avatar.src = data.image_url.avatar_url;

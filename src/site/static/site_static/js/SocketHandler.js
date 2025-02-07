@@ -149,9 +149,10 @@ export default class SocketHandler {
 		});
 	}
 
-	handleLobbyRoomName(messageData) {
-		console.log('🎮 Handling lobby room name:', messageData);
-		this.lobbyRoomName = messageData.lobby_room_name;
+	handleLobbyRoomName(lobbyRoomName) {
+		console.log('🎮 Handling lobby room name:', lobbyRoomName);
+		Window.localStorage['room_name'] = lobbyRoomName;
+		this.lobbyRoomName = lobbyRoomName;
 		console.log('🎮 Lobby room name:', this.lobbyRoomName);
 	}
 }
