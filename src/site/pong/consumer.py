@@ -3,9 +3,11 @@ import uuid
 
 from channels.generic.websocket import AsyncWebsocketConsumer
 from pong.scripts.PongGameManager import PongGameManager
-from utilities.lobbies import Lobbies
+from utilities.MatchManager import MatchManager
 from utilities.lobby import Lobby
-lobbies = Lobbies()
+from utilities.Tournament import Tournament
+
+match_manager = MatchManager()
 
 class PongMatchmaking(AsyncWebsocketConsumer):
 	matchmaking_queue = []
@@ -62,9 +64,9 @@ class PongMultiplayerConsumer(AsyncWebsocketConsumer):
 		
 		#get or create a lobby
 		self.room_name = self.scope["url_route"]["kwargs"]["room_name"]
-		self.lobby = lobbies.get_lobby(self.room_name)
+		self.lobby = match_manager.get_match(self.room_name)
 		if self.lobby == None:
-			self.lobby = lobbies.create_lobby("pong", self.room_name,  PongGameManager())
+			self.lobby = match_manager.create_match("pong", self.room_name,  PongGameManager(), "lobby")
 
 		await self.channel_layer.group_add(self.lobby.room_group_name, self.channel_name)
 		await self.accept()
@@ -104,7 +106,7 @@ class PongSingleplayerConsumer(AsyncWebsocketConsumer):
 
 	async def connect(self):
 		self.room_name = self.generate_random_room_name()
-		self.lobby: Lobby = lobbies.create_lobby("pong", self.room_name,  PongGameManager())
+		self.lobby: Lobby = match_manager.create_match("pong", self.room_name,  PongGameManager(), "Lobby")
 
 		await self.channel_layer.group_add(self.lobby.room_group_name, self.channel_name)
 		await self.accept()
@@ -129,13 +131,19 @@ class PongSingleplayerConsumer(AsyncWebsocketConsumer):
 		}
 		await self.send(text_data=json.dumps(data_to_send))
 
-# class PongTournament(AsyncWebsocketConsumer):
-	
-# 	async def connect(self):
-# 		pass
-	
-	# async def disconnect(self, close_code):
+class PongTournament(AsyncWebsocketConsumer):
 
-	# async def receive(self, text_data):
+	async def connect(self):
+		self.tournament = Tournament()
 
-	# async def lobby_state(self, event: dict):
+		await self.channel_layer.group_add(self.tournament.room_group_name, self.channel_name)
+		await self.accept()
+	
+	async def lobby_state(self, event: dict):
+		"""Aggiorna lo stato lato client."""
+
+		data_to_send = {
+			"event_info": event,
+			"lobby_info": self.tournament.to_dict()
+		}
+		await self.send(text_data=json.dumps(data_to_send))

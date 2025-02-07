@@ -78,6 +78,4 @@ class SocialConsumer(AsyncWebsocketConsumer):
 		Handles the event when a user joins a Pong lobby and notifies the social chat.
 		"""
 		self.lobby_room_name = event["room_name"]
-	
-	async def get_lobby_room_name(self):
 		await self.send_event("get_lobby_room_name", lobby_room_name=self.lobby_room_name)

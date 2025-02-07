@@ -17,29 +17,26 @@ class Lobby:
 
 	def __init__(self, game_name: str, room_name: str, game_manager: GameManager):
 		"""
-        Initializes a new lobby with the specified room name and game manager.
+		Initializes a new lobby with the specified room name and game manager.
 
-        Args:
-            room_name (str): The name of the room (used for group communication).
-            game_manager (GameManager): The game manager responsible for managing the game state and players.
-        """
-		self.room_group_name = f"{game_name}_multiplayer_{room_name}"
-		self.game_manager = game_manager
+		Args:
+			room_name (str): The name of the room (used for group communication).
+			game_manager (GameManager): The game manager responsible for managing the game state and players.
+		"""
+		self.room_group_name = f"{game_name}_lobby_{room_name}"
 		self.lobby_status = Lobby.LobbyStatus.TO_SETUP
 		self.update_lock = asyncio.Lock()
+		self.game_manager = game_manager
 		self.client_ready = 0
 
 	async def broadcast_message(self, message: dict):
 		"""
-        Broadcasts a message to all clients in the lobby.
+		Broadcasts a message to all clients in the lobby.
 
-        Args:
-            message (dict): The message to send, typically containing event type and data.
-        """
+		Args:
+			message (dict): The message to send, typically containing event type and data.
+		"""
 		channel_layer = get_channel_layer()
-		if not channel_layer:
-			print("Channel layer is unavailable.")
-			return
 		await channel_layer.group_send(self.room_group_name, message)
 
 	async def manage_event(self, data: dict):
@@ -112,7 +109,6 @@ class Lobby:
 
 		await self.broadcast_message(data_to_send)
 
-	
 	async def game_loop(self):
 		"""
 		Runs the core game loop for the lobby. The game loop runs at a fixed frame rate while the lobby is full.

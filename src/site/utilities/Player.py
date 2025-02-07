@@ -10,35 +10,35 @@ class Player(ABC):
 
 	class PlayerConnectionState(Enum):
 		"""
-        Enum to represent the connection status of a player.
-        """
+		Enum to represent the connection status of a player.
+		"""
 		CONNECTED = 0, "connected"
 		DISCONNECTED = 1, "disconnected"
 
 	def __init__(self, player_id: int):
 		"""
-        Initialize a player with a unique identifier and default connection status.
+		Initialize a player with a unique identifier and default connection status.
 
-        :param player_id: A unique identifier for the player.
-        """
+		:param player_id: A unique identifier for the player.
+		"""
 		self.player_id = player_id
 		self.status = Player.PlayerConnectionState.CONNECTED
 
 	@abstractmethod
 	def update_player_data(self, data: dict):
 		"""
-        Update the player's data. Must be implemented by subclasses.
+		Update the player's data. Must be implemented by subclasses.
 
-        :param data: A dictionary containing the updated player data.
-        """
+		:param data: A dictionary containing the updated player data.
+		"""
 		pass
 
 	@abstractmethod
 	def player_loop(self):
 		"""
-        The main loop for the player. Defines actions performed in each iteration of the game loop.
-        Must be implemented by subclasses.
-        """
+		The main loop for the player. Defines actions performed in each iteration of the game loop.
+		Must be implemented by subclasses.
+		"""
 		pass
 
 	def disconnect(self):

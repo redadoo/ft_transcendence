@@ -2,10 +2,10 @@ import json
 import uuid
 
 from channels.generic.websocket import AsyncWebsocketConsumer
-from utilities.lobbies import Lobbies
+from utilities.MatchManager import MatchManager
 from .scripts.LiarsBarGameManager import LiarsBarGameManager
 
-lobbies = Lobbies()
+match_manager = MatchManager()
 
 class LiarsBarMatchmaking(AsyncWebsocketConsumer):
 	matchmaking_queue = []
@@ -51,9 +51,9 @@ class LiarsBarConsumer(AsyncWebsocketConsumer):
 	async def connect(self):
 		self.room_name = self.scope["url_route"]["kwargs"]["room_name"]
 	
-		self.lobby = lobbies.get_lobby(self.room_name) 
+		self.lobby = match_manager.get_match(self.room_name) 
 		if self.lobby == None:
-			self.lobby = lobbies.create_lobby("liarsbar", self.room_name,  LiarsBarGameManager())
+			self.lobby = match_manager.create_match("liarsbar", self.room_name,  LiarsBarGameManager(), "Lobby")
 
 		await self.channel_layer.group_add(self.lobby.room_group_name, self.channel_name)
 		await self.accept()
