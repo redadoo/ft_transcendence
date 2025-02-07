@@ -6,6 +6,12 @@ websocket_pong_urlpatterns = [
 		r"ws/singleplayer/pong/",
 		PongSingleplayerConsumer.as_asgi()
 	),
+    
+	re_path(
+		r"ws/lobby/pong/",
+		PongLobbyConsumer.as_asgi()
+	),
+
 	re_path(
 		r"ws/multiplayer/pong/matchmaking",
 		PongMatchmaking.as_asgi()

@@ -62,7 +62,6 @@ class PongMultiplayerConsumer(AsyncWebsocketConsumer):
 	async def connect(self):
 		self.user_id = self.scope["user"].id
 		
-		#get or create a lobby
 		self.room_name = self.scope["url_route"]["kwargs"]["room_name"]
 		self.lobby = match_manager.get_match(self.room_name)
 		if self.lobby == None:
@@ -121,6 +120,45 @@ class PongSingleplayerConsumer(AsyncWebsocketConsumer):
 		if data.get("type") == "init_player":
 			await self.lobby.add_player_to_lobby({"player_id" : "-1"}, True)
 			await self.lobby.start_game()
+
+	async def lobby_state(self, event: dict):
+		"""Aggiorna lo stato lato client."""
+
+		data_to_send = {
+			"event_info": event,
+			"lobby_info": self.lobby.to_dict()
+		}
+		await self.send(text_data=json.dumps(data_to_send))
+
+class PongLobbyConsumer(AsyncWebsocketConsumer):
+
+	async def connect(self):
+		self.user_id = self.scope["user"].id
+		
+		#get or create a lobby
+		self.room_name = str(uuid.uuid4())
+		self.lobby = match_manager.get_match(self.room_name)
+		if self.lobby == None:
+			self.lobby = match_manager.create_match("pong", self.room_name,  PongGameManager(), "lobby")
+
+		await self.channel_layer.group_add(self.lobby.room_group_name, self.channel_name)
+		await self.accept()
+		
+		#send room_name to social consumer to send lobby invites
+		await self.channel_layer.group_send(
+			f"user_{self.user_id}",  
+			{
+				"type": "send_pong_lobby",
+				"room_name": self.room_name,
+			}
+		)
+
+	async def disconnect(self, close_code):
+		await self.channel_layer.group_discard(self.lobby.room_group_name, self.channel_name)
+
+	async def receive(self, text_data):
+		data = json.loads(text_data)
+		await self.lobby.manage_event(data)
 
 	async def lobby_state(self, event: dict):
 		"""Aggiorna lo stato lato client."""

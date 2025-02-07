@@ -23,7 +23,7 @@ export default class SocketHandler {
 				'get_friend_request_declined': () => this.handleFriendRequestDeclined(socketData.username),
 				'get_friend_removed': () => this.handleFriendRemoved(socketData.username),
 				'get_message': () => this.handleIncomingMessage(socketData),
-				'get_lobby_room_name': () => this.handleLobbyRoomName(socketData.room_name)
+				'get_lobby_room_name': () => this.handleLobbyRoomName(socketData.lobby_room_name)
 			};
 
 			const handler = messageHandlers[socketData.type];
