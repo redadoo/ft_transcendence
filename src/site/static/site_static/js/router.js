@@ -13,6 +13,7 @@ const router = {
 			'/config': 'config',
 			'/friends-profile': 'friendsProfile',
 			'/leaderboard': 'leaderboard',
+			'/lobby': 'lobby',
 			'/login': 'login',
 			'/login42': 'login42',
 			'/logout': 'logout',

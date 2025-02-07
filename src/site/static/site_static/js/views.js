@@ -201,7 +201,40 @@ const views = {
 
 	async configScripts() {
 		setupConfigEventListeners();
-	}
+	},
+
+	async lobby() {
+		return html.lobby;
+	},
+
+	async lobbyScripts() {
+		const lobbyCode = document.getElementById('lobbyCode');
+		const copyButton = document.getElementById('copyCode');
+		const startButton = document.getElementById('startGame');
+		const player1Name = document.getElementById('player1Name');
+		const player2Name = document.getElementById('player2Name');
+		const player1Avatar = document.getElementById('player1Avatar');
+		const player2Avatar = document.getElementById('player2Avatar');
+
+		import('../../pong_static/js/Game.js')
+		.catch(e => console.error('Pong script error:', e));
+
+		lobbyCode.textContent = '1234567890ABCDEF';
+		api.getProfileInfo().then(data => {
+			player1Name.textContent = data.username;
+			player1Avatar.src = data.image_url.avatar_url;
+		});
+
+		copyButton.addEventListener('click', () => {
+			navigator.clipboard.writeText(lobbyCode.textContent).then(() => {
+				const originalText = copyButton.textContent;
+				copyButton.textContent = 'COPIED!';
+				setTimeout(() => {
+					copyButton.textContent = originalText;
+				}, 2000);
+			});
+		});
+	},
 };
 
 export default views;

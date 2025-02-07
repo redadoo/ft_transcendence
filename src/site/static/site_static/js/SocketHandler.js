@@ -5,6 +5,7 @@ export default class SocketHandler {
 		this.notificationManager = notificationManager;
 		this.friendListManager = friendListManager;
 		this.chatManager = chatManager;
+		this.lobbyRoomName = null;
 		console.log('🔌 SocketHandler initialized');
 	}
 
@@ -22,6 +23,7 @@ export default class SocketHandler {
 				'get_friend_request_declined': () => this.handleFriendRequestDeclined(socketData.username),
 				'get_friend_removed': () => this.handleFriendRemoved(socketData.username),
 				'get_message': () => this.handleIncomingMessage(socketData),
+				'get_lobby_room_name': () => this.handleLobbyRoomName(socketData.room_name)
 			};
 
 			const handler = messageHandlers[socketData.type];
@@ -145,5 +147,11 @@ export default class SocketHandler {
 			title: `New message from ${messageData.username}`,
 			message: messageData.message.message_text
 		});
+	}
+
+	handleLobbyRoomName(messageData) {
+		console.log('🎮 Handling lobby room name:', messageData);
+		this.lobbyRoomName = messageData.lobby_room_name;
+		console.log('🎮 Lobby room name:', this.lobbyRoomName);
 	}
 }
