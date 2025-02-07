@@ -101,6 +101,7 @@ class LiarsBarGameManager(GameManager):
 		self.deck = self.init_cards()
 		HAND_SIZE = 5
 		self.card_required = Card.CardSeed(random.randint(1, 3))
+		self.hands_cleared = 0
 		print(f"card required: {self.card_required}")
 		for player in self.players.values():
 			cards_to_deal = self.deck[:HAND_SIZE]
@@ -123,6 +124,16 @@ class LiarsBarGameManager(GameManager):
 			player.selected_cards.clear()
 			card_names = [card.to_dict() for card in player.hand]
 			print(f"\n\n Player {player.player_id} has the following cards: {card_names}")
+			if self.hands_cleared == (self.players_alive - 1):
+				player.doubting = True
+				print("forced doubt")
+			if len(player.hand) == 0 and not player.doubting:
+				print("turn skipping for empty hand")
+				self.player_turn_index += 1
+				if self.player_turn_index > 3:
+						print("fix index")
+						self.player_turn_index = 0
+				player.player_turn = False
 			if self.player_turn_index == 2:
 				print(f"inserisco le carte nelle sue selected {player.player_id}")
 				player.card_sent = True
@@ -210,6 +221,9 @@ class LiarsBarGameManager(GameManager):
 							break
 		if self.players[self.player_turn_index].card_sent and self.started:
 			print("ho mandato carte\n")
+			if len(self.players[self.player_turn_index].hand) == 0:
+				print("hand cleared")
+				self.hands_cleared += 1
 			self.players[self.player_turn_index].player_turn = False
 			self.player_turn_index += 1
 			if self.player_turn_index > 3:
