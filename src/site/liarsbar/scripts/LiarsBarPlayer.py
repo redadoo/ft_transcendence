@@ -126,9 +126,16 @@ class LiarsBarPlayer(Player):
 							print(f"Index {index} added. Current indices: {self.selected_index}")
 				elif key == "Enter":
 					if self.player_turn and not self.card_sent:
-						self.card_sent = True
-						#togli le carte con index selected card nella mano
+						print("premuto enter e passato controllo")
 						self.selected_cards.clear()
+						# Ordina gli indici in ordine decrescente per evitare problemi di rimozione
+						for index in sorted(self.selected_index, reverse=True):
+							if 0 <= index < len(self.hand):  # Controlla che l'indice sia valido
+								self.selected_cards.append(self.hand.pop(index))
+
+						# Svuota la lista degli indici selezionati dopo aver rimosso le carte
+							self.selected_index.clear()
+						self.card_sent = True
 				elif key == "Space":
 					if self.player_turn and not self.doubting:
 						self.doubting = True
