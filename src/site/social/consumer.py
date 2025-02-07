@@ -34,7 +34,7 @@ class SocialConsumer(AsyncWebsocketConsumer):
 			"friend_request_declined": lambda d: self.user.remove_friend(d, "get_friend_request_declined"),
 			"friend_request_accepted": self.user.accept_friend_request,
 			"send_message": self.user.send_message,
-			"get_lobby_room_name": self.get_lobby_room_name
+			"send_lobby_invite": self.user.send_lobby_invite
 		}.get(event_type, self.handle_unhandled_event)
 
 		await handler(data)
@@ -79,3 +79,6 @@ class SocialConsumer(AsyncWebsocketConsumer):
 		"""
 		self.lobby_room_name = event["room_name"]
 		await self.send_event("get_lobby_room_name", lobby_room_name=self.lobby_room_name)
+
+	async def get_lobby_invite(self, event):
+		await self.send_event("get_lobby_invite", room_name=event["room_name"])

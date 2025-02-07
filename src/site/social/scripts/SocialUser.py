@@ -279,3 +279,30 @@ class SocialUser:
 			"username": self.user.username,
 		}
 		await channel_layer.group_send(f"user_{target_user.id}", payload)
+
+
+	async def send_lobby_invite(self, data: dict):
+		target_username = await self._validate_user(data.get("username"))
+
+		try:
+			target_user = await sync_to_async(User.objects.get)(username=target_username)
+		except User.DoesNotExist:
+			raise ValueError(f"User '{target_username}' does not exist.")
+
+		# existing_friendship = await sync_to_async(
+		# 	lambda: Friendships.objects.filter(
+		# 		Q(first_user=self.user, second_user=target_user) |
+		# 		Q(first_user=target_user, second_user=self.user)
+		# 	).exists()
+		# )()
+
+		# if existing_friendship:
+		# 	raise ValueError(f"A friendship or pending request already exists with '{target_username}'.")
+
+		channel_layer = get_channel_layer()
+		payload = {
+			"type": "get_lobby_invite",
+			"room_name": data.get("room_name"),
+		}
+
+		await channel_layer.group_send(f"user_{target_user.id}", payload)
