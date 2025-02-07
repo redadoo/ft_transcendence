@@ -302,6 +302,7 @@ class SocialUser:
 		payload = {
 			"type": "get_lobby_invite",
 			"room_name": data.get("room_name"),
+			"username": self.user.username 
 		}
 
 		await channel_layer.group_send(f"user_{target_user.id}", payload)
