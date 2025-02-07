@@ -82,3 +82,6 @@ class SocialConsumer(AsyncWebsocketConsumer):
 
 	async def get_lobby_invite(self, event):
 		await self.send_event("get_lobby_invite", room_name=event["room_name"])
+
+	async def user_join_lobby(self, event):
+		await self.send_event("user_join_lobby", username=event["username"])

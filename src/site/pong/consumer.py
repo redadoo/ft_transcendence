@@ -197,7 +197,7 @@ class PongLobbyConsumer(AsyncWebsocketConsumer):
 				f"user_{self.user_id}",  
 				{
 					"type": "user_join_Lobby",
-					"player_id": username,
+					"username": username,
 				}
 			)
 			
