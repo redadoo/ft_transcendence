@@ -125,10 +125,9 @@ class Game
 	{
 		this.gameSocket = new SocketManager();
 		
-		this.gameSocket.initGameWebSocket(
+		this.gameSocket.initWebSocket(
 			'pong',
 			this.handleGameSocketMessage.bind(this),
-			crypto.randomUUID(),
 			this.onSocketOpen.bind(this)
 		);
 	}
