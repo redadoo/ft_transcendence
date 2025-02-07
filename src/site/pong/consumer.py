@@ -135,8 +135,10 @@ class PongLobbyConsumer(AsyncWebsocketConsumer):
 	async def connect(self):
 		self.user_id = self.scope["user"].id
 		
-		#get or create a lobby
-		self.room_name = str(uuid.uuid4())
+		self.room_name = self.scope["url_route"]["kwargs"].get("room_name", None)
+
+		if self.room_name is None:
+			self.room_name = str(uuid.uuid4())
 		self.lobby = match_manager.get_match(self.room_name)
 		if self.lobby == None:
 			self.lobby = match_manager.create_match("pong", self.room_name,  PongGameManager(), "lobby")

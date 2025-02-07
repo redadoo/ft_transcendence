@@ -126,7 +126,7 @@ class Game
 		this.gameSocket = new SocketManager();
 		
 		this.gameSocket.initWebSocket(
-			'pong',
+			'lobby/pong/',
 			this.handleGameSocketMessage.bind(this),
 			this.onSocketOpen.bind(this)
 		);
