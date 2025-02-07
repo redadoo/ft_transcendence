@@ -189,10 +189,8 @@ class PongLobbyConsumer(AsyncWebsocketConsumer):
 		event_name: str = event.get("event_name", None) 
 		player_id: str = event.get("player_id", None) 
 		
-		if event_name == 'player_join' and player_id is not None:
-
+		if event_name == 'player_join' and player_id is not None and self.user_id != int(player_id):
 			username = await sync_to_async(User.objects.get)(id=int(player_id))
-			
 			await self.channel_layer.group_send(
 				f"user_{self.user_id}",  
 				{
