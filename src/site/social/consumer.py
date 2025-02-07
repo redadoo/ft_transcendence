@@ -34,7 +34,8 @@ class SocialConsumer(AsyncWebsocketConsumer):
 			"friend_request_declined": lambda d: self.user.remove_friend(d, "get_friend_request_declined"),
 			"friend_request_accepted": self.user.accept_friend_request,
 			"send_message": self.user.send_message,
-			"send_lobby_invite": self.user.send_lobby_invite
+			"send_lobby_invite": self.user.send_lobby_invite,
+			"user_join_lobby": self.user_join_lobby
 		}.get(event_type, self.handle_unhandled_event)
 
 		await handler(data)
