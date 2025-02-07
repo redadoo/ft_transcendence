@@ -55,3 +55,5 @@ read [Subject](https://github.com/redadoo/ft_transcendence/blob/master/en.subjec
 [improving-database-accessibility](https://dev.to/slavkus/django-41-improving-database-accessibility-4hbh)
 
 [dockerignore](https://docs.docker.com/build/concepts/context/#dockerignore-files)
+
+[-prometheus-and-grafana](https://rezakhademix.medium.com/a-complete-guide-to-monitor-postgresql-with-prometheus-and-grafana-5611af229882)
