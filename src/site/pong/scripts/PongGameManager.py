@@ -8,6 +8,7 @@ from utilities.GameManager import GameManager
 from pong.scripts.ai import PongAI
 from utilities.Player import Player
 from website.models import User, MatchHistory
+from datetime import datetime, timezone
 
 class PongGameManager(GameManager):
 	def __init__(self):
@@ -20,7 +21,7 @@ class PongGameManager(GameManager):
 
 	def start_game(self):
 		"""Marks the game as started."""
-		self.start_match_timestamp = time.time()
+		self.start_match_timestamp = datetime.now()
 		self.game_loop_is_active = True
 
 	async def clear_and_save(self):
@@ -31,7 +32,7 @@ class PongGameManager(GameManager):
 		if len(players_list) < 2:
 			print("Not enough players to save the match.")
 			return
-		
+
 		first_player = await sync_to_async(User.objects.get)(id=players_list[0])
 		second_player = await sync_to_async(User.objects.get)(id=players_list[1])
 
@@ -45,9 +46,17 @@ class PongGameManager(GameManager):
 			start_date=self.start_match_timestamp
 		)
 
-		for player in (first_player, second_player):
-			history, _ = await sync_to_async(MatchHistory.objects.get_or_create)(user=player)
-			await sync_to_async(history.pong_matches.add)(match)
+		await sync_to_async(match.save)()
+		
+		player1_history, _ = await sync_to_async(MatchHistory.objects.get_or_create)(user=first_player)
+		player2_history, _ = await sync_to_async(MatchHistory.objects.get_or_create)(user=second_player)
+
+		def add_match_to_history(history, match):
+			history.pong_matches.add(match)
+			history.save()
+
+		await sync_to_async(add_match_to_history)(player1_history, match)
+		await sync_to_async(add_match_to_history)(player2_history, match)
 
 	def add_player(self, players_id: int, is_bot: bool):
 		"""
