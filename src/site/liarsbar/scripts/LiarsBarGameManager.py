@@ -1,3 +1,4 @@
+from datetime import datetime
 import random
 import asyncio
 import time
@@ -25,6 +26,11 @@ class LiarsBarGameManager(GameManager):
 		self.player_turn_index = 0
 		self.players_alive = 4
 
+	def start_game(self):
+		"""Marks the game as started."""
+		self.start_match_timestamp = datetime.now()
+		self.game_loop_is_active = True
+		
 	def init_cards(self) -> list[Card]:
 		"""
 		Initializes a shuffled deck of cards for the game.
