@@ -181,8 +181,7 @@ class PongLobbyConsumer(AsyncWebsocketConsumer):
 		"""
 		Disconnects the user from the lobby by removing them from the lobby group.
 		"""
-		if hasattr(self, "lobby") and self.lobby:
-			await self.channel_layer.group_discard(self.lobby.room_group_name, self.channel_name)
+		await self.channel_layer.group_discard(self.lobby.room_group_name, self.channel_name)
 
 	async def receive(self, text_data: str):
 		"""
@@ -220,8 +219,13 @@ class PongLobbyConsumer(AsyncWebsocketConsumer):
 		event_name = event.get("event_name")
 		player_id = event.get("player_id")
 
+		# print(f"player id joined {player_id}")
+		# print(f"current player id {self.user_id}")
+		# print(f"event_name {event_name}")
+		# print(f"cirrent user {len(self.lobby.game_manager.players)}")
+
 		if event_name == "player_join" and player_id:
-			user = await sync_to_async(User.objects.get)(id=int(player_id))
+			user = await sync_to_async(User.objects.get)(id=player_id)
 			await self.channel_layer.group_send(
 				f"user_{self.user_id}",
 				{
