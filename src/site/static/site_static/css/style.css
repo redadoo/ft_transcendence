@@ -1694,3 +1694,21 @@ label {
     color: #686868;
     cursor: not-allowed;
 }
+
+.btn-matchmaking {
+	background-color: #de4f5d;
+	color: white;
+	font-family: "PRESS START 2P";
+	font-size: 20px;
+	padding: 15px 30px;
+	border: none;
+	border-radius: 5px;
+	cursor: pointer;
+	transition: background-color 0.3s, transform 0.2s;
+	text-shadow: 2px 2px 0px rgba(0, 0, 0, 0.3);
+}
+
+.btn-matchmaking:hover {
+	background-color: #b53d48;
+	transform: scale(1.05);
+}

@@ -15,7 +15,9 @@ const HeaderText = {
 	profile: 'PROFILE',
 	register: 'REGISTER',
 	singleplayer: 'SINGLEPLAYER',
-	singleplayerPong: 'SINGLEPLAYER PONG'
+	singleplayerPong: 'SINGLEPLAYER PONG',
+	lobby: 'LOBBY',
+	lobbyGuest: 'LOBBY GUEST',
 }
 
 const FooterText = {
@@ -36,6 +38,8 @@ const FooterText = {
 	register: 'Sign up to unlock all features and join the community.',
 	singleplayer: 'Play singleplayer games at your own pace.',
 	singleplayerPong: 'Enjoy a solo Pong game and beat your high score.',
+	lobby: 'Open chat interface to invite friends to play.',
+	lobbyGuest: 'Waiting for host to start the game.',
 }
 
 

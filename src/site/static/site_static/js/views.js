@@ -124,9 +124,10 @@ const views = {
 		return html.liarsbar;
 	},
 
-	pongScripts() {
-		import('../../pong_static/js/Game.js')
-		.catch(e => console.error('Pong script error:', e));
+	async pongScripts() {
+		const game = new Game();
+		await game.init();
+		game.sceneManager.animate();
 	},
 
 	singleplayerPongScripts() {
@@ -228,16 +229,6 @@ const views = {
 		api.getProfileInfo().then(data => {
 			player1Name.textContent = data.username;
 			player1Avatar.src = data.image_url.avatar_url;
-		});
-
-		copyButton.addEventListener('click', () => {
-			navigator.clipboard.writeText(lobbyCode.textContent).then(() => {
-				const originalText = copyButton.textContent;
-				copyButton.textContent = 'COPIED!';
-				setTimeout(() => {
-					copyButton.textContent = originalText;
-				}, 2000);
-			});
 		});
 	},
 

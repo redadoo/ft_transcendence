@@ -1,6 +1,6 @@
 import SocketManager from './SocketManager.js';
 
-export default class MatchmakingManager 
+export default class MatchmakingManager
 {
 	constructor(gameName, onMatchFound) {
 
@@ -18,17 +18,25 @@ export default class MatchmakingManager
   	/**
    	 * Sets up the UI and binds the matchmaking button to the matchmaking socket setup.
    	 */
-	addEventToButton() 
+	addEventToButton()
 	{
-		const matchmakingButton = document.getElementById('startMatchmaking');
-		if (matchmakingButton) 
-			matchmakingButton.addEventListener('click', () => this.setupMatchmakingSocket());
+		const matchmakingButton = document.getElementById("startMatchmaking");
+		const matchmakingStatus = document.getElementById("matchmakingStatus");
+
+		if (matchmakingButton) {
+			matchmakingButton.addEventListener('click', () => {
+				matchmakingButton.innerText = "SEARCHING...";
+				matchmakingButton.disabled = true;
+				matchmakingStatus.innerText = "Looking for an opponent...";
+				this.setupMatchmakingSocket()
+			});
+		}
 	}
 
 	/**
 	 * Initializes the matchmaking WebSocket and defines its behavior.
 	 */
-	setupMatchmakingSocket() 
+	setupMatchmakingSocket()
 	{
 		this.gameSocket = new SocketManager();
 		this.gameSocket.initWebSocket(
@@ -42,9 +50,9 @@ export default class MatchmakingManager
 	 * Handles incoming messages from the matchmaking WebSocket.
 	 * @param {MessageEvent} event - The WebSocket message event.
 	 */
-	handleMatchmakingSocketMessage(event) 
+	handleMatchmakingSocketMessage(event)
 	{
-		try 
+		try
 		{
 			const data = JSON.parse(event.data);
 			switch (data.type) {
@@ -62,10 +70,21 @@ export default class MatchmakingManager
 	/**
 	 * Cleans up the matchmaking UI and WebSocket resources.
 	 */
-	cleanUp() 
+	cleanUp()
 	{
+		const matchmakingButton = document.getElementById("startMatchmaking");
+		const matchmakingStatus = document.getElementById("matchmakingStatus");
+
+		if (matchmakingButton) {
+			matchmakingButton.innerText = "START MATCHMAKING";
+			matchmakingButton.disabled = false;
+		}
+		if (matchmakingStatus) {
+			matchmakingStatus.innerText = "Click below to start matchmaking";
+		}
+
 		document.getElementById('pong-container')?.remove();
-		if (this.gameSocket) 
+		if (this.gameSocket)
 		{
 			this.gameSocket.close();
 			this.gameSocket = null;
@@ -76,7 +95,7 @@ export default class MatchmakingManager
 	 * Sets up the lobby based on the provided data.
 	 * @param {Object} data - The data received for the lobby setup.
 	 */
-	setupLobby(data) 
+	setupLobby(data)
 	{
 		this.cleanUp();
 		this.onMatchFound(data);

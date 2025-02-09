@@ -287,13 +287,13 @@ const html = {
 	`,
 
 	pong: `
-		<div id="pong-container" class="container-fluid game-container">
-			<div class="row h-100">
-				<div class="col d-flex justify-content-center align-items-center">
-					<button id="startMatchmaking" class="btn btn-primary btn-lg">
-						Start Matchmaking
-					</button>
-				</div>
+		<div id="pong-container" class="container-fluid game-container d-flex justify-content-center align-items-center">
+			<div class="text-center">
+				<h1 class="pixel-font multiplayer">PONG</h1>
+				<p id="matchmakingStatus" class="hundin-font text-up multiplayer">Click below to start matchmaking</p>
+				<button id="startMatchmaking" class="btn btn-matchmaking">
+					START MATCHMAKING
+				</button>
 			</div>
 		</div>
 	`,
@@ -881,8 +881,7 @@ const html = {
 							<span class="pixel-font lobby-title">GAME LOBBY</span>
 							<div class="lobby-code-container">
 								<span class="pixel-font lobby-code-label">LOBBY CODE:</span>
-								<span class="pixel-font lobby-code" id="lobbyCode">ABC123</span>
-								<button class="copy-button pixel-font" id="copyCode">COPY</button>
+								<span class="pixel-font lobby-code" id="lobbyCode"></span>
 							</div>
 						</div>
 
