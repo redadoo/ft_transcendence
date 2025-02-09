@@ -79,7 +79,8 @@ class Game
 
 		await this.sceneManager.modelManager.loadModel({
 			'/static/liarsbar_static/assets/liarsbar/LobbyScene2.glb': 'LobbyScene',
-			'/static/liarsbar_static/assets/liarsbar/human.glb': 'human'
+			'/static/liarsbar_static/assets/liarsbar/human.glb': 'human',
+			'/static/liarsbar_static/assets/liarsbar/king_boo.glb': 'test'
 		});
 
 		this.initLobbyScene();
@@ -135,6 +136,13 @@ class Game
 		LobbyScene.scene.position.set(230, 0, 0);
 
 		this.sceneManager.scene.add(LobbyScene.scene);
+
+		const bo = this.sceneManager.modelManager.getModel("test");
+		bo.scene.scale.set(119, 119, 119);
+		bo.scene.rotation.y = 90;
+		bo.scene.position.set(230, 0, 0);
+
+		this.sceneManager.scene.add(bo.scene);
 	}
 
 	/**
