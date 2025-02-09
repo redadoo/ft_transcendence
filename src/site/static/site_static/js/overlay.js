@@ -304,9 +304,9 @@ export default class SocialOverlayManager {
 	}
 
 	acceptInviteToGame(inviteData) {
-		window.localStorage[`room_name`] = inviteData.lobby_room_name;
+		window.localStorage[`room_name`] = inviteData.room_name;
 		window.localStorage[`invited_username`] = inviteData.username;
-
+		
 		router.navigateTo('/lobby/guest');
 	}
 

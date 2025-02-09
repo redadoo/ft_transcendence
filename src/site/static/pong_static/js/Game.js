@@ -120,14 +120,24 @@ export default class Game
 
 		this.sceneManager.setExternalFunction(() => this.fixedUpdate());
 	}
-
+	
 	setupPrivateLobby()
 	{
+		var room_name = "";
+		if (window.location.pathname.includes("guest"))
+			room_name = window.localStorage['room_name'];
+		else
+		{
+			window.localStorage['room_name'] = crypto.randomUUID();
+			room_name = window.localStorage['room_name'];
+		}
+
 		this.gameSocket = new SocketManager();
 
-		this.gameSocket.initWebSocket(
-			'lobby/pong/',
+		this.gameSocket.initGameWebSocket(
+			'pong',
 			this.handleGameSocketMessage.bind(this),
+			room_name,
 			this.onSocketOpen.bind(this)
 		);
 	}

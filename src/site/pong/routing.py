@@ -8,7 +8,7 @@ websocket_pong_urlpatterns = [
 	),
     
 	re_path(
-		r"ws/lobby/pong/",
+		r"ws/lobby/pong/(?P<room_name>[\w\-]+)$",
 		PongLobbyConsumer.as_asgi()
 	),
 

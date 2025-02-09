@@ -159,7 +159,6 @@ class PongLobbyConsumer(AsyncWebsocketConsumer):
 		self.user = self.scope["user"]
 		self.user_id = self.user.id
 		self.room_name = self.scope["url_route"]["kwargs"].get("room_name")
-
 		if self.room_name is None:
 			self.room_name = str(uuid.uuid4())
 			await self.channel_layer.group_send(
@@ -218,11 +217,6 @@ class PongLobbyConsumer(AsyncWebsocketConsumer):
 
 		event_name = event.get("event_name")
 		player_id = event.get("player_id")
-
-		# print(f"player id joined {player_id}")
-		# print(f"current player id {self.user_id}")
-		# print(f"event_name {event_name}")
-		# print(f"cirrent user {len(self.lobby.game_manager.players)}")
 
 		if event_name == "player_join" and player_id:
 			user = await sync_to_async(User.objects.get)(id=player_id)
