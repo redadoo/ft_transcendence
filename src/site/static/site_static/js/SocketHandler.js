@@ -5,7 +5,6 @@ export default class SocketHandler {
 		this.notificationManager = notificationManager;
 		this.friendListManager = friendListManager;
 		this.chatManager = chatManager;
-		this.lobbyRoomName = null;
 		console.log('🔌 SocketHandler initialized');
 	}
 
@@ -23,7 +22,10 @@ export default class SocketHandler {
 				'get_friend_request_declined': () => this.handleFriendRequestDeclined(socketData.username),
 				'get_friend_removed': () => this.handleFriendRemoved(socketData.username),
 				'get_message': () => this.handleIncomingMessage(socketData),
-				'get_lobby_room_name': () => this.handleLobbyRoomName(socketData.lobby_room_name)
+				'get_lobby_room_name': () => this.handleLobbyRoomName(socketData.lobby_room_name),
+				'get_lobby_invite': () => this.handleLobbyInvite(socketData),
+				'get_player_joined': () => this.handlePlayerJoined(socketData),
+
 			};
 
 			const handler = messageHandlers[socketData.type];
@@ -151,8 +153,28 @@ export default class SocketHandler {
 
 	handleLobbyRoomName(lobbyRoomName) {
 		console.log('🎮 Handling lobby room name:', lobbyRoomName);
-		Window.localStorage['room_name'] = lobbyRoomName;
-		this.lobbyRoomName = lobbyRoomName;
-		console.log('🎮 Lobby room name:', this.lobbyRoomName);
+		window.localStorage['room_name'] = lobbyRoomName;
 	}
+
+	handleLobbyInvite(inviteData) {
+		console.log('🎟️ Handling lobby invite:', inviteData);
+
+		this.notificationManager.addNotification({
+			type: 'lobby_invite',
+			title: 'Game Invite',
+			message: `${inviteData.username} has invited you to a game`,
+			actions: [
+				{
+					label: 'Accept',
+					handler: () => this.userActions.acceptInviteToGame(inviteData)
+				},
+				{
+					label: 'Decline',
+					handler: () => this.userActions.declineInviteToGame(inviteData.username)
+				}
+			]
+		});
+	}
+
+
 }

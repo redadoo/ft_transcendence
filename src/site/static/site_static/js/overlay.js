@@ -5,6 +5,7 @@ import FriendListManager from './FriendListManager.js';
 import SocketHandler from './SocketHandler.js';
 import api from './api.js';
 import SocketManager from '../../common_static/js/SocketManager.js';
+import router from './router.js';
 
 export default class SocialOverlayManager {
 	constructor() {
@@ -23,7 +24,9 @@ export default class SocialOverlayManager {
 			remove: this.removeFriend.bind(this),
 			accept: this.acceptFriendRequest.bind(this),
 			decline: this.declineFriendRequest.bind(this),
-			chat: this.openChat.bind(this)
+			chat: this.openChat.bind(this),
+			inviteToGame: this.sendInviteToGame.bind(this),
+			acceptInviteToGame: this.acceptInviteToGame.bind(this),
 		}
 		this.initializeUIElements();
 		this.notificationManager = new NotificationManager();
@@ -180,6 +183,19 @@ export default class SocialOverlayManager {
 				this.sendFriendRequest(targetUsername);
 			}
 		});
+
+		document.addEventListener('click', (event) => {
+			const inviteButton = event.target.closest('#inviteToGame');
+			if (inviteButton) {
+				const friendListItem = inviteButton.closest('.friend-item');
+				const targetUsername = friendListItem.querySelector('.friend-name').textContent;
+				if (window.location.pathname === '/lobby') {
+				this.sendInviteToGame(targetUsername);
+				} else {
+					alert('You must be in a game lobby to invite a friend to play a game.');
+				}
+			}
+		});
 	}
 
 	openChat(username) {
@@ -278,6 +294,22 @@ export default class SocialOverlayManager {
 		this.sendFriendRequestDeclinedUpdate(username);
 	}
 
+	sendInviteToGame(targetUsername) {
+		this.sendInviteToGameUpdate(targetUsername);
+		this.notificationManager.addNotification({
+			type: 'game_invite',
+			title: 'Game Invite',
+			message: `You have invited ${targetUsername} to a game`
+		});
+	}
+
+	acceptInviteToGame(inviteData) {
+		window.localStorage[`room_name`] = inviteData.lobby_room_name;
+		window.localStorage[`invited_username`] = inviteData.username;
+
+		router.navigateTo('/lobby/guest');
+	}
+
 	// Socket message senders
 	sendStatusUpdate(newStatus) {
 		this.socialData.socket.send(JSON.stringify({
@@ -330,13 +362,34 @@ export default class SocialOverlayManager {
 		}));
 	}
 
-	sendChatMessage(user ,message) {
+	sendChatMessageUpdate(user ,message) {
 		this.socialData.socket.send(JSON.stringify({
 			type: 'send_message',
 			username: user,
 			message: message
 		}));
+
 	}
+
+	sendInviteToGameUpdate(targetUsername) {
+		this.socialData.socket.send(JSON.stringify({
+			type: 'send_lobby_invite',
+			username: targetUsername,
+			room_name: window.localStorage['room_name']
+		}));
+	}
+
+	acceptInviteToGameUpdate(inviteData) {
+		this.socialData.socket.send(JSON.stringify({
+			type: 'accept_lobby_invite',
+			room_name: inviteData.room_name
+		}));
+	}
+
+	declineInviteToGameUpdate(inviteData) {
+
+	}
+
 
 	// UI handlers
 	switchActiveTab(selectedTab) {

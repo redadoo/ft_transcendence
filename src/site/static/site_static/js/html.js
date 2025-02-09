@@ -915,6 +915,50 @@ const html = {
 			</div>
 		</div>
 	`,
+
+	lobbyGuest: `
+		<div class="container-fluid game-container">
+			<div class="row h-100">
+				<div class="col-2 px-0">
+					<nav class="nav-wrapper">
+						<div class="d-flex flex-column">
+							<div class="nav-link-left back" data-link="/multiplayer/pong">
+								<span class="hundin-font back">BACK</span>
+							</div>
+						</div>
+					</nav>
+				</div>
+
+				<div class="col-10 px-0">
+					<div class="lobby-container">
+						<div class="lobby-header">
+							<span class="pixel-font lobby-title">GAME LOBBY</span>
+						</div>
+
+						<div class="lobby-content">
+							<div class="players-container">
+								<div class="player-slot">
+									<div class="player-avatar">
+										<img src="/api/placeholder/80/80" alt="Player 1" id="player1Avatar">
+									</div>
+									<span class="pixel-font player-name" id="player1Name">WAITING...</span>
+									<span class="pixel-font player-status host">HOST</span>
+								</div>
+								<div class="player-slot empty">
+									<div class="player-avatar">
+										<img src="/api/placeholder/80/80" alt="Player 2" id="player2Avatar">
+									</div>
+									<span class="pixel-font player-name" id="player2Name">WAITING...</span>
+									<span class="pixel-font player-status">GUEST</span>
+								</div>
+							</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	`,
 };
 
 

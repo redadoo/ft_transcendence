@@ -5,6 +5,7 @@ import router from './router.js';
 import setupConfigEventListeners from './Config.js';
 import SocialOverlayManager from './overlay.js';
 import SocketHandler from './SocketHandler.js';
+import Game from '../../pong_static/js/Game.js';
 
 const views = {
 	// Auth views
@@ -218,13 +219,12 @@ const views = {
 		const player1Avatar = document.getElementById('player1Avatar');
 		const player2Avatar = document.getElementById('player2Avatar');
 
-		import('../../pong_static/js/Game.js')
-		.catch(e => console.error('Pong script error:', e));
+		const game = new Game();
+		await game.init();
 
-		await new Promise(r => setTimeout(r, 5000));
-
-		console.log("room_name:", Window.localStorage['room_name']);
-		lobbyCode.textContent = Window.localStorage['room_name'];
+		await new Promise(resolve => setTimeout(resolve, 1000));
+		console.log("room_name:", window.localStorage['room_name']);
+		lobbyCode.textContent = window.localStorage['room_name'];
 		api.getProfileInfo().then(data => {
 			player1Name.textContent = data.username;
 			player1Avatar.src = data.image_url.avatar_url;
@@ -239,6 +239,30 @@ const views = {
 				}, 2000);
 			});
 		});
+	},
+
+	async lobbyGuest() {
+		return html.lobbyGuest;
+	},
+
+	async lobbyGuestScripts() {
+		const player1Name = document.getElementById('player1Name');
+		const player2Name = document.getElementById('player2Name');
+		const player1Avatar = document.getElementById('player1Avatar');
+		const player2Avatar = document.getElementById('player2Avatar');
+
+		api.getProfileInfo().then(data => {
+			player2Name.textContent = data.username;
+			player2Avatar.src = data.image_url.avatar_url;
+		});
+
+		api.getUserProfile(window.localStorage['invited_username']).then(data => {
+			player1Name.textContent = data.username;
+			player1Avatar.src = data.image_url.avatar_url;
+		});
+
+		const game = new Game();
+		await game.init();
 	},
 };
 

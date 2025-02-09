@@ -14,6 +14,7 @@ const router = {
 			'/friends-profile': 'friendsProfile',
 			'/leaderboard': 'leaderboard',
 			'/lobby': 'lobby',
+			'/lobby/guest': 'lobbyGuest',
 			'/login': 'login',
 			'/login42': 'login42',
 			'/logout': 'logout',

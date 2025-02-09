@@ -70,6 +70,7 @@ export default class FriendListManager {
 				<span class="friend-action" id="blockUser">🔒</span>
 				<span class="friend-action" id="removeFriend">💔</span>
 				<span class="friend-chat-action" id="openChat">💬</span>
+				<span class="friend-action" id="inviteToGame">🎮</span>
 			</div>
 		`;
 	}
