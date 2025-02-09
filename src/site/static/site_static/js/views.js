@@ -214,12 +214,9 @@ const views = {
 
 	async lobbyScripts() {
 		const lobbyCode = document.getElementById('lobbyCode');
-		const copyButton = document.getElementById('copyCode');
-		const startButton = document.getElementById('startGame');
 		const player1Name = document.getElementById('player1Name');
-		const player2Name = document.getElementById('player2Name');
 		const player1Avatar = document.getElementById('player1Avatar');
-		const player2Avatar = document.getElementById('player2Avatar');
+		const startButton = document.getElementById('startGame');
 
 		const game = new Game();
 		await game.init();
@@ -230,6 +227,12 @@ const views = {
 		api.getProfileInfo().then(data => {
 			player1Name.textContent = data.username;
 			player1Avatar.src = data.image_url.avatar_url;
+		});
+
+		startButton.addEventListener('click', () => {
+			alert('Boia');
+			//aggiungi funzioni cose boh
+			//router.navigateTo('/pong'); usa questa funzione per cambiare view
 		});
 	},
 

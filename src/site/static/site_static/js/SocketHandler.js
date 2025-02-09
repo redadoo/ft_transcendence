@@ -183,16 +183,14 @@ export default class SocketHandler {
 		if (window.location.pathname === '/lobby' && playerData.username !== window.localStorage['username']) {
 			const player2Name = document.getElementById('player2Name');
 			const player2Avatar = document.getElementById('player2Avatar');
-
-			// const playerInfo = api.getUserProfile(playerData.username);
-			// console.log('Player info:', playerInfo);
-			// player2Name.textContent = playerInfo.username;
-			// player2Avatar.src = playerInfo.image_url.avatar_url;
+			const startButton = document.getElementById('startGame');
 
 			api.getUserProfile(playerData.username).then(data => {
 				player2Name.textContent = data.username;
 				player2Avatar.src = data.image_url.avatar_url;
 			});
+
+			startButton.disabled = false;
 		}
 	}
 
