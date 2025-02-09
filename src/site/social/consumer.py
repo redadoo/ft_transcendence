@@ -14,18 +14,8 @@ class SocialConsumer(AsyncWebsocketConsumer):
 		await self.accept()
 		await self.user.change_status({"new_status": "Online"})
 
-	async def disconnect(self, close_code):
-		"""
-		Remove the user from the channel group when they disconnect.
-		"""
-		await self.user.change_status({"new_status": "Offline"})
-		await self.channel_layer.group_discard(self.group_name, self.channel_name)
 
-	async def receive(self, text_data: dict):
-		data = json.loads(text_data)
-		event_type = data.get("type")
-
-		handler = {
+		self.event_mapping = {
 			"status_change": self.user.change_status,
 			"block_user": self.user.block_user,
 			"unblock_user": self.user.unblock_user,
@@ -36,8 +26,27 @@ class SocialConsumer(AsyncWebsocketConsumer):
 			"send_message": self.user.send_message,
 			"send_lobby_invite": self.user.send_lobby_invite,
 			"user_join_lobby": self.user_join_lobby
-		}.get(event_type, self.handle_unhandled_event)
+        }
 
+	async def disconnect(self, close_code):
+		"""
+		Remove the user from the channel group when they disconnect.
+		"""
+		await self.user.change_status({"new_status": "Offline"})
+		await self.channel_layer.group_discard(self.group_name, self.channel_name)
+
+	async def receive(self, text_data: str):
+		"""
+		Process incoming WebSocket messages.
+		"""
+		try:
+			data = json.loads(text_data)
+		except json.JSONDecodeError as e:
+			print(f"Invalid JSON received: {e}")
+			return
+
+		event_type = data.get("type")
+		handler = self.event_mapping.get(event_type, self.handle_unhandled_event)
 		await handler(data)
 
 	async def handle_unhandled_event(self, data):
@@ -48,7 +57,8 @@ class SocialConsumer(AsyncWebsocketConsumer):
 		"""
 		Generic method to send events to the WebSocket.
 		"""
-		await self.send(text_data=json.dumps({"type": event_type, **kwargs}))
+		payload = {"type": event_type, **kwargs}
+		await self.send(text_data=json.dumps(payload))
 
 	async def get_status_change(self, event: dict):
 		await self.send_event("get_status_change", friend_username=event["friend_username"], new_status=event["status"])
@@ -75,9 +85,6 @@ class SocialConsumer(AsyncWebsocketConsumer):
 		await self.send_event("get_message", username=event["username"], message=event["message"])
 
 	async def send_pong_lobby(self, event):
-		"""
-		Handles the event when a user joins a Pong lobby and notifies the social chat.
-		"""
 		self.lobby_room_name = event["room_name"]
 		await self.send_event("get_lobby_room_name", lobby_room_name=self.lobby_room_name)
 
@@ -85,4 +92,4 @@ class SocialConsumer(AsyncWebsocketConsumer):
 		await self.send_event("get_lobby_invite", room_name=event["room_name"], username=event["username"])
 
 	async def user_join_lobby(self, event):
-		await self.send_event("player_joined", username=event["username"])
+		await self.send_event("get_player_joined", username=event["username"])
