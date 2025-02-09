@@ -147,90 +147,90 @@ class PongSingleplayerConsumer(AsyncWebsocketConsumer):
 		await self.send(text_data=json.dumps(data_to_send))
 
 class PongLobbyConsumer(AsyncWebsocketConsumer):
-    async def connect(self):
-        """
-        Connects the user to a Pong lobby.
+	async def connect(self):
+		"""
+		Connects the user to a Pong lobby.
 
-        If no room name is provided via the URL route, a new unique room name is generated.
-        In that case, the consumer sends a notification to the social consumer so that it
-        can forward lobby invites. Then, the consumer retrieves or creates a lobby for the
-        room, adds the connection to the lobby's group, and accepts the WebSocket.
-        """
-        self.user = self.scope["user"]
-        self.user_id = self.user.id
-        self.room_name = self.scope["url_route"]["kwargs"].get("room_name")
+		If no room name is provided via the URL route, a new unique room name is generated.
+		In that case, the consumer sends a notification to the social consumer so that it
+		can forward lobby invites. Then, the consumer retrieves or creates a lobby for the
+		room, adds the connection to the lobby's group, and accepts the WebSocket.
+		"""
+		self.user = self.scope["user"]
+		self.user_id = self.user.id
+		self.room_name = self.scope["url_route"]["kwargs"].get("room_name")
 
-        if self.room_name is None:
-            self.room_name = str(uuid.uuid4())
-            await self.channel_layer.group_send(
-                f"user_{self.user_id}",
-                {
-                    "type": "send_pong_lobby",
-                    "room_name": self.room_name,
-                }
-            )
+		if self.room_name is None:
+			self.room_name = str(uuid.uuid4())
+			await self.channel_layer.group_send(
+				f"user_{self.user_id}",
+				{
+					"type": "send_pong_lobby",
+					"room_name": self.room_name,
+				}
+			)
 
-        self.lobby = match_manager.get_match(self.room_name)
-        if self.lobby is None:
-            self.lobby = match_manager.create_match("pong", self.room_name, PongGameManager(), "lobby")
+		self.lobby = match_manager.get_match(self.room_name)
+		if self.lobby is None:
+			self.lobby = match_manager.create_match("pong", self.room_name, PongGameManager(), "lobby")
 
-        await self.channel_layer.group_add(self.lobby.room_group_name, self.channel_name)
-        await self.accept()
+		await self.channel_layer.group_add(self.lobby.room_group_name, self.channel_name)
+		await self.accept()
 
-    async def disconnect(self, close_code):
-        """
-        Disconnects the user from the lobby by removing them from the lobby group.
-        """
-        if hasattr(self, "lobby") and self.lobby:
-            await self.channel_layer.group_discard(self.lobby.room_group_name, self.channel_name)
+	async def disconnect(self, close_code):
+		"""
+		Disconnects the user from the lobby by removing them from the lobby group.
+		"""
+		if hasattr(self, "lobby") and self.lobby:
+			await self.channel_layer.group_discard(self.lobby.room_group_name, self.channel_name)
 
-    async def receive(self, text_data: str):
-        """
-        Receives a JSON-formatted message from the WebSocket and delegates event handling to the lobby.
+	async def receive(self, text_data: str):
+		"""
+		Receives a JSON-formatted message from the WebSocket and delegates event handling to the lobby.
 
-        Args:
-            text_data (str): The JSON message received from the client.
-        """
-        try:
-            data = json.loads(text_data)
-        except json.JSONDecodeError as e:
-            print(f"Error decoding JSON: {e}")
-            return
+		Args:
+			text_data (str): The JSON message received from the client.
+		"""
+		try:
+			data = json.loads(text_data)
+		except json.JSONDecodeError as e:
+			print(f"Error decoding JSON: {e}")
+			return
 
-        await self.lobby.manage_event(data)
+		await self.lobby.manage_event(data)
 
-    async def lobby_state(self, event: dict):
-        """
-        Sends updated lobby state information to the client.
+	async def lobby_state(self, event: dict):
+		"""
+		Sends updated lobby state information to the client.
 
-        Additionally, if the event indicates that a new player has joined (via the 'player_join'
-        event name), it fetches the player's username and notifies the social consumer so that
-        related UI updates can be triggered on the client side.
+		Additionally, if the event indicates that a new player has joined (via the 'player_join'
+		event name), it fetches the player's username and notifies the social consumer so that
+		related UI updates can be triggered on the client side.
 
-        Args:
-            event (dict): The event data containing at least an 'event_info' key.
-                          It may also include 'event_name' and 'player_id' if the event is related
-                          to a player joining.
-        """
-        data_to_send = {
-            "event_info": event,
-            "lobby_info": self.lobby.to_dict()
-        }
+		Args:
+			event (dict): The event data containing at least an 'event_info' key.
+						  It may also include 'event_name' and 'player_id' if the event is related
+						  to a player joining.
+		"""
+		data_to_send = {
+			"event_info": event,
+			"lobby_info": self.lobby.to_dict()
+		}
 
-        event_name = event.get("event_name")
-        player_id = event.get("player_id")
+		event_name = event.get("event_name")
+		player_id = event.get("player_id")
 
-        if event_name == "player_join" and player_id:
-            user = await sync_to_async(User.objects.get)(id=int(player_id))
-            await self.channel_layer.group_send(
-                f"user_{self.user_id}",
-                {
-                    "type": "user_join_lobby",
-                    "username": user.username,
-                }
-            )
+		if event_name == "player_join" and player_id:
+			user = await sync_to_async(User.objects.get)(id=int(player_id))
+			await self.channel_layer.group_send(
+				f"user_{self.user_id}",
+				{
+					"type": "user_join_lobby",
+					"username": user.username,
+				}
+			)
 
-        await self.send(text_data=json.dumps(data_to_send))
+		await self.send(text_data=json.dumps(data_to_send))
 
 class PongTournament(AsyncWebsocketConsumer):
 
