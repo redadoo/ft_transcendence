@@ -6,6 +6,7 @@ import PongPlayer from './Scritps/Class/PongPlayer.js';
 import Background from './Scritps/Class/Background.js';
 import SocketManager from '../../common_static/js/SocketManager.js';
 import MatchmakingManager from  '../../common_static/js/MatchmakingManager.js';
+import router from '../../site_static/js/router.js';
 
 const CAMERA_SETTINGS = {
 	FOV: 75,
@@ -335,35 +336,74 @@ export default class Game
 		}
 	}
 
+	send_ready()
+	{
+		this.gameSocket.send(JSON.stringify({ type: 'private lobby setuped' }));
+	}
+
 	/**
 	 * Sets up the lobby based on socket data.
 	 * @param {Object} data - Socket data about the lobby event.
 	 */
 	setUpLobby(data)
 	{
-		if (this.bounds == null) this.initGameEnvironment(data);
-
-		if (this.pongOpponent != null && this.pongPlayer != null)
-			this.gameSocket.send(JSON.stringify({ type: 'lobby setuped' }));
-		else
+		if (window.location.pathname.includes("/lobby"))
 		{
-			if (data.event_info.event_name === "recover_player_data")
+			if (data.event_info.event_name === "host_started_game")
 			{
-				const players = data.lobby_info.players;
-
-				for (const [key, value] of Object.entries(players))
-				{
-					if (this.pongPlayer != null && this.pongPlayer.playerId == parseInt(key))
-						continue;
-					this.AddUserToLobby(key,value);
-				}
+				this.gameSocket.send(JSON.stringify({ type: 'private lobby setuped' }));
+				this.gameSocket.send(JSON.stringify({ type: 'lobby setuped' }));
+				router.navigateTo('/lobby/playing');
+				return;
 			}
 
-			if (data.event_info.event_name === "player_join")
+			if (this.bounds == null) this.initGameEnvironment(data);
+			
+			if (data.event_info.event_name === "recover_player_data")
+				{
+					const players = data.lobby_info.players;
+	
+					for (const [key, value] of Object.entries(players))
+					{
+						if (this.pongPlayer != null && this.pongPlayer.playerId == parseInt(key))
+							continue;
+						this.AddUserToLobby(key,value);
+					}
+				}
+	
+				if (data.event_info.event_name === "player_join")
+				{
+					const newPlayerId = data.event_info.player_id;
+					const playerData = data.lobby_info.players[data.event_info.player_id];
+					this.AddUserToLobby(newPlayerId, playerData);
+				}
+		}
+		else
+		{
+			if (this.bounds == null) this.initGameEnvironment(data);
+
+			if (this.pongOpponent != null && this.pongPlayer != null)
+				this.gameSocket.send(JSON.stringify({ type: 'lobby setuped' }));
+			else
 			{
-				const newPlayerId = data.event_info.player_id;
-				const playerData = data.lobby_info.players[data.event_info.player_id];
-				this.AddUserToLobby(newPlayerId, playerData);
+				if (data.event_info.event_name === "recover_player_data")
+				{
+					const players = data.lobby_info.players;
+	
+					for (const [key, value] of Object.entries(players))
+					{
+						if (this.pongPlayer != null && this.pongPlayer.playerId == parseInt(key))
+							continue;
+						this.AddUserToLobby(key,value);
+					}
+				}
+	
+				if (data.event_info.event_name === "player_join")
+				{
+					const newPlayerId = data.event_info.player_id;
+					const playerData = data.lobby_info.players[data.event_info.player_id];
+					this.AddUserToLobby(newPlayerId, playerData);
+				}
 			}
 		}
 	}

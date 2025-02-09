@@ -169,9 +169,9 @@ class PongLobbyConsumer(AsyncWebsocketConsumer):
 				}
 			)
 
-		self.lobby = match_manager.get_match(self.room_name)
+		self.lobby: Lobby = match_manager.get_match(self.room_name)
 		if self.lobby is None:
-			self.lobby = match_manager.create_match("pong", self.room_name, PongGameManager(), "lobby")
+			self.lobby: Lobby = match_manager.create_match("pong", self.room_name, PongGameManager(), "lobby")
 
 		await self.channel_layer.group_add(self.lobby.room_group_name, self.channel_name)
 		await self.accept()
@@ -195,6 +195,16 @@ class PongLobbyConsumer(AsyncWebsocketConsumer):
 			print(f"Error decoding JSON: {e}")
 			return
 
+		event_type = data.get("type")
+		if event_type == "private lobby setuped":
+			print("several")
+			data_to_send = {
+				"type": "lobby_state",
+				"event_name": "host_started_game",
+			}
+			await self.lobby.broadcast_message(data_to_send)
+			return
+
 		await self.lobby.manage_event(data)
 
 	async def lobby_state(self, event: dict):
@@ -216,6 +226,10 @@ class PongLobbyConsumer(AsyncWebsocketConsumer):
 		}
 
 		event_name = event.get("event_name")
+		# if event_name == "host_started_game":
+		# 	print("dioooooo")
+		
+		
 		player_id = event.get("player_id")
 
 		if event_name == "player_join" and player_id:
@@ -227,6 +241,7 @@ class PongLobbyConsumer(AsyncWebsocketConsumer):
 					"username": user.username,
 				}
 			)
+
 
 		await self.send(text_data=json.dumps(data_to_send))
 

@@ -15,6 +15,7 @@ const router = {
 			'/leaderboard': 'leaderboard',
 			'/lobby': 'lobby',
 			'/lobby/guest': 'lobbyGuest',
+			'/lobby/playing': 'lobbyPlaying',
 			'/login': 'login',
 			'/login42': 'login42',
 			'/logout': 'logout',

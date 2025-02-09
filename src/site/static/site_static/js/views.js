@@ -220,6 +220,7 @@ const views = {
 
 		const game = new Game();
 		await game.init();
+		game.sceneManager.animate();
 
 		await new Promise(resolve => setTimeout(resolve, 1000));
 		console.log("room_name:", window.localStorage['room_name']);
@@ -230,14 +231,21 @@ const views = {
 		});
 
 		startButton.addEventListener('click', () => {
-			alert('Boia');
-			//aggiungi funzioni cose boh
-			//router.navigateTo('/pong'); usa questa funzione per cambiare view
+			game.send_ready();
+			router.navigateTo('/lobby/playing');
 		});
 	},
 
 	async lobbyGuest() {
 		return html.lobbyGuest;
+	},
+
+	async lobbyPlaying() {
+		return html.singleplayerPong;
+	},
+	
+	async lobbyPlayingScripts() {
+
 	},
 
 	async lobbyGuestScripts() {
@@ -258,6 +266,7 @@ const views = {
 
 		const game = new Game();
 		await game.init();
+		game.sceneManager.animate();
 	},
 };
 
