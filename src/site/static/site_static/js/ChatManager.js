@@ -156,7 +156,7 @@ export default class ChatManager {
 
 		this.addMessage(message, this.currentUsername);
 
-		this.socialOverlay.sendChatMessage(this.activeChat, message);
+		this.socialOverlay.sendChatMessageUpdate(this.activeChat, message);
 
 		messageInput.value = '';
 	}

@@ -27,6 +27,7 @@ export default class SocialOverlayManager {
 			chat: this.openChat.bind(this),
 			inviteToGame: this.sendInviteToGame.bind(this),
 			acceptInviteToGame: this.acceptInviteToGame.bind(this),
+
 		}
 		this.initializeUIElements();
 		this.notificationManager = new NotificationManager();
@@ -306,7 +307,7 @@ export default class SocialOverlayManager {
 	acceptInviteToGame(inviteData) {
 		window.localStorage[`room_name`] = inviteData.room_name;
 		window.localStorage[`invited_username`] = inviteData.username;
-		
+
 		router.navigateTo('/lobby/guest');
 	}
 

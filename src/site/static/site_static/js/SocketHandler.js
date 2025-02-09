@@ -149,7 +149,7 @@ export default class SocketHandler {
 		this.notificationManager.addNotification({
 			type: 'chat_message',
 			title: `New message from ${messageData.username}`,
-			message: messageData.message.message_text
+			message: messageData.message
 		});
 	}
 
@@ -184,9 +184,15 @@ export default class SocketHandler {
 			const player2Name = document.getElementById('player2Name');
 			const player2Avatar = document.getElementById('player2Avatar');
 
-			playerInfo = api.getUserProfile(playerData.username);
-			player2Name.textContent = playerInfo.username;
-			player2Avatar.src = playerInfo.image_url.avatar_url;
+			// const playerInfo = api.getUserProfile(playerData.username);
+			// console.log('Player info:', playerInfo);
+			// player2Name.textContent = playerInfo.username;
+			// player2Avatar.src = playerInfo.image_url.avatar_url;
+
+			api.getUserProfile(playerData.username).then(data => {
+				player2Name.textContent = data.username;
+				player2Avatar.src = data.image_url.avatar_url;
+			});
 		}
 	}
 
