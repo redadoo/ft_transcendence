@@ -40,6 +40,7 @@ const views = {
 			e.preventDefault();
 			const res = await api.login(document.getElementById('username').value, document.getElementById('password').value);
 			if (res.success === 'true') {
+				window.localStorage['username'] = document.getElementById('username').value;
 				router.navigateTo('/');
 			}
 			else {

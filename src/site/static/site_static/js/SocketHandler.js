@@ -1,3 +1,5 @@
+import api from './api.js';
+
 export default class SocketHandler {
 	constructor(socialData, userActions, notificationManager, friendListManager, chatManager) {
 		this.socialData = socialData;
@@ -176,5 +178,16 @@ export default class SocketHandler {
 		});
 	}
 
+	handlePlayerJoined(playerData) {
+		console.log('👥 Handling player joined:', playerData);
+		if (window.location.pathname === '/lobby' && playerData.username !== window.localStorage['username']) {
+			const player2Name = document.getElementById('player2Name');
+			const player2Avatar = document.getElementById('player2Avatar');
+
+			playerInfo = api.getUserProfile(playerData.username);
+			player2Name.textContent = playerInfo.username;
+			player2Avatar.src = playerInfo.image_url.avatar_url;
+		}
+	}
 
 }
