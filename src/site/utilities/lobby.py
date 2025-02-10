@@ -119,13 +119,16 @@ class Lobby:
 		try:
 			while self.game_manager.game_loop_is_active:
 				async with self.update_lock:
-					print("sadsad sa as")
 					await self.game_manager.game_loop()
 					await asyncio.sleep(1 / 60)
 					await self.broadcast_message({
 						"type": "lobby_state",
 						"event": "game_loop"
 						})
+			await self.broadcast_message({
+				"type": "lobby_state",
+				"event": "game_finished"
+				})
 		except asyncio.CancelledError:
 			print("Game loop task was cancelled.")
 
