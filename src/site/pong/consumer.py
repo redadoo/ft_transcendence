@@ -197,15 +197,13 @@ class PongLobbyConsumer(AsyncWebsocketConsumer):
 
 		event_type = data.get("type")
 		if event_type == "private lobby setuped":
-			print("several")
 			data_to_send = {
 				"type": "lobby_state",
 				"event_name": "host_started_game",
 			}
 			await self.lobby.broadcast_message(data_to_send)
-			return
-
-		await self.lobby.manage_event(data)
+		else:
+			await self.lobby.manage_event(data)
 
 	async def lobby_state(self, event: dict):
 		"""
@@ -226,10 +224,6 @@ class PongLobbyConsumer(AsyncWebsocketConsumer):
 		}
 
 		event_name = event.get("event_name")
-		# if event_name == "host_started_game":
-		# 	print("dioooooo")
-		
-		
 		player_id = event.get("player_id")
 
 		if event_name == "player_join" and player_id:
