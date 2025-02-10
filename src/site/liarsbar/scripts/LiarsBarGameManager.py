@@ -113,6 +113,9 @@ class LiarsBarGameManager(GameManager):
 			cards_to_deal = self.deck[:HAND_SIZE]
 			self.deck = self.deck[HAND_SIZE:]
 			player.hand.clear()
+			player.card_selection_index = 0
+			player.selected_index.clear()
+			player.selected_cards.clear
 			player.player_turn = False
 			player.add_cards_to_hand(cards_to_deal)
 			card_names = [card.to_dict() for card in player.hand]

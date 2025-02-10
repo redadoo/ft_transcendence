@@ -78,9 +78,12 @@ class Game
 		this.initLights();
 
 		await this.sceneManager.modelManager.loadModel({
-			'/static/liarsbar_static/assets/liarsbar/LobbyScene2.glb': 'LobbyScene',
+			'/static/liarsbar_static/assets/liarsbar/liars_room.glb': 'LobbyScene',
 			'/static/liarsbar_static/assets/liarsbar/human.glb': 'human',
-			'/static/liarsbar_static/assets/liarsbar/king_boo.glb': 'test'
+			'/static/liarsbar_static/assets/liarsbar/king_boo.glb': 'kingboo',
+			'/static/liarsbar_static/assets/liarsbar/rimuru_slime.glb': 'rimuru',
+			'/static/liarsbar_static/assets/liarsbar/winged_kuriboh.glb': 'kuriboh',
+			'/static/liarsbar_static/assets/liarsbar/slime_gun.glb': 'slimegun'
 		});
 
 		this.initLobbyScene();
@@ -106,23 +109,37 @@ class Game
 	{
 		this.ambientLight = new THREE.AmbientLight(0xb0e0e6, 10.1);
 
-		this.pointLight = new THREE.SpotLight(0xFFB84D, 850000, 500);
-		this.pointLight.position.set(0, 300, -250);
-		this.pointLight.target.position.set(0, -1000, 0);
+		// PointLight che si propaga in tutte le direzioni
+		this.pointLight = new THREE.PointLight(0xFFB84D, 5000000, 1500); // (Colore, Intensità, Distanza massima)
+		this.pointLight.position.set(-300, 250, -40);
 
+		// Abilita le ombre
 		this.pointLight.castShadow = true;
 		this.pointLight.shadow.camera.near = 1;
-		this.pointLight.shadow.camera.far = 500;
-		this.pointLight.shadow.camera.left = -200;
-		this.pointLight.shadow.camera.right = 200;
-		this.pointLight.shadow.camera.top = 200;
-		this.pointLight.shadow.camera.bottom = -200;
-		this.pointLight.shadow.mapSize.set(1024, 1024);
-		this.pointLight.shadow.normalBias = 0.1;
+		this.pointLight.shadow.camera.far = 2000;
+		this.pointLight.shadow.mapSize.set(2048, 2048);
 		this.pointLight.shadow.bias = -0.0001;
 
-		this.sceneManager.scene.add(this.ambientLight);
+		// Helper per visualizzare la PointLight
+		const pointLightHelper = new THREE.PointLightHelper(this.pointLight, 50);
+
 		this.sceneManager.scene.add(this.pointLight);
+		this.sceneManager.scene.add(pointLightHelper);
+
+		// Seconda PointLight (gialla)
+		this.yellowLight = new THREE.PointLight(0xFFD700, 5000000, 1500); // Giallo dorato
+		this.yellowLight.position.set(0, 400, 500);
+		this.yellowLight.castShadow = true;
+		this.yellowLight.shadow.camera.near = 1;
+		this.yellowLight.shadow.camera.far = 2000;
+		this.yellowLight.shadow.mapSize.set(2048, 2048);
+		this.yellowLight.shadow.bias = -0.0001;
+		const yellowLightHelper = new THREE.PointLightHelper(this.yellowLight, 50);
+		this.sceneManager.scene.add(this.yellowLight);
+		this.sceneManager.scene.add(yellowLightHelper);
+
+
+		this.sceneManager.scene.add(this.ambientLight);
 	}
 
 	/**
@@ -131,18 +148,42 @@ class Game
 	initLobbyScene() 
 	{
 		const LobbyScene = this.sceneManager.modelManager.getModel("LobbyScene");
-		LobbyScene.scene.scale.set(9, 9, 9);
-		LobbyScene.scene.rotation.y = 90;
-		LobbyScene.scene.position.set(230, 0, 0);
+		LobbyScene.scene.scale.set(10000, 10000, 10000);
+		LobbyScene.scene.rotation.y = 0;
+		LobbyScene.scene.position.set(0, 0, 0);
 
 		this.sceneManager.scene.add(LobbyScene.scene);
 
-		const bo = this.sceneManager.modelManager.getModel("test");
-		bo.scene.scale.set(119, 119, 119);
-		bo.scene.rotation.y = 90;
-		bo.scene.position.set(230, 0, 0);
+		const bo = this.sceneManager.modelManager.getModel("kingboo");
+		bo.scene.scale.set(170, 170, 170);
+		bo.scene.rotation.y = 0;
+		bo.scene.position.set(200, 100, -400);
+
+		const slimegun = this.sceneManager.modelManager.getModel("slimegun");
+		slimegun.scene.scale.set(4000, 4000, 4000);
+		slimegun.scene.rotation.y = 90;
+		slimegun.scene.position.set(200, 100, -400);
+
+		const bo3 = this.sceneManager.modelManager.getModel("rimuru");
+		bo3.scene.scale.set(30, 30, 30);
+		bo3.scene.rotation.y = 180;
+		bo3.scene.position.set(200, 100, -400);
+
+		const bo4 = this.sceneManager.modelManager.getModel("kuriboh");
+		bo4.scene.scale.set(3, 3, 3);
+		bo4.scene.rotation.y = 0;
+		bo4.scene.position.set(200, 100, -400);
+
+		const axesHelper = new THREE.AxesHelper(500); // La dimensione determina la lunghezza degli assi
+		this.sceneManager.scene.add(axesHelper);
+		const gridHelper = new THREE.GridHelper(10000, 10); // (Dimensione, Divisioni)
+		this.sceneManager.scene.add(gridHelper);
 
 		this.sceneManager.scene.add(bo.scene);
+		this.sceneManager.scene.add(slimegun.scene);
+		this.sceneManager.scene.add(bo3.scene);
+		this.sceneManager.scene.add(bo4.scene);
+	
 	}
 
 	/**

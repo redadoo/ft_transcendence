@@ -35,7 +35,7 @@ export default class SceneManager
 
         this.fov = 45;
         this.nearPlane = 1;
-        this.farPlane = 1000;
+        this.farPlane = 10000;
 
         this.needOrbital = needOrbital;
         this.accumulatedTime = 0;

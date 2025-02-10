@@ -125,7 +125,8 @@ class LiarsBarPlayer(Player):
 							self.selected_index.append(index)
 							print(f"Index {index} added. Current indices: {self.selected_index}")
 				elif key == "Enter":
-					if self.player_turn and not self.card_sent:
+					if self.player_turn and not self.card_sent and self.selected_index:
+						self.card_selection_index = 0
 						print("premuto enter e passato controllo")
 						self.selected_cards.clear()
 						# Ordina gli indici in ordine decrescente per evitare problemi di rimozione
