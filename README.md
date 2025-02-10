@@ -56,4 +56,6 @@ read [Subject](https://github.com/redadoo/ft_transcendence/blob/master/en.subjec
 
 [dockerignore](https://docs.docker.com/build/concepts/context/#dockerignore-files)
 
-[-prometheus-and-grafana](https://rezakhademix.medium.com/a-complete-guide-to-monitor-postgresql-with-prometheus-and-grafana-5611af229882)
+[prometheus-and-grafana](https://rezakhademix.medium.com/a-complete-guide-to-monitor-postgresql-with-prometheus-and-grafana-5611af229882)
+
+[prometheus-and-grafana 2](https://nelsoncode.medium.com/how-to-monitor-posgresql-with-prometheus-and-grafana-docker-36d216532ea2)
