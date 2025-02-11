@@ -150,6 +150,8 @@ class PongLobbyConsumer(AsyncWebsocketConsumer):
 		self.user = self.scope["user"]
 		self.user_id = self.user.id
 		self.room_name = self.scope["url_route"]["kwargs"].get("room_name")
+		
+		#if room_name is not in url_route we are host of the lobby
 		if self.room_name is None:
 			self.room_name = str(uuid.uuid4())
 			await self.channel_layer.group_send(
@@ -233,11 +235,51 @@ class PongLobbyConsumer(AsyncWebsocketConsumer):
 class PongTournament(AsyncWebsocketConsumer):
 
 	async def connect(self):
-		self.tournament = Tournament()
+		self.user = self.scope["user"]
+		self.user_id = self.user.id
+		self.room_name = self.scope["url_route"]["kwargs"].get("room_name")
+
+		#if room_name is not in url_route we are host of the lobby
+		if self.room_name is None:
+			self.room_name = str(uuid.uuid4())
+			await self.channel_layer.group_send(
+				f"user_{self.user_id}",
+				{
+					"type": "send_pong_tournament",
+					"room_name": self.room_name,
+				}
+			)
+
+		self.tournament: Tournament = match_manager.get_match(self.room_name) 
+		if self.lobby is None:
+			self.tournament: Tournament = match_manager.create_match("pong", self.room_name, PongGameManager(), "tournament")
 
 		await self.channel_layer.group_add(self.tournament.room_group_name, self.channel_name)
 		await self.accept()
-	
+
+	async def receive(self, text_data: str):
+		"""
+		Receives a JSON-formatted message from the WebSocket and delegates event handling to the tournament.
+
+		Args:
+			text_data (str): The JSON message received from the client.
+		"""
+		try:
+			data = json.loads(text_data)
+		except json.JSONDecodeError as e:
+			print(f"Error decoding JSON: {e}")
+			return
+
+		event_type = data.get("type")
+		if event_type == "client_ready":
+			data_to_send = {
+				"type": "lobby_state",
+				"event_name": "host_started_game",
+			}
+			await self.tournament.broadcast_message(data_to_send)
+
+		await self.tournament.manage_event(data)
+
 	async def lobby_state(self, event: dict):
 		"""Aggiorna lo stato lato client."""
 

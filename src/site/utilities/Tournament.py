@@ -15,6 +15,7 @@ class Tournament():
 	def __init__(self, game_name: str, room_name: str, game_manager: GameManager):
 		self.room_group_name = f"{game_name}_tournament_{room_name}"
 		self.tournament_status = self.TournamentStatus.TO_SETUP
+		self.channel_layer = get_channel_layer()
 		self.update_lock = asyncio.Lock()
 		self.game_manager = game_manager
 		self.tournament_player = 4
@@ -54,17 +55,22 @@ class Tournament():
 			while True:
 				async with self.update_lock:
 					await self.game_manager.game_loop()
-					await asyncio.sleep(1 / 60)
-					await self.broadcast_message({
-						"type": "lobby_state",
-						"event": "game_loop"
-						})
+				await asyncio.sleep(1 / 60)
+				await self.broadcast_message({
+					"type": "lobby_state",
+					"event": "game_loop"
+				})
 		except asyncio.CancelledError:
 			print("Game loop task was cancelled.")
+		finally:
+			self.tournament_status = self.TournamentStatus.ENDED
+			await self.broadcast_message({
+				"type": "lobby_state",
+				"event": "game_finished"
+			})
 
 	async def broadcast_message(self, message: dict):
-		channel_layer = get_channel_layer()
-		await channel_layer.group_send(self.room_group_name, message)
+		await self.channel_layer.group_send(self.room_group_name, message)
 	
 	async def manage_event(self, data: dict):
 		event_type = data.get("type")

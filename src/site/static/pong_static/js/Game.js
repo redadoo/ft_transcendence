@@ -1,6 +1,8 @@
 import SinglePlayerPongMode from './utils/pongMode/SinglePlayerPongMode.js';
 import MultiplayerPongMode from './utils/pongMode/MultiplayerPongMode.js';
 import PrivateLobbyPongMode from './utils/pongMode/PrivateLobbyPongMode.js';
+import TournamentPongMode from './utils/pongMode/TournamentPongMode.js';
+
 import * as THREE from '../../lib/threejs/src/Three.js';
 import SceneManager from '../../common_static/js/SceneManager.js';
 import Bounds from './utils/Bounds.js';
@@ -144,6 +146,8 @@ export default class Game
 			case 'lobby':
 				this.mode = new PrivateLobbyPongMode(this);
 				break;
+			case 'tournament':
+				this.mode = new TournamentPongMode(this);
 			default:
 				console.error("Modalità di gioco non valida.");
 		}
