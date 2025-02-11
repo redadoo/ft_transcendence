@@ -1,31 +1,22 @@
-import uuid
-from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from .models import *
 from .serializers import *
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.views import APIView
+from rest_framework import status
+from django.db.models import Q
 
-# @api_view(['GET'])
-# def start_singleplayer_pong_game(request):
-# 	room_name = str(uuid.uuid4())
-# 	return Response({'room_name' : room_name})
+class LastPongMatchView(APIView):
 
-# @api_view(['GET'])
-# def start_multiplayer_pong_game(request):
-# 	room_name = str(uuid.uuid4())
-# 	return Response({'room_name' : room_name})
+    permission_classes = [IsAuthenticated]
+    def get(self, request):
+        user = request.user
 
-# def start_tournament_pong(request):
-# 	tournament_code = str(uuid.uuid4())
-# 	return Response({'tournament_code' : tournament_code})
+        last_match = PongMatch.objects.filter(
+            Q(first_user=user) | Q(second_user=user)
+        ).order_by('-start_date').first() 
 
-# def join_pong_tournament(request):
-# 	tournament_code = request.GET.get('tournament_code')
-# 	return Response({'tournament_code' : tournament_code})
-
-# def start_pong_tournament_match(request):
-# 	tournament_code = request.GET.get('tournament_code')
-# 	return Response({'tournament_code' : tournament_code})
-
-# def get_match_winner(request):
-# 	tournament_code = request.GET.get('tournament_code')
-# 	return Response({'tournament_code' : tournament_code})
+        if last_match:
+            serializer = PongMatchSerializer(last_match)
+            return Response(serializer.data)
+        return Response({"detail": "No matches found"}, status=status.HTTP_400_BAD_REQUEST)
