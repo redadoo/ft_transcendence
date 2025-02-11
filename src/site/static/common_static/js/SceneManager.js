@@ -218,11 +218,11 @@ export default class SceneManager
 			this.controls.dispose();
 			this.controls = null;
 		} 
-		// if (this.stats)
-		// {
-		// 	document.body.removeChild(this.stats.dom);
-		// 	this.stats = null;
-		// }
+		if (this.stats)
+		{
+			document.body.removeChild(this.stats.dom);
+			this.stats = null;
+		}
 		window.removeEventListener("resize", this.onWindowResize);
 	}
 }
