@@ -266,13 +266,20 @@ export default class Game
      */
 	updateGameState(data)
 	{
-		if (data.ball)
-			this.ball.updatePosition(data.ball);
-
-		if (data.players)
+		try
 		{
-			this.pongPlayer.updatePosition(data.players[this.pongPlayer.playerId].y);
-			this.pongOpponent.updatePosition(data.players[this.pongOpponent.playerId].y);
+			if (data.ball)
+				this.ball.updatePosition(data.ball);
+	
+			if (data.players)
+			{
+				this.pongPlayer.updatePosition(data.players[this.pongPlayer.playerId].y);
+				this.pongOpponent.updatePosition(data.players[this.pongOpponent.playerId].y);
+			}
+		}
+		catch (error) {
+			console.error("An error occurred during game update state:", error);
+			console.error("data:", data);
 		}
 	}
 

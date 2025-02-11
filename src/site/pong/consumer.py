@@ -123,10 +123,11 @@ class PongSingleplayerConsumer(AsyncWebsocketConsumer):
 
 	async def receive(self, text_data):
 		data = json.loads(text_data)
+		if data.get("type") == "client_ready":
+			await self.lobby.mark_player_ready("-1")
 		await self.lobby.manage_event(data)
 		if data.get("type") == "init_player":
 			await self.lobby.add_player_to_lobby({"player_id" : "-1"}, True)
-			await self.lobby.start_game()
 
 	async def lobby_state(self, event: dict):
 		"""Aggiorna lo stato lato client."""
@@ -187,7 +188,7 @@ class PongLobbyConsumer(AsyncWebsocketConsumer):
 			return
 
 		event_type = data.get("type")
-		if event_type == "lobby setuped":
+		if event_type == "client_ready":
 			data_to_send = {
 				"type": "lobby_state",
 				"event_name": "host_started_game",

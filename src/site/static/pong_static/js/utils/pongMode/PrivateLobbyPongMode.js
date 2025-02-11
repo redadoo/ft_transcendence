@@ -48,7 +48,10 @@ export default class PrivateLobbyPongMode extends PongMode {
 	 */
 	sendStart() 
 	{
-		this.socket.send(JSON.stringify({ type: 'lobby setuped' }));
+		this.socket.send(JSON.stringify({ 
+			type: 'client_ready',
+			player_id: this.game.player_id
+		 }));
 	}
 
 	/**

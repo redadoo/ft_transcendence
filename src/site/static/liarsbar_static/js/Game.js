@@ -205,7 +205,7 @@ class Game
 		else
 			this.players[joinedPlayerId] = new LiarsBarPlayer(null, joinedPlayerId);
 		if (Object.keys(this.players).length === 4) 
-			this.gameSocket.send(JSON.stringify({ type: 'lobby setuped' }));
+			this.gameSocket.send(JSON.stringify({ type: 'client_ready' }));
 	}
 
 	/**

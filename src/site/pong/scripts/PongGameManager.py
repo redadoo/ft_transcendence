@@ -8,7 +8,7 @@ from utilities.GameManager import GameManager
 from pong.scripts.ai import PongAI
 from utilities.Player import Player
 from website.models import User, MatchHistory
-from datetime import datetime, timezone
+from datetime import datetime
 
 class PongGameManager(GameManager):
 	def __init__(self):

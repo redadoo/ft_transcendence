@@ -3,6 +3,7 @@ from enum import Enum
 from channels.layers import get_channel_layer
 from utilities.GameManager import GameManager
 
+
 class Lobby:
 	"""
 	A class representing a multiplayer lobby for managing the game state, players, and events.
@@ -20,14 +21,16 @@ class Lobby:
 		Initializes a new lobby with the specified room name and game manager.
 
 		Args:
+			game_name (str): The name of the game.
 			room_name (str): The name of the room (used for group communication).
 			game_manager (GameManager): The game manager responsible for managing the game state and players.
 		"""
 		self.room_group_name = f"{game_name}_lobby_{room_name}"
 		self.lobby_status = Lobby.LobbyStatus.TO_SETUP
+		self.channel_layer = get_channel_layer()
 		self.update_lock = asyncio.Lock()
 		self.game_manager = game_manager
-		self.client_ready = 0
+		self.ready_players = set()
 
 	async def broadcast_message(self, message: dict):
 		"""
@@ -36,8 +39,7 @@ class Lobby:
 		Args:
 			message (dict): The message to send, typically containing event type and data.
 		"""
-		channel_layer = get_channel_layer()
-		await channel_layer.group_send(self.room_group_name, message)
+		await self.channel_layer.group_send(self.room_group_name, message)
 
 	async def manage_event(self, data: dict):
 		"""
@@ -50,12 +52,14 @@ class Lobby:
 		if not event_type:
 			print("Event type is missing in the received data.")
 			return
-		
+
 		match event_type:
 			case "init_player":
-				await self.add_player_to_lobby(data, False)
-			case "lobby setuped":
-				await self.start_game()
+				await self.add_player_to_lobby(data, is_bot=False)
+			case "client_ready":
+				player_id = data.get("player_id")
+				if player_id is not None:
+					await self.mark_player_ready(player_id)
 			case "update_player":
 				self.game_manager.update_player(data)
 			case "quit_game":
@@ -63,26 +67,40 @@ class Lobby:
 			case _:
 				print(f"Unhandled event type: {event_type}. Full data: {data}")
 
-	async def start_game(self):
-		self.client_ready += 1
+	async def mark_player_ready(self, player_id: int):
+		"""
+		Marks the specified player as ready and starts the game if all players are ready.
 
-		if self.client_ready == self.game_manager.max_players:
-			self.lobby_status = Lobby.LobbyStatus.PLAYING
-			self.game_manager.start_game()
-			self.game_loop_task = asyncio.create_task(self.game_loop())
-			data_to_send = {
-				"type": "lobby_state",
-				"event_name": "game_started",
-			}
-			await self.broadcast_message(data_to_send)
+		Args:
+			player_id (int): The ID of the player to mark as ready.
+		"""
+		self.ready_players.add(player_id)
+
+		if len(self.ready_players) >= self.game_manager.max_players:
+			await self.start_game()
+
+	async def start_game(self):
+		"""
+		Transitions the lobby into the PLAYING state, starts the game manager, and initiates the game loop.
+		Also broadcasts a 'game_started' event to all players.
+		"""
+		self.lobby_status = Lobby.LobbyStatus.PLAYING
+		self.game_manager.start_game()
+		self.game_loop_task = asyncio.create_task(self.game_loop())
+		data_to_send = {
+			"type": "lobby_state",
+			"event_name": "game_started",
+		}
+		await self.broadcast_message(data_to_send)
 
 	async def add_player_to_lobby(self, data: dict, is_bot: bool):
 		"""
-		Adds a player to the lobby. If the lobby is full, starts the game loop.
+		Adds a player to the lobby. If there are already players in the lobby, 
+		sends a message to recover the data of the already connected players.
 
 		Args:
-			data (dict): The player data, including the player ID.
-			is_bot (bool): Whether the player is a bot.
+			data (dict): The player data, which must include the player ID.
+			is_bot (bool): Indicates whether the joining player is a bot.
 		
 		Raises:
 			ValueError: If the player data is missing a player ID.
@@ -90,16 +108,15 @@ class Lobby:
 		player_id = data.get("player_id")
 		if not player_id:
 			raise ValueError("Invalid data: 'player_id' is required.")
-		
+
 		self.game_manager.add_player(player_id, is_bot)
-		
-		#if a player enters the lobby he needs the data of the players already present
+
+		# If more than one player is present, instruct the new player to recover existing players' data
 		if len(self.game_manager.players) > 1:
 			data_to_send = {
 				"type": "lobby_state",
 				"event_name": "recover_player_data",
 			}
-
 			await self.broadcast_message(data_to_send)
 
 		data_to_send = {
@@ -107,34 +124,36 @@ class Lobby:
 			"event_name": "player_join",
 			"player_id": player_id
 		}
-
 		await self.broadcast_message(data_to_send)
 
 	async def game_loop(self):
 		"""
-		Runs the core game loop for the lobby. The game loop runs at a fixed frame rate while the lobby is full.
-
-		This method is responsible for updating the game state and broadcasting it to all players.
+		Runs the core game loop for the lobby. This loop updates the game state at a fixed frame rate,
+		broadcasts updates to all players, and terminates when the game is no longer active.
 		"""
 		try:
+			# Main game loop
 			while self.game_manager.game_loop_is_active:
 				async with self.update_lock:
 					await self.game_manager.game_loop()
-					await asyncio.sleep(1 / 60)
-					await self.broadcast_message({
-						"type": "lobby_state",
-						"event": "game_loop"
-						})
+				await asyncio.sleep(1 / 60)
+				await self.broadcast_message({
+					"type": "lobby_state",
+					"event": "game_loop"
+				})
+
+			# When the game loop ends, transition to the ENDED state and notify players
+			self.lobby_status = self.LobbyStatus.ENDED
 			await self.broadcast_message({
 				"type": "lobby_state",
 				"event": "game_finished"
-				})
+			})
 		except asyncio.CancelledError:
 			print("Game loop task was cancelled.")
 
 	def remove_player(self, player_id: int):
 		"""
-		Removes a player from the lobby and handles player disconnection logic.
+		Removes a player from the lobby and handles the logic for player disconnection.
 
 		Args:
 			player_id (int): The ID of the player to remove.
@@ -144,12 +163,11 @@ class Lobby:
 
 	def to_dict(self) -> dict:
 		"""
-		Converts the lobby's state into a dictionary format, including the game manager's state.
+		Converts the current state of the lobby into a dictionary, including the game manager's state.
 
 		Returns:
 			dict: A dictionary representing the lobby's state.
 		"""
-		lobby_data =  {"current_lobby_status": self.lobby_status.name}
+		lobby_data = {"current_lobby_status": self.lobby_status.name}
 		lobby_data.update(self.game_manager.to_dict())
-
 		return lobby_data

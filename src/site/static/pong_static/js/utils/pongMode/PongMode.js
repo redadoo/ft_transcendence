@@ -77,23 +77,18 @@ export default class PongMode {
 	}
 
 	/**
-	 * Updates the game state based on the incoming data. This method must be implemented by subclasses.
-	 * @param {Object} data - The data used to update the game state.
-	 * @throws {Error} Will throw an error if called directly from this class.
-	 */
-	updateGameState(data) 
-	{
-		throw new Error("Method 'updateGameState()' must be implemented.");
-	}
-
-	/**
 	 * Configures the lobby based on the received server data.
 	 * @param {Object} data - The data received from the WebSocket.
 	 */
 	setUpLobby(data)
 	{
 		if (this.game.pongOpponent != null && this.game.pongPlayer != null)
-			this.socket.send(JSON.stringify({ type: 'lobby setuped' }));
+		{
+			this.socket.send(JSON.stringify({ 
+				type: 'client_ready',
+				player_id: this.game.player_id
+			 }));
+		}
 		else
 		{
 			if (data.event_info.event_name === "recover_player_data")
