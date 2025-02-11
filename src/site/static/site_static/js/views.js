@@ -131,9 +131,10 @@ const views = {
 		game.sceneManager.animate();
 	},
 
-	singleplayerPongScripts() {
-		import('../../pong_static/js/Game.js')
-		.catch(e => console.error('Pong script error:', e));
+	async singleplayerPongScripts() {
+		const game = new Game();
+		await game.init();
+		game.sceneManager.animate();
 	},
 
 	liarsbarScripts() {
@@ -231,7 +232,7 @@ const views = {
 		});
 
 		startButton.addEventListener('click', () => {
-			game.send_ready();
+			game.mode.send_start();
 			router.navigateTo('/lobby/playing');
 		});
 	},

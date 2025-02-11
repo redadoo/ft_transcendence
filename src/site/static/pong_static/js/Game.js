@@ -1,13 +1,25 @@
+import SinglePlayerPongMode from './utils/pongMode/SinglePlayerPongMode.js';
+import MultiplayerPongMode from './utils/pongMode/MultiplayerPongMode.js';
+import PrivateLobbyPongMode from './utils/pongMode/PrivateLobbyPongMode.js';
 import * as THREE from '../../lib/threejs/src/Three.js';
 import SceneManager from '../../common_static/js/SceneManager.js';
-import Bounds from './Scritps/Bounds.js';
-import Ball from './Scritps/Class/Ball.js';
-import PongPlayer from './Scritps/Class/PongPlayer.js';
-import Background from './Scritps/Class/Background.js';
+import Bounds from './utils/Bounds.js';
+import Ball from './utils/Ball.js';
+import PongPlayer from './utils/PongPlayer.js';
+import Background from './utils/Background.js';
 import SocketManager from '../../common_static/js/SocketManager.js';
-import MatchmakingManager from  '../../common_static/js/MatchmakingManager.js';
-import router from '../../site_static/js/router.js';
 
+/**
+ * Camera configuration settings for the scene.
+ * 
+ * @constant
+ * @type {Object}
+ * @property {number} FOV - Field of view for the camera, set to 75 degrees.
+ * @property {number} NEAR_PLANE - The near clipping plane distance, set to 0.1.
+ * @property {number} FAR_PLANE - The far clipping plane distance, set to 1500.
+ * @property {THREE.Vector3} POSITION - The initial position of the camera in the scene.
+ * @property {number} ROTATION_X - The rotation angle of the camera around the X-axis, set to π/6 (30 degrees).
+ */
 const CAMERA_SETTINGS = {
 	FOV: 75,
 	NEAR_PLANE: 0.1,
@@ -16,15 +28,21 @@ const CAMERA_SETTINGS = {
 	ROTATION_X: Math.PI / 6,
 };
 
-export default class Game
+/**
+ * Game class handles the setup and execution of a Pong-style game.
+ * It manages the scene, players, ball, lighting, and game modes.
+ */
+export default class Game 
 {
-	constructor() {
-
-		//manager
+	/**
+     * Constructs a new Game instance, initializing properties.
+     */
+	constructor() 
+	{
 		this.sceneManager = null;
-		this.matchmakingManager = null;
+		this.mode = null;
+		this.player_id = null;
 
-		// Lights
 		this.ambientLight = null;
 		this.pointLightMagenta = null;
 		this.pointLightBlue = null;
@@ -37,14 +55,16 @@ export default class Game
 		this.pongOpponent = null;
 		this.ball = null;
 		this.background = null;
-		this.player_id = null;
 
-		// socket
-		this.gameSocket = null;
-
-		this.manageWindowClose();
+		this.isSceneCreated = false;
+		
+		this.manageWindowClose();	
 	}
-
+	
+	/**
+     * Handles the event of closing or navigating away from the game window.
+     * Ensures that the game socket is closed properly before leaving.
+     */
 	manageWindowClose()
 	{
 		history.pushState(null, document.title, location.href);
@@ -52,13 +72,13 @@ export default class Game
 			const leavePage = confirm("Do you want to leave?");
 			if (leavePage)
 			{
-				if (this.gameSocket != null)
+				if (this.mode.socket != null)
 				{
-					this.gameSocket.send(JSON.stringify({
+					this.mode.socket.send(JSON.stringify({
 						type: 'quitting lobby',
 						player_id: this.player_id
 					}))
-					this.gameSocket.close();
+					this.mode.socket.close();
 				}
 				this.sceneManager.dispose();
 				window.location.href = "/";
@@ -71,6 +91,9 @@ export default class Game
 		});
 	}
 
+    /**
+     * Fetches and sets the player's ID from the server.
+     */
 	async setPlayerId()
 	{
 		try
@@ -82,116 +105,90 @@ export default class Game
 			console.error("An error occurred when call profile api: ", error);
 		}
 	}
-
+	
+	/**
+     * Initializes the game scene, mode, and environment.
+     */
 	async init()
 	{
+		await this.setPlayerId();
+
+		//init scene 
 		this.sceneManager = new SceneManager(true);
 		Object.assign(this.sceneManager, CAMERA_SETTINGS);
 		this.sceneManager.initialize(true, true);
-
-		await this.setPlayerId();
+		
 		await this.sceneManager.modelManager.loadModel({ '/static/pong_static/assets/models/Scene.glb': 'Scene' });
-
-		this.configureCamera();
+		
+		this.sceneManager.camera.position.copy(CAMERA_SETTINGS.POSITION);
+		this.sceneManager.camera.rotation.x = CAMERA_SETTINGS.ROTATION_X;
+		
 		this.initializeLights();
-
+		
 		if (!this.player_id)
 		{
 			console.error("Failed to set player ID. Aborting initialization.");
 			return;
 		}
 
-		switch (SocketManager.getModeFromPath())
+		const modeFromPath = SocketManager.getModeFromPath();
+		switch (modeFromPath) 
 		{
 			case 'singleplayer':
-				this.setupSinglePlayerSocket();
+				this.mode = new SinglePlayerPongMode(this);
 				break;
 			case 'multiplayer':
-				this.matchmakingManager = new MatchmakingManager("pong", this.setupMultiplayerPongSocket.bind(this));
-				break;
-			case 'tournament':
-				this.setupPongTournament();
+				this.mode = new MultiplayerPongMode(this);
 				break;
 			case 'lobby':
-				this.setupPrivateLobby();
+				this.mode = new PrivateLobbyPongMode(this);
 				break;
 			default:
-				console.error("Invalid game mode");
+				console.error("Modalità di gioco non valida.");
 		}
+	
+		if (this.mode) 
+			this.mode.init();
 
 		this.sceneManager.setExternalFunction(() => this.fixedUpdate());
 	}
-	
-	setupPrivateLobby()
+
+	/**
+     * Initializes the game environment with given data.
+     * @param {Object} data - The data used to set up the game environment.
+     */
+	initGameEnvironment(data)
 	{
-		var room_name = "";
-		if (window.location.pathname.includes("guest"))
-			room_name = window.localStorage['room_name'];
-		else
+		if (this.isSceneCreated == false)
 		{
-			window.localStorage['room_name'] = crypto.randomUUID();
-			room_name = window.localStorage['room_name'];
+			try {
+				this.setupScene();
+	
+				const bounds_data = data?.lobby_info?.bounds;
+				const ball_data = data?.lobby_info?.ball;
+	
+				if (!bounds_data || !ball_data)
+				{
+					console.error("Game data is missing or incomplete:", { bounds_data, ball_data });
+					return;
+				}
+	
+				this.bounds = new Bounds(bounds_data.xMin, bounds_data.xMax, bounds_data.yMin, bounds_data.yMax);
+				this.ball = new Ball(ball_data.radius);
+				this.background = new Background(this.sceneManager.scene, this.bounds.xMax * 2, this.bounds.yMax * 2);
+	
+				this.sceneManager.scene.add(this.ball.mesh);
+				console.log("bound, ball and dbackground are initialized");
+				this.isSceneCreated = true;
+			} catch (error) {
+				console.error("An error occurred during game initialization:", error);
+			}
 		}
-
-		this.gameSocket = new SocketManager();
-
-		this.gameSocket.initGameWebSocket(
-			'pong',
-			this.handleGameSocketMessage.bind(this),
-			room_name,
-			this.onSocketOpen.bind(this)
-		);
 	}
 
-	setupPongTournament()
-	{
-		this.gameSocket = new SocketManager();
-
-		this.gameSocket.initGameWebSocket(
-			'pong',
-			this.handleGameSocketMessage.bind(this),
-			crypto.randomUUID(),
-			this.onSocketOpen.bind(this)
-		);
-	}
-
-	onSocketOpen()
-	{
-		this.gameSocket.send(JSON.stringify({
-			type: 'init_player',
-			player_id: this.player_id
-		}));
-	}
-
-	setupMultiplayerPongSocket(data)
-	{
-		this.gameSocket = new SocketManager();
-
-		this.gameSocket.initGameWebSocket(
-			'pong',
-			this.handleGameSocketMessage.bind(this),
-			data.room_name,
-			this.onSocketOpen.bind(this)
-		);
-	}
-
-	setupSinglePlayerSocket()
-	{
-		this.gameSocket = new SocketManager();
-
-		this.gameSocket.initWebSocket(
-			'singleplayer/pong/',
-			this.handleGameSocketMessage.bind(this),
-			this.onSocketOpen.bind(this)
-		);
-	}
-
-	configureCamera()
-	{
-		this.sceneManager.camera.position.copy(CAMERA_SETTINGS.POSITION);
-		this.sceneManager.camera.rotation.x = CAMERA_SETTINGS.ROTATION_X;
-	}
-
+	/**
+     * Initializes the lighting system for the game scene.
+     */
 	initializeLights()
 	{
 		this.ambientLight = new THREE.AmbientLight(0xA2C2E9, 0.2);
@@ -249,6 +246,9 @@ export default class Game
 		this.sceneManager.scene.add(this.lightHelper);
 	}
 
+	/**
+     * Sets up the game scene with the loaded room model.
+     */
 	setupScene()
 	{
 		const room = this.sceneManager.modelManager.getModel('Scene');
@@ -260,6 +260,10 @@ export default class Game
 		this.sceneManager.scene.add(room.scene);
 	}
 
+	/**
+     * Updates the game state with new data.
+     * @param {Object} data - The game state data.
+     */
 	updateGameState(data)
 	{
 		if (data.ball)
@@ -272,20 +276,15 @@ export default class Game
 		}
 	}
 
-	fixedUpdate()
-	{
-		if (this.pongPlayer == null || this.pongOpponent == null) return;
-
-		this.pongPlayer.syncPosition();
-		this.pongOpponent.syncPosition();
-		this.ball.syncPosition();
-	}
-
 	/**
-	 * Adds a user to the lobby by cloning the human model and updating the scene.
-	 * @param {Object} data - Data about the joining player.
-	*/
-	AddUserToLobby(newPlayer_id, playerData)
+	 * Adds a new player to the lobby, initializing either the client player or the opponent.
+	 * 
+	 * @param {string} newPlayer_id - The unique identifier of the new player joining the lobby.
+	 * @param {Object} playerData - The data associated with the player, including attributes and settings.
+	 * @param {Object} socket - The socket connection for the player (only used for the client player).
+	 *     
+	 */
+	AddUserToLobby(newPlayer_id, playerData, socket)
 	{
 		if (newPlayer_id == this.player_id)
 		{
@@ -294,7 +293,7 @@ export default class Game
 				console.log("client player already init");
 				return;
 			}
-			this.pongPlayer = new PongPlayer(this.gameSocket, this.player_id, playerData);
+			this.pongPlayer = new PongPlayer(socket, this.player_id, playerData);
 			this.sceneManager.scene.add(this.pongPlayer.paddle.mesh);
 			console.log("player initialized:", this.pongPlayer);
 		}
@@ -311,130 +310,16 @@ export default class Game
 		}
 	}
 
-	initGameEnvironment(data)
-	{
-		try {
-			this.setupScene();
-
-			const bounds_data = data?.lobby_info?.bounds;
-			const ball_data = data?.lobby_info?.ball;
-
-			if (!bounds_data || !ball_data)
-			{
-				console.error("Game data is missing or incomplete:", { bounds_data, ball_data });
-				return;
-			}
-
-			this.bounds = new Bounds(bounds_data.xMin, bounds_data.xMax, bounds_data.yMin, bounds_data.yMax);
-			this.ball = new Ball(ball_data.radius);
-			this.background = new Background(this.sceneManager.scene, this.bounds.xMax * 2, this.bounds.yMax * 2);
-
-			this.sceneManager.scene.add(this.ball.mesh);
-			console.log("bound, ball and dbackground are initialized");
-		} catch (error) {
-			console.error("An error occurred during game initialization:", error);
-		}
-	}
-
-	send_ready()
-	{
-		this.gameSocket.send(JSON.stringify({ type: 'private lobby setuped' }));
-	}
-
 	/**
-	 * Sets up the lobby based on socket data.
-	 * @param {Object} data - Socket data about the lobby event.
-	 */
-	setUpLobby(data)
+     * Fixed update loop for synchronizing game objects.
+     */
+	fixedUpdate() 
 	{
-		if (window.location.pathname.includes("/lobby"))
-		{
-			if (data.event_info.event_name === "host_started_game")
-			{
-				this.gameSocket.send(JSON.stringify({ type: 'private lobby setuped' }));
-				this.gameSocket.send(JSON.stringify({ type: 'lobby setuped' }));
-				router.navigateTo('/lobby/playing');
-				return;
-			}
+		if (this.pongPlayer == null || this.pongOpponent == null || this.ball == null) 
+			return;
 
-			if (this.bounds == null) this.initGameEnvironment(data);
-			
-			if (data.event_info.event_name === "recover_player_data")
-				{
-					const players = data.lobby_info.players;
-	
-					for (const [key, value] of Object.entries(players))
-					{
-						if (this.pongPlayer != null && this.pongPlayer.playerId == parseInt(key))
-							continue;
-						this.AddUserToLobby(key,value);
-					}
-				}
-	
-				if (data.event_info.event_name === "player_join")
-				{
-					const newPlayerId = data.event_info.player_id;
-					const playerData = data.lobby_info.players[data.event_info.player_id];
-					this.AddUserToLobby(newPlayerId, playerData);
-				}
-		}
-		else
-		{
-			if (this.bounds == null) this.initGameEnvironment(data);
-
-			if (this.pongOpponent != null && this.pongPlayer != null)
-				this.gameSocket.send(JSON.stringify({ type: 'lobby setuped' }));
-			else
-			{
-				if (data.event_info.event_name === "recover_player_data")
-				{
-					const players = data.lobby_info.players;
-	
-					for (const [key, value] of Object.entries(players))
-					{
-						if (this.pongPlayer != null && this.pongPlayer.playerId == parseInt(key))
-							continue;
-						this.AddUserToLobby(key,value);
-					}
-				}
-	
-				if (data.event_info.event_name === "player_join")
-				{
-					const newPlayerId = data.event_info.player_id;
-					const playerData = data.lobby_info.players[data.event_info.player_id];
-					this.AddUserToLobby(newPlayerId, playerData);
-				}
-			}
-		}
-	}
-
-	handleGameSocketMessage(event)
-	{
-		try {
-			const data = JSON.parse(event.data);
-			// console.log("data:", data);
-			switch (data.lobby_info.current_lobby_status)
-			{
-				case 'TO_SETUP':
-					this.setUpLobby(data);
-					break;
-				case 'PLAYING':
-					this.updateGameState(data.lobby_info)
-					break;
-				case 'ENDED':
-					break;
-				case 'WAITING_PLAYER_RECONNECTION':
-					break;
-				default:
-					console.log('Unhandled game socket event type ' + data.lobby.current_lobby_status);
-			}
-		} catch (error) {
-			console.error("Error processing WebSocket message:", error);
-			console.log("error data: ", data);
-		}
+		this.pongPlayer.syncPosition();
+		this.pongOpponent.syncPosition();
+		this.ball.syncPosition();
 	}
 }
-
-// const game = new Game();
-// await game.init();
-// game.sceneManager.animate();

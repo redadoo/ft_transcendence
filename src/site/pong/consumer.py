@@ -85,15 +85,6 @@ class PongMultiplayerConsumer(AsyncWebsocketConsumer):
 
 		await self.channel_layer.group_add(self.lobby.room_group_name, self.channel_name)
 		await self.accept()
-		
-		#send room_name to social consumer to send lobby invites
-		await self.channel_layer.group_send(
-			f"user_{self.user_id}",  
-			{
-				"type": "send_pong_lobby",
-				"room_name": self.room_name,
-			}
-		)
 
 	async def disconnect(self, close_code):
 		await self.channel_layer.group_discard(self.lobby.room_group_name, self.channel_name)
@@ -196,14 +187,14 @@ class PongLobbyConsumer(AsyncWebsocketConsumer):
 			return
 
 		event_type = data.get("type")
-		if event_type == "private lobby setuped":
+		if event_type == "lobby setuped":
 			data_to_send = {
 				"type": "lobby_state",
 				"event_name": "host_started_game",
 			}
 			await self.lobby.broadcast_message(data_to_send)
-		else:
-			await self.lobby.manage_event(data)
+
+		await self.lobby.manage_event(data)
 
 	async def lobby_state(self, event: dict):
 		"""
