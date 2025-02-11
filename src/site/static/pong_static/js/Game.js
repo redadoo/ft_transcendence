@@ -14,7 +14,7 @@ import router from '../../site_static/js/router.js';
 
 /**
  * Camera configuration settings for the scene.
- * 
+ *
  * @constant
  * @type {Object}
  * @property {number} FOV - Field of view for the camera, set to 75 degrees.
@@ -35,12 +35,12 @@ const CAMERA_SETTINGS = {
  * Game class handles the setup and execution of a Pong-style game.
  * It manages the scene, players, ball, lighting, and game modes.
  */
-export default class Game 
+export default class Game
 {
 	/**
      * Constructs a new Game instance, initializing properties.
      */
-	constructor() 
+	constructor()
 	{
 		this.sceneManager = null;
 		this.mode = null;
@@ -60,10 +60,10 @@ export default class Game
 		this.background = null;
 
 		this.isSceneCreated = false;
-		
-		this.manageWindowClose();	
+
+		this.manageWindowClose();
 	}
-	
+
 	/**
      * Handles the event of closing or navigating away from the game window.
      * Ensures that the game socket is closed properly before leaving.
@@ -108,7 +108,7 @@ export default class Game
 			console.error("An error occurred when call profile api: ", error);
 		}
 	}
-	
+
 	/**
      * Initializes the game scene, mode, and environment.
      */
@@ -116,18 +116,18 @@ export default class Game
 	{
 		await this.setPlayerId();
 
-		//init scene 
+		//init scene
 		this.sceneManager = new SceneManager(true);
 		Object.assign(this.sceneManager, CAMERA_SETTINGS);
 		this.sceneManager.initialize(true, true);
-		
+
 		await this.sceneManager.modelManager.loadModel({ '/static/pong_static/assets/models/Scene.glb': 'Scene' });
-		
+
 		this.sceneManager.camera.position.copy(CAMERA_SETTINGS.POSITION);
 		this.sceneManager.camera.rotation.x = CAMERA_SETTINGS.ROTATION_X;
-		
+
 		this.initializeLights();
-		
+
 		if (!this.player_id)
 		{
 			console.error("Failed to set player ID. Aborting initialization.");
@@ -135,7 +135,7 @@ export default class Game
 		}
 
 		const modeFromPath = SocketManager.getModeFromPath();
-		switch (modeFromPath) 
+		switch (modeFromPath)
 		{
 			case 'singleplayer':
 				this.mode = new SinglePlayerPongMode(this);
@@ -151,8 +151,8 @@ export default class Game
 			default:
 				console.error("Modalità di gioco non valida.");
 		}
-	
-		if (this.mode) 
+
+		if (this.mode)
 			this.mode.init();
 
 		this.sceneManager.setExternalFunction(() => this.fixedUpdate());
@@ -168,20 +168,20 @@ export default class Game
 		{
 			try {
 				this.setupScene();
-	
+
 				const bounds_data = data?.lobby_info?.bounds;
 				const ball_data = data?.lobby_info?.ball;
-	
+
 				if (!bounds_data || !ball_data)
 				{
 					console.error("Game data is missing or incomplete:", { bounds_data, ball_data });
 					return;
 				}
-	
+
 				this.bounds = new Bounds(bounds_data.xMin, bounds_data.xMax, bounds_data.yMin, bounds_data.yMax);
 				this.ball = new Ball(ball_data.radius);
 				this.background = new Background(this.sceneManager.scene, this.bounds.xMax * 2, this.bounds.yMax * 2);
-	
+
 				this.sceneManager.scene.add(this.ball.mesh);
 				console.log("bound, ball and dbackground are initialized");
 				this.isSceneCreated = true;
@@ -275,7 +275,7 @@ export default class Game
 		{
 			if (data.ball)
 				this.ball.updatePosition(data.ball);
-	
+
 			if (data.players)
 			{
 				this.pongPlayer.updatePosition(data.players[this.pongPlayer.playerId].y);
@@ -290,11 +290,11 @@ export default class Game
 
 	/**
 	 * Adds a new player to the lobby, initializing either the client player or the opponent.
-	 * 
+	 *
 	 * @param {string} newPlayer_id - The unique identifier of the new player joining the lobby.
 	 * @param {Object} playerData - The data associated with the player, including attributes and settings.
 	 * @param {Object} socket - The socket connection for the player (only used for the client player).
-	 *     
+	 *
 	 */
 	AddUserToLobby(newPlayer_id, playerData, socket)
 	{
@@ -325,9 +325,9 @@ export default class Game
 	/**
      * Fixed update loop for synchronizing game objects.
      */
-	fixedUpdate() 
+	fixedUpdate()
 	{
-		if (this.pongPlayer == null || this.pongOpponent == null || this.ball == null) 
+		if (this.pongPlayer == null || this.pongOpponent == null || this.ball == null)
 			return;
 
 		this.pongPlayer.syncPosition();
@@ -343,6 +343,6 @@ export default class Game
 		}));
 		this.mode.socket.close();
 		this.sceneManager.dispose();
-		router.navigateTo('/');
+		router.navigateTo('/match-result');
 	}
 }

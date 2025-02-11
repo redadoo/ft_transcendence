@@ -18,7 +18,7 @@ const api = {
 		try {
 			const protocol = window.location.protocol === 'https:' ? 'https' : 'http';
 
-			if (protocol == 'https://')  
+			if (protocol == 'https://')
 				url = `${protocol}//${window.location.host}${url}`;
 
 			const csrftoken = getCookie('csrftoken');
@@ -42,7 +42,7 @@ const api = {
 
 			const response = await fetch(url, mergedOptions);
 
-			if (!response.ok) 
+			if (!response.ok)
 				throw new Error(`HTTP error! status: ${response.status}`);
 			return await response.json();
 		} catch (error) {
@@ -160,6 +160,15 @@ const api = {
 			return await this.fetchJson('/api/profile');
 		} catch (error) {
 			console.error('Header info error:', error);
+			return false;
+		}
+	},
+
+	async getLastMatch() {
+		try {
+			return await this.fetchJson('/api/pong/last_match');
+		} catch (error) {
+			console.error('Last match error:', error);
 			return false;
 		}
 	},

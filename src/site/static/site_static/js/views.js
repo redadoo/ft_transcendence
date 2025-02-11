@@ -6,6 +6,7 @@ import setupConfigEventListeners from './Config.js';
 import SocialOverlayManager from './overlay.js';
 import SocketHandler from './SocketHandler.js';
 import Game from '../../pong_static/js/Game.js';
+import dateFormatter from './dateFormatter.js';
 
 const views = {
 	// Auth views
@@ -244,7 +245,7 @@ const views = {
 	async lobbyPlaying() {
 		return html.singleplayerPong;
 	},
-	
+
 	async lobbyPlayingScripts() {
 
 	},
@@ -268,6 +269,34 @@ const views = {
 		const game = new Game();
 		await game.init();
 		game.sceneManager.animate();
+	},
+
+	async matchResult() {
+		return html.matchResult;
+	},
+
+	async matchResultScripts() {
+		const data = await api.getLastMatch();
+		const updateElement = (id, value) => document.getElementById(id).textContent = value;
+
+		updateElement('player1Name', data.first_user_username);
+		updateElement('player2Name', data.second_user_username);
+		updateElement('player1Score', data.first_user_score);
+		updateElement('player2Score', data.second_user_score);
+		updateElement('player1MMR', data.first_user_mmr_gain);
+		updateElement('player2MMR', data.second_user_mmr_gain);
+		updateElement('winnerName', data.winner);
+		updateElement('matchDuration', dateFormatter.formatDuration(data.duration));
+		updateElement('matchStart', dateFormatter.formatDateString(data.start_date));
+		updateElement('matchEnd', dateFormatter.formatDateString(data.end_date));
+
+		api.getUserProfile(data.first_user_username).then(data => {
+			document.getElementById('player1Avatar').src = data.image_url.avatar_url;
+		});
+
+		api.getUserProfile(data.second_user_username).then(data => {
+			document.getElementById('player2Avatar').src = data.image_url.avatar_url;
+		});
 	},
 };
 

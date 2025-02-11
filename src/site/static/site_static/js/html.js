@@ -863,101 +863,185 @@ const html = {
 	`,
 
 	lobby: `
-		<div class="container-fluid game-container">
-			<div class="row h-100">
-				<div class="col-2 px-0">
-					<nav class="nav-wrapper">
-						<div class="d-flex flex-column">
-							<div class="nav-link-left back" data-link="/multiplayer/pong">
-								<span class="hundin-font back">BACK</span>
-							</div>
-						</div>
-					</nav>
-				</div>
-
-				<div class="col-10 px-0">
-					<div class="lobby-container">
-						<div class="lobby-header">
-							<span class="pixel-font lobby-title">GAME LOBBY</span>
-							<div class="lobby-code-container">
-								<span class="pixel-font lobby-code-label">LOBBY CODE:</span>
-								<span class="pixel-font lobby-code" id="lobbyCode"></span>
-							</div>
-						</div>
-
-						<div class="lobby-content">
-							<div class="players-container">
-								<div class="player-slot">
-									<div class="player-avatar">
-										<img src="/api/placeholder/80/80" alt="Player 1" id="player1Avatar">
-									</div>
-									<span class="pixel-font player-name" id="player1Name">WAITING...</span>
-									<span class="pixel-font player-status host">HOST</span>
+			<div class="container-fluid game-container">
+				<div class="row h-100">
+					<div class="col-2 px-0">
+						<nav class="nav-wrapper">
+							<div class="d-flex flex-column">
+								<div class="nav-link-left back" data-link="/multiplayer/pong">
+									<span class="hundin-font back">BACK</span>
 								</div>
-								<div class="player-slot empty">
-									<div class="player-avatar">
-										<img src="/api/placeholder/80/80" alt="Player 2" id="player2Avatar">
-									</div>
-									<span class="pixel-font player-name" id="player2Name">WAITING...</span>
-									<span class="pixel-font player-status">GUEST</span>
+							</div>
+						</nav>
+					</div>
+
+					<div class="col-10 px-0">
+						<div class="lobby-container">
+							<div class="lobby-header">
+								<span class="pixel-font lobby-title">GAME LOBBY</span>
+								<div class="lobby-code-container">
+									<span class="pixel-font lobby-code-label">LOBBY CODE:</span>
+									<span class="pixel-font lobby-code" id="lobbyCode"></span>
 								</div>
 							</div>
 
-							<div class="lobby-controls">
-								<button class="start-button pixel-font" id="startGame" disabled>
-									START GAME
-								</button>
+							<div class="lobby-content">
+								<div class="players-container">
+									<div class="player-slot">
+										<div class="player-avatar">
+											<img src="/api/placeholder/80/80" alt="Player 1" id="player1Avatar">
+										</div>
+										<span class="pixel-font player-name" id="player1Name">WAITING...</span>
+										<span class="pixel-font player-status host">HOST</span>
+									</div>
+									<div class="player-slot empty">
+										<div class="player-avatar">
+											<img src="/api/placeholder/80/80" alt="Player 2" id="player2Avatar">
+										</div>
+										<span class="pixel-font player-name" id="player2Name">WAITING...</span>
+										<span class="pixel-font player-status">GUEST</span>
+									</div>
+								</div>
+
+								<div class="lobby-controls">
+									<button class="start-button pixel-font" id="startGame" disabled>
+										START GAME
+									</button>
+								</div>
 							</div>
 						</div>
 					</div>
 				</div>
 			</div>
-		</div>
-	`,
+		`,
 
-	lobbyGuest: `
-		<div class="container-fluid game-container">
-			<div class="row h-100">
-				<div class="col-2 px-0">
-					<nav class="nav-wrapper">
-						<div class="d-flex flex-column">
-							<div class="nav-link-left back" data-link="/multiplayer/pong">
-								<span class="hundin-font back">BACK</span>
-							</div>
-						</div>
-					</nav>
-				</div>
-
-				<div class="col-10 px-0">
-					<div class="lobby-container">
-						<div class="lobby-header">
-							<span class="pixel-font lobby-title">GAME LOBBY</span>
-						</div>
-
-						<div class="lobby-content">
-							<div class="players-container">
-								<div class="player-slot">
-									<div class="player-avatar">
-										<img src="/api/placeholder/80/80" alt="Player 1" id="player1Avatar">
-									</div>
-									<span class="pixel-font player-name" id="player1Name">WAITING...</span>
-									<span class="pixel-font player-status host">HOST</span>
-								</div>
-								<div class="player-slot empty">
-									<div class="player-avatar">
-										<img src="/api/placeholder/80/80" alt="Player 2" id="player2Avatar">
-									</div>
-									<span class="pixel-font player-name" id="player2Name">WAITING...</span>
-									<span class="pixel-font player-status">GUEST</span>
+		lobbyGuest: `
+			<div class="container-fluid game-container">
+				<div class="row h-100">
+					<div class="col-2 px-0">
+						<nav class="nav-wrapper">
+							<div class="d-flex flex-column">
+								<div class="nav-link-left back" data-link="/multiplayer/pong">
+									<span class="hundin-font back">BACK</span>
 								</div>
 							</div>
+						</nav>
+					</div>
+
+					<div class="col-10 px-0">
+						<div class="lobby-container">
+							<div class="lobby-header">
+								<span class="pixel-font lobby-title">GAME LOBBY</span>
+							</div>
+
+							<div class="lobby-content">
+								<div class="players-container">
+									<div class="player-slot">
+										<div class="player-avatar">
+											<img src="/api/placeholder/80/80" alt="Player 1" id="player1Avatar">
+										</div>
+										<span class="pixel-font player-name" id="player1Name">WAITING...</span>
+										<span class="pixel-font player-status host">HOST</span>
+									</div>
+									<div class="player-slot empty">
+										<div class="player-avatar">
+											<img src="/api/placeholder/80/80" alt="Player 2" id="player2Avatar">
+										</div>
+										<span class="pixel-font player-name" id="player2Name">WAITING...</span>
+										<span class="pixel-font player-status">GUEST</span>
+									</div>
+								</div>
+								</div>
 							</div>
 						</div>
 					</div>
 				</div>
 			</div>
-		</div>
-	`,
+		`,
+
+		// In html.js:
+matchResult: `
+<div class="container-fluid game-container">
+  <div class="row h-100">
+    <!-- Back Button Column -->
+    <div class="col-2 px-0">
+      <nav class="nav-wrapper">
+        <div class="d-flex flex-column">
+          <div class="nav-link-left back" data-link="/">
+            <span class="hundin-font back">BACK</span>
+          </div>
+        </div>
+      </nav>
+    </div>
+
+    <!-- Match Result Content -->
+    <div class="col-10 d-flex align-items-center justify-content-center">
+      <div class="match-result-container">
+        <div class="title">
+          <span class="pixel-font result-title">MATCH RESULT</span>
+        </div>
+
+        <div class="match-players">
+          <div class="player-section">
+            <div class="profile-image">
+              <img src="" alt="Player 1" id="player1Avatar" />
+            </div>
+            <div class="player-left">
+              <span class="pixel-font player-name" id="player1Name">Player 1</span>
+              <div class="stat-line">
+                <span class="pixel-font stat-label">SCORE: </span>
+                <span class="pixel-font stat-value" id="player1Score">0</span>
+              </div>
+              <div class="stat-line">
+                <span class="pixel-font stat-label">MMR: </span>
+                <span class="pixel-font stat-value" id="player1MMR">0</span>
+              </div>
+            </div>
+
+            <span class="pixel-font vs">VS</span>
+
+            <div class="player-right">
+              <span class="pixel-font player-name" id="player2Name">Player 2</span>
+              <div class="stat-line">
+                <span class="pixel-font stat-label">SCORE: </span>
+                <span class="pixel-font stat-value" id="player2Score">0</span>
+              </div>
+              <div class="stat-line">
+                <span class="pixel-font stat-label">MMR: </span>
+                <span class="pixel-font stat-value" id="player2MMR">0</span>
+              </div>
+            </div>
+            <div class="profile-image">
+              <img src="" alt="Player 2" id="player2Avatar" />
+            </div>
+          </div>
+        </div>
+
+        <div class="winner-section">
+          <span class="pixel-font winner-label">WINNER</span>
+          <span class="pixel-font winner-name" id="winnerName">Player 1</span>
+        </div>
+
+        <div class="match-details">
+          <div class="detail-item">
+            <span class="pixel-font detail-label">DURATION</span>
+            <span class="pixel-font detail-value" id="matchDuration">0 min 0 sec</span>
+          </div>
+          <div class="detail-item">
+            <span class="pixel-font detail-label">START</span>
+            <span class="pixel-font detail-value" id="matchStart">--</span>
+          </div>
+          <div class="detail-item">
+            <span class="pixel-font detail-label">END</span>
+            <span class="pixel-font detail-value" id="matchEnd">--</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+`,
+
 };
 
 

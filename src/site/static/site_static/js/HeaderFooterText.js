@@ -18,6 +18,7 @@ const HeaderText = {
 	singleplayerPong: 'SINGLEPLAYER PONG',
 	lobby: 'LOBBY',
 	lobbyGuest: 'LOBBY GUEST',
+	matchResult: 'MATCH RESULT',
 }
 
 const FooterText = {
@@ -40,6 +41,7 @@ const FooterText = {
 	singleplayerPong: 'Enjoy a solo Pong game and beat your high score.',
 	lobby: 'Open chat interface to invite friends to play.',
 	lobbyGuest: 'Waiting for host to start the game.',
+	matchResult: 'View the results of your match.',
 }
 
 
