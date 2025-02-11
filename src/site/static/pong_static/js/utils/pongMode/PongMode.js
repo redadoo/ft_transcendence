@@ -68,6 +68,7 @@ export default class PongMode {
 				this.game.updateGameState(lobby_info);
 				break;
 			case 'ENDED':
+				this.game.game_ended();
 				break;
 			case 'WAITING_PLAYER_RECONNECTION':
 				break;

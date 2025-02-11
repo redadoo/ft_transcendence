@@ -141,15 +141,14 @@ class Lobby:
 					"type": "lobby_state",
 					"event": "game_loop"
 				})
-
-			# When the game loop ends, transition to the ENDED state and notify players
+		except asyncio.CancelledError:
+			print("Game loop task was cancelled.")
+		finally:
 			self.lobby_status = self.LobbyStatus.ENDED
 			await self.broadcast_message({
 				"type": "lobby_state",
 				"event": "game_finished"
 			})
-		except asyncio.CancelledError:
-			print("Game loop task was cancelled.")
 
 	def remove_player(self, player_id: int):
 		"""

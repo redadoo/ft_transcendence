@@ -120,7 +120,6 @@ class PongGameManager(GameManager):
 			player.player_loop()
 
 		self.ball.update_position()
-
 		for player in players:
 			self.ball.handle_paddle_collision(player.paddle)
 

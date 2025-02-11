@@ -8,6 +8,7 @@ import Ball from './utils/Ball.js';
 import PongPlayer from './utils/PongPlayer.js';
 import Background from './utils/Background.js';
 import SocketManager from '../../common_static/js/SocketManager.js';
+import router from '../../site_static/js/router.js';
 
 /**
  * Camera configuration settings for the scene.
@@ -75,7 +76,7 @@ export default class Game
 				if (this.mode.socket != null)
 				{
 					this.mode.socket.send(JSON.stringify({
-						type: 'quitting lobby',
+						type: 'quit_game',
 						player_id: this.player_id
 					}))
 					this.mode.socket.close();
@@ -328,5 +329,16 @@ export default class Game
 		this.pongPlayer.syncPosition();
 		this.pongOpponent.syncPosition();
 		this.ball.syncPosition();
+	}
+
+	game_ended()
+	{
+		this.mode.socket.send(JSON.stringify({
+			type: 'quit_game',
+			player_id: this.player_id
+		}));
+		this.mode.socket.close();
+		this.sceneManager.dispose();
+		router.navigateTo('/');
 	}
 }

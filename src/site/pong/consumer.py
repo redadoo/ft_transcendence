@@ -118,7 +118,6 @@ class PongSingleplayerConsumer(AsyncWebsocketConsumer):
 		await self.accept()
 
 	async def disconnect(self, close_code):
-		await self.lobby.broadcast_message({"type": "lobby_state"})
 		await self.channel_layer.group_discard(self.lobby.room_group_name, self.channel_name)
 
 	async def receive(self, text_data):
