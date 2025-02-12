@@ -147,4 +147,39 @@ export default class ModelManager
 		else 
             console.warn(`Model "${name}" is not loaded and cannot be unloaded.`);
     }
+
+    /**
+     * Unloads and disposes of all loaded models to free up memory.
+     */
+    dispose() 
+    {
+        for (const modelName in this.modelsLoaded) 
+        {
+            const gltfScene = this.modelsLoaded[modelName];
+
+            if (gltfScene && gltfScene.scene) 
+            {
+                gltfScene.scene.traverse((object) => 
+                {
+                    if (object.geometry) 
+                        object.geometry.dispose();
+
+                    if (object.material) 
+                    {
+                        if (Array.isArray(object.material)) 
+                            object.material.forEach((material) => material.dispose());
+                        else 
+                            object.material.dispose();
+                    }
+
+                    if (object.material && object.material.map) 
+                        object.material.map.dispose();
+                });
+            }
+        }
+        this.modelsLoaded = {};
+        this.loadingPromises = [];
+        this.gltfLoader = null;
+    }
+
 }

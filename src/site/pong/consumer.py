@@ -127,6 +127,9 @@ class PongSingleplayerConsumer(AsyncWebsocketConsumer):
 		await self.lobby.manage_event(data)
 		if data.get("type") == "init_player":
 			await self.lobby.add_player_to_lobby({"player_id" : "-1"}, True)
+		if data.get("type") == "quit_game":
+			match_manager.remove_match(self.lobby.room_group_name)
+
 
 	async def lobby_state(self, event: dict):
 		"""Aggiorna lo stato lato client."""
@@ -195,8 +198,12 @@ class PongLobbyConsumer(AsyncWebsocketConsumer):
 				"event_name": "host_started_game",
 			}
 			await self.lobby.broadcast_message(data_to_send)
-
+		
 		await self.lobby.manage_event(data)
+
+		event_type = data.get("event_name")
+		if event_type == "game_finished":
+			match_manager.remove_match(self.lobby.room_group_name)
 
 	async def lobby_state(self, event: dict):
 		"""

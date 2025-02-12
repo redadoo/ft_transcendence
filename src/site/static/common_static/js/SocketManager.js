@@ -216,8 +216,8 @@ export default class SocketManager
 	{
 		if (!this.connected) 
 		{
-			console.warn('Cannot send data. WebSocket is not connected.');
-			console.warn('data tryed to send.', data);
+			// console.warn('Cannot send data. WebSocket is not connected.');
+			// console.warn('data tryed to send.', data);
 			return;
 		}
 		// console.log("send to socket this data : " + data);

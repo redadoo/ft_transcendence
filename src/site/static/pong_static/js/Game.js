@@ -341,8 +341,19 @@ export default class Game
 			type: 'quit_game',
 			player_id: this.player_id
 		}));
+		
 		this.mode.socket.close();
 		this.sceneManager.dispose();
+		
+		delete this.sceneManager;
+		delete this.pongPlayer;
+		delete this.pongOpponent;
+		delete this.ball;
+
+		this.ball = null;
+		this.pongPlayer = null;
+		this.pongOpponent = null;
+		
 		router.navigateTo('/match-result');
 	}
 }

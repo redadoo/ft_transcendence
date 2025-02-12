@@ -168,11 +168,12 @@ export default class SceneManager
 				this.accumulatedTime -= this.fixedTimeStep;
 			}
 			
-			if(this.renderer == null)
+			if (this.renderer == null)
 				return;
 
 			this.render();
-			this.stats.update();
+			if (this.renderer != null)
+				this.stats.update();
 			if (this.needOrbital) this.controls.update();
 
 			window.requestAnimationFrame(animateLoop);
@@ -206,23 +207,65 @@ export default class SceneManager
 	 */
 	dispose() 
 	{
-		this.scene = null;
-		this.camera = null;
-		if (this.renderer) 
+		if (this.scene) 
 		{
-			this.renderer.dispose();
-			this.renderer = null;
+			this.scene.traverse((object) => {
+				if (object.geometry)
+					object.geometry.dispose();
+	
+				if (object.material) {
+					if (Array.isArray(object.material))
+						object.material.forEach((material) => material.dispose());
+					else 
+						object.material.dispose();
+				}
+	
+				if (object.texture)
+					object.texture.dispose();
+			});
+	
+			this.scene.clear();
+			this.scene = null;
 		}
-		if (this.controls)
+	
+		this.camera = null;
+	
+		if (this.controls) 
 		{
 			this.controls.dispose();
 			this.controls = null;
-		} 
+		}
+	
 		if (this.stats)
 		{
 			document.body.removeChild(this.stats.dom);
 			this.stats = null;
 		}
+	
 		window.removeEventListener("resize", this.onWindowResize);
+	
+		if (this.modelManager) 
+		{
+			this.modelManager.dispose();
+			this.modelManager = null;
+		}
+		if (this.audioManager) 
+		{
+			this.audioManager.dispose();
+			this.audioManager = null;
+		}
+	
+		if (this.renderer) 
+		{
+			
+			this.renderer.forceContextLoss();
+			this.renderer.context = null;
+
+			this.renderer.dispose();
+			
+			document.body.removeChild(this.renderer.domElement);
+			this.renderer.domElement = null;
+			this.renderer = null;
+		}
 	}
 }
