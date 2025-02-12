@@ -233,7 +233,7 @@ const views = {
 		});
 
 		startButton.addEventListener('click', () => {
-			game.mode.send_start();
+			game.mode.sendStart();
 			router.navigateTo('/lobby/playing');
 		});
 	},
