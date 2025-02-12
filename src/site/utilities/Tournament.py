@@ -3,6 +3,9 @@ from enum import Enum
 from utilities.GameManager import GameManager
 from channels.layers import get_channel_layer
 
+MIN_PLAYER_NUMBER = 8
+SCORE_TO_WIN = 5
+
 class Tournament():
 
 	class TournamentStatus(Enum):
@@ -18,13 +21,9 @@ class Tournament():
 		self.channel_layer = get_channel_layer()
 		self.update_lock = asyncio.Lock()
 		self.game_manager = game_manager
-		self.tournament_player = 4
-		self.score_to_win = 5
-		self.players = []
-
-	def tournament_settings(self, tournament_player: int = 4, score_to_win: int = 5):
-		self.tournament_player = tournament_player
-		self.score_to_win = score_to_win
+		self.tournament_player = MIN_PLAYER_NUMBER
+		self.score_to_win = SCORE_TO_WIN
+		self.players = set()
 
 	async def start_tournament(self):
 

@@ -1,9 +1,11 @@
 import PongMode from './PongMode.js';
+import router from '../../../../site_static/js/router.js';
 
 export default class TournamentPongMode extends PongMode {
 
     constructor(game) {
 		super(game);
+		this.room_name = null;
 	}
 
 	/**
@@ -49,4 +51,63 @@ export default class TournamentPongMode extends PongMode {
 		 }));
 	}
 
+	handleSocketMessage(event) 
+	{
+		let parsedData;
+		try {
+			parsedData = JSON.parse(event.data);
+		} catch (error) {
+			console.error("Error parsing WebSocket message:", error);
+			console.log("Raw received data:", event.data);
+			return;
+		}
+
+		const { lobby_info, event_info } = parsedData;
+		if (!lobby_info || !event_info) 
+		{
+			console.error("Invalid data structure received:", parsedData);
+			return;
+		}
+
+		switch (lobby_info.current_lobby_status) 
+		{
+			case 'TO_SETUP':
+				break;
+			case 'PLAYING':
+				break;
+			case 'ENDED':
+				break;
+			case 'WAITING_PLAYER_RECONNECTION':
+				break;
+			default:
+				console.warn("Unhandled lobby status:", lobby_info.current_lobby_status);
+		}
+	}
+
+	setUpLobby(data) 
+  	{
+		const { event_info, lobby_info } = data;
+
+		if (event_info.event_name === "host_started_game") 
+		{
+			return;
+		}
+
+		if (event_info.event_name === "recover_player_data") 
+		{
+			Object.entries(lobby_info.players).forEach(([key, value]) => 
+			{
+				if (this.game.pongPlayer && this.game.pongPlayer.playerId === parseInt(key)) 
+					return;
+				this.game.AddUserToLobby(key, value, this.socket);
+			});
+		}
+
+		if (event_info.event_name === "player_join") 
+		{
+			const { player_id } = event_info;
+			const playerData = lobby_info.players[player_id];
+			this.game.AddUserToLobby(player_id, playerData, this.socket);
+		}
+	}
 }
