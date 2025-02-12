@@ -14,7 +14,7 @@ class LastPongMatchView(APIView):
 
         last_match = PongMatch.objects.filter(
             Q(first_user=user) | Q(second_user=user)
-        ).order_by('-start_date').first() 
+        ).last()
 
         if last_match:
             serializer = PongMatchSerializer(last_match)

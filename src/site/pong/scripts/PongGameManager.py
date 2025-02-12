@@ -26,13 +26,10 @@ class PongGameManager(GameManager):
 
 	async def clear_and_save(self):
 		"""Saves the match results and updates players' match history."""
-		self.game_loop_is_active = False
-
 		players_list = list(self.players.keys())
 		if len(players_list) < 2:
 			print("Not enough players to save the match.")
 			return
-
 		first_player = await sync_to_async(User.objects.get)(id=players_list[0])
 		second_player = await sync_to_async(User.objects.get)(id=players_list[1])
 
@@ -45,7 +42,6 @@ class PongGameManager(GameManager):
 			second_user_mmr_gain=0,
 			start_date=self.start_match_timestamp
 		)
-
 		await sync_to_async(match.save)()
 		
 		player1_history, _ = await sync_to_async(MatchHistory.objects.get_or_create)(user=first_player)
@@ -57,6 +53,8 @@ class PongGameManager(GameManager):
 
 		await sync_to_async(add_match_to_history)(player1_history, match)
 		await sync_to_async(add_match_to_history)(player2_history, match)
+		self.game_loop_is_active = False
+
 
 	def add_player(self, players_id: int, is_bot: bool):
 		"""
@@ -130,7 +128,9 @@ class PongGameManager(GameManager):
 			self.ball.reset()
 
 		if any(score >= constants.MAX_SCORE for score in self.scores.values()):
+			print("is saved? yes")
 			await self.clear_and_save()
+			print("maybe yes")
 			return
 
 	def to_dict(self) -> dict:
