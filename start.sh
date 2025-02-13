@@ -212,8 +212,8 @@ local() {
 		python3 src/site/manage.py migrate
 	fi
 
-	# echo -e "${YELLOW}Creating bot user if it doesn't exist...${NONE}"
-    # python3 src/site/manage.py create_bot_user
+	echo -e "${YELLOW}Creating bot user if it doesn't exist...${NONE}"
+    python3 src/site/manage.py create_bot_user
 
 	echo -e "${YELLOW}Running server locally...${NONE}"
 	python3 src/site/manage.py runserver 0.0.0.0:8000 --verbosity 3
