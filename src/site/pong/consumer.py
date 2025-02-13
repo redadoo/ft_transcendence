@@ -141,6 +141,10 @@ class PongSingleplayerConsumer(AsyncWebsocketConsumer):
 		await self.send(text_data=json.dumps(data_to_send))
 
 class PongLobbyConsumer(AsyncWebsocketConsumer):
+	
+	async def send_to_social(self, data):
+		await self.channel_layer.group_send(f"user_{self.user_id}", data)
+
 	async def connect(self):
 		"""
 		Connects the user to a Pong lobby.
@@ -157,13 +161,10 @@ class PongLobbyConsumer(AsyncWebsocketConsumer):
 		#if room_name is not in url_route we are host of the lobby
 		if self.room_name is None:
 			self.room_name = str(uuid.uuid4())
-			await self.channel_layer.group_send(
-				f"user_{self.user_id}",
-				{
+			await self.send_to_social({
 					"type": "send_pong_lobby",
 					"room_name": self.room_name,
-				}
-			)
+				})
 
 		self.lobby: Lobby = match_manager.get_match(self.room_name)
 		if self.lobby is None:
@@ -228,37 +229,33 @@ class PongLobbyConsumer(AsyncWebsocketConsumer):
 
 		if event_name == "player_join" and player_id:
 			user = await sync_to_async(User.objects.get)(id=player_id)
-			await self.channel_layer.group_send(
-				f"user_{self.user_id}",
-				{
+			await self.send_to_social({
 					"type": "user_join_lobby",
 					"username": user.username,
-				}
-			)
-
+				})
 
 		await self.send(text_data=json.dumps(data_to_send))
 
 class PongTournament(AsyncWebsocketConsumer):
+
+	async def send_to_social(self, data):
+		await self.channel_layer.group_send(f"user_{self.user_id}", data)
 
 	async def connect(self):
 		self.user = self.scope["user"]
 		self.user_id = self.user.id
 		self.room_name = self.scope["url_route"]["kwargs"].get("room_name")
 
-		#if room_name is not in url_route we are host of the lobby
+		#if room_name is not in url_route we are host of the tournament
 		if self.room_name is None:
 			self.room_name = str(uuid.uuid4())
-			await self.channel_layer.group_send(
-				f"user_{self.user_id}",
-				{
+			await self.send_to_social({
 					"type": "send_pong_tournament",
 					"room_name": self.room_name,
-				}
-			)
+				})
 
 		self.tournament: Tournament = match_manager.get_match(self.room_name) 
-		if self.lobby is None:
+		if self.tournament is None:
 			self.tournament: Tournament = match_manager.create_match("pong", self.room_name, PongGameManager(), "tournament")
 
 		await self.channel_layer.group_add(self.tournament.room_group_name, self.channel_name)
@@ -277,14 +274,6 @@ class PongTournament(AsyncWebsocketConsumer):
 			print(f"Error decoding JSON: {e}")
 			return
 
-		event_type = data.get("type")
-		if event_type == "client_ready":
-			data_to_send = {
-				"type": "lobby_state",
-				"event_name": "host_started_game",
-			}
-			await self.tournament.broadcast_message(data_to_send)
-
 		await self.tournament.manage_event(data)
 
 	async def lobby_state(self, event: dict):
@@ -294,4 +283,15 @@ class PongTournament(AsyncWebsocketConsumer):
 			"event_info": event,
 			"lobby_info": self.tournament.to_dict()
 		}
+
+		event_name = event.get("event_name")
+		player_id = event.get("player_id")
+
+		if event_name == "player_join" and player_id:
+			user = await sync_to_async(User.objects.get)(id=player_id)
+			await self.send_to_social({
+					"type": "user_join_tournament",
+					"username": user.username,
+				})
+
 		await self.send(text_data=json.dumps(data_to_send))

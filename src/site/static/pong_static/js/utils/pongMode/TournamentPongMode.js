@@ -92,22 +92,7 @@ export default class TournamentPongMode extends PongMode {
 		{
 			return;
 		}
-
-		if (event_info.event_name === "recover_player_data") 
-		{
-			Object.entries(lobby_info.players).forEach(([key, value]) => 
-			{
-				if (this.game.pongPlayer && this.game.pongPlayer.playerId === parseInt(key)) 
-					return;
-				this.game.AddUserToLobby(key, value, this.socket);
-			});
-		}
-
-		if (event_info.event_name === "player_join") 
-		{
-			const { player_id } = event_info;
-			const playerData = lobby_info.players[player_id];
-			this.game.AddUserToLobby(player_id, playerData, this.socket);
-		}
+		
+		this.managePlayerSetup(data);
 	}
 }

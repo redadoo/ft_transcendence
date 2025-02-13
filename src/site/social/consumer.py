@@ -25,7 +25,8 @@ class SocialConsumer(AsyncWebsocketConsumer):
 			"friend_request_accepted": self.user.accept_friend_request,
 			"send_message": self.user.send_message,
 			"send_lobby_invite": self.user.send_lobby_invite,
-			"user_join_lobby": self.user_join_lobby
+			"user_join_lobby": self.user_join_lobby,
+			"send_tournament_invite": self.user.send_tournament_invite 
         }
 
 	async def disconnect(self, close_code):
@@ -93,3 +94,13 @@ class SocialConsumer(AsyncWebsocketConsumer):
 
 	async def user_join_lobby(self, event):
 		await self.send_event("get_player_joined", username=event["username"])
+
+	async def send_pong_tournament(self, event):
+		self.lobby_room_name = event["room_name"]
+		await self.send_event("get_tournament_room_name", lobby_room_name=self.lobby_room_name)
+
+	async def get_tournament_invite(self, event):
+		await self.send_event("get_tournament_invite", room_name=event["room_name"], username=event["username"])
+
+	async def user_tournament_join_lobby(self, event):
+		await self.send_event("get_tournament_player_joined", username=event["username"])

@@ -4,7 +4,7 @@ from utilities.GameManager import GameManager
 from channels.layers import get_channel_layer
 
 MIN_PLAYER_NUMBER = 8
-SCORE_TO_WIN = 5
+SCORE_TO_WIN = 1
 
 class Tournament():
 
@@ -23,26 +23,64 @@ class Tournament():
 		self.game_manager = game_manager
 		self.tournament_player = MIN_PLAYER_NUMBER
 		self.score_to_win = SCORE_TO_WIN
-		self.players = set()
+		self.players: dict[int, str] = {}
 
-	async def start_tournament(self):
+	async def broadcast_message(self, message: dict):
+		await self.channel_layer.group_send(self.room_group_name, message)
+	
+	async def manage_event(self, data: dict):
+		event_type = data.get("type")
+		if not event_type:
+			print("Event type is missing in the received data.")
+			return
 
-		data_to_send = {
-			"type": "lobby_state",
-			"event_name": "tournament start",
-		}
+		match event_type:
+			case "init_player":
+				self.add_player_to_tournament(data, False)
+			case "client_ready":
+				self.tournament_start()
+			case _:
+				print(f"Unhandled event type: {event_type}. Full data: {data}")
 
-		self.game_manager.add_player(self.players[0], False)
-		self.game_manager.add_player(self.players[1], False)
-		del self.players[:2]
+	async def tournament_start(self):
+		
+		players_list = list(self.players)
 
-		self.lobby_status = self.TournamentStatus.PLAYING
+		self.game_manager.add_player(players_list[0], False)
+		self.game_manager.add_player(players_list[1], False)
+
+		self.tournament_status = self.TournamentStatus.PLAYING
 		self.game_loop_task = asyncio.create_task(self.game_loop())
-		data_to_send = {
+
+		await self.broadcast_message({
 			"type": "lobby_state",
-			"event_name": "game_started",
-		}
-		await self.broadcast_message(data_to_send)
+			"event_name": "host_started_game",
+		})
+
+	async def setup_next_match(self):
+		pass
+
+	async def add_player_to_tournament(self, data: dict, is_bot: bool):
+		if not data.get("player_id"):
+			raise ValueError("Invalid data: 'player_id' is required.")
+		
+		player_id = int(data.get("player_id"))
+		player_alias = data.get("player_alias")
+
+		if len(self.players) > 1:
+			await self.broadcast_message({
+				"type": "lobby_state",
+				"event_name": "recover_player_data",
+			})
+		
+		self.players[player_id] = player_alias
+
+		await self.broadcast_message({
+			"type": "lobby_state",
+			"event_name": "player_join",
+			"player_id": player_id,
+			"player_alias": player_alias
+		})
 
 	async def game_loop(self):
 		"""
@@ -51,7 +89,7 @@ class Tournament():
 		This method is responsible for updating the game state and broadcasting it to all players.
 		"""
 		try:
-			while True:
+			while self.game_manager.game_loop_is_active:
 				async with self.update_lock:
 					await self.game_manager.game_loop()
 				await asyncio.sleep(1 / 60)
@@ -62,54 +100,14 @@ class Tournament():
 		except asyncio.CancelledError:
 			print("Game loop task was cancelled.")
 		finally:
-			self.tournament_status = self.TournamentStatus.ENDED
+
+			id_winner = self.game_manager.get_loser()
+			self.players.pop(id_winner)
+
 			await self.broadcast_message({
 				"type": "lobby_state",
-				"event": "game_finished"
+				"event": "match_finished"
 			})
-
-	async def broadcast_message(self, message: dict):
-		await self.channel_layer.group_send(self.room_group_name, message)
-	
-	async def manage_event(self, data: dict):
-		event_type = data.get("type")
-		if not event_type:
-			print("Event type is missing in the received data.")
-			return
-		
-		match event_type:
-			case "init_player":
-				self.add_player_to_tournament(data, False)
-			case _:
-				print(f"Unhandled event type: {event_type}. Full data: {data}")
-
-	async def add_player_to_tournament(self, data: dict, is_bot: bool):
-		if not data.get("player_id"):
-			raise ValueError("Invalid data: 'player_id' is required.")
-		
-		player_id = int(data.get("player_id"))
-		
-		if len(self.players) > 1:
-
-			data_to_send = {
-				"type": "lobby_state",
-				"event_name": "recover_player_data",
-			}
-
-			await self.broadcast_message(data_to_send)
-		
-		self.players.append(player_id)
-
-		data_to_send = {
-			"type": "lobby_state",
-			"event_name": "player_join",
-			"player_id": player_id
-		}
-
-		await self.broadcast_message(data_to_send)
-
-		if len(self.players) == self.tournament_player:
-			self.start_tournament()
 
 	def to_dict(self) -> dict:
 		tournament_data =  {"current_tournament_status": self.tournament_status.name}

@@ -128,10 +128,15 @@ class PongGameManager(GameManager):
 			self.ball.reset()
 
 		if any(score >= constants.MAX_SCORE for score in self.scores.values()):
-			print("is saved? yes")
 			await self.clear_and_save()
-			print("maybe yes")
 			return
+
+	def get_loser(self):
+		player_list = list(self.players)
+
+		if self.scores["player1"] > self.scores["player2"]:
+			return player_list[1]
+		return player_list[0]
 
 	def to_dict(self) -> dict:
 		"""

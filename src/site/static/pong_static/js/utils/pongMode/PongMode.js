@@ -91,25 +91,28 @@ export default class PongMode {
 			 }));
 		}
 		else
+			managePlayerSetup(data);
+	}
+
+	managePlayerSetup(data)
+	{
+		if (data.event_info.event_name === "recover_player_data")
 		{
-			if (data.event_info.event_name === "recover_player_data")
-			{
-				const players = data.lobby_info.players;
+			const players = data.lobby_info.players;
 
-				for (const [key, value] of Object.entries(players))
-				{
-					if (this.game.pongPlayer != null && this.game.pongPlayer.playerId == parseInt(key))
-						continue;
-					this.game.AddUserToLobby(key,value, this.socket);
-				}
-			}
-
-			if (data.event_info.event_name === "player_join")
+			for (const [key, value] of Object.entries(players))
 			{
-				const newPlayerId = data.event_info.player_id;
-				const playerData = data.lobby_info.players[data.event_info.player_id];
-				this.game.AddUserToLobby(newPlayerId, playerData, this.socket);
+				if (this.game.pongPlayer != null && this.game.pongPlayer.playerId == parseInt(key))
+					continue;
+				this.game.AddUserToLobby(key,value, this.socket);
 			}
+		}
+
+		if (data.event_info.event_name === "player_join")
+		{
+			const newPlayerId = data.event_info.player_id;
+			const playerData = data.lobby_info.players[data.event_info.player_id];
+			this.game.AddUserToLobby(newPlayerId, playerData, this.socket);
 		}
 	}
 }
