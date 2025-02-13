@@ -91,7 +91,7 @@ export default class PongMode {
 			 }));
 		}
 		else
-			managePlayerSetup(data);
+			this.managePlayerSetup(data);
 	}
 
 	managePlayerSetup(data)
