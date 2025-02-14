@@ -9,24 +9,26 @@ from rest_framework.views import APIView
 from rest_framework import status
 from django.db.models import Q
 from .consumer import match_manager
+from utilities.lobby import Lobby
 from .scripts.PongGameManager import PongGameManager
 
+
 class PongInitView(APIView):
-	permission_classes = [IsAuthenticated]
+	# permission_classes = [IsAuthenticated]
 
 	def post(self, request):
 		"""
-		Initializes a new game or retrieves an existing one.
-		Expected payload: {"room_name": <optional>}
+		create a new game.
 		"""
-		room_name = request.data.get('room_name') or str(uuid.uuid4())
-		match = match_manager.get_match(room_name)
-		if not match:
-			match = match_manager.create_match("pong", room_name, PongGameManager(), "Lobby")
+		
+		room_name = str(uuid.uuid4())
+		match: Lobby = match_manager.create_match("pong", room_name, PongGameManager(), "Lobby")
+		match.add_player_to_lobby({"player_id": "-1"}, False)
+		match.mark_player_ready("-1")
 		return Response({"room_name": room_name, "lobby_info": match.to_dict()}, status=status.HTTP_201_CREATED)
 
 class PongPlayerControlView(APIView):
-	permission_classes = [IsAuthenticated]
+	# permission_classes = [IsAuthenticated]
 
 	def post(self, request):
 		"""
@@ -38,12 +40,10 @@ class PongPlayerControlView(APIView):
 			'key': '<key_pressed>', 
 		}
 		"""
-
 		room_name = request.data.get('room_name')
 		match = match_manager.get_match(room_name)
 		if not match:
 			return Response({"error": "Match not found."}, status=status.HTTP_404_NOT_FOUND)
-
 		try:
 			match.game_manager.update_player(request.data)
 		except Exception as e:
@@ -51,7 +51,7 @@ class PongPlayerControlView(APIView):
 		return Response({"lobby_info": match.to_dict()}, status=status.HTTP_200_OK)
 
 class PongGameStateView(APIView):
-	permission_classes = [IsAuthenticated]
+	# permission_classes = [IsAuthenticated]
 
 	def get(self, request):
 		"""
@@ -65,7 +65,7 @@ class PongGameStateView(APIView):
 
 		return Response({
 			"lobby_info": match.to_dict()
-		}, status=status.HTTP_200_OK)
+		}, status=status.HTTP_200_OK) 
 
 class LastPongMatchView(APIView):
 
