@@ -72,31 +72,35 @@ class PongAI():
 				self.returning_to_center = True
 
 			if self.tracking_ball and self.current_target is None:
+				# Calcola il tempo per raggiungere la racchetta
 				time_to_reach_paddle = abs((self.paddle.x - self.ball.x) / (self.ball.speed_x * self.ball.speed_multiplier))
+				
+				# Usa una copia di speed_y per la simulazione
+				simulated_speed_y = self.ball.speed_y
 				predicted_y = self.ball.y
 				remaining_time = time_to_reach_paddle
 
 				while remaining_time > 0:
 					# Calcola la distanza verticale che la palla può percorrere prima del prossimo rimbalzo
-					if self.ball.speed_y > 0:
+					if simulated_speed_y > 0:
 						distance_to_next_bounce = constants.GAME_BOUNDS["yMax"] - predicted_y
 					else:
 						distance_to_next_bounce = predicted_y - constants.GAME_BOUNDS["yMin"]
 
 					# Calcola il tempo necessario per raggiungere il prossimo rimbalzo
-					time_to_next_bounce = distance_to_next_bounce / abs(self.ball.speed_y * self.ball.speed_multiplier)
+					time_to_next_bounce = distance_to_next_bounce / abs(simulated_speed_y * self.ball.speed_multiplier)
 
 					if time_to_next_bounce > remaining_time:
 						# Se non c'è abbastanza tempo per un rimbalzo, aggiorna la posizione e interrompi
-						predicted_y += self.ball.speed_y * remaining_time * self.ball.speed_multiplier
+						predicted_y += simulated_speed_y * remaining_time * self.ball.speed_multiplier
 						break
 					else:
 						# Altrimenti, aggiorna la posizione e il tempo rimanente
-						predicted_y += self.ball.speed_y * time_to_next_bounce * self.ball.speed_multiplier
+						predicted_y += simulated_speed_y * time_to_next_bounce * self.ball.speed_multiplier
 						remaining_time -= time_to_next_bounce
 
 						# Inverte la direzione verticale della palla (simula il rimbalzo)
-						self.ball.speed_y *= -1
+						simulated_speed_y *= -1  # Usa la copia, non self.ball.speed_y
 
 				# Imposta il target della racchetta
 				self.current_target = max(min_y_reachable, min(max_y_reachable, predicted_y))
