@@ -127,7 +127,7 @@ class Game
 		this.sceneManager.scene.add(pointLightHelper);
 
 		// Seconda PointLight (gialla)
-		this.yellowLight = new THREE.PointLight(0xFFD700, 5000000, 1500); // Giallo dorato
+		this.yellowLight = new THREE.PointLight(0xFFD700, 3000000, 1500); // Giallo dorato
 		this.yellowLight.position.set(0, 400, 500);
 		this.yellowLight.castShadow = true;
 		this.yellowLight.shadow.camera.near = 1;
@@ -157,22 +157,22 @@ class Game
 		const bo = this.sceneManager.modelManager.getModel("kingboo");
 		bo.scene.scale.set(170, 170, 170);
 		bo.scene.rotation.y = 0;
-		bo.scene.position.set(200, 100, -400);
+		bo.scene.position.set(120, 150, 620);
 
 		const slimegun = this.sceneManager.modelManager.getModel("slimegun");
 		slimegun.scene.scale.set(4000, 4000, 4000);
-		slimegun.scene.rotation.y = 90;
-		slimegun.scene.position.set(200, 100, -400);
+		slimegun.scene.rotation.y = 1.571;
+		slimegun.scene.position.set(0, 160, 740);
 
 		const bo3 = this.sceneManager.modelManager.getModel("rimuru");
 		bo3.scene.scale.set(30, 30, 30);
-		bo3.scene.rotation.y = 180;
-		bo3.scene.position.set(200, 100, -400);
+		bo3.scene.rotation.y =  200;
+		bo3.scene.position.set(120, 96, 840);
 
 		const bo4 = this.sceneManager.modelManager.getModel("kuriboh");
 		bo4.scene.scale.set(3, 3, 3);
-		bo4.scene.rotation.y = 0;
-		bo4.scene.position.set(200, 100, -400);
+		bo4.scene.rotation.y = -1.571;
+		bo4.scene.position.set(240, 150, 750);
 
 		const axesHelper = new THREE.AxesHelper(500); // La dimensione determina la lunghezza degli assi
 		this.sceneManager.scene.add(axesHelper);
