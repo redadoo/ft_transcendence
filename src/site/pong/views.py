@@ -28,8 +28,6 @@ class PongRoomState(APIView):
 			return Response({"error": "Match not found."}, status=status.HTTP_404_NOT_FOUND)
 		return Response({"lobby_info": match.to_dict()}, status=status.HTTP_200_OK) 
 
-
-
 class PongCheckLobby(APIView):
 	
 	def get(self, request):
