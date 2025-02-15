@@ -12,6 +12,17 @@ from .consumer import match_manager
 from utilities.lobby import Lobby
 from .scripts.PongGameManager import PongGameManager
 
+class PongCheckLobby(APIView):
+	
+	def get(self, request):
+		"""
+		create a new game.
+		"""
+		room_name = request.query_params.get('room_name')
+		match = match_manager.get_match(room_name)
+		if not match:
+			return Response({"success": False}, status=status.HTTP_404_NOT_FOUND)
+		return Response({"success": True}, status=status.HTTP_201_CREATED)
 
 class PongInitView(APIView):
 	# permission_classes = [IsAuthenticated]
