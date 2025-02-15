@@ -22,7 +22,7 @@ class PongCheckLobby(APIView):
 		match = match_manager.get_match(room_name)
 		if not match:
 			return Response({"success": False}, status=status.HTTP_404_NOT_FOUND)
-		return Response({"success": True}, status=status.HTTP_201_CREATED)
+		return Response({"success": True}, status=status.HTTP_200_OK)
 
 class PongInitView(APIView):
 	# permission_classes = [IsAuthenticated]
