@@ -1,6 +1,5 @@
 import uuid
 
-from django.views.decorators.csrf import csrf_exempt
 from rest_framework.response import Response
 from .models import *
 from .serializers import *
@@ -12,6 +11,7 @@ from .consumer import match_manager
 from utilities.lobby import Lobby
 from .scripts.PongGameManager import PongGameManager
 from website.models import User
+
 class PongCheckLobby(APIView):
 	
 	def get(self, request):
@@ -50,7 +50,6 @@ class PongCheckLobby(APIView):
 
 class PongInitView(APIView):
 	# permission_classes = [IsAuthenticated]
-
 	def post(self, request):
 		"""
 		create a new game.

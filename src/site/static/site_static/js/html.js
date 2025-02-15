@@ -868,7 +868,7 @@ const html = {
 					<div class="col-2 px-0">
 						<nav class="nav-wrapper">
 							<div class="d-flex flex-column">
-								<div class="nav-link-left back" data-link="/multiplayer/pong" id="backButton">
+								<div class="nav-link-left back" data-link="/multiplayer/pong_selection" id="backButton">
 									<span class="hundin-font back">BACK</span>
 								</div>
 							</div>
@@ -921,7 +921,7 @@ const html = {
 					<div class="col-2 px-0">
 						<nav class="nav-wrapper">
 							<div class="d-flex flex-column">
-								<div class="nav-link-left back" data-link="/multiplayer/pong" id="backButton">
+								<div class="nav-link-left back" data-link="/multiplayer/pong_selection" id="backButton">
 									<span class="hundin-font back">BACK</span>
 								</div>
 							</div>
@@ -1049,7 +1049,7 @@ matchResult: `
     <div class="col-2 px-0">
       <nav class="nav-wrapper">
         <div class="d-flex flex-column">
-          <div class="nav-link-left back" data-link="/multiplayer/pong">
+          <div class="nav-link-left back" data-link="/multiplayer/pong_selection">
             <span class="hundin-font back">BACK</span>
           </div>
         </div>

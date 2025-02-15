@@ -258,7 +258,7 @@ const views = {
 		});
 
 		backButton.addEventListener('click', () => {
-			
+			game.game_ended();
 		});
 	},
 
