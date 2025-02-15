@@ -12,6 +12,15 @@ from utilities.lobby import Lobby
 from .scripts.PongGameManager import PongGameManager
 from website.models import User
 
+class PongTournamentStateView(APIView):
+	def post(self, request):
+
+		room_name = request.data.get('room_name')
+		match: Lobby = match_manager.get_match(room_name)
+		if not match:
+			return Response({"error": "Match not found."}, status=status.HTTP_404_NOT_FOUND)
+		return Response({"lobby_info": match.to_dict()}, status=status.HTTP_201_CREATED)
+
 class PongCheckLobby(APIView):
 	
 	def get(self, request):
