@@ -85,13 +85,8 @@ class Auth42(View):
 		"""Handle both login initiation and callback."""
 
 		base_url = request.build_absolute_uri('/')
-		print(f"base_url {base_url}")
 		self.params_auth["redirect_uri"] = base_url + self.params_auth["redirect_uri"]
-		test = self.params_auth["redirect_uri"]
-		print(f"self.params_auth {test}")
 		self.params_token["redirect_uri"] = self.params_auth["redirect_uri"]
-		test = self.params_token["redirect_uri"]
-		print(f"self.params_token {test}")
 
 		if request.path == "/42login":
 			return self.user_42login(request)
