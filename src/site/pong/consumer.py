@@ -123,7 +123,7 @@ class PongSingleplayerConsumer(AsyncWebsocketConsumer):
 	async def receive(self, text_data):
 		data = json.loads(text_data)
 		if data.get("type") == "client_ready":
-			await self.lobby.mark_player_ready("-1")
+			await self.lobby.mark_player_ready({"player_id" : "-1"})
 		await self.lobby.manage_event(data)
 		if data.get("type") == "init_player":
 			await self.lobby.add_player_to_lobby({"player_id" : "-1"}, True)

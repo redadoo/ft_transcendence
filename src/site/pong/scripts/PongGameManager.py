@@ -23,14 +23,23 @@ class PongGameManager(GameManager):
 		self.start_match_timestamp = datetime.now()
 		self.game_loop_is_active = True
 
-	async def clear_and_save(self):
+	async def clear_and_save(self, isGameEnded: bool, player_disconnected_id: bool = None):
 		"""Saves the match results and updates players' match history."""
 		players_list = list(self.players.keys())
 		if len(players_list) < 2:
 			print("Not enough players to save the match.")
 			return
+
 		first_player = await sync_to_async(User.objects.get)(id=players_list[0])
 		second_player = await sync_to_async(User.objects.get)(id=players_list[1])
+
+		if isGameEnded == False:
+			if player_disconnected_id == players_list[0]:
+				self.scores["player1"] = 0
+				self.scores["player2"] = 5
+			else:
+				self.scores["player1"] = 5
+				self.scores["player2"] = 0
 
 		match = await sync_to_async(PongMatch.objects.create)(
 			first_user=first_player,
@@ -42,7 +51,7 @@ class PongGameManager(GameManager):
 			start_date=self.start_match_timestamp
 		)
 		await sync_to_async(match.save)()
-		
+
 		player1_history, _ = await sync_to_async(MatchHistory.objects.get_or_create)(user=first_player)
 		player2_history, _ = await sync_to_async(MatchHistory.objects.get_or_create)(user=second_player)
 
@@ -52,6 +61,7 @@ class PongGameManager(GameManager):
 
 		await sync_to_async(add_match_to_history)(player1_history, match)
 		await sync_to_async(add_match_to_history)(player2_history, match)
+
 		self.game_loop_is_active = False
 
 
@@ -127,7 +137,7 @@ class PongGameManager(GameManager):
 			self.ball.reset()
 
 		if any(score >= constants.MAX_SCORE for score in self.scores.values()):
-			await self.clear_and_save()
+			await self.clear_and_save(True)
 			return
 
 	def get_loser(self):

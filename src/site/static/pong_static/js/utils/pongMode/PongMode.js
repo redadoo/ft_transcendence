@@ -68,9 +68,9 @@ export default class PongMode {
 				this.game.updateGameState(lobby_info);
 				break;
 			case 'ENDED':
-				this.game.game_ended();
+				this.game.game_ended(true);
 				break;
-			case 'WAITING_PLAYER_RECONNECTION':
+			case 'PLAYER_DISCONNECTED':
 				break;
 			default:
 				console.warn("Unhandled lobby status:", lobby_info.current_lobby_status);

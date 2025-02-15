@@ -14,7 +14,7 @@ class Lobby:
 		TO_SETUP = "to_setup"
 		PLAYING = "playing"
 		ENDED = "ended"
-		WAITING_PLAYER_RECONNECTION = "waiting_player_reconnection"
+		PLAYER_DISCONNECTED = "PLAYER_DISCONNECTED"
 
 	def __init__(self, game_name: str, room_name: str, game_manager: GameManager):
 		"""
@@ -57,27 +57,28 @@ class Lobby:
 			case "init_player":
 				await self.add_player_to_lobby(data, is_bot=False)
 			case "client_ready":
-				player_id = data.get("player_id")
-				if player_id is not None:
-					await self.mark_player_ready(player_id)
+				await self.mark_player_ready(data)
 			case "update_player":
 				self.game_manager.update_player(data)
+			case "unexpected_quit":
+				await self.close_lobby(data)
 			case "quit_game":
 				pass
 			case _:
 				print(f"Unhandled event type: {event_type}. Full data: {data}")
 
-	async def mark_player_ready(self, player_id: int):
+	async def mark_player_ready(self, data: dict):
 		"""
 		Marks the specified player as ready and starts the game if all players are ready.
 
 		Args:
 			player_id (int): The ID of the player to mark as ready.
 		"""
-		self.ready_players.add(player_id)
-
-		if len(self.ready_players) >= self.game_manager.max_players:
-			await self.start_game()
+		player_id = data.get("player_id")
+		if player_id is not None:
+			self.ready_players.add(player_id)
+			if len(self.ready_players) >= self.game_manager.max_players:
+				await self.start_game()
 
 	async def start_game(self):
 		"""
@@ -150,15 +151,9 @@ class Lobby:
 				"event": "game_finished"
 			})
 
-	def remove_player(self, player_id: int):
-		"""
-		Removes a player from the lobby and handles the logic for player disconnection.
-
-		Args:
-			player_id (int): The ID of the player to remove.
-		"""
-		self.lobby_status = Lobby.LobbyStatus.WAITING_PLAYER_RECONNECTION
-		self.game_manager.player_disconnected(player_id)
+	async def close_lobby(self, data: dict):
+		player_disconnected_id = data.get("player_id")
+		await self.game_manager.clear_and_save(False, player_disconnected_id)
 
 	def to_dict(self) -> dict:
 		"""

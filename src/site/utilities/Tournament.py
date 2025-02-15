@@ -13,7 +13,7 @@ class Tournament():
 		TO_SETUP = "to_setup"
 		PLAYING = "playing"
 		ENDED = "ended"
-		WAITING_PLAYER_RECONNECTION = "waiting_player_reconnection"
+		PLAYER_DISCONNECTED = "PLAYER_DISCONNECTED"
 		
 	def __init__(self, game_name: str, room_name: str, game_manager: GameManager):
 		self.room_group_name = f"{game_name}_tournament_{room_name}"

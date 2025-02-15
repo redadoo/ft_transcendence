@@ -23,4 +23,4 @@ GAME_BOUNDS = {
 }
 
 # game data
-MAX_SCORE = 20
+MAX_SCORE = 5

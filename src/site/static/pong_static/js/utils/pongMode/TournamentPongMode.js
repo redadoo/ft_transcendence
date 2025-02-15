@@ -77,7 +77,7 @@ export default class TournamentPongMode extends PongMode {
 				break;
 			case 'ENDED':
 				break;
-			case 'WAITING_PLAYER_RECONNECTION':
+			case 'PLAYER_DISCONNECTED':
 				break;
 			default:
 				console.warn("Unhandled lobby status:", lobby_info.current_lobby_status);
