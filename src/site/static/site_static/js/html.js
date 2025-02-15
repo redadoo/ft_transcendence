@@ -451,7 +451,7 @@ const html = {
 						<input type="lobbyID" class="pfw-font lobbyID-input" placeholder="enter room id or url and hit enter..." id="lobbyID" name="lobbyID">
 
 						<div class="d-flex flex-column">
-							<a class="nav-link-right tournament" data-link="/">
+							<a class="nav-link-right tournament" data-link="/multiplayer/tournament">
 								<span class="pixel-font tournament">TMT</span>
 								<div class="column-text">
 									<span class="hundin-font tournament text-up">TOURNAMENT</span>
@@ -1041,6 +1041,123 @@ matchResult: `
   </div>
 </div>
 `,
+
+	tournament: `
+	<div class="container-fluid game-container">
+  <div class="row h-100">
+    <!-- Back Button Column -->
+    <div class="col-2 px-0">
+      <nav class="nav-wrapper">
+        <div class="d-flex flex-column">
+          <div class="nav-link-left back" data-link="/multiplayer/pong">
+            <span class="hundin-font back">BACK</span>
+          </div>
+        </div>
+      </nav>
+    </div>
+
+    <!-- Tournament Content -->
+   	<div class="col-10 px-0">
+      <div class="tournament-container">
+        <div class="tournament-header">
+          <span class="pixel-font tournament-title">TOURNAMENT LOBBY</span>
+          <div class="nickname-container">
+            <span class="pixel-font nickname-label">NICKNAME:</span>
+            <input type="text" class="pixel-font nickname-input" id="nicknameInput" placeholder="Enter nickname...">
+            <button class="change-button pixel-font" id="changeNickname">CHANGE</button>
+          </div>
+        </div>
+
+        <div class="tournament-content">
+          <!-- Players Grid -->
+          <div class="players-grid">
+            <div class="player-cell">
+              <div class="player-slot">
+                <div class="player-avatar">
+                  <img src="" alt="Player 1" id="player1Avatar">
+                </div>
+                <div class="player-info">
+                  <span class="pixel-font player-name" id="player1Name">WAITING...</span>
+                  <span class="pixel-font player-status host">HOST</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="player-cell">
+              <div class="player-slot empty">
+                <div class="player-avatar">
+                  <img src="" alt="Player 2" id="player2Avatar">
+                </div>
+                <div class="player-info">
+                  <span class="pixel-font player-name" id="player2Name">WAITING...</span>
+                  <span class="pixel-font player-status">PLAYER</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="player-cell">
+              <div class="player-slot empty">
+                <div class="player-avatar">
+                  <img src="" alt="Player 3" id="player3Avatar">
+                </div>
+                <div class="player-info">
+                  <span class="pixel-font player-name" id="player3Name">WAITING...</span>
+                  <span class="pixel-font player-status">PLAYER</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="player-cell">
+              <div class="player-slot empty">
+                <div class="player-avatar">
+                  <img src="" alt="Player 4" id="player4Avatar">
+                </div>
+                <div class="player-info">
+                  <span class="pixel-font player-name" id="player4Name">WAITING...</span>
+                  <span class="pixel-font player-status">PLAYER</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Tournament Bracket -->
+          <div class="tournament-bracket">
+            <h2 class="pixel-font bracket-title">MATCHUPS</h2>
+            <div class="bracket-rounds">
+              <!-- Semifinals -->
+              <div class="bracket-round">
+                <div class="bracket-match">
+                  <div class="match-player" id="semi1Player1">TBD</div>
+                  <div class="match-player" id="semi1Player2">TBD</div>
+                </div>
+                <div class="bracket-match">
+                  <div class="match-player" id="semi2Player1">TBD</div>
+                  <div class="match-player" id="semi2Player2">TBD</div>
+                </div>
+              </div>
+
+              <!-- Finals -->
+              <div class="bracket-round">
+                <div class="bracket-match finals">
+                  <div class="match-player" id="finalPlayer1">TBD</div>
+                  <div class="match-player" id="finalPlayer2">TBD</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Tournament Controls -->
+          <div class="tournament-controls">
+            <button class="start-button pixel-font" id="startTournament" disabled>
+              START TOURNAMENT
+            </button>
+          </div>
+        </div>
+      </div>
+	</nav>
+    </div>
+  </div>
+</div>`,
 
 };
 

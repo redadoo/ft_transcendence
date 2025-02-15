@@ -27,7 +27,9 @@ export default class SocketHandler {
 				'get_lobby_room_name': () => this.handleLobbyRoomName(socketData.lobby_room_name),
 				'get_lobby_invite': () => this.handleLobbyInvite(socketData),
 				'get_player_joined': () => this.handlePlayerJoined(socketData),
-
+				'get_tournament_room_name': () => this.handleTournamentRoomName(socketData.tournament_room_name),
+				'get_tournament_invite': () => this.handleTournamentInvite(socketData),
+				'get_tournament_player_joined': () => this.handleTournamentPlayerJoined(socketData),
 			};
 
 			const handler = messageHandlers[socketData.type];
@@ -194,4 +196,8 @@ export default class SocketHandler {
 		}
 	}
 
+	handleTournamentRoomName(tournamentRoomName) {
+		console.log('🏆 Handling tournament room name:', tournamentRoomName);
+		window.localStorage['tournament_room_name'] = tournamentRoomName;
+	}
 }

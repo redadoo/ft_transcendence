@@ -1844,3 +1844,219 @@ label {
 	color: #b8b8b8;
 	font-size: 0.8rem;
   }
+
+  .tournament-container {
+	padding: 2rem;
+	height: 100%;
+	background-color: rgba(34, 34, 34, 0.95);
+	border-radius: 10px;
+	margin: 1rem;
+	border: 1px solid rgba(104, 104, 104, 0.2);
+  }
+
+  .tournament-header {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	margin-bottom: 2rem;
+	padding-bottom: 1rem;
+	border-bottom: 2px solid rgba(104, 104, 104, 0.2);
+  }
+
+  .tournament-title {
+	color: #ff6232;
+	font-size: 2rem;
+	text-shadow: 4px 4px 1px rgba(0, 0, 0, 0.4);
+  }
+
+  .nickname-container {
+	display: flex;
+	align-items: center;
+	gap: 1rem;
+	background-color: #2a2a2a;
+	padding: 0.5rem 1rem;
+	border-radius: 5px;
+	border: 1px solid rgba(104, 104, 104, 0.3);
+  }
+
+  .nickname-label {
+	color: #a0a0a0;
+	font-size: 0.8rem;
+	white-space: nowrap;
+  }
+
+  .nickname-input {
+	background-color: #1a1a1a;
+	border: 1px solid rgba(104, 104, 104, 0.3);
+	color: #ff6232;
+	font-size: 0.9rem;
+	padding: 0.5rem 1rem;
+	border-radius: 3px;
+	min-width: 200px;
+	letter-spacing: 1px;
+  }
+
+  .nickname-input::placeholder {
+	color: rgba(247, 150, 102, 0.5);
+  }
+
+  .nickname-input:focus {
+	outline: none;
+	border-color: #ff6232;
+	box-shadow: 0 0 0 1px rgba(255, 98, 50, 0.2);
+  }
+
+  .change-button {
+	background-color: #532314;
+	color: #f79666;
+	border: none;
+	padding: 0.5rem 1rem;
+	font-size: 0.8rem;
+	border-radius: 3px;
+	cursor: pointer;
+	transition: all 0.3s ease;
+	white-space: nowrap;
+  }
+
+  .change-button:hover {
+	background-color: #683a2a;
+	transform: translateY(-2px);
+  }
+
+  /* Players Grid */
+  .players-grid {
+	display: grid;
+	grid-template-columns: repeat(2, 1fr);
+	gap: 1rem;
+	margin-bottom: 2rem;
+  }
+
+  .player-slot {
+	background-color: #2a2a2a;
+	padding: 1.5rem;
+	border-radius: 8px;
+	display: flex;
+	align-items: center;
+	gap: 1.5rem;
+	border: 1px solid rgba(104, 104, 104, 0.3);
+  }
+
+  .player-slot.empty {
+	opacity: 0.6;
+  }
+
+  .player-avatar {
+	width: 80px;
+	height: 80px;
+	border-radius: 8px;
+	overflow: hidden;
+	border: 2px solid #532314;
+  }
+
+  .player-avatar img {
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+  }
+
+  .player-info {
+	display: flex;
+	flex-direction: column;
+	gap: 0.5rem;
+  }
+
+  .player-name {
+	color: #f79666;
+	font-size: 1rem;
+  }
+
+  .player-status {
+	color: #f79666;
+	font-size: 0.8rem;
+	padding: 0.3rem 0.8rem;
+	background-color: #532314;
+	border-radius: 3px;
+	display: inline-block;
+	width: fit-content;
+  }
+
+  /* Tournament Bracket */
+  .tournament-bracket {
+	background-color: #2a2a2a;
+	padding: 2rem;
+	border-radius: 8px;
+	margin-bottom: 2rem;
+	border: 1px solid rgba(104, 104, 104, 0.3);
+  }
+
+  .bracket-title {
+	color: #f79666;
+	font-size: 1.5rem;
+	margin-bottom: 2rem;
+	text-align: center;
+  }
+
+  .bracket-rounds {
+	display: flex;
+	justify-content: space-around;
+	gap: 2rem;
+  }
+
+  .bracket-round {
+	display: flex;
+	flex-direction: column;
+	gap: 2rem;
+  }
+
+  .bracket-match {
+	background-color: #1a1a1a;
+	padding: 1rem;
+	border-radius: 6px;
+	border: 1px solid rgba(104, 104, 104, 0.3);
+	min-width: 200px;
+  }
+
+  .bracket-match.finals {
+	background-color: #532314;
+  }
+
+  .match-player {
+	color: #f79666;
+	font-family: "Press Start 2P";
+	font-size: 0.8rem;
+	padding: 0.5rem;
+	border-bottom: 1px solid rgba(104, 104, 104, 0.3);
+  }
+
+  .match-player:last-child {
+	border-bottom: none;
+  }
+
+  /* Tournament Controls */
+  .tournament-controls {
+	display: flex;
+	justify-content: center;
+	margin-top: 2rem;
+  }
+
+  .start-button {
+	background-color: #ff6232;
+	color: white;
+	border: none;
+	padding: 1rem 2rem;
+	font-size: 1.2rem;
+	border-radius: 5px;
+	cursor: pointer;
+	transition: all 0.3s ease;
+  }
+
+  .start-button:hover:not(:disabled) {
+	background-color: #cc4f28;
+	transform: translateY(-2px);
+  }
+
+  .start-button:disabled {
+	background-color: #2a2a2a;
+	color: #686868;
+	cursor: not-allowed;
+  }

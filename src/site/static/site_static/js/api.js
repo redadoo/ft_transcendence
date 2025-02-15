@@ -105,6 +105,16 @@ const api = {
 		}
 	},
 
+	async checkLobby(roomName) {
+		try {
+			const data = await this.fetchJson(`/api/pong/lobby?room_name=${roomName}`);
+			return data.success === 'true';
+		} catch (error) {
+			console.error('Lobby check failed:', error);
+			return false;
+		}
+	},
+
 	async getAllUsers() {
 		try {
 			return await this.fetchJson('/api/users?type=simple');

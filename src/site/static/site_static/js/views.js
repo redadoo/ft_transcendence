@@ -110,6 +110,24 @@ const views = {
 		return html.pongSelection;
 	},
 
+	async pongSelectionScripts() {
+		const lobbyID = document.getElementById('lobbyID');
+
+		lobbyID.addEventListener('keydown', (e) => {
+			if (e.key === 'Enter') {
+				api.checkLobby(lobbyID.value).then(res => {
+					if (res === 'true') {
+						window.localStorage['room_name'] = lobbyID.value;
+						router.navigateTo('/lobby/guest');
+					}
+					else {
+						alert('Invalid lobby ID');
+					}
+				});
+			}
+		});
+	},
+
 	async singleplayer() {
 		return html.singleplayer;
 	},
@@ -297,6 +315,16 @@ const views = {
 		api.getUserProfile(data.second_user_username).then(data => {
 			document.getElementById('player2Avatar').src = data.image_url.avatar_url;
 		});
+	},
+
+	async tournament() {
+		return html.tournament;
+	},
+
+	async tournamentScripts() {
+		// const game = new Game();
+		// await game.init();
+		// game.sceneManager.animate();
 	},
 };
 
