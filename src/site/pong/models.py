@@ -53,6 +53,9 @@ class PongMatch(models.Model):
 	)
 
 	def get_winner(self):
+		if self.first_user is None or self.second_user is None:
+			return "unknown"
+
 		if self.first_user_score > self.second_user_score:
 			return self.first_user.username
 		elif self.first_user_score < self.second_user_score:

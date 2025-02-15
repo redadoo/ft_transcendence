@@ -67,6 +67,14 @@ class Lobby:
 			case _:
 				print(f"Unhandled event type: {event_type}. Full data: {data}")
 
+	async def force_player_ready(self):
+		self.ready_players.add(list(self.game_manager.players)[1])
+		data_to_send = {
+			"type": "lobby_state",
+			"event_name": "host_started_game",
+		}
+		await self.broadcast_message(data_to_send)
+
 	async def mark_player_ready(self, data: dict):
 		"""
 		Marks the specified player as ready and starts the game if all players are ready.

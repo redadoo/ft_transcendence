@@ -75,6 +75,9 @@ class PongGameManager(GameManager):
 		if len(self.players) > 2:
 			raise ValueError("Two unique player IDs are required to initialize players.")
 
+		if isinstance(players_id, int) == False:
+			players_id = int(players_id)
+
 		if is_bot:
 			self.players[players_id] = PongAI(players_id, self.ball, constants.GAME_BOUNDS["xMax"] - 1, constants.PADDLE_COLOR)
 		else:

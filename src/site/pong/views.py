@@ -1,5 +1,5 @@
 import uuid
-
+from asgiref.sync import async_to_sync
 from rest_framework.response import Response
 from .models import *
 from .serializers import *
@@ -48,18 +48,38 @@ class PongCheckLobby(APIView):
 			status=status.HTTP_200_OK
 		)
 
+class PongStartLobbyView(APIView):
+	def post(self, request):
+
+		room_name = request.data.get('room_name')
+		match: Lobby = match_manager.get_match(room_name)
+		if not match:
+			return Response({"error": "Match not found."}, status=status.HTTP_404_NOT_FOUND)
+		
+		if len(match.game_manager.players) != 2:
+			return Response({"error": "not enough player."}, status=status.HTTP_404_NOT_FOUND)
+
+		async_to_sync(match.force_player_ready)()
+		async_to_sync(match.start_game)()
+		return Response({"lobby_info": match.to_dict()}, status=status.HTTP_201_CREATED)
+
 class PongInitView(APIView):
 	# permission_classes = [IsAuthenticated]
 	def post(self, request):
 		"""
-		create a new game.
+		Create a new game.
 		"""
-		
 		room_name = str(uuid.uuid4())
 		match: Lobby = match_manager.create_match("pong", room_name, PongGameManager(), "Lobby")
-		match.add_player_to_lobby({"player_id": "-1"}, False)
-		match.mark_player_ready("-1")
-		return Response({"room_name": room_name, "lobby_info": match.to_dict()}, status=status.HTTP_201_CREATED)
+		
+		# Wrap asynchronous calls to run synchronously
+		async_to_sync(match.add_player_to_lobby)({"player_id": "-1"}, False)
+		async_to_sync(match.mark_player_ready)({"player_id": "-1"})
+		
+		return Response(
+			{"room_name": room_name, "lobby_info": match.to_dict()}, 
+			status=status.HTTP_201_CREATED
+		)
 
 class PongPlayerControlView(APIView):
 	# permission_classes = [IsAuthenticated]
@@ -75,11 +95,11 @@ class PongPlayerControlView(APIView):
 		}
 		"""
 		room_name = request.data.get('room_name')
-		match = match_manager.get_match(room_name)
+		match: Lobby = match_manager.get_match(room_name)
 		if not match:
 			return Response({"error": "Match not found."}, status=status.HTTP_404_NOT_FOUND)
 		try:
-			match.game_manager.update_player(request.data)
+			match.game_manager.players[-1].update_player_data(request.data)
 		except Exception as e:
 			return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 		return Response({"lobby_info": match.to_dict()}, status=status.HTTP_200_OK)

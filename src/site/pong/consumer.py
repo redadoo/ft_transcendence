@@ -6,9 +6,9 @@ from utilities.lobby import Lobby
 from asgiref.sync import sync_to_async
 from utilities.Tournament import Tournament
 from utilities.MatchManager import MatchManager
+from autobahn.websocket.protocol import Disconnected
 from pong.scripts.PongGameManager import PongGameManager
 from channels.generic.websocket import AsyncWebsocketConsumer
-
 match_manager = MatchManager()
 
 class PongMatchmaking(AsyncWebsocketConsumer):
@@ -100,7 +100,11 @@ class PongMultiplayerConsumer(AsyncWebsocketConsumer):
 			"event_info": event,
 			"lobby_info": self.lobby.to_dict()
 		}
-		await self.send(text_data=json.dumps(data_to_send))
+		try:
+			await self.send(text_data=json.dumps(data_to_send))
+		except Disconnected:
+			print(f"Attempted to send a message on a closed websocket connection. data : {data_to_send}")
+
 
 class PongSingleplayerConsumer(AsyncWebsocketConsumer):
 
@@ -138,7 +142,11 @@ class PongSingleplayerConsumer(AsyncWebsocketConsumer):
 			"event_info": event,
 			"lobby_info": self.lobby.to_dict()
 		}
-		await self.send(text_data=json.dumps(data_to_send))
+
+		try:
+			await self.send(text_data=json.dumps(data_to_send))
+		except Disconnected:
+			print(f"Attempted to send a message on a closed websocket connection. data : {data_to_send}")
 
 class PongLobbyConsumer(AsyncWebsocketConsumer):
 	
@@ -233,8 +241,10 @@ class PongLobbyConsumer(AsyncWebsocketConsumer):
 					"type": "user_join_lobby",
 					"username": user.username,
 				})
-
-		await self.send(text_data=json.dumps(data_to_send))
+		try:
+			await self.send(text_data=json.dumps(data_to_send))
+		except Disconnected:
+			print(f"Attempted to send a message on a closed websocket connection. data : {data_to_send}")
 
 class PongTournament(AsyncWebsocketConsumer):
 
@@ -294,4 +304,7 @@ class PongTournament(AsyncWebsocketConsumer):
 					"username": user.username,
 				})
 
-		await self.send(text_data=json.dumps(data_to_send))
+		try:
+			await self.send(text_data=json.dumps(data_to_send))
+		except Disconnected:
+			print(f"Attempted to send a message on a closed websocket connection. data : {data_to_send}")
