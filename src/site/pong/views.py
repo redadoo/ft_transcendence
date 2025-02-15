@@ -13,6 +13,7 @@ from .scripts.PongGameManager import PongGameManager
 from website.models import User
 
 class PongTournamentStateView(APIView):
+	permission_classes = [IsAuthenticated]
 	def post(self, request):
 
 		room_name = request.data.get('room_name')
