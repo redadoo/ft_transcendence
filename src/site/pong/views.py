@@ -15,17 +15,38 @@ from website.models import User
 class PongCheckLobby(APIView):
 	
 	def get(self, request):
-		"""
-		create a new game.
-		"""
-		room_name = request.query_params.get('room_name')
-		match: Lobby = match_manager.get_match(room_name)
+		room_name: str = request.query_params.get('room_name')
+
+		if not room_name:
+			return Response(
+				{"success": False, "error": "room_name parameter is required."},
+				status=status.HTTP_400_BAD_REQUEST
+			)
+
+		match = match_manager.get_match(room_name)
 		if not match:
-			return Response({"success": "false"}, status=status.HTTP_404_NOT_FOUND)
-		player_list = list(match.game_manager.players)
-		host_id = player_list[0]
-		host_username = User.objects.get(id=host_id)
-		return Response({"success": "true", "host": host_username.username }, status=status.HTTP_200_OK)
+			return Response({"success": False}, status=status.HTTP_404_NOT_FOUND)
+
+		if not match.game_manager.players:
+			return Response(
+				{"success": False, "error": "No players in the lobby."},
+				status=status.HTTP_404_NOT_FOUND
+			)
+
+		host_id = next(iter(match.game_manager.players.keys()))
+		
+		try:
+			host_username = User.objects.values_list('username', flat=True).get(id=host_id)
+		except User.DoesNotExist:
+			return Response(
+				{"success": False, "error": "Host not found."},
+				status=status.HTTP_404_NOT_FOUND
+			)
+
+		return Response(
+			{"success": True, "host": host_username},
+			status=status.HTTP_200_OK
+		)
 
 class PongInitView(APIView):
 	# permission_classes = [IsAuthenticated]
