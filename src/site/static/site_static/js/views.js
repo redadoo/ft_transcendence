@@ -116,7 +116,7 @@ const views = {
 		lobbyID.addEventListener('keydown', (e) => {
 			if (e.key === 'Enter') {
 				api.checkLobby(lobbyID.value).then(res => {
-					if (res === 'true') {
+					if (res === true) {
 						window.localStorage['room_name'] = lobbyID.value;
 						router.navigateTo('/lobby/guest');
 					}

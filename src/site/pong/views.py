@@ -11,7 +11,7 @@ from django.db.models import Q
 from .consumer import match_manager
 from utilities.lobby import Lobby
 from .scripts.PongGameManager import PongGameManager
-
+from website.models import User
 class PongCheckLobby(APIView):
 	
 	def get(self, request):
@@ -19,10 +19,13 @@ class PongCheckLobby(APIView):
 		create a new game.
 		"""
 		room_name = request.query_params.get('room_name')
-		match = match_manager.get_match(room_name)
+		match: Lobby = match_manager.get_match(room_name)
 		if not match:
-			return Response({"success": False}, status=status.HTTP_404_NOT_FOUND)
-		return Response({"success": True}, status=status.HTTP_200_OK)
+			return Response({"success": "false"}, status=status.HTTP_404_NOT_FOUND)
+		player_list = list(match.game_manager.players)
+		host_id = player_list[0]
+		host_username = User.objects.get(id=host_id)
+		return Response({"success": "true", "host": host_username.username }, status=status.HTTP_200_OK)
 
 class PongInitView(APIView):
 	# permission_classes = [IsAuthenticated]
