@@ -12,8 +12,7 @@ from utilities.lobby import Lobby
 from .scripts.PongGameManager import PongGameManager
 from website.models import User
 
-class PongTournamentStateView(APIView):
-	permission_classes = [IsAuthenticated]
+class PongRoomState(APIView):
 	def post(self, request):
 
 		room_name = request.data.get('room_name')
@@ -21,6 +20,15 @@ class PongTournamentStateView(APIView):
 		if not match:
 			return Response({"error": "Match not found."}, status=status.HTTP_404_NOT_FOUND)
 		return Response({"lobby_info": match.to_dict()}, status=status.HTTP_201_CREATED)
+
+	def get(self, request):
+		room_name = request.query_params.get('room_name')
+		match: Lobby = match_manager.get_match(room_name)
+		if not match:
+			return Response({"error": "Match not found."}, status=status.HTTP_404_NOT_FOUND)
+		return Response({"lobby_info": match.to_dict()}, status=status.HTTP_200_OK) 
+
+
 
 class PongCheckLobby(APIView):
 	
@@ -113,23 +121,6 @@ class PongPlayerControlView(APIView):
 		except Exception as e:
 			return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 		return Response({"lobby_info": match.to_dict()}, status=status.HTTP_200_OK)
-
-class PongGameStateView(APIView):
-	# permission_classes = [IsAuthenticated]
-
-	def get(self, request):
-		"""
-		Retrieves the current game state.
-		Expects a query parameter: ?room_name=<room_name>
-		"""
-		room_name = request.query_params.get('room_name')
-		match = match_manager.get_match(room_name)
-		if not match:
-			return Response({"error": "Match not found."}, status=status.HTTP_404_NOT_FOUND)
-
-		return Response({
-			"lobby_info": match.to_dict()
-		}, status=status.HTTP_200_OK) 
 
 class LastPongMatchView(APIView):
 
