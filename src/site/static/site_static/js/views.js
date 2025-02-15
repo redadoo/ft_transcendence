@@ -238,6 +238,7 @@ const views = {
 		const player1Name = document.getElementById('player1Name');
 		const player1Avatar = document.getElementById('player1Avatar');
 		const startButton = document.getElementById('startGame');
+		const backButton = document.getElementById('backButton');
 
 		const game = new Game();
 		await game.init();
@@ -254,6 +255,10 @@ const views = {
 		startButton.addEventListener('click', () => {
 			game.mode.sendStart();
 			router.navigateTo('/lobby/playing');
+		});
+
+		backButton.addEventListener('click', () => {
+			
 		});
 	},
 
@@ -274,6 +279,7 @@ const views = {
 		const player2Name = document.getElementById('player2Name');
 		const player1Avatar = document.getElementById('player1Avatar');
 		const player2Avatar = document.getElementById('player2Avatar');
+		const backButton = document.getElementById('backButton');
 
 		api.getProfileInfo().then(data => {
 			player2Name.textContent = data.username;
@@ -283,6 +289,10 @@ const views = {
 		api.getUserProfile(window.localStorage['invited_username']).then(data => {
 			player1Name.textContent = data.username;
 			player1Avatar.src = data.image_url.avatar_url;
+		});
+
+		backButton.addEventListener('click', () => {
+
 		});
 
 		const game = new Game();
