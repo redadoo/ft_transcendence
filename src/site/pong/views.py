@@ -19,17 +19,17 @@ class PongCheckLobby(APIView):
 
 		if not room_name:
 			return Response(
-				{"success": False, "error": "room_name parameter is required."},
+				{"success": "false", "error": "room_name parameter is required."},
 				status=status.HTTP_400_BAD_REQUEST
 			)
 
 		match = match_manager.get_match(room_name)
 		if not match:
-			return Response({"success": False}, status=status.HTTP_404_NOT_FOUND)
+			return Response({"success": "false"}, status=status.HTTP_404_NOT_FOUND)
 
 		if not match.game_manager.players:
 			return Response(
-				{"success": False, "error": "No players in the lobby."},
+				{"success": "false", "error": "No players in the lobby."},
 				status=status.HTTP_404_NOT_FOUND
 			)
 
@@ -39,12 +39,12 @@ class PongCheckLobby(APIView):
 			host_username = User.objects.values_list('username', flat=True).get(id=host_id)
 		except User.DoesNotExist:
 			return Response(
-				{"success": False, "error": "Host not found."},
+				{"success": "false", "error": "Host not found."},
 				status=status.HTTP_404_NOT_FOUND
 			)
 
 		return Response(
-			{"success": True, "host": host_username},
+			{"success": "true", "host": host_username},
 			status=status.HTTP_200_OK
 		)
 
