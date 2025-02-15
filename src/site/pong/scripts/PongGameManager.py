@@ -48,7 +48,7 @@ class PongGameManager(GameManager):
 			second_user_score=self.scores["player2"],
 			first_user_mmr_gain=0,
 			second_user_mmr_gain=0,
-			start_date=self.start_match_timestamp
+			start_date=self.start_match_timestamp or datetime.now()
 		)
 		await sync_to_async(match.save)()
 
