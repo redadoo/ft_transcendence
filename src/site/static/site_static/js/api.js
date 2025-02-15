@@ -108,7 +108,7 @@ const api = {
 	async checkLobby(roomName) {
 		try {
 			const data = await this.fetchJson(`/api/pong/check_lobby?room_name=${roomName}`);
-			return data.success === 'true';
+			return data;
 		} catch (error) {
 			console.error('Lobby check failed:', error);
 			return false;
