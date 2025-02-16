@@ -20,17 +20,16 @@ class UploadUserImageView(APIView):
 
 	def post(self, request, *args, **kwargs):
 		user = request.user
-		
-		user_image = UserImage.objects.get(user=user)
-		form = UserImageForm(request.FILES)
+		user_image, created = UserImage.objects.get_or_create(user=user)
+
+		form = UserImageForm(request.POST, request.FILES, instance=user_image)
 		
 		if form.is_valid():
-			user_image.user_avatar = form.cleaned_data['user_avatar']
-			user_image.save()
+			form.save()
 			return Response({"message": "Image uploaded successfully", "image_url": user_image.user_avatar.url}, status=status.HTTP_200_OK)
 		
 		return Response({"error": form.errors}, status=status.HTTP_400_BAD_REQUEST)
-	
+
 class ChangePasswordView(APIView):
 	"""
 	A view to allow authenticated users to change their password securely.

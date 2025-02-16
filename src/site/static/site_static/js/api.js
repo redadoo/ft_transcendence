@@ -95,6 +95,18 @@ const api = {
 		}
 	},
 
+	async updateProfileImage(formData) {
+		try {
+			return await this.fetchJson('/api/upload_profile_image', {
+				method: 'POST',
+				body: formData
+			});
+		} catch (error) {
+			console.error('Password change error:', error);
+			return false;
+		}
+	},
+
 	async checkAuth() {
 		try {
 			const data = await this.fetchJson('/api/users/is_logged_in/');
