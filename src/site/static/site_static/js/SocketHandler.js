@@ -222,6 +222,6 @@ export default class SocketHandler {
 	}
 
 	handleTournamentPlayerJoined(playerData) {
-
+		console.log('👥 Handling tournament player joined:', playerData);
 	}
 }

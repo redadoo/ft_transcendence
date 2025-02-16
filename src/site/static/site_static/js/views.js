@@ -291,7 +291,7 @@ const views = {
 			player1Name.textContent = data.username;
 			player1Avatar.src = data.image_url.avatar_url;
 		});
-		
+
 		const game = new Game();
 		await game.init();
 		game.sceneManager.animate();
@@ -342,7 +342,24 @@ const views = {
 		await new Promise(resolve => setTimeout(resolve, 1000));
 		console.log("room_name:", window.localStorage['room_name']);
 
-		const tournament = new Tournament(window.localStorage['username']);
+		const tournament = new Tournament(window.localStorage['username'], window.localStorage['room_name']);
+		await tournament.initialize();
+	},
+
+	async tournamentGuest() {
+		return html.tournamentGuest;
+	},
+
+	async tournamentGuestScripts() {
+		const game = new Game();
+		await game.init();
+		game.sceneManager.animate();
+
+		await new Promise(resolve => setTimeout(resolve, 1000));
+		console.log("room_name:", window.localStorage['room_name']);
+
+		const tournament = new Tournament(window.localStorage['username'], window.localStorage['room_name']);
+		await tournament.initialize();
 	},
 };
 
