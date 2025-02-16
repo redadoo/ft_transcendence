@@ -25,7 +25,7 @@ class PongPlayersList(APIView):
 			player_ids = list(players.keys())
 		elif isinstance(match, Tournament):
 			players =  match.to_dict().get("tournament_players", {})
-			player_ids = list(players.keys())
+			player_ids = list(players)
 		usernames = []
 		for pid in player_ids:
 			try:
