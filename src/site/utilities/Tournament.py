@@ -23,7 +23,7 @@ class Tournament():
 		self.game_manager = game_manager
 		self.tournament_player = MIN_PLAYER_NUMBER
 		self.score_to_win = SCORE_TO_WIN
-		self.players: dict[int, str] = {}
+		self.players: list = [] 
 
 	async def broadcast_message(self, message: dict):
 		await self.channel_layer.group_send(self.room_group_name, message)
@@ -36,9 +36,9 @@ class Tournament():
 
 		match event_type:
 			case "init_player":
-				self.add_player_to_tournament(data, False)
+				await self.add_player_to_tournament(data, False)
 			case "client_ready":
-				self.tournament_start()
+				await self.tournament_start()
 			case _:
 				print(f"Unhandled event type: {event_type}. Full data: {data}")
 
@@ -65,7 +65,6 @@ class Tournament():
 			raise ValueError("Invalid data: 'player_id' is required.")
 		
 		player_id = int(data.get("player_id"))
-		player_alias = data.get("player_alias")
 
 		if len(self.players) > 1:
 			await self.broadcast_message({
@@ -73,13 +72,12 @@ class Tournament():
 				"event_name": "recover_player_data",
 			})
 		
-		self.players[player_id] = player_alias
+		self.players.append(player_id)
 
 		await self.broadcast_message({
 			"type": "lobby_state",
 			"event_name": "player_join",
 			"player_id": player_id,
-			"player_alias": player_alias
 		})
 
 	async def game_loop(self):

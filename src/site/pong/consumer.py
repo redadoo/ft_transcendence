@@ -278,6 +278,7 @@ class PongTournament(AsyncWebsocketConsumer):
 		Args:
 			text_data (str): The JSON message received from the client.
 		"""
+		
 		try:
 			data = json.loads(text_data)
 		except json.JSONDecodeError as e:
