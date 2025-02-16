@@ -71,7 +71,7 @@ export default class PongMode {
 				this.game.game_ended(true);
 				break;
 			case 'PLAYER_DISCONNECTED':
-				this.remove_player(parsedData);
+				this.game.game_ended(false);
 				break;
 			default:
 				console.warn("Unhandled lobby status:", lobby_info.current_lobby_status);
@@ -115,11 +115,5 @@ export default class PongMode {
 			const playerData = data.lobby_info.players[data.event_info.player_id];
 			this.game.AddUserToLobby(newPlayerId, playerData, this.socket);
 		}
-	}
-
-	remove_player(data)
-	{
-		this.game.pongOpponent = null;
-		this.game.game_ended(false);
 	}
 }

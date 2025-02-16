@@ -384,6 +384,6 @@ export default class Game
 		if (isGamefinished === true)
 			router.navigateTo('/match-result');
 		else
-			router.navigateTo('/');
+			router.navigateTo('/multiplayer/pong_selection');
 	}
 }
