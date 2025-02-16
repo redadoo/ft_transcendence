@@ -75,6 +75,40 @@ class PongMatch(models.Model):
 		else:
 			return "Match is still ongoing"
 
+
+	@staticmethod
+	def get_player_mmr_gained(is_first_player, first_score, second_score):
+		"""
+		Calculate MMR gained for a player based on their score and whether they are the first player.
+		
+		Args:
+			is_first_player (bool): True if calculating for the first player, False for the second.
+			first_score (int): Score of the first player.
+			second_score (int): Score of the second player.
+		
+		Returns:
+			int: MMR gained for the player.
+		"""
+		player_won = first_score > second_score if is_first_player else second_score > first_score
+		return 100 if player_won else 10
+
+		
+
+	def get_player_xp_gained(self, user):
+		if user == self.get_winner():
+			return 100
+		return 10
+
+	def get_player_mmr_gained(self, user):
+		if user == self.first_user:
+			return self.first_user_mmr_gain
+		return self.second_user_mmr_gain  
+
+	def get_player_point_scored(self, user):
+		if user == self.first_user:
+			return self.first_user_score
+		return self.second_user_score  
+
 	def __str__(self):
 		"""
 		String representation of the PongMatch instance.
