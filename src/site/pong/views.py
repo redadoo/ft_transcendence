@@ -8,20 +8,24 @@ from rest_framework.views import APIView
 from rest_framework import status
 from django.db.models import Q
 from .consumer import match_manager
-from utilities.lobby import Lobby
+from utilities.lobby import Lobby 
+from utilities.Tournament import Tournament 
 from .scripts.PongGameManager import PongGameManager
 from website.models import User
 
 class PongPlayersList(APIView):
 	def get(self, request):
 		room_name = request.query_params.get('room_name')
-		match: Lobby = match_manager.get_match(room_name)
+		match = match_manager.get_match(room_name)
 		if not match:
 			return Response({"error": "Match not found."}, status=status.HTTP_404_NOT_FOUND)
 		
-		players =  match.to_dict().get("players", {})
-		player_ids = list(players.keys())
-		
+		if isinstance(match, Lobby):
+			players =  match.to_dict().get("players", {})
+			player_ids = list(players.keys())
+		elif isinstance(match, Tournament):
+			players =  match.to_dict().get("tournament_players", {})
+			player_ids = list(players.keys())
 		usernames = []
 		for pid in player_ids:
 			try:

@@ -109,6 +109,7 @@ class Tournament():
 
 	def to_dict(self) -> dict:
 		tournament_data =  {"current_tournament_status": self.tournament_status.name}
+		tournament_player = {"tournament_players": {player_id for player_id in self.players()}}
+		tournament_data.update(tournament_player)
 		tournament_data.update(self.game_manager.to_dict())
-
 		return tournament_data
