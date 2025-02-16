@@ -101,8 +101,8 @@ class Tournament():
 			print("Game loop task was cancelled.")
 		finally:
 
-			id_winner = self.game_manager.get_loser()
-			self.players.pop(id_winner)
+			loser_id = self.game_manager.get_loser()
+			self.players.pop(loser_id)
 
 			await self.broadcast_message({
 				"type": "lobby_state",
