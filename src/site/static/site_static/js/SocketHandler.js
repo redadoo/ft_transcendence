@@ -198,6 +198,30 @@ export default class SocketHandler {
 
 	handleTournamentRoomName(tournamentRoomName) {
 		console.log('🏆 Handling tournament room name:', tournamentRoomName);
-		window.localStorage['tournament_room_name'] = tournamentRoomName;
+		window.localStorage['room_name'] = tournamentRoomName;
+	}
+
+	handleTournamentInvite(inviteData) {
+		console.log('🎟️ Handling tournament invite:', inviteData);
+
+		this.notificationManager.addNotification({
+			type: 'tournament_invite',
+			title: 'Tournament Invite',
+			message: `${inviteData.username} has invited you to a tournament`,
+			actions: [
+				{
+					label: 'Accept',
+					handler: () => this.userActions.acceptInviteToTournament(inviteData)
+				},
+				{
+					label: 'Decline',
+					handler: () => this.userActions.declineInviteToTournament(inviteData.username)
+				}
+			]
+		});
+	}
+
+	handleTournamentPlayerJoined(playerData) {
+
 	}
 }

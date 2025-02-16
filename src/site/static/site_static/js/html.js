@@ -451,7 +451,7 @@ const html = {
 						<input type="lobbyID" class="pfw-font lobbyID-input" placeholder="enter room id or url and hit enter..." id="lobbyID" name="lobbyID">
 
 						<div class="d-flex flex-column">
-							<a class="nav-link-right tournament" data-link="/multiplayer/tournament">
+							<a class="nav-link-right tournament" data-link="/tournament">
 								<span class="pixel-font tournament">TMT</span>
 								<div class="column-text">
 									<span class="hundin-font tournament text-up">TOURNAMENT</span>

@@ -27,8 +27,7 @@ export default class SocialOverlayManager {
 			chat: this.openChat.bind(this),
 			inviteToGame: this.sendInviteToGame.bind(this),
 			acceptInviteToGame: this.acceptInviteToGame.bind(this),
-			// inviteToTournament: this.sendInviteToTournament.bind(this),
-			// acceptInviteToTournament: this.acceptInviteToTournament.bind(this),
+			acceptInviteToTournament: this.acceptInviteToTournament.bind(this),
 		}
 		this.initializeUIElements();
 		this.notificationManager = new NotificationManager();
@@ -321,7 +320,12 @@ export default class SocialOverlayManager {
 		router.navigateTo('/lobby/guest');
 	}
 
-	acceptInviteToTournament
+	acceptInviteToTournament(inviteData) {
+		window.localStorage[`room_name`] = inviteData.room_name;
+		window.localStorage[`invited_username`] = inviteData.username;
+
+		router.navigateTo('/multiplayer/tournament/guest');
+	}
 
 	// Socket message senders
 	sendStatusUpdate(newStatus) {

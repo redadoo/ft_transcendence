@@ -11,12 +11,13 @@ export default class TournamentPongMode extends PongMode {
 	/**
 	 * Retrieves or generates a room name for the lobby.
 	 */
-	getRoomName() 
+	getRoomName()
 	{
-		if (window.location.pathname.includes("guest")) 
+		if (window.location.pathname.includes("guest"))
 			this.room_name = window.localStorage.getItem('room_name');
-		else 
+		else
 		{
+			console.log("Generating new room name...");
 			this.room_name = crypto.randomUUID();
 			window.localStorage.setItem('room_name', this.room_name);
 		}
@@ -28,10 +29,10 @@ export default class TournamentPongMode extends PongMode {
 	/**
 	 * Initializes the private lobby mode.
 	 */
-	init() 
+	init()
 	{
 		this.getRoomName();
-	
+
 		this.socket.initGameWebSocket(
 			'pong',
 			this.handleSocketMessage.bind(this),
@@ -39,19 +40,19 @@ export default class TournamentPongMode extends PongMode {
 			this.onSocketOpen.bind(this)
 		);
 	}
-	
+
 	/**
 	 * Sends a start signal to the server to confirm lobby setup.
 	 */
-	sendStart() 
+	sendStart()
 	{
-		this.socket.send(JSON.stringify({ 
+		this.socket.send(JSON.stringify({
 			type: 'client_ready',
 			player_id: this.game.player_id
 		 }));
 	}
 
-	handleSocketMessage(event) 
+	handleSocketMessage(event)
 	{
 		let parsedData;
 		try {
@@ -63,13 +64,13 @@ export default class TournamentPongMode extends PongMode {
 		}
 
 		const { lobby_info, event_info } = parsedData;
-		if (!lobby_info || !event_info) 
+		if (!lobby_info || !event_info)
 		{
 			console.error("Invalid data structure received:", parsedData);
 			return;
 		}
 
-		switch (lobby_info.current_lobby_status) 
+		switch (lobby_info.current_lobby_status)
 		{
 			case 'TO_SETUP':
 				break;
@@ -84,15 +85,15 @@ export default class TournamentPongMode extends PongMode {
 		}
 	}
 
-	setUpLobby(data) 
+	setUpLobby(data)
   	{
 		const { event_info, lobby_info } = data;
 
-		if (event_info.event_name === "host_started_game") 
+		if (event_info.event_name === "host_started_game")
 		{
 			return;
 		}
-		
+
 		this.managePlayerSetup(data);
 	}
 }

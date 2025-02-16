@@ -73,7 +73,7 @@ export default class Game
 		const leavePage = window.confirm("Do you want to leave?");
 		if (leavePage)
 			this.game_ended(false);
-		else 
+		else
 			history.pushState(null, document.title, location.href);
 	}
 
@@ -84,12 +84,12 @@ export default class Game
 	manageWindowClose()
 	{
 		history.pushState(null, document.title, location.href);
-		
+
 		this.close_window_event_popstate = this.handleExit.bind(this);
 		this.close_window_event_beforeunload = (event) => {
 			event.preventDefault();
 			event.returnValue = "Are you sure you want to leave?";
-			
+
 			this.shouldCleanupOnExit = true;
 		};
 
@@ -154,6 +154,7 @@ export default class Game
 		}
 
 		const modeFromPath = SocketManager.getModeFromPath();
+		console.log("Mode from path:", modeFromPath);
 		switch (modeFromPath)
 		{
 			case 'singleplayer':
@@ -167,6 +168,7 @@ export default class Game
 				break;
 			case 'tournament':
 				this.mode = new TournamentPongMode(this);
+				break;
 			default:
 				console.error("Modalità di gioco non valida.");
 		}
@@ -362,13 +364,13 @@ export default class Game
 			this.sceneManager.dispose();
 			this.sceneManager = null;
 		}
-	
+
 		this.ball = null;
 		this.pongPlayer = null;
 		this.pongOpponent = null;
-	
+
 		let event_name = isGamefinished === true ? "quit_game" : "unexpected_quit";
-	
+
 		if (this.mode && this.mode.socket) {
 			this.mode.socket.send(JSON.stringify({
 				type: event_name,
@@ -376,9 +378,9 @@ export default class Game
 			}));
 			this.mode.socket.close();
 		}
-	
+
 		this.cleanupWindowClose();
-	
+
 		if (isGamefinished === true)
 			router.navigateTo('/match-result');
 		else

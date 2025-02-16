@@ -236,6 +236,15 @@ const api = {
 		}
 	},
 
+	async getTournamentInfo(roomName) {
+		try {
+			return await this.fetchJson(`/api/pong/room_state?room_name=${roomName}`);
+		} catch (error) {
+			console.error('Tournament info error:', error);
+			return false;
+		}
+	},
+
 	async login(username, password) {
 		try {
 			return await this.fetchJson('/api/users/login/', {
