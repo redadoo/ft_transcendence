@@ -7,7 +7,8 @@ from utilities.GameManager import GameManager
 from pong.scripts.ai import PongAI
 from utilities.Player import Player
 from website.models import User, MatchHistory, UserStats
-from datetime import datetime
+from channels.db import database_sync_to_async
+from django.utils import timezone
 
 class PongGameManager(GameManager):
 	def __init__(self):
@@ -20,7 +21,7 @@ class PongGameManager(GameManager):
 
 	def start_game(self):
 		"""Marks the game as started."""
-		self.start_match_timestamp = datetime.now()
+		self.start_match_timestamp = timezone.now()
 		self.game_loop_is_active = True
 
 	async def clear_and_save(self, is_game_ended: bool, player_disconnected_id: int = None):
@@ -30,8 +31,8 @@ class PongGameManager(GameManager):
 			print("Not enough players to save the match.")
 			return
 
-		first_player = await sync_to_async(User.objects.get)(id=players_list[0])
-		second_player = await sync_to_async(User.objects.get)(id=players_list[1])
+		first_player = await database_sync_to_async(User.objects.get)(id=players_list[0])
+		second_player = await database_sync_to_async(User.objects.get)(id=players_list[1])
 
 		if not is_game_ended:
 			if player_disconnected_id == players_list[0]:
@@ -39,34 +40,43 @@ class PongGameManager(GameManager):
 			else:
 				self.scores["player1"], self.scores["player2"] = 5, 0
 
-		first_user_mmr_gain = PongMatch.get_player_mmr_gained(True, self.scores["player1"], self.scores["player2"])	
-		second_user_mmr_gain = PongMatch.get_player_mmr_gained(False, self.scores["player2"], self.scores["player1"])
+		first_user_mmr_gain = PongMatch.static_get_player_mmr_gained(True, self.scores["player1"], self.scores["player2"])	
+		second_user_mmr_gain = PongMatch.static_get_player_mmr_gained(False, self.scores["player2"], self.scores["player1"])
 
-		match = await sync_to_async(PongMatch.objects.create)(
+		match = await database_sync_to_async(PongMatch.objects.create)(
 			first_user=first_player,
 			second_user=second_player,
 			first_user_score=self.scores["player1"],
 			second_user_score=self.scores["player2"],
 			first_user_mmr_gain=first_user_mmr_gain,
 			second_user_mmr_gain=second_user_mmr_gain,
-			start_date=self.start_match_timestamp or datetime.now()
+			start_date=self.start_match_timestamp or timezone.now()
 		)
-		await sync_to_async(match.save)()
+		await database_sync_to_async(match.save)()
 
-		first_player_stats = await sync_to_async(UserStats.objects.get)(user=first_player)
-		second_player_stats = await sync_to_async(UserStats.objects.get)(user=second_player)
+		try:
+			first_player_stats = await database_sync_to_async(
+				lambda: UserStats.objects.select_related('user').get(user=first_player)
+			)()
+			second_player_stats = await database_sync_to_async(
+				lambda: UserStats.objects.select_related('user').get(user=second_player)
+			)()
+		except UserStats.DoesNotExist:
+			print(f"UserStats not found for user: {first_player.username}")
+			return
 
 		first_player_stats.update_with_match_info(match)
 		second_player_stats.update_with_match_info(match)
-		await sync_to_async(first_player_stats.save)()
-		await sync_to_async(second_player_stats.save)()
-		
-		player1_history, _ = await sync_to_async(MatchHistory.objects.get)(user=first_player)
-		player2_history, _ = await sync_to_async(MatchHistory.objects.get)(user=second_player)
+
+		await database_sync_to_async(first_player_stats.save)()
+		await database_sync_to_async(second_player_stats.save)()
+
+		player1_history, _ = await database_sync_to_async(MatchHistory.objects.get)(user=first_player)
+		player2_history, _ = await database_sync_to_async(MatchHistory.objects.get)(user=second_player)
 
 		async def add_match_to_history(history):
 			history.pong_matches.add(match)
-			await sync_to_async(history.save)()
+			await database_sync_to_async(history.save)()
 
 		await add_match_to_history(player1_history)
 		await add_match_to_history(player2_history)

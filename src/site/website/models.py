@@ -124,8 +124,8 @@ class UserStats(models.Model):
 	mmr = models.PositiveIntegerField(default=1000, validators=[MinValueValidator(0)])
 	win = models.PositiveIntegerField(default=0, validators=[MinValueValidator(0)])
 	lose = models.PositiveIntegerField(default=0, validators=[MinValueValidator(0)])
+	current_winstreak = models.PositiveIntegerField(default=0, validators=[MinValueValidator(0)])
 	longest_winstreak = models.PositiveIntegerField(default=0, validators=[MinValueValidator(0)])
-	longest_losestreak = models.PositiveIntegerField(default=0, validators=[MinValueValidator(0)])
 	total_points_scored = models.PositiveIntegerField(default=0, validators=[MinValueValidator(0)])
 	longest_game = models.PositiveIntegerField(default=0, validators=[MinValueValidator(0)])
 	time_on_site = models.PositiveIntegerField(default=0, validators=[MinValueValidator(0)])
@@ -170,25 +170,20 @@ class UserStats(models.Model):
 		Args:
 			match (PongMatch): The match instance containing match data.
 		"""
-		# Update experience and MMR
-		exp_gained = match.get_player_xp_gained(self.user)
-		mmr_gained = match.get_player_mmr_gained(self.user)
+		exp_gained = match.get_player_xp_gained(self.user.username)
+		mmr_gained = match.get_player_mmr_gained(self.user.username)
 		self.exp += exp_gained
 		self.mmr += mmr_gained
-
-		# Update win/loss count and streaks
 		is_winner = match.get_winner() == self.user.username
 		if is_winner:
 			self.win += 1
 		else:
 			self.lose += 1
-		# Update total points scored
 		points_scored = match.get_player_point_scored(self.user)
 		self.total_points_scored += points_scored
-
-		# Update longest game duration
-		game_duration = match.get_duration()
-		self.longest_game = max(self.longest_game, game_duration)
+		game_duration = match.get_duration_minutes()
+		if game_duration > self.longest_game:
+			self.longest_game = game_duration	 
 
 	class Meta:
 		verbose_name = "User Stat"

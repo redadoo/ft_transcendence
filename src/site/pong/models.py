@@ -62,6 +62,13 @@ class PongMatch(models.Model):
 			return self.second_user.username
 		return "Tie"
 
+	def get_duration_minutes(self):
+		if self.end_date:
+			duration = self.end_date - self.start_date
+			total_seconds = int(duration.total_seconds())
+			minutes, seconds = divmod(total_seconds, 60)
+			return minutes
+		return 0
 
 	def get_duration(self):
 		if self.end_date:
@@ -70,14 +77,13 @@ class PongMatch(models.Model):
 			minutes, seconds = divmod(total_seconds, 60)
 
 			start_date_formatted = self.start_date.strftime("%d-%m-%Y")
-
 			return f"{start_date_formatted} {minutes}m {seconds}s"
 		else:
 			return "Match is still ongoing"
 
 
 	@staticmethod
-	def get_player_mmr_gained(is_first_player, first_score, second_score):
+	def static_get_player_mmr_gained(is_first_player, first_score, second_score):
 		"""
 		Calculate MMR gained for a player based on their score and whether they are the first player.
 		
@@ -94,8 +100,8 @@ class PongMatch(models.Model):
 
 		
 
-	def get_player_xp_gained(self, user):
-		if user == self.get_winner():
+	def get_player_xp_gained(self, username: str):
+		if username == self.get_winner():
 			return 100
 		return 10
 
