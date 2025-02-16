@@ -236,9 +236,9 @@ const api = {
 		}
 	},
 
-	async getTournamentInfo(roomName) {
+	async getTournamentPlayers(roomName) {
 		try {
-			return await this.fetchJson(`/api/pong/room_state?room_name=${roomName}`);
+			return await this.fetchJson(`/api/pong/player_list?room_name=${roomName}`);
 		} catch (error) {
 			console.error('Tournament info error:', error);
 			return false;
