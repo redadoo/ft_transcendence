@@ -1,4 +1,5 @@
 import api from './api.js';
+import router from './router.js';
 
 export default class SocketHandler {
 	constructor(socialData, userActions, notificationManager, friendListManager, chatManager) {
@@ -223,5 +224,7 @@ export default class SocketHandler {
 
 	handleTournamentPlayerJoined(playerData) {
 		console.log('👥 Handling tournament player joined:', playerData);
+		router.tournament.addNewPlayer(playerData.username);
+
 	}
 }

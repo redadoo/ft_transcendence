@@ -7,7 +7,7 @@ import SocialOverlayManager from './overlay.js';
 import SocketHandler from './SocketHandler.js';
 import Game from '../../pong_static/js/Game.js';
 import dateFormatter from './dateFormatter.js';
-import Tournament from './Tournament.js';
+import './Tournament.js';
 
 const views = {
 	// Auth views
@@ -342,8 +342,7 @@ const views = {
 		await new Promise(resolve => setTimeout(resolve, 1000));
 		console.log("room_name:", window.localStorage['room_name']);
 
-		const tournament = new Tournament(window.localStorage['username'], window.localStorage['room_name']);
-		await tournament.initialize();
+
 	},
 
 	async tournamentGuest() {
@@ -358,8 +357,7 @@ const views = {
 		await new Promise(resolve => setTimeout(resolve, 1000));
 		console.log("room_name:", window.localStorage['room_name']);
 
-		const tournament = new Tournament(window.localStorage['username'], window.localStorage['room_name']);
-		await tournament.initialize();
+		router.tournament.initialize(window.localStorage['username'], window.localStorage['room_name']);
 	},
 };
 

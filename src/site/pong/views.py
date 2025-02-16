@@ -8,8 +8,8 @@ from rest_framework.views import APIView
 from rest_framework import status
 from django.db.models import Q
 from .consumer import match_manager
-from utilities.lobby import Lobby 
-from utilities.Tournament import Tournament 
+from utilities.lobby import Lobby
+from utilities.Tournament import Tournament
 from .scripts.PongGameManager import PongGameManager
 from website.models import User
 
@@ -19,7 +19,7 @@ class PongPlayersList(APIView):
 		match = match_manager.get_match(room_name)
 		if not match:
 			return Response({"error": "Match not found."}, status=status.HTTP_404_NOT_FOUND)
-		
+
 		if isinstance(match, Lobby):
 			players =  match.to_dict().get("players", {})
 			player_ids = list(players.keys())
@@ -33,7 +33,7 @@ class PongPlayersList(APIView):
 				usernames.append(user.username)
 			except (User.DoesNotExist, ValueError):
 				usernames.append("Unknown")
-		return Response({"usernames": usernames.reverse()}, status=status.HTTP_200_OK)
+		return Response({"usernames": list(usernames.reverse())}, status=status.HTTP_200_OK)
 
 class PongRoomState(APIView):
 	def post(self, request):
@@ -45,7 +45,7 @@ class PongRoomState(APIView):
 		return Response({"lobby_info": match.to_dict()}, status=status.HTTP_201_CREATED)
 
 class PongCheckLobby(APIView):
-	
+
 	def get(self, request):
 		room_name: str = request.query_params.get('room_name')
 
@@ -66,7 +66,7 @@ class PongCheckLobby(APIView):
 			)
 
 		host_id = next(iter(match.game_manager.players.keys()))
-		
+
 		try:
 			host_username = User.objects.values_list('username', flat=True).get(id=host_id)
 		except User.DoesNotExist:
@@ -87,7 +87,7 @@ class PongStartLobbyView(APIView):
 		match: Lobby = match_manager.get_match(room_name)
 		if not match:
 			return Response({"error": "Match not found."}, status=status.HTTP_404_NOT_FOUND)
-		
+
 		if len(match.game_manager.players) != 2:
 			return Response({"error": "not enough player."}, status=status.HTTP_404_NOT_FOUND)
 
@@ -103,13 +103,13 @@ class PongInitView(APIView):
 		"""
 		room_name = str(uuid.uuid4())
 		match: Lobby = match_manager.create_match("pong", room_name, PongGameManager(), "Lobby")
-		
+
 		# Wrap asynchronous calls to run synchronously
 		async_to_sync(match.add_player_to_lobby)({"player_id": "-1"}, False)
 		async_to_sync(match.mark_player_ready)({"player_id": "-1"})
-		
+
 		return Response(
-			{"room_name": room_name, "lobby_info": match.to_dict()}, 
+			{"room_name": room_name, "lobby_info": match.to_dict()},
 			status=status.HTTP_201_CREATED
 		)
 
@@ -122,8 +122,8 @@ class PongPlayerControlView(APIView):
 		Expected payload: {
 			"room_name": <room_name>,
 			"player_id": <player_id>,
-			'action_type': '<action_type>', 
-			'key': '<key_pressed>', 
+			'action_type': '<action_type>',
+			'key': '<key_pressed>',
 		}
 		"""
 		room_name = request.data.get('room_name')

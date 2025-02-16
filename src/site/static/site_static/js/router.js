@@ -3,6 +3,7 @@ import {HeaderText, FooterText}  from './HeaderFooterText.js';
 import html from './html.js';
 import overlayManager from './overlay.js';
 import views from './views.js';
+import Tournament from './Tournament.js';
 
 const router = {
 	init: function() {
@@ -40,8 +41,11 @@ const router = {
 		document.getElementById('statusOverlay').innerHTML = html.statusOverlay;
 		document.getElementById('header').innerHTML = html.header;
 
+		this.tournament = new Tournament();
+
 		this.overlay = new overlayManager();
 		this.setupEventListeners();
+
 		this.navigateTo(window.location.pathname);
 	},
 
