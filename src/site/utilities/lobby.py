@@ -163,7 +163,7 @@ class Lobby:
 		player_disconnected_id = data.get("player_id")
 		player_disconnected_id = int(player_disconnected_id)
 
-		if self.lobby_status != self.LobbyStatus.TO_SETUP:
+		if self.lobby_status == self.LobbyStatus.PLAYING:
 			await self.game_manager.clear_and_save(False, player_disconnected_id)
 		else:
 			self.lobby_status = self.LobbyStatus.PLAYER_DISCONNECTED
