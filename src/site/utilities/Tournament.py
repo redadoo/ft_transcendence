@@ -13,7 +13,7 @@ class Tournament():
 		TO_SETUP = "to_setup"
 		PLAYING = "playing"
 		ENDED = "ended"
-		WAITING_PLAYER_RECONNECTION = "waiting_player_reconnection"
+		PLAYER_DISCONNECTED = "PLAYER_DISCONNECTED"
 		
 	def __init__(self, game_name: str, room_name: str, game_manager: GameManager):
 		self.room_group_name = f"{game_name}_tournament_{room_name}"
@@ -23,7 +23,7 @@ class Tournament():
 		self.game_manager = game_manager
 		self.tournament_player = MIN_PLAYER_NUMBER
 		self.score_to_win = SCORE_TO_WIN
-		self.players: dict[int, str] = {}
+		self.players: list = [] 
 
 	async def broadcast_message(self, message: dict):
 		await self.channel_layer.group_send(self.room_group_name, message)
@@ -36,9 +36,9 @@ class Tournament():
 
 		match event_type:
 			case "init_player":
-				self.add_player_to_tournament(data, False)
+				await self.add_player_to_tournament(data, False)
 			case "client_ready":
-				self.tournament_start()
+				await self.tournament_start()
 			case _:
 				print(f"Unhandled event type: {event_type}. Full data: {data}")
 
@@ -65,7 +65,6 @@ class Tournament():
 			raise ValueError("Invalid data: 'player_id' is required.")
 		
 		player_id = int(data.get("player_id"))
-		player_alias = data.get("player_alias")
 
 		if len(self.players) > 1:
 			await self.broadcast_message({
@@ -73,13 +72,12 @@ class Tournament():
 				"event_name": "recover_player_data",
 			})
 		
-		self.players[player_id] = player_alias
+		self.players.append(player_id)
 
 		await self.broadcast_message({
 			"type": "lobby_state",
 			"event_name": "player_join",
 			"player_id": player_id,
-			"player_alias": player_alias
 		})
 
 	async def game_loop(self):
@@ -101,8 +99,8 @@ class Tournament():
 			print("Game loop task was cancelled.")
 		finally:
 
-			id_winner = self.game_manager.get_loser()
-			self.players.pop(id_winner)
+			loser_id = self.game_manager.get_loser()
+			self.players.pop(loser_id)
 
 			await self.broadcast_message({
 				"type": "lobby_state",
@@ -111,6 +109,7 @@ class Tournament():
 
 	def to_dict(self) -> dict:
 		tournament_data =  {"current_tournament_status": self.tournament_status.name}
+		tournament_player = {"tournament_players": list({player_id for player_id in self.players})}
+		tournament_data.update(tournament_player)
 		tournament_data.update(self.game_manager.to_dict())
-
 		return tournament_data

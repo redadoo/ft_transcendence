@@ -26,7 +26,7 @@ class SocialConsumer(AsyncWebsocketConsumer):
 			"send_message": self.user.send_message,
 			"send_lobby_invite": self.user.send_lobby_invite,
 			"user_join_lobby": self.user_join_lobby,
-			"send_tournament_invite": self.user.send_tournament_invite 
+			"send_tournament_invite": self.user.send_tournament_invite
         }
 
 	async def disconnect(self, close_code):
@@ -102,5 +102,5 @@ class SocialConsumer(AsyncWebsocketConsumer):
 	async def get_tournament_invite(self, event):
 		await self.send_event("get_tournament_invite", room_name=event["room_name"], username=event["username"])
 
-	async def user_tournament_join_lobby(self, event):
+	async def user_join_tournament(self, event):
 		await self.send_event("get_tournament_player_joined", username=event["username"])

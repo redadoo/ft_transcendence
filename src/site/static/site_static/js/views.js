@@ -7,6 +7,7 @@ import SocialOverlayManager from './overlay.js';
 import SocketHandler from './SocketHandler.js';
 import Game from '../../pong_static/js/Game.js';
 import dateFormatter from './dateFormatter.js';
+import './Tournament.js';
 
 const views = {
 	// Auth views
@@ -258,7 +259,7 @@ const views = {
 		});
 
 		backButton.addEventListener('click', () => {
-			game.game_ended();
+			game.game_ended(false);
 		});
 	},
 
@@ -291,13 +292,14 @@ const views = {
 			player1Avatar.src = data.image_url.avatar_url;
 		});
 
-		backButton.addEventListener('click', () => {
-
-		});
-
 		const game = new Game();
 		await game.init();
 		game.sceneManager.animate();
+
+		backButton.addEventListener('click', () => {
+			game.game_ended(false);
+		});
+
 	},
 
 	async matchResult() {
@@ -333,9 +335,29 @@ const views = {
 	},
 
 	async tournamentScripts() {
-		// const game = new Game();
-		// await game.init();
-		// game.sceneManager.animate();
+		const game = new Game();
+		await game.init();
+		game.sceneManager.animate();
+
+		await new Promise(resolve => setTimeout(resolve, 1000));
+		console.log("room_name:", window.localStorage['room_name']);
+
+
+	},
+
+	async tournamentGuest() {
+		return html.tournamentGuest;
+	},
+
+	async tournamentGuestScripts() {
+		const game = new Game();
+		await game.init();
+		game.sceneManager.animate();
+
+		await new Promise(resolve => setTimeout(resolve, 1000));
+		console.log("room_name:", window.localStorage['room_name']);
+
+		router.tournament.initialize(window.localStorage['username'], window.localStorage['room_name']);
 	},
 };
 

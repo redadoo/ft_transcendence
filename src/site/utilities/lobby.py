@@ -14,7 +14,7 @@ class Lobby:
 		TO_SETUP = "to_setup"
 		PLAYING = "playing"
 		ENDED = "ended"
-		WAITING_PLAYER_RECONNECTION = "waiting_player_reconnection"
+		PLAYER_DISCONNECTED = "PLAYER_DISCONNECTED"
 
 	def __init__(self, game_name: str, room_name: str, game_manager: GameManager):
 		"""
@@ -57,27 +57,36 @@ class Lobby:
 			case "init_player":
 				await self.add_player_to_lobby(data, is_bot=False)
 			case "client_ready":
-				player_id = data.get("player_id")
-				if player_id is not None:
-					await self.mark_player_ready(player_id)
+				await self.mark_player_ready(data)
 			case "update_player":
 				self.game_manager.update_player(data)
+			case "unexpected_quit":
+				await self.close_lobby(data)
 			case "quit_game":
 				pass
 			case _:
 				print(f"Unhandled event type: {event_type}. Full data: {data}")
 
-	async def mark_player_ready(self, player_id: int):
+	async def force_player_ready(self):
+		self.ready_players.add(list(self.game_manager.players)[1])
+		data_to_send = {
+			"type": "lobby_state",
+			"event_name": "host_started_game",
+		}
+		await self.broadcast_message(data_to_send)
+
+	async def mark_player_ready(self, data: dict):
 		"""
 		Marks the specified player as ready and starts the game if all players are ready.
 
 		Args:
 			player_id (int): The ID of the player to mark as ready.
 		"""
-		self.ready_players.add(player_id)
-
-		if len(self.ready_players) >= self.game_manager.max_players:
-			await self.start_game()
+		player_id = data.get("player_id")
+		if player_id is not None:
+			self.ready_players.add(player_id)
+			if len(self.ready_players) >= self.game_manager.max_players:
+				await self.start_game()
 
 	async def start_game(self):
 		"""
@@ -150,15 +159,20 @@ class Lobby:
 				"event": "game_finished"
 			})
 
-	def remove_player(self, player_id: int):
-		"""
-		Removes a player from the lobby and handles the logic for player disconnection.
+	async def close_lobby(self, data: dict):
+		player_disconnected_id = data.get("player_id")
+		player_disconnected_id = int(player_disconnected_id)
 
-		Args:
-			player_id (int): The ID of the player to remove.
-		"""
-		self.lobby_status = Lobby.LobbyStatus.WAITING_PLAYER_RECONNECTION
-		self.game_manager.player_disconnected(player_id)
+		if self.lobby_status == self.LobbyStatus.PLAYING:
+			await self.game_manager.clear_and_save(False, player_disconnected_id)
+		else:
+			self.lobby_status = self.LobbyStatus.PLAYER_DISCONNECTED
+			self.game_manager.game_loop_is_active = False
+			data_to_send = {
+				"type": "lobby_state",
+				"event_name": "close_lobby",
+			}
+			await self.broadcast_message(data_to_send)
 
 	def to_dict(self) -> dict:
 		"""

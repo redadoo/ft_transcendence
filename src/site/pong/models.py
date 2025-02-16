@@ -53,12 +53,22 @@ class PongMatch(models.Model):
 	)
 
 	def get_winner(self):
+		if self.first_user is None or self.second_user is None:
+			return "unknown"
+
 		if self.first_user_score > self.second_user_score:
 			return self.first_user.username
 		elif self.first_user_score < self.second_user_score:
 			return self.second_user.username
 		return "Tie"
 
+	def get_duration_minutes(self):
+		if self.end_date:
+			duration = self.end_date - self.start_date
+			total_seconds = int(duration.total_seconds())
+			minutes, seconds = divmod(total_seconds, 60)
+			return minutes
+		return 0
 
 	def get_duration(self):
 		if self.end_date:
@@ -67,10 +77,43 @@ class PongMatch(models.Model):
 			minutes, seconds = divmod(total_seconds, 60)
 
 			start_date_formatted = self.start_date.strftime("%d-%m-%Y")
-
 			return f"{start_date_formatted} {minutes}m {seconds}s"
 		else:
 			return "Match is still ongoing"
+
+
+	@staticmethod
+	def static_get_player_mmr_gained(is_first_player, first_score, second_score):
+		"""
+		Calculate MMR gained for a player based on their score and whether they are the first player.
+		
+		Args:
+			is_first_player (bool): True if calculating for the first player, False for the second.
+			first_score (int): Score of the first player.
+			second_score (int): Score of the second player.
+		
+		Returns:
+			int: MMR gained for the player.
+		"""
+		player_won = first_score > second_score if is_first_player else second_score > first_score
+		return 100 if player_won else 10
+
+		
+
+	def get_player_xp_gained(self, username: str):
+		if username == self.get_winner():
+			return 100
+		return 10
+
+	def get_player_mmr_gained(self, user):
+		if user == self.first_user:
+			return self.first_user_mmr_gain
+		return self.second_user_mmr_gain  
+
+	def get_player_point_scored(self, user):
+		if user == self.first_user:
+			return self.first_user_score
+		return self.second_user_score  
 
 	def __str__(self):
 		"""

@@ -38,13 +38,18 @@ const CAMERA_SETTINGS = {
 export default class Game
 {
 	/**
-     * Constructs a new Game instance, initializing properties.
-     */
+	 * Constructs a new Game instance, initializing properties.
+	*/
 	constructor()
 	{
 		this.sceneManager = null;
 		this.mode = null;
 		this.player_id = null;
+
+		this.close_window_event_beforeunload = null;
+		this.close_window_event_popstate = null;
+		this.close_window_event_unload = null;
+		this.shouldCleanupOnExit = false;
 
 		this.ambientLight = null;
 		this.pointLightMagenta = null;
@@ -60,8 +65,16 @@ export default class Game
 		this.background = null;
 
 		this.isSceneCreated = false;
-
 		this.manageWindowClose();
+	}
+
+	handleExit(event)
+	{
+		const leavePage = window.confirm("Do you want to leave?");
+		if (leavePage)
+			this.game_ended(false);
+		else
+			history.pushState(null, document.title, location.href);
 	}
 
 	/**
@@ -71,27 +84,33 @@ export default class Game
 	manageWindowClose()
 	{
 		history.pushState(null, document.title, location.href);
-		window.addEventListener('popstate', (event) => {
-			const leavePage = confirm("Do you want to leave?");
-			if (leavePage)
-			{
-				if (this.mode.socket != null)
-				{
-					this.mode.socket.send(JSON.stringify({
-						type: 'quit_game',
-						player_id: this.player_id
-					}))
-					this.mode.socket.close();
-				}
-				this.sceneManager.dispose();
-				window.location.href = "/";
-				console.log("Leaving the game...");
-			}
-			else
-			{
-				history.pushState(null, document.title, location.href);
-			}
-		});
+
+		this.close_window_event_popstate = this.handleExit.bind(this);
+		this.close_window_event_beforeunload = (event) => {
+			event.preventDefault();
+			event.returnValue = "Are you sure you want to leave?";
+
+			this.shouldCleanupOnExit = true;
+		};
+
+		this.close_window_event_unload = () => {
+			if (this.shouldCleanupOnExit)
+				this.game_ended(false);
+		};
+
+		window.addEventListener("beforeunload", this.close_window_event_beforeunload);
+		window.addEventListener("unload", this.close_window_event_unload);
+		window.addEventListener('popstate', this.close_window_event_popstate, false);
+	}
+
+	/**
+	 * Cleanup event listeners to prevent memory leaks.
+	 */
+	cleanupWindowClose()
+	{
+		window.removeEventListener('beforeunload', this.close_window_event_beforeunload);
+		window.removeEventListener('unload', this.close_window_event_unload);
+		window.removeEventListener('popstate', this.close_window_event_popstate);
 	}
 
     /**
@@ -135,6 +154,7 @@ export default class Game
 		}
 
 		const modeFromPath = SocketManager.getModeFromPath();
+		console.log("Mode from path:", modeFromPath);
 		switch (modeFromPath)
 		{
 			case 'singleplayer':
@@ -148,6 +168,7 @@ export default class Game
 				break;
 			case 'tournament':
 				this.mode = new TournamentPongMode(this);
+				break;
 			default:
 				console.error("Modalità di gioco non valida.");
 		}
@@ -468,25 +489,34 @@ export default class Game
 		this.ball.syncPosition();
 	}
 
-	game_ended()
+	game_ended(isGamefinished)
 	{
-		this.mode.socket.send(JSON.stringify({
-			type: 'quit_game',
-			player_id: this.player_id
-		}));
-		
-		this.mode.socket.close();
-		this.sceneManager.dispose();
-		
-		delete this.sceneManager;
-		delete this.pongPlayer;
-		delete this.pongOpponent;
-		delete this.ball;
+		console.log("Game ending...");
+
+		if (this.sceneManager) {
+			this.sceneManager.dispose();
+			this.sceneManager = null;
+		}
 
 		this.ball = null;
 		this.pongPlayer = null;
 		this.pongOpponent = null;
-		
-		router.navigateTo('/match-result');
+
+		let event_name = isGamefinished === true ? "quit_game" : "unexpected_quit";
+
+		if (this.mode && this.mode.socket) {
+			this.mode.socket.send(JSON.stringify({
+				type: event_name,
+				player_id: this.player_id
+			}));
+			this.mode.socket.close();
+		}
+
+		this.cleanupWindowClose();
+
+		if (isGamefinished === true)
+			router.navigateTo('/match-result');
+		else
+			router.navigateTo('/multiplayer/pong_selection');
 	}
 }

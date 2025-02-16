@@ -240,7 +240,7 @@ class Game
 					break;
 				case 'ENDED':
 					break;
-				case 'WAITING_PLAYER_RECONNECTION':
+				case 'PLAYER_DISCONNECTED':
 					break;
 				default:
 					console.log('Unhandled game socket event type ' + data.lobby.current_lobby_status);

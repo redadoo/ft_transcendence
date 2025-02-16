@@ -27,8 +27,7 @@ export default class SocialOverlayManager {
 			chat: this.openChat.bind(this),
 			inviteToGame: this.sendInviteToGame.bind(this),
 			acceptInviteToGame: this.acceptInviteToGame.bind(this),
-			// inviteToTournament: this.sendInviteToTournament.bind(this),
-			// acceptInviteToTournament: this.acceptInviteToTournament.bind(this),
+			acceptInviteToTournament: this.acceptInviteToTournament.bind(this),
 		}
 		this.initializeUIElements();
 		this.notificationManager = new NotificationManager();
@@ -191,7 +190,7 @@ export default class SocialOverlayManager {
 			if (inviteButton) {
 				const friendListItem = inviteButton.closest('.friend-item');
 				const targetUsername = friendListItem.querySelector('.friend-name').textContent;
-				if (window.location.pathname === '/lobby' || window.location.pathname === '/multiplayer/tournament') {
+				if (window.location.pathname === '/lobby' || window.location.pathname === '/tournament') {
 				this.sendInviteToGame(targetUsername);
 				} else {
 					alert('You must be in a game lobby to invite a friend to play a game.');
@@ -304,7 +303,7 @@ export default class SocialOverlayManager {
 				title: 'Game Invite',
 				message: `You have invited ${targetUsername} to a game`
 			});
-		} else if (window.location.pathname === '/multiplayer/tournament') {
+		} else if (window.location.pathname === '/tournament') {
 			this.sendInviteToTournamentUpdate(targetUsername);
 			this.notificationManager.addNotification({
 				type: 'tournament_invite',
@@ -321,7 +320,12 @@ export default class SocialOverlayManager {
 		router.navigateTo('/lobby/guest');
 	}
 
-	acceptInviteToTournament
+	acceptInviteToTournament(inviteData) {
+		window.localStorage[`room_name`] = inviteData.room_name;
+		window.localStorage[`invited_username`] = inviteData.username;
+
+		router.navigateTo('/tournament/guest');
+	}
 
 	// Socket message senders
 	sendStatusUpdate(newStatus) {

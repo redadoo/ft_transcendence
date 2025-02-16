@@ -105,68 +105,90 @@ class User(AbstractUser):
 		db_table = "Users"
 
 class UserStats(models.Model):
-    """
-    Model to track a user's statistics, including experience, match performance, and activity.
-    """
-    exp_for_level = [
-        766, 1568, 2390, 3232, 4095, 4981, 5894, 6835, 7808, 8814,
-        9855, 10932, 12048, 13203, 14399, 15635, 16912, 18231, 19593, 20996
-    ]
+	"""
+	Model to track a user's statistics, including experience, match performance, and activity.
+	"""
+	exp_for_level = [
+		766, 1568, 2390, 3232, 4095, 4981, 5894, 6835, 7808, 8814,
+		9855, 10932, 12048, 13203, 14399, 15635, 16912, 18231, 19593, 20996
+	]
 
-    user = models.OneToOneField(
-        settings.AUTH_USER_MODEL,
-        on_delete=models.CASCADE,
-        related_name='user_stat',
-        primary_key=True
-    )
+	user = models.OneToOneField(
+		settings.AUTH_USER_MODEL,
+		on_delete=models.CASCADE,
+		related_name='user_stat',
+		primary_key=True
+	)
 
-    exp = models.PositiveIntegerField(default=0, validators=[MinValueValidator(0)])
-    mmr = models.PositiveIntegerField(default=1000, validators=[MinValueValidator(0)])
-    win = models.PositiveIntegerField(default=0, validators=[MinValueValidator(0)])
-    lose = models.PositiveIntegerField(default=0, validators=[MinValueValidator(0)])
-    longest_winstreak = models.PositiveIntegerField(default=0, validators=[MinValueValidator(0)])
-    longest_losestreak = models.PositiveIntegerField(default=0, validators=[MinValueValidator(0)])
-    total_points_scored = models.PositiveIntegerField(default=0, validators=[MinValueValidator(0)])
-    longest_game = models.PositiveIntegerField(default=0, validators=[MinValueValidator(0)])  # Measured in seconds
-    time_on_site = models.PositiveIntegerField(default=0, validators=[MinValueValidator(0)])  # Measured in seconds
+	exp = models.PositiveIntegerField(default=0, validators=[MinValueValidator(0)])
+	mmr = models.PositiveIntegerField(default=1000, validators=[MinValueValidator(0)])
+	win = models.PositiveIntegerField(default=0, validators=[MinValueValidator(0)])
+	lose = models.PositiveIntegerField(default=0, validators=[MinValueValidator(0)])
+	current_winstreak = models.PositiveIntegerField(default=0, validators=[MinValueValidator(0)])
+	longest_winstreak = models.PositiveIntegerField(default=0, validators=[MinValueValidator(0)])
+	total_points_scored = models.PositiveIntegerField(default=0, validators=[MinValueValidator(0)])
+	longest_game = models.PositiveIntegerField(default=0, validators=[MinValueValidator(0)])
+	time_on_site = models.PositiveIntegerField(default=0, validators=[MinValueValidator(0)])
 
-    date_updated = models.DateTimeField(auto_now=True)
+	date_updated = models.DateTimeField(auto_now=True)
 
-    def __str__(self):
-        return f"Stats for {self.user.username}"
+	def __str__(self):
+		return f"Stats for {self.user.username}"
 
-    @property
-    def level(self):
-        """
-        Get the user's current level based on experience points.
-        """
-        return next((index + 1 for index, level_exp in enumerate(self.exp_for_level) if self.exp < level_exp), len(self.exp_for_level))
+	@property
+	def level(self):
+		"""
+		Get the user's current level based on experience points.
+		"""
+		return next((index + 1 for index, level_exp in enumerate(self.exp_for_level) if self.exp < level_exp), len(self.exp_for_level))
 
-    @property
-    def cap_exp(self):
-        """
-        Get the experience required for the next level cap.
-        """
-        return next((level_exp for level_exp in self.exp_for_level if self.exp < level_exp), self.exp_for_level[-1])
+	@property
+	def cap_exp(self):
+		"""
+		Get the experience required for the next level cap.
+		"""
+		return next((level_exp for level_exp in self.exp_for_level if self.exp < level_exp), self.exp_for_level[-1])
 
-    @property
-    def percentage_next_level(self):
-        """
-        Calculate the percentage of progress towards the next level.
-        """
-        current_level = self.level
-        previous_level_exp = self.exp_for_level[current_level - 2] if current_level > 1 else 0
-        next_level_exp = self.exp_for_level[current_level - 1]
+	@property
+	def percentage_next_level(self):
+		"""
+		Calculate the percentage of progress towards the next level.
+		"""
+		current_level = self.level
+		previous_level_exp = self.exp_for_level[current_level - 2] if current_level > 1 else 0
+		next_level_exp = self.exp_for_level[current_level - 1]
 
-        progress = self.exp - previous_level_exp
-        level_range = next_level_exp - previous_level_exp
+		progress = self.exp - previous_level_exp
+		level_range = next_level_exp - previous_level_exp
 
-        return f"{(progress / level_range) * 100:.2f}%" if level_range > 0 else "100.00%"
+		return f"{(progress / level_range) * 100:.2f}%" if level_range > 0 else "100.00%"
 
-    class Meta:
-        verbose_name = "User Stat"
-        verbose_name_plural = "User Stats"
-        db_table = "user_stats"
+	def update_with_match_info(self, match: PongMatch):
+		"""
+		Update user statistics based on the outcome of a match.
+		
+		Args:
+			match (PongMatch): The match instance containing match data.
+		"""
+		exp_gained = match.get_player_xp_gained(self.user.username)
+		mmr_gained = match.get_player_mmr_gained(self.user.username)
+		self.exp += exp_gained
+		self.mmr += mmr_gained
+		is_winner = match.get_winner() == self.user.username
+		if is_winner:
+			self.win += 1
+		else:
+			self.lose += 1
+		points_scored = match.get_player_point_scored(self.user)
+		self.total_points_scored += points_scored
+		game_duration = match.get_duration_minutes()
+		if game_duration > self.longest_game:
+			self.longest_game = game_duration	 
+
+	class Meta:
+		verbose_name = "User Stat"
+		verbose_name_plural = "User Stats"
+		db_table = "user_stats"
 
 class Friendships(models.Model):
 
