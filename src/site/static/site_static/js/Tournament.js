@@ -5,31 +5,23 @@ export default class Tournament {
 		this.players = new Array(4).fill(null);
 	}
 
-	async initialize(username, room_name) {
+	async initialize(room_name) {
 		this.room_name = room_name;
-		this.newPlayer = {
-			username,
-			alias: username,
-			profile_picture: "",
-		};
 
 		try {
-			const response = await api.getTournamentPlayers(this.room_name);
-			console.log("Tournament players:", response);
-			const usernames = response.usernames;
+			const playersResponse = await api.getTournamentPlayers(this.room_name);
+			console.log("Tournament players:", playersResponse);
 
-			usernames.forEach((username) => {
-				this.addNewPlayer(username);
-			});
-
-
-			this.addNewPlayer(username);
+			for (const player of playersResponse.usernames) {
+				await this.addNewPlayer(player);
+			}
 		} catch (error) {
 			console.error("Error initializing tournament", error);
 		}
 	}
 
 	updatePlayers() {
+		console.log("Updating players in tournament:", this.players);
 		const updatePlayerDOM = (index, player) => {
 			const nameEl = document.getElementById(`player${index}Name`);
 			const avatarEl = document.getElementById(`player${index}Avatar`);
