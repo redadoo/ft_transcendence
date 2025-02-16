@@ -23,13 +23,14 @@ class PongGameManager(GameManager):
 		self.start_match_timestamp = datetime.now()
 		self.game_loop_is_active = True
 
-	async def clear_and_save(self, isGameEnded: bool, player_disconnected_id: bool = None):
+	async def clear_and_save(self, isGameEnded: bool, player_disconnected_id: int = None):
 		"""Saves the match results and updates players' match history."""
 		players_list = list(self.players.keys())
 		if len(players_list) < 2:
 			print("Not enough players to save the match.")
 			return
 
+		print("salvando")
 		first_player = await sync_to_async(User.objects.get)(id=players_list[0])
 		second_player = await sync_to_async(User.objects.get)(id=players_list[1])
 
@@ -63,7 +64,6 @@ class PongGameManager(GameManager):
 		await sync_to_async(add_match_to_history)(player2_history, match)
 
 		self.game_loop_is_active = False
-
 
 	def add_player(self, players_id: int, is_bot: bool):
 		"""
@@ -115,7 +115,7 @@ class PongGameManager(GameManager):
 		"""
 		player = self.players.get(player_id)
 		if player:
-			player.status = Player.PlayerConnectionState.DISCONNECTED
+			self.players.pop(player_id)
 			print(f"Player {player_id} marked as disconnected.")
 		else:
 			print(f"Error: Player ID {player_id} not found in players.")

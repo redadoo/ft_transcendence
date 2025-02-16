@@ -160,8 +160,19 @@ class Lobby:
 			})
 
 	async def close_lobby(self, data: dict):
+		
+		event_type = data.get("type")
 		player_disconnected_id = data.get("player_id")
-		await self.game_manager.clear_and_save(False, player_disconnected_id)
+		player_disconnected_id = int(player_disconnected_id)
+
+		if event_type == "unexpected_quit":
+			self.lobby_status = self.LobbyStatus.PLAYER_DISCONNECTED
+			self.game_manager.player_disconnected(player_disconnected_id)
+
+		if self.lobby_status != self.LobbyStatus.TO_SETUP:
+			await self.game_manager.clear_and_save(False, player_disconnected_id)
+		else:
+			self.game_manager.game_loop_is_active = False
 
 	def to_dict(self) -> dict:
 		"""

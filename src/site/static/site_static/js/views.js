@@ -291,14 +291,15 @@ const views = {
 			player1Name.textContent = data.username;
 			player1Avatar.src = data.image_url.avatar_url;
 		});
-
-		backButton.addEventListener('click', () => {
-
-		});
-
+		
 		const game = new Game();
 		await game.init();
 		game.sceneManager.animate();
+
+		backButton.addEventListener('click', () => {
+			game.game_ended(false);
+		});
+
 	},
 
 	async matchResult() {
