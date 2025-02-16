@@ -127,6 +127,19 @@ if not DEBUG:
     SESSION_COOKIE_SECURE = True
     CSRF_COOKIE_SECURE = True
 
+REST_FRAMEWORK = {
+    'DEFAULT_THROTTLE_CLASSES': [
+        'ft_transcendence.throttles.BurstRateThrottle',
+        'rest_framework.throttling.UserRateThrottle',
+        'rest_framework.throttling.AnonRateThrottle'
+    ],
+    'DEFAULT_THROTTLE_RATES': {
+        'burst': '20/second', 
+        'user': '2000/day',
+        'anon': '2000/day'
+    }
+}
+
 # Localization settings
 LANGUAGE_CODE = 'en-us'
 TIME_ZONE = 'UTC'
