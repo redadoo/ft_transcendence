@@ -387,7 +387,6 @@ const views = {
 		console.log("room_name:", window.localStorage['room_name']);
 
 		await router.tournament.initialize(window.localStorage['room_name']);
-
 	},
 
 	async tournamentGuest() {

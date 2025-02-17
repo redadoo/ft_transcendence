@@ -48,6 +48,11 @@ export default class Tournament {
 			};
 			this.players[emptySlotIndex] = newPlayerObj;
 			this.updatePlayers();
+
+			if (this.isLobbyFull() && window.localStorage['username'] === this.player1.username) {
+				const startButton = document.getElementById('startTournament');
+				startButton.disabled = false;
+			}
 		} else {
 			console.warn("No empty slot available to add a new player.");
 		}
@@ -62,7 +67,7 @@ export default class Tournament {
 	}
 
 	isLobbyFull() {
-		return this.players.every((player) => player !== null);
+		return this.players.every(player => player !== null);
 	}
 
 	get player1() {
