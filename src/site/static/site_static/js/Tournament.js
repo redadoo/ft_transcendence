@@ -53,6 +53,18 @@ export default class Tournament {
 		}
 	}
 
+	updatePlayerAlias(username, alias) {
+		const player = this.players.find((player) => player.username === username);
+		if (player) {
+			player.alias = alias;
+			this.updatePlayers();
+		}
+	}
+
+	isLobbyFull() {
+		return this.players.every((player) => player !== null);
+	}
+
 	get player1() {
 		return (
 			this.players[0] || { username: "WAITING...", alias: "WAITING...", profile_picture: "" }

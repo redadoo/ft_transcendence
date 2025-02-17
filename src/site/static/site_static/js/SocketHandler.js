@@ -227,5 +227,10 @@ export default class SocketHandler {
 			console.log('👥 Handling tournament player joined:', playerData);
 			router.tournament.addNewPlayer(playerData.username);
 		}
+
+		if (router.tournament.isLobbyFull() && window.localStorage['username'] === router.tournament.players[0].username) {
+			const startButton = document.getElementById('startTournament');
+			startButton.disabled = false;
+		}
 	}
 }

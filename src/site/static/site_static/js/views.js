@@ -196,9 +196,9 @@ const views = {
 		return html.profile;
 	},
 
-	
+
 	async profileScripts() {
-		
+
 		const formatTimeDelta = (seconds) => {
 			const hrs = Math.floor(seconds / 3600).toString().padStart(2, '0');
 			const mins = Math.floor((seconds % 3600) / 60).toString().padStart(2, '0');
@@ -206,7 +206,7 @@ const views = {
 			return `${hrs}:${mins}:${secs}`;
 		};
 
-		
+
 		const parseTimeDelta = (timeString) => {
 			const [hours, minutes, seconds] = timeString.split(':').map(parseFloat);
 			return (hours * 3600) + (minutes * 60) + Math.floor(seconds);
@@ -221,15 +221,15 @@ const views = {
 			return `${day}/${month}/${year}`;
 		};
 
-		
+
 		const data = await api.getProfileInfo();
 		console.log(data); // Check the structure of the data
-		
+
 		const updateElement = (id, value) => document.getElementById(id).textContent = value;
-	
+
 		document.getElementById('profilePageImage').src = data.image_url.avatar_url;
 		document.getElementById('profilePagePercent').style.width = data.stat.percentage_next_level;
-	
+
 		updateElement('profilePageName', data.username);
 		updateElement('profilePageLevel', data.stat.level);
 		updateElement('currentExp', `${data.stat.exp} / ${data.stat.cap_exp} XP`);
@@ -238,13 +238,13 @@ const views = {
 		updateElement('profilePageLose', `${data.stat.lose}`);
 		updateElement('profilePageStreak', `${data.stat.longest_winstreak}`);
 		updateElement('profilePagePoint', `${data.stat.total_points_scored}`);
-	
+
 		const longestGameSeconds = parseTimeDelta(data.stat.longest_game_duration);
 		const longestGame = formatTimeDelta(longestGameSeconds);
 		updateElement('profilePageLongestGame', `${longestGame}`);
-		
-		const timeOnSite = data.stat.time_on_site; 
-		if (timeOnSite) 
+
+		const timeOnSite = data.stat.time_on_site;
+		if (timeOnSite)
 		{
 			const [hours, minutes, seconds] = timeOnSite.split(":");
 			const [sec, ms] = seconds.split(".");
@@ -253,9 +253,9 @@ const views = {
 		}
 		else
 			updateElement('profilePageTime', "00:00:00");
-		
+
 		updateElement('profilePageCreated', `${formatDate(data.created_at)}`);
-	
+
 		matchHistory.renderMatchHistory(data.history, data.username);
 	},
 
@@ -371,19 +371,23 @@ const views = {
 		});
 	},
 
-	async tournament() {
-		return html.tournament;
-	},
-
 	async tournamentScripts() {
+		const backButton = document.getElementById('backButton');
+		const startButton = document.getElementById('startTournament');
+
 		const game = new Game();
 		await game.init();
 		game.sceneManager.animate();
 
+		backButton.addEventListener('click', () => {
+			game.game_ended(false);
+		});
+
 		await new Promise(resolve => setTimeout(resolve, 1000));
 		console.log("room_name:", window.localStorage['room_name']);
 
-		await router.tournament.initialize(window.localStorage['username'], window.localStorage['room_name']);
+		await router.tournament.initialize(window.localStorage['room_name']);
+
 	},
 
 	async tournamentGuest() {
@@ -391,14 +395,21 @@ const views = {
 	},
 
 	async tournamentGuestScripts() {
+		const backButton = document.getElementById('backButton');
+
 		const game = new Game();
 		await game.init();
 		game.sceneManager.animate();
 
+		backButton.addEventListener('click', () => {
+			game.game_ended(false);
+		});
+
 		await new Promise(resolve => setTimeout(resolve, 1000));
 		console.log("room_name:", window.localStorage['room_name']);
 
-		await router.tournament.initialize(window.localStorage['username'], window.localStorage['room_name']);
+		await router.tournament.initialize(window.localStorage['room_name']);
+
 	},
 };
 
