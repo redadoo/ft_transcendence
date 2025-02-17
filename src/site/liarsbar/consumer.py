@@ -82,6 +82,4 @@ class LiarsBarConsumer(AsyncWebsocketConsumer):
 		await self.send(text_data=json.dumps(data_to_send))
 
 		if event.get("event_name") == "player_join":
-			await self.lobby.mark_player_ready({"player_id": "123"})
-			await self.lobby.mark_player_ready({"player_id": "124"})
-			await self.lobby.mark_player_ready({"player_id": "125"})
+			await self.lobby.mark_player_ready({"player_id": event.get("player_id")})
