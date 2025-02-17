@@ -127,7 +127,7 @@ class UserStats(models.Model):
 	current_winstreak = models.PositiveIntegerField(default=0, validators=[MinValueValidator(0)])
 	longest_winstreak = models.PositiveIntegerField(default=0, validators=[MinValueValidator(0)])
 	total_points_scored = models.PositiveIntegerField(default=0, validators=[MinValueValidator(0)])
-	longest_game = models.PositiveIntegerField(default=0, validators=[MinValueValidator(0)])
+	longest_game_duration = models.DurationField(null=True, blank=True)
 	time_on_site = models.PositiveIntegerField(default=0, validators=[MinValueValidator(0)])
 
 	date_updated = models.DateTimeField(auto_now=True)
@@ -170,20 +170,16 @@ class UserStats(models.Model):
 		Args:
 			match (PongMatch): The match instance containing match data.
 		"""
-		exp_gained = match.get_player_xp_gained(self.user.username)
-		mmr_gained = match.get_player_mmr_gained(self.user.username)
-		self.exp += exp_gained
-		self.mmr += mmr_gained
-		is_winner = match.get_winner() == self.user.username
-		if is_winner:
+		self.exp += match.get_player_xp_gained(self.user.username)
+		self.mmr += match.get_player_mmr_gained(self.user.username)
+		if match.get_winner() == self.user.username:
 			self.win += 1
 		else:
 			self.lose += 1
-		points_scored = match.get_player_point_scored(self.user)
-		self.total_points_scored += points_scored
-		game_duration = match.get_duration_minutes()
-		if game_duration > self.longest_game:
-			self.longest_game = game_duration	 
+		self.total_points_scored += match.get_player_point_scored(self.user)
+		game_duration = match.end_date - match.start_date
+		if not self.longest_game_duration or game_duration > self.longest_game_duration:
+			self.longest_game_duration = game_duration
 
 	class Meta:
 		verbose_name = "User Stat"

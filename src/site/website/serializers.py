@@ -15,7 +15,7 @@ class UserStatsSerializer(serializers.ModelSerializer):
 		model = UserStats
 		fields = [
 			'exp', 'mmr', 'win', 'lose', 'longest_winstreak',
-			'total_points_scored', 'longest_game', 'time_on_site',
+			'total_points_scored', 'longest_game_duration', 'time_on_site',
 			'level', 'cap_exp', 'percentage_next_level', 'date_updated'
 		]
 		read_only_fields = [
