@@ -168,6 +168,12 @@ class LiarsBarPlayer(Player):
 		base_dict = super().to_dict()
 		base_dict.update({
 			"status": self.status.name,
-			"hand": [card.to_dict() for card in self.hand]
+			"hand": [card.to_dict() for card in self.hand],
+			"selection_index": self.card_selection_index,
+			"selected_index": self.selected_index,
+			"selected_cards": [card.to_dict() for card in self.selected_cards],
+			"player_turn": self.player_turn,
+			"card_sent": self.card_sent,
+			"doubting": self.doubting
 		})
 		return base_dict

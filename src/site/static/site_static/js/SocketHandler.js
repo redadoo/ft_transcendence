@@ -223,8 +223,9 @@ export default class SocketHandler {
 	}
 
 	handleTournamentPlayerJoined(playerData) {
-		console.log('👥 Handling tournament player joined:', playerData);
-		router.tournament.addNewPlayer(playerData.username);
-
+		if (playerData.username !== window.localStorage['username']) {
+			console.log('👥 Handling tournament player joined:', playerData);
+			router.tournament.addNewPlayer(playerData.username);
+		}
 	}
 }

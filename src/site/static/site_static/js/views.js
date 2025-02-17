@@ -342,7 +342,7 @@ const views = {
 		await new Promise(resolve => setTimeout(resolve, 1000));
 		console.log("room_name:", window.localStorage['room_name']);
 
-
+		await router.tournament.initialize(window.localStorage['username'], window.localStorage['room_name']);
 	},
 
 	async tournamentGuest() {
@@ -357,7 +357,7 @@ const views = {
 		await new Promise(resolve => setTimeout(resolve, 1000));
 		console.log("room_name:", window.localStorage['room_name']);
 
-		router.tournament.initialize(window.localStorage['username'], window.localStorage['room_name']);
+		await router.tournament.initialize(window.localStorage['username'], window.localStorage['room_name']);
 	},
 };
 

@@ -231,6 +231,7 @@ class Game
 	{
 		try {
 			const data = JSON.parse(event.data);
+			console.log(data);
 			switch (data.lobby_info.current_lobby_status) 
 			{
 				case 'TO_SETUP':
