@@ -97,7 +97,7 @@ class UserProfileView(APIView):
 		allowed_fields = {'username', 'image_url', 'stat', 'status', 'email', 'friendships', 'history'}
 		requested_fields = set(request.query_params.getlist('include'))
 
-		fields = ['id', 'username', 'image_url', 'stat', 'status']
+		fields = ['id', 'username', 'image_url', 'stat', 'status', 'created_at']
 		fields.extend(requested_fields.intersection(allowed_fields))
 
 		user = request.user

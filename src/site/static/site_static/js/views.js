@@ -196,25 +196,66 @@ const views = {
 		return html.profile;
 	},
 
+	
 	async profileScripts() {
-		const data = await api.getProfileInfo();
-		const updateElement = (id, value) => document.getElementById(id).textContent = value;
+		
+		const formatTimeDelta = (seconds) => {
+			const hrs = Math.floor(seconds / 3600).toString().padStart(2, '0');
+			const mins = Math.floor((seconds % 3600) / 60).toString().padStart(2, '0');
+			const secs = (seconds % 60).toString().padStart(2, '0');
+			return `${hrs}:${mins}:${secs}`;
+		};
 
+		
+		const parseTimeDelta = (timeString) => {
+			const [hours, minutes, seconds] = timeString.split(':').map(parseFloat);
+			return (hours * 3600) + (minutes * 60) + Math.floor(seconds);
+		};
+
+		// Format date as DD/MM/YYYY
+		const formatDate = (isoDate) => {
+			const date = new Date(isoDate);
+			const day = String(date.getDate()).padStart(2, '0');
+			const month = String(date.getMonth() + 1).padStart(2, '0'); // Months are zero-based
+			const year = date.getFullYear();
+			return `${day}/${month}/${year}`;
+		};
+
+		
+		const data = await api.getProfileInfo();
+		console.log(data); // Check the structure of the data
+		
+		const updateElement = (id, value) => document.getElementById(id).textContent = value;
+	
 		document.getElementById('profilePageImage').src = data.image_url.avatar_url;
 		document.getElementById('profilePagePercent').style.width = data.stat.percentage_next_level;
-
+	
 		updateElement('profilePageName', data.username);
-		updateElement('profilePageLevel', "LV." + data.stat.level);
-		updateElement('currentExp', `${data.stat.exp} / ${data.stat.cap_exp}XP`);
-		updateElement('profilePageMmr', data.stat.mmr);
-		updateElement('profilePageWin', data.stat.win);
-		updateElement('profilePageLose', data.stat.lose);
-		updateElement('profilePageStreak', data.stat.longest_winstreak);
-		updateElement('profilePagePoint', data.stat.total_points_scored);
-		updateElement('profilePageLongestGame', data.stat.longest_game);
-		updateElement('profilePageTime', data.stat.time_on_site);
-		updateElement('profilePageCreated', data.created_at);
-
+		updateElement('profilePageLevel', data.stat.level);
+		updateElement('currentExp', `${data.stat.exp} / ${data.stat.cap_exp} XP`);
+		updateElement('profilePageMmr', `${data.stat.mmr}`);
+		updateElement('profilePageWin', `${data.stat.win}`);
+		updateElement('profilePageLose', `${data.stat.lose}`);
+		updateElement('profilePageStreak', `${data.stat.longest_winstreak}`);
+		updateElement('profilePagePoint', `${data.stat.total_points_scored}`);
+	
+		const longestGameSeconds = parseTimeDelta(data.stat.longest_game_duration);
+		const longestGame = formatTimeDelta(longestGameSeconds);
+		updateElement('profilePageLongestGame', `${longestGame}`);
+		
+		const timeOnSite = data.stat.time_on_site; 
+		if (timeOnSite) 
+		{
+			const [hours, minutes, seconds] = timeOnSite.split(":");
+			const [sec, ms] = seconds.split(".");
+			const formattedTime = `${hours}:${minutes}:${sec}`;
+			updateElement('profilePageTime', formattedTime);
+		}
+		else
+			updateElement('profilePageTime', "00:00:00");
+		
+		updateElement('profilePageCreated', `${formatDate(data.created_at)}`);
+	
 		matchHistory.renderMatchHistory(data.history, data.username);
 	},
 

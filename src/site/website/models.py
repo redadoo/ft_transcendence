@@ -6,6 +6,7 @@ from liarsbar.models import LiarsBarMatch
 from datetime import datetime
 from django.contrib.auth.models import AbstractUser, Group, Permission
 from django.core.validators import MinLengthValidator, RegexValidator, MinValueValidator
+from django.utils.timezone import now
 
 class User(AbstractUser):
 	"""
@@ -128,8 +129,9 @@ class UserStats(models.Model):
 	longest_winstreak = models.PositiveIntegerField(default=0, validators=[MinValueValidator(0)])
 	total_points_scored = models.PositiveIntegerField(default=0, validators=[MinValueValidator(0)])
 	longest_game_duration = models.DurationField(null=True, blank=True)
-	time_on_site = models.PositiveIntegerField(default=0, validators=[MinValueValidator(0)])
+	time_on_site = models.DurationField(null=True, blank=True)
 
+	created_at = models.DateTimeField(default=now, blank=True)
 	date_updated = models.DateTimeField(auto_now=True)
 
 	def __str__(self):
@@ -178,8 +180,12 @@ class UserStats(models.Model):
 			self.lose += 1
 		self.total_points_scored += match.get_player_point_scored(self.user)
 		game_duration = match.end_date - match.start_date
-		if not self.longest_game_duration or game_duration > self.longest_game_duration:
+		if game_duration > self.longest_game_duration:
 			self.longest_game_duration = game_duration
+		if not self.time_on_site:
+			self.time_on_site = game_duration
+		else:
+			self.time_on_site += game_duration
 
 	class Meta:
 		verbose_name = "User Stat"

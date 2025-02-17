@@ -73,13 +73,12 @@ class PongGameManager(GameManager):
 
 		player1_history, _ = await database_sync_to_async(MatchHistory.objects.get)(user=first_player)
 		player2_history, _ = await database_sync_to_async(MatchHistory.objects.get)(user=second_player)
-
 		async def add_match_to_history(history):
-			history.pong_matches.add(match)
+			history.add_pong_match(match)
 			await database_sync_to_async(history.save)()
-
 		await add_match_to_history(player1_history)
 		await add_match_to_history(player2_history)
+
 
 		self.game_loop_is_active = False
 
