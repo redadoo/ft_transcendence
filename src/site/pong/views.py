@@ -33,6 +33,7 @@ class PongPlayersList(APIView):
 				usernames.append(user.username)
 			except (User.DoesNotExist, ValueError):
 				usernames.append("Unknown")
+		usernames.reverse()
 		return Response({"usernames": usernames}, status=status.HTTP_200_OK)
 
 class PongRoomState(APIView):
