@@ -61,3 +61,4 @@ read [Subject](https://github.com/redadoo/ft_transcendence/blob/master/en.subjec
 [prometheus-and-grafana 2](https://nelsoncode.medium.com/how-to-monitor-posgresql-with-prometheus-and-grafana-docker-36d216532ea2)
 
 [api-throttling](https://www.django-rest-framework.org/api-guide/throttling/)
+[docker-monitoring-with-prometheus](https://last9.io/blog/docker-monitoring-with-prometheus-a-step-by-step-guide/)

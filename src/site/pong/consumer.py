@@ -105,7 +105,6 @@ class PongMultiplayerConsumer(AsyncWebsocketConsumer):
 		except Disconnected:
 			print(f"Attempted to send a message on a closed websocket connection. data : {data_to_send}")
 
-
 class PongSingleplayerConsumer(AsyncWebsocketConsumer):
 
 	def generate_random_room_name(self) -> str:
