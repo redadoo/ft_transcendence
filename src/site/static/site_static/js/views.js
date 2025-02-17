@@ -371,17 +371,17 @@ const views = {
 		});
 	},
 
+	async tournament() {
+		return html.tournament;
+	},
+
 	async tournamentScripts() {
-		const backButton = document.getElementById('backButton');
 		const startButton = document.getElementById('startTournament');
 
 		const game = new Game();
 		await game.init();
 		game.sceneManager.animate();
 
-		backButton.addEventListener('click', () => {
-			game.game_ended(false);
-		});
 
 		await new Promise(resolve => setTimeout(resolve, 1000));
 		console.log("room_name:", window.localStorage['room_name']);
@@ -395,15 +395,9 @@ const views = {
 	},
 
 	async tournamentGuestScripts() {
-		const backButton = document.getElementById('backButton');
-
 		const game = new Game();
 		await game.init();
 		game.sceneManager.animate();
-
-		backButton.addEventListener('click', () => {
-			game.game_ended(false);
-		});
 
 		await new Promise(resolve => setTimeout(resolve, 1000));
 		console.log("room_name:", window.localStorage['room_name']);

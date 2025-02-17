@@ -14,7 +14,7 @@ class Tournament():
 		PLAYING = "playing"
 		ENDED = "ended"
 		PLAYER_DISCONNECTED = "PLAYER_DISCONNECTED"
-		
+
 	def __init__(self, game_name: str, room_name: str, game_manager: GameManager):
 		self.room_group_name = f"{game_name}_tournament_{room_name}"
 		self.tournament_status = self.TournamentStatus.TO_SETUP
@@ -23,11 +23,11 @@ class Tournament():
 		self.game_manager = game_manager
 		self.tournament_player = MIN_PLAYER_NUMBER
 		self.score_to_win = SCORE_TO_WIN
-		self.players: list = [] 
+		self.players: list = []
 
 	async def broadcast_message(self, message: dict):
 		await self.channel_layer.group_send(self.room_group_name, message)
-	
+
 	async def manage_event(self, data: dict):
 		event_type = data.get("type")
 		if not event_type:
@@ -43,7 +43,7 @@ class Tournament():
 				print(f"Unhandled event type: {event_type}. Full data: {data}")
 
 	async def tournament_start(self):
-		
+
 		players_list = list(self.players)
 
 		self.game_manager.add_player(players_list[0], False)
@@ -63,7 +63,7 @@ class Tournament():
 	async def add_player_to_tournament(self, data: dict, is_bot: bool):
 		if not data.get("player_id"):
 			raise ValueError("Invalid data: 'player_id' is required.")
-		
+
 		player_id = int(data.get("player_id"))
 
 		if len(self.players) > 1:
@@ -71,7 +71,7 @@ class Tournament():
 				"type": "lobby_state",
 				"event_name": "recover_player_data",
 			})
-		
+
 		self.players.append(player_id)
 
 		await self.broadcast_message({
@@ -109,7 +109,7 @@ class Tournament():
 
 	def to_dict(self) -> dict:
 		tournament_data =  {"current_tournament_status": self.tournament_status.name}
-		tournament_player = {"tournament_players": list({player_id for player_id in self.players})}
+		tournament_player = {"tournament_players": self.players}
 		tournament_data.update(tournament_player)
 		tournament_data.update(self.game_manager.to_dict())
 		return tournament_data
