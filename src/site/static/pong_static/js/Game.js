@@ -175,9 +175,11 @@ export default class Game
 
 		if (this.mode)
 			this.mode.init();
-
 		this.sceneManager.setExternalFunction(() => this.fixedUpdate());
+
+		
 	}
+
 
 	/**
      * Initializes the game environment with given data.
@@ -203,10 +205,11 @@ export default class Game
 				this.bounds = new Bounds(bounds_data.xMin, bounds_data.xMax, bounds_data.yMin, bounds_data.yMax);
 				this.ball = new Ball(ball_data.radius);
 				this.background = new Background(this.sceneManager.scene, this.bounds.xMax * 2, this.bounds.yMax * 2);
-				
 				this.handleScoreSprites(scores_data);
 
 				this.sceneManager.scene.add(this.ball.mesh);
+
+
 				console.log("bound, ball and dbackground are initialized");
 				this.isSceneCreated = true;
 			} catch (error) {
@@ -220,26 +223,21 @@ export default class Game
      */
 	handleScoreSprites(scores) {
 		try {
-		  // Se gli sprite non sono stati creati, creali
 		  if (!this.scoreSpritesInitialized) {
-			// Crea uno sprite per Player 1 (solo il numero)
 			this.createTextSprite(`${scores.player1}`).then((sprite) => {
 			  this.player1ScoreSprite = sprite;
-			  this.player1ScoreSprite.position.set(-10, 18, 0); // Posizione nella scena
+			  this.player1ScoreSprite.position.set(-10, 18, 0); 
 			  this.sceneManager.scene.add(this.player1ScoreSprite);
 			}).catch((error) => console.error("Failed to create Player 1 sprite:", error));
 	  
-			// Crea uno sprite per Player 2 (solo il numero)
 			this.createTextSprite(`${scores.player2}`).then((sprite) => {
 			  this.player2ScoreSprite = sprite;
-			  this.player2ScoreSprite.position.set(10, 18, 0); // Posizione nella scena
+			  this.player2ScoreSprite.position.set(10, 18, 0); 
 			  this.sceneManager.scene.add(this.player2ScoreSprite);
 			}).catch((error) => console.error("Failed to create Player 2 sprite:", error));
 	  
-			// Segna che gli sprite sono stati creati
 			this.scoreSpritesInitialized = true;
 		  } else {
-			// Se gli sprite esistono, aggiorna il loro contenuto
 			if (this.player1ScoreSprite) {
 			  this.updateSpriteTexture(this.player1ScoreSprite, `${scores.player1}`);
 			} else {
@@ -259,7 +257,8 @@ export default class Game
 	  
 	  
 	  /**
-     * Initializes the 
+     * Initializes the sprites for the score
+	 * * @param {string} text - The value of the score
      */
 	  createTextSprite(text) {
 		return new Promise((resolve, reject) => {
@@ -281,7 +280,7 @@ export default class Game
 			const sprite = new THREE.Sprite(material);
 			sprite.scale.set(5, 2.5, 1);
 	  
-			resolve(sprite); // Risolvi la Promise con lo sprite creato
+			resolve(sprite); 
 		  }).catch((error) => {
 			console.error('Failed to load font:', error);
 			reject(error);
@@ -378,7 +377,6 @@ export default class Game
 		{
 			if (data.ball)
 				this.ball.updatePosition(data.ball);
-
 			if (data.players)
 			{
 				this.pongPlayer.updatePosition(data.players[this.pongPlayer.playerId].y);
@@ -396,31 +394,30 @@ export default class Game
 		}
 	}
 
+	 /**
+     * Updates the sprites for the score
+	 * * @param {string} text - The value of the score
+     */
 	updateSpriteTexture(sprite, text) {
 		if (!sprite || !sprite.material || !sprite.material.map) {
 		  console.warn("Sprite or texture is not defined yet.");
 		  return;
 		}
 	  
-		// Ottieni la texture dello sprite
 		const texture = sprite.material.map;
-		const canvas = texture.image; // Ottieni il canvas associato alla texture
-		const context = canvas.getContext('2d'); // Ottieni il contesto 2D del canvas
+		const canvas = texture.image;
+		const context = canvas.getContext('2d');
 	  
 		if (!context) {
 		  console.error("Failed to get 2D context from canvas.");
 		  return;
 		}
 	  
-		// Pulisci il canvas
 		context.clearRect(0, 0, canvas.width, canvas.height);
 	  
-		// Controlla se il font è già caricato
 		if (document.fonts.check('150px "Press Start 2P"')) {
-		  // Se il font è già disponibile, aggiorna subito la texture
 		  this.drawTextOnCanvas(context, canvas, text, texture);
 		} else {
-		  // Altrimenti, attendi il caricamento e poi aggiorna
 		  document.fonts.load('150px "Press Start 2P"').then(() => {
 			this.drawTextOnCanvas(context, canvas, text, texture);
 		  }).catch((error) => {
@@ -429,15 +426,13 @@ export default class Game
 		}
 	  }
 	  
-	  // Funzione di supporto per disegnare il testo e aggiornare la texture
 	  drawTextOnCanvas(context, canvas, text, texture) {
-		context.font = '150px "Press Start 2P"'; // Usa il font corretto
-		context.fillStyle = 'white'; // Colore del testo
-		context.textAlign = 'center'; // Allineamento orizzontale
-		context.textBaseline = 'middle'; // Allineamento verticale
-		context.fillText(text, canvas.width / 2, canvas.height / 2); // Disegna il testo
+		context.font = '150px "Press Start 2P"';
+		context.fillStyle = 'white';
+		context.textAlign = 'center'; 
+		context.textBaseline = 'middle'; 
+		context.fillText(text, canvas.width / 2, canvas.height / 2); 
 	  
-		// Aggiorna la texture
 		texture.needsUpdate = true;
 	  }
 	  
