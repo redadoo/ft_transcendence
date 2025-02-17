@@ -41,7 +41,7 @@ class PongGameManager(GameManager):
 				self.scores["player1"], self.scores["player2"] = 5, 0
 
 		first_user_mmr_gain = PongMatch.static_get_player_mmr_gained(True, self.scores["player1"], self.scores["player2"])	
-		second_user_mmr_gain = PongMatch.static_get_player_mmr_gained(False, self.scores["player2"], self.scores["player1"])
+		second_user_mmr_gain = PongMatch.static_get_player_mmr_gained(False, self.scores["player1"], self.scores["player2"])
 
 		match = await database_sync_to_async(PongMatch.objects.create)(
 			first_user=first_player,
