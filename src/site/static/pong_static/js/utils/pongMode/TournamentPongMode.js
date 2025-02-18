@@ -135,6 +135,9 @@ export default class TournamentPongMode extends PongMode {
 
 		if (this.isPlaying == true)
 		{
+			if(event_info.loser_id == this.game.player_id)
+				this.game.game_ended(true);
+			
 			this.isPlaying = false;
 		}
 	}
