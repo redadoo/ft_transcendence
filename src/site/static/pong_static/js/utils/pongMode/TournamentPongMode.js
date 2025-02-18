@@ -6,6 +6,7 @@ export default class TournamentPongMode extends PongMode {
     constructor(game) {
 		super(game);
 		this.room_name = null;
+		this.isPlaying = false;
 	}
 
 	/**
@@ -47,7 +48,7 @@ export default class TournamentPongMode extends PongMode {
 	sendStart()
 	{
 		this.socket.send(JSON.stringify({
-			type: 'client_ready',
+			type: 'host_start_tournament',
 			player_id: this.game.player_id
 		 }));
 	}
@@ -63,25 +64,30 @@ export default class TournamentPongMode extends PongMode {
 			return;
 		}
 
-		const { lobby_info, event_info } = parsedData;
+		const {lobby_info, event_info } = parsedData;
 		if (!lobby_info || !event_info)
 		{
 			console.error("Invalid data structure received:", parsedData);
 			return;
 		}
-
-		switch (lobby_info.current_lobby_status)
+			
+		console.log("data to capire", parsedData);
+		switch (lobby_info.current_tournament_status)
 		{
 			case 'TO_SETUP':
+				this.setUpLobby(parsedData);
 				break;
 			case 'PLAYING':
+				this.manageMatch(parsedData);
 				break;
 			case 'ENDED':
+				this.manageEndMatch(parsedData);
 				break;
 			case 'PLAYER_DISCONNECTED':
+				this.game.game_ended(false);
 				break;
 			default:
-				console.warn("Unhandled lobby status:", lobby_info.current_lobby_status);
+				console.warn("Unhandled lobby status:", lobby_info.current_tournament_status);
 		}
 	}
 
@@ -89,11 +95,43 @@ export default class TournamentPongMode extends PongMode {
   	{
 		const { event_info, lobby_info } = data;
 
-		if (event_info.event_name === "host_started_game")
+		if (event_info.event_name === "player_to_setup")
 		{
-			return;
+			const players = data.lobby_info.players;
+
+			for (const [key, value] of Object.entries(players))
+			{
+				if (this.game.player_id == key)
+					this.isPlaying = true;
+
+				this.game.AddUserToLobby(key,value, this.socket);
+			}
 		}
 
-		this.managePlayerSetup(data);
+	}
+
+	manageMatch(data)
+	{
+		const { event_info, lobby_info } = data;
+
+		
+		if (event_info.event_name === "match_start")
+		{
+			if (this.isPlaying == true)
+			{
+				this.game.initGameEnvironment(data);
+				router.navigateTo('/tournament/playing');
+			}
+		}
+		else
+		{
+			this.game.updateGameState(lobby_info);
+		}
+	}
+
+	manageEndMatch(data)
+	{
+		if (this.isPlaying == true)
+			this.isPlaying = false;
 	}
 }

@@ -62,7 +62,6 @@ export default class PongMode {
 		{
 			case 'TO_SETUP':
 				this.setUpLobby(parsedData);
-				this.game.initGameEnvironment(parsedData);
 				break;
 			case 'PLAYING':
 				this.game.updateGameState(lobby_info);
@@ -84,6 +83,8 @@ export default class PongMode {
 	 */
 	setUpLobby(data)
 	{
+		this.game.initGameEnvironment(data);
+
 		if (this.game.pongOpponent != null && this.game.pongPlayer != null)
 		{
 			this.socket.send(JSON.stringify({ 

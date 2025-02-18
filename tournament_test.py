@@ -35,7 +35,7 @@ def create_connection(player_id):
 if __name__ == "__main__":
     threads = []
     players_id = ["-2","-3","-4"]
-    for i in range(3):
+    for i in range(1):
         player_id = i + 1
         t = threading.Thread(target=create_connection, args=(players_id[i],))
         threads.append(t)

@@ -5,6 +5,7 @@ import Paddle from './Paddle.js';
  * Represents a Pong player, handling input and paddle synchronization.
  * @class
  */
+
 export default class PongPlayer {
 	/**
 	 * Creates an instance of the PongPlayer class.

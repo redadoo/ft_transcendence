@@ -270,6 +270,12 @@ class PongTournament(AsyncWebsocketConsumer):
 		await self.channel_layer.group_add(self.tournament.room_group_name, self.channel_name)
 		await self.accept()
 
+	async def disconnect(self, close_code):
+		"""
+		Disconnects the user from the lobby by removing them from the lobby group.
+		"""
+		await self.channel_layer.group_discard(self.tournament.room_group_name, self.channel_name)
+
 	async def receive(self, text_data: str):
 		"""
 		Receives a JSON-formatted message from the WebSocket and delegates event handling to the tournament.
@@ -285,6 +291,10 @@ class PongTournament(AsyncWebsocketConsumer):
 			return
 
 		await self.tournament.manage_event(data)
+
+		if data.get("type") == "quit_game":
+			match_manager.remove_match(self.lobby.room_group_name)
+
 
 	async def lobby_state(self, event: dict):
 		"""Aggiorna lo stato lato client."""
@@ -303,8 +313,9 @@ class PongTournament(AsyncWebsocketConsumer):
 					"type": "user_join_tournament",
 					"username": user.username,
 				})
-
-		try:
-			await self.send(text_data=json.dumps(data_to_send))
-		except Disconnected:
-			print(f"Attempted to send a message on a closed websocket connection. data : {data_to_send}")
+		else:
+			try:
+				await self.send(text_data=json.dumps(data_to_send))
+			except Disconnected:
+				print(f"Attempted to send a message on a closed websocket connection. data : {data_to_send}")
+				

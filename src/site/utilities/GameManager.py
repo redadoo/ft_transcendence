@@ -54,6 +54,11 @@ class GameManager(ABC):
 		"""
 		return
 	
+	def players_to_dict(self) -> dict[str, any]:
+		return {
+			"players": {player_id: player.to_dict() for player_id, player in self.players.items()},
+		}
+
 	def to_dict(self) -> dict[str, any]:
 		"""
 		Converts the current state of the game manager to a dictionary format, including player information.
@@ -61,6 +66,4 @@ class GameManager(ABC):
 		Returns:
 			dict: A dictionary representing the game manager state, including players and their data.
 		"""
-		return {
-			"players": {player_id: player.to_dict() for player_id, player in self.players.items()},
-		}
+		return self.players_to_dict()

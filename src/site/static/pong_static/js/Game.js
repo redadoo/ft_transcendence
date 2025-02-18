@@ -180,6 +180,7 @@ export default class Game
 		
 	}
 
+	
 
 	/**
      * Initializes the game environment with given data.
@@ -253,7 +254,7 @@ export default class Game
 		} catch (error) {
 		  console.error("An error occurred while handling score sprites:", error);
 		}
-	  }
+	}
 	  
 	  
 	  /**
@@ -286,7 +287,7 @@ export default class Game
 			reject(error);
 		  });
 		});
-	  }
+	}
 	  
 
 	/**
@@ -368,9 +369,6 @@ export default class Game
      * @param {Object} data - The game state data.
      */
 
-
-	  
-
 	updateGameState(data)
 	{
 		try
@@ -398,7 +396,8 @@ export default class Game
      * Updates the sprites for the score
 	 * * @param {string} text - The value of the score
      */
-	updateSpriteTexture(sprite, text) {
+	updateSpriteTexture(sprite, text) 
+	{
 		if (!sprite || !sprite.material || !sprite.material.map) {
 		  console.warn("Sprite or texture is not defined yet.");
 		  return;
@@ -424,17 +423,18 @@ export default class Game
 			console.error('Failed to load font:', error);
 		  });
 		}
-	  }
+	}
 	  
-	  drawTextOnCanvas(context, canvas, text, texture) {
+	drawTextOnCanvas(context, canvas, text, texture) 
+	{
 		context.font = '150px "Press Start 2P"';
 		context.fillStyle = 'white';
 		context.textAlign = 'center'; 
 		context.textBaseline = 'middle'; 
 		context.fillText(text, canvas.width / 2, canvas.height / 2); 
-	  
+		
 		texture.needsUpdate = true;
-	  }
+	}
 	  
 	  
 	/**

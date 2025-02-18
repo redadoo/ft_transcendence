@@ -79,7 +79,6 @@ class PongGameManager(GameManager):
 		await add_match_to_history(player1_history)
 		await add_match_to_history(player2_history)
 
-
 		self.game_loop_is_active = False
 
 	def add_player(self, players_id: int, is_bot: bool):

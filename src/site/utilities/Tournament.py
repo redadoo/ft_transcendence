@@ -3,7 +3,8 @@ from enum import Enum
 from utilities.GameManager import GameManager
 from channels.layers import get_channel_layer
 
-MIN_PLAYER_NUMBER = 8
+PLAYER_NUMBER = 4
+MATCH_PLAYER_NUMBER = 2
 SCORE_TO_WIN = 1
 
 class Tournament():
@@ -18,13 +19,14 @@ class Tournament():
 	def __init__(self, game_name: str, room_name: str, game_manager: GameManager):
 		self.room_group_name = f"{game_name}_tournament_{room_name}"
 		self.tournament_status = self.TournamentStatus.TO_SETUP
+		self.game_manager: GameManager = game_manager
 		self.channel_layer = get_channel_layer()
 		self.update_lock = asyncio.Lock()
-		self.game_manager = game_manager
-		self.tournament_player = MIN_PLAYER_NUMBER
+		self.tournament_player = PLAYER_NUMBER
 		self.score_to_win = SCORE_TO_WIN
+		self.bracket_match: list = []
 		self.players: list = []
-
+	
 	async def broadcast_message(self, message: dict):
 		await self.channel_layer.group_send(self.room_group_name, message)
 
@@ -36,42 +38,54 @@ class Tournament():
 
 		match event_type:
 			case "init_player":
-				await self.add_player_to_tournament(data, False)
-			case "client_ready":
+				await self.add_player_to_tournament(data)
+			case "host_start_tournament":
 				await self.tournament_start()
+			case "update_player":
+				self.game_manager.update_player(data)
 			case _:
 				print(f"Unhandled event type: {event_type}. Full data: {data}")
 
+	def setup_tournamet(self):
+
+		number_of_first_bracket_match = int(len(self.players) / MATCH_PLAYER_NUMBER)
+
+		i = 0
+		while i <= number_of_first_bracket_match:
+			self.bracket_match.append([self.players[i],self.players[i + 1]])
+			i += MATCH_PLAYER_NUMBER
+
+	async def setup_match(self):
+
+		if len(self.bracket_match) == 0:
+			print("impossible to start a match")
+			return
+		
+		match = self.bracket_match.pop(0)
+		self.game_manager.add_player(match[0], False)
+		self.game_manager.add_player(match[1], False)		
+
+		await self.broadcast_message({
+			"type": "lobby_state",
+			"event_name": "player_to_setup",
+			"players": self.game_manager.players_to_dict()
+		})
+
 	async def tournament_start(self):
-
-		players_list = list(self.players)
-
-		self.game_manager.add_player(players_list[0], False)
-		self.game_manager.add_player(players_list[1], False)
-
 		self.tournament_status = self.TournamentStatus.PLAYING
+		self.game_manager.start_game()
 		self.game_loop_task = asyncio.create_task(self.game_loop())
 
 		await self.broadcast_message({
 			"type": "lobby_state",
-			"event_name": "host_started_game",
+			"event_name": "match_start",
 		})
 
-	async def setup_next_match(self):
-		pass
-
-	async def add_player_to_tournament(self, data: dict, is_bot: bool):
+	async def add_player_to_tournament(self, data: dict):
 		if not data.get("player_id"):
 			raise ValueError("Invalid data: 'player_id' is required.")
 
 		player_id = int(data.get("player_id"))
-
-		if len(self.players) > 1:
-			await self.broadcast_message({
-				"type": "lobby_state",
-				"event_name": "recover_player_data",
-			})
-
 		self.players.append(player_id)
 
 		await self.broadcast_message({
@@ -79,6 +93,10 @@ class Tournament():
 			"event_name": "player_join",
 			"player_id": player_id,
 		})
+
+		if len(self.players) == PLAYER_NUMBER:
+			self.setup_tournamet()
+			await self.setup_match()
 
 	async def game_loop(self):
 		"""
@@ -98,10 +116,9 @@ class Tournament():
 		except asyncio.CancelledError:
 			print("Game loop task was cancelled.")
 		finally:
-
 			loser_id = self.game_manager.get_loser()
-			self.players.pop(loser_id)
-
+			self.players.remove(loser_id)
+			self.tournament_status = self.TournamentStatus.ENDED
 			await self.broadcast_message({
 				"type": "lobby_state",
 				"event": "match_finished"
