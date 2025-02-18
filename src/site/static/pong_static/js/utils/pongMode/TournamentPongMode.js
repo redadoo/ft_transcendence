@@ -71,7 +71,6 @@ export default class TournamentPongMode extends PongMode {
 			return;
 		}
 			
-		console.log("data to capire", parsedData);
 		switch (lobby_info.current_tournament_status)
 		{
 			case 'TO_SETUP':
@@ -137,7 +136,7 @@ export default class TournamentPongMode extends PongMode {
 		{
 			if(event_info.loser_id == this.game.player_id)
 				this.game.game_ended(true);
-			
+
 			this.isPlaying = false;
 		}
 	}

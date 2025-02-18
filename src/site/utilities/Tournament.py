@@ -123,7 +123,7 @@ class Tournament():
 			await self.broadcast_message({
 				"type": "lobby_state",
 				"event": "match_finished",
-				"loser": loser_id
+				"loser_id": loser_id
 			})
 
 	def to_dict(self) -> dict:
