@@ -130,10 +130,6 @@ const views = {
 		});
 	},
 
-	async singleplayer() {
-		return html.singleplayer;
-	},
-
 	async pong() {
 		return html.pong;
 	},
@@ -387,7 +383,7 @@ const views = {
 		console.log("room_name:", window.localStorage['room_name']);
 
 		await router.tournament.initialize(window.localStorage['room_name']);
-	
+
 		startButton.addEventListener('click', () => {
 			game.mode.sendStart();
 			router.navigateTo('/tournament/playing');

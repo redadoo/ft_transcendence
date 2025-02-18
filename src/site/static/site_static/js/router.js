@@ -31,7 +31,6 @@ const router = {
 			'/match-result': 'matchResult',
 			'/profile': 'profile',
 			'/register': 'register',
-			'/singleplayer': 'singleplayer',
 			'/singleplayer/pong': 'singleplayerPong',
 		};
 
