@@ -4,6 +4,13 @@ import SceneManager from '../../common_static/js/SceneManager.js';
 import SocketManager from '../../common_static/js/SocketManager.js';
 
 
+
+const cardTextures = {
+    'ACE': 'images/ace.png',
+    'QUEEN': 'images/queen.png',
+    'KING': 'images/king.png',
+    'JOLLY': 'images/jolly.png'
+};
 /**
  * Game class for managing the Liar's Bar multiplayer game environment.
  * Handles player setup, scene management, lighting, and WebSocket communication.
@@ -16,6 +23,7 @@ class Game
 		this.lightHelper = null;
 		this.gameSocket = null;
 		this.players = {};
+
 	}
 
 	/**
@@ -69,11 +77,11 @@ class Game
 		this.sceneManager = new SceneManager(true);
 		this.sceneManager.initialize(true, true);
 
-		this.sceneManager.setCameraState(
+	/* 	this.sceneManager.setCameraState(
 			new THREE.Vector3(-34.619, 96.642, 233.726),
 			new THREE.Quaternion(-0.188, 0.223, 0, 0.95),
 			new THREE.Vector3(-173.113, -31.705, -47.019)
-		);
+		); */
 
 		this.initLights();
 
@@ -110,7 +118,7 @@ class Game
 		this.ambientLight = new THREE.AmbientLight(0xb0e0e6, 10.1);
 
 		// PointLight che si propaga in tutte le direzioni
-		this.pointLight = new THREE.PointLight(0xFFB84D, 5000000, 1500); // (Colore, Intensità, Distanza massima)
+		this.pointLight = new THREE.PointLight(0xFFB84D, 500000, 1500); // (Colore, Intensità, Distanza massima)
 		this.pointLight.position.set(-300, 250, -40);
 
 		// Abilita le ombre
@@ -127,7 +135,7 @@ class Game
 		this.sceneManager.scene.add(pointLightHelper);
 
 		// Seconda PointLight (gialla)
-		this.yellowLight = new THREE.PointLight(0xFFD700, 3000000, 1500); // Giallo dorato
+		this.yellowLight = new THREE.PointLight(0xFFD700, 1500000, 1500); // Giallo dorato
 		this.yellowLight.position.set(0, 400, 500);
 		this.yellowLight.castShadow = true;
 		this.yellowLight.shadow.camera.near = 1;
@@ -208,6 +216,61 @@ class Game
 			this.gameSocket.send(JSON.stringify({ type: 'client_ready' }));
 	}
 
+	setCameraForPlayer(data) {
+		// Ottieni l'array dei giocatori
+		const playersArray = Object.values(data.lobby_info.players);
+	
+		// Trova l'indice del giocatore locale (quello con player_id)
+		const playerIndex = playersArray.findIndex(player => player.player_id === this.player_id);
+		if (playerIndex === -1) {
+			console.warn("Player ID non trovato nella lista dei giocatori!");
+			return;
+		}
+	
+		// Definiamo le posizioni della camera per ciascun giocatore
+		const cameraPositions = [
+			new THREE.Vector3(315.57587851518224, 195.70035909390145, 994.4429210866258), //rimuru
+			new THREE.Vector3(325.4030018545432, 243.79773664778745, 615.7566110039751), // kuriboh
+			new THREE.Vector3(-36.235102977326164, 239.9165631088926, 524.2427525269686), //king boh
+			new THREE.Vector3(-114.35623802611076, 202.76800820190383, 918.8519282059492), //slimegun
+		];
+	
+		// Definiamo i target per ciascun giocatore (4 target distinti)
+		const targets = [
+			new THREE.Vector3(-200, 0, 0),      // rimuru
+			new THREE.Vector3(0, 100, 800), // kuriboh
+			new THREE.Vector3(200, 100, 900),    //king boh
+			new THREE.Vector3(300, 150, 600),    //slimegun
+		];
+	
+		// Prendi la posizione della camera e il target in base all'indice del giocatore
+		const cameraPos = cameraPositions[playerIndex];
+		const target = targets[playerIndex];
+	
+		// Calcoliamo la direzione verso il target
+		const direction = target.clone().sub(cameraPos).normalize();  // Cambia la direzione verso il target specificato
+	
+		// Creiamo un quaternion per la rotazione della camera affinché guardi al target
+		const cameraRot = new THREE.Quaternion().setFromUnitVectors(new THREE.Vector3(0, 0, 1), direction);
+	
+		// Disabilita temporaneamente i controlli orbitali se sono attivi
+		if (this.sceneManager.controls) {
+			this.sceneManager.controls.enabled = false;
+		}
+	
+		// Impostiamo la camera nella scena
+		this.sceneManager.setCameraState(cameraPos, cameraRot, target);
+	
+		// Riabilita i controlli orbitali
+		if (this.sceneManager.controls) {
+			this.sceneManager.controls.enabled = true;
+		}
+	}
+	
+	
+	
+	
+
 	/**
 	 * Updates the game state at fixed intervals.
 	 */
@@ -221,6 +284,74 @@ class Game
 	{
 		if (data.event_info.event_name === "player_join") 
 			this.AddUserToLobby(data);
+		this.setCameraForPlayer(data);
+	}
+
+	/**
+	 * Updates the state of existing players based on socket data.
+	 * @param {Object} data - Socket data about the lobby event.
+	 */
+	updatePlayers(data) 
+	{
+		// Verifica che i dati contengano informazioni sui giocatori
+		if (!data) 
+		{
+			console.error('1Dati non validi o mancanti per aggiornare i giocatori.');
+			return;
+		}
+		if (!data.lobby_info) 
+		{
+			console.error('2Dati non validi o mancanti per aggiornare i giocatori.');
+			return;
+		}
+		if (!data.lobby_info.players || typeof data.lobby_info.players !== 'object') 
+		{
+			console.error('3Dati non validi o mancanti per aggiornare i giocatori.', data.lobby_info);
+			return;
+		}
+		console.log('Eccomi', data.lobby_info);
+
+		// Converti l'oggetto players in un array
+		const playersArray = Object.values(data.lobby_info.players);
+
+		// Itera sui giocatori nei dati ricevuti
+		playersArray.forEach(playerData => 
+		{
+			const playerId = playerData.player_id;
+
+			// Verifica se il giocatore esiste già
+			if (this.players[playerId]) 
+			{
+				// Aggiorna lo stato del giocatore esistente
+				this.players[playerId].updateState(data.lobby_info);
+			} 
+			else 
+			{
+				console.warn(`Giocatore con ID ${playerId} non trovato.`);
+			}
+		});
+
+		console.log('Stato dei giocatori aggiornato:', this.players);
+	}
+
+	
+	updateGameState(data)
+	{
+		try
+		{
+			if (data)
+				this.updatePlayers(data);
+
+
+			if(data)
+			{
+				//update UI overlay
+			}
+		}
+		catch (error) {
+			console.error("An error occurred during game update state:", error);
+			console.error("data:", data);
+		}
 	}
 
 	/**
@@ -229,15 +360,19 @@ class Game
 	 */
 	handleSocketMessage(event) 
 	{
+		console.log(this.sceneManager.camera);
 		try {
 			const data = JSON.parse(event.data);
-			console.log(data);
 			switch (data.lobby_info.current_lobby_status) 
 			{
 				case 'TO_SETUP':
+					console.log("to setup");	
 					this.setUpLobby(data);
 					break;
-				case 'PLAYING':
+					case 'PLAYING':
+					console.log("playing");	
+
+					//this.updateGameState(data);
 					break;
 				case 'ENDED':
 					break;

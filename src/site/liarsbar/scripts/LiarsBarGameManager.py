@@ -252,6 +252,6 @@ class LiarsBarGameManager(GameManager):
 		"""
 		base_dict = super().to_dict()
 		base_dict.update({
-			"deck": [card.to_dict() for card in self.deck]
+			"deck": [card.to_dict() for card in self.deck],
 		})
 		return base_dict
