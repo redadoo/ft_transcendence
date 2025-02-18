@@ -939,8 +939,10 @@ const html = {
 
 						<div class="match-players">
 							<div class="player-section">
-								<div class="profile-image">
-									<img src="" alt="Player 1" id="player1Avatar" />
+								<div class="profile-image-container mb-4">
+									<div class="profile-image">
+										<img src="" alt="Player 1" id="player1Avatar" />
+									</div>
 								</div>
 								<div class="player-left">
 									<span class="pixel-font player-name" id="player1Name">Player 1</span>
@@ -965,8 +967,10 @@ const html = {
 									<span class="pixel-font stat-value" id="player2MMR">0</span>
 								</div>
 							</div>
-							<div class="profile-image">
-								<img src="" alt="Player 2" id="player2Avatar" />
+							<div class="profile-image-container mb-4">
+								<div class="profile-image">
+									<img src="" alt="Player 2" id="player2Avatar" />
+								</div>
 							</div>
 						</div>
 					</div>
