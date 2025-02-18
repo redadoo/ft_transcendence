@@ -134,10 +134,10 @@ export default class TournamentPongMode extends PongMode {
 
 		if (this.isPlaying == true)
 		{
-			document.getElementById('pongOverlay').classList.remove('d-none');
 			if(event_info.loser_id == this.game.player_id)
 				this.game.game_ended(true);
-
+			else
+				document.getElementById('pongOverlay').classList.remove('d-none');
 			this.isPlaying = false;
 		}
 	}
