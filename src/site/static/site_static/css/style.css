@@ -462,13 +462,21 @@ label {
 	border-radius: 10px;
 	overflow: hidden;
 	border: 1px solid rgba(104, 104, 104, 0.3);
+	position: relative;
 }
 
 .profile-image {
-	width: 100%;
-	height: 100%;
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+	min-width: 100%;
+	min-height: 100%;
+	width: auto;
+	height: auto;
 	object-fit: cover;
 }
+
 
 .level-indicator {
 	color: #a0a0a0;

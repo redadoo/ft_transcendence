@@ -252,10 +252,21 @@ const html = {
 		</div>
 	`,
 
-	singleplayerPong: `<div></div>`,
+	singleplayerPong: `
+		<div></div>
+	`,
+
+	pongOverlay: `
+		<div id="pong-container" class="container-fluid game-container d-flex justify-content-center align-items-center">
+			<div class="text-center">
+				<h1 class="pixel-font multiplayer">CONGRATULATIONS!</h1>
+				<p id="matchmakingStatus" class="hundin-font text-up multiplayer">Wait for your next opponent...</p>
+			</div>
+		</div>
+	`,
 
 	liarsbar: `
-	<div> </div>
+		<div> </div>
 	`,
 
 	profile: `

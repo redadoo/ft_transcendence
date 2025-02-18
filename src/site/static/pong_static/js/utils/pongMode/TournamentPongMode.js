@@ -70,7 +70,7 @@ export default class TournamentPongMode extends PongMode {
 			console.error("Invalid data structure received:", parsedData);
 			return;
 		}
-			
+
 		switch (lobby_info.current_tournament_status)
 		{
 			case 'TO_SETUP':
@@ -113,7 +113,7 @@ export default class TournamentPongMode extends PongMode {
 	{
 		const { event_info, lobby_info } = data;
 
-		
+
 		if (event_info.event_name === "match_start")
 		{
 			if (this.isPlaying == true)
@@ -134,6 +134,7 @@ export default class TournamentPongMode extends PongMode {
 
 		if (this.isPlaying == true)
 		{
+			document.getElementById('pongOverlay').classList.remove('d-none');
 			if(event_info.loser_id == this.game.player_id)
 				this.game.game_ended(true);
 
