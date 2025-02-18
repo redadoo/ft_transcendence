@@ -131,7 +131,11 @@ export default class TournamentPongMode extends PongMode {
 
 	manageEndMatch(data)
 	{
+		const { event_info, lobby_info } = data;
+
 		if (this.isPlaying == true)
+		{
 			this.isPlaying = false;
+		}
 	}
 }

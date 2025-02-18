@@ -119,9 +119,11 @@ class Tournament():
 			loser_id = self.game_manager.get_loser()
 			self.players.remove(loser_id)
 			self.tournament_status = self.TournamentStatus.ENDED
+			
 			await self.broadcast_message({
 				"type": "lobby_state",
-				"event": "match_finished"
+				"event": "match_finished",
+				"loser": loser_id
 			})
 
 	def to_dict(self) -> dict:
