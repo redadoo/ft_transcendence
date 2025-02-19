@@ -10,6 +10,17 @@ import router from './router.js';
 export default class SocialOverlayManager {
 	constructor() {
 		this.initialized = false;
+		this.invalidPathnames = ['/lobby',
+			'/lobby/guest',
+			'/lobby/playing',
+			'/multiplayer/pong_ranked',
+			'/multiplayer/pong_unranked',
+			'/tournament',
+			'/tournament/guest',
+			'/tournament/playing',
+			'/singleplayer/pong',
+		];
+
 		this.socialData = {
 			socket: null,
 			currentUsername: null,
@@ -316,6 +327,10 @@ export default class SocialOverlayManager {
 	}
 
 	acceptInviteToGame(inviteData) {
+		if (this.invalidPathnames.includes(window.location.pathname)) {
+			alert('You cannot accept a game invite while in a game lobby');
+			return;
+		}
 
 		window.localStorage[`room_name`] = inviteData.room_name;
 		window.localStorage[`invited_username`] = inviteData.username;
@@ -324,6 +339,11 @@ export default class SocialOverlayManager {
 	}
 
 	acceptInviteToTournament(inviteData) {
+		if (this.invalidPathnames.includes(window.location.pathname)) {
+			alert('You cannot accept a tournament invite while in a game lobby');
+			return;
+		}
+
 		window.localStorage[`room_name`] = inviteData.room_name;
 		window.localStorage[`invited_username`] = inviteData.username;
 
