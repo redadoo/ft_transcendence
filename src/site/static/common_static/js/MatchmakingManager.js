@@ -55,12 +55,16 @@ export default class MatchmakingManager
 		try
 		{
 			const data = JSON.parse(event.data);
-			switch (data.type) {
-			case 'setup_pong_lobby':
-				this.setupLobby(data);
-				break;
-			default:
-				console.log(`Unhandled matchmaking event type: ${data.type}`);
+			switch (data.type) 
+			{
+				case 'setup_pong_lobby':
+					this.setupLobby(data);
+					break;
+				case 'setup_liarsbar_lobby':
+					this.setupLobby(data);
+					break;
+				default:
+					console.log(`Unhandled matchmaking event type: ${data.type}`);
 			}
 		} catch (error) {
 			console.error('Error processing matchmaking WebSocket message:', error);
