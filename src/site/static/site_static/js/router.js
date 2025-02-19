@@ -124,24 +124,6 @@ const router = {
 
 		this.handleLocation();
 	},
-
-	// setupEventListeners: function() {
-	// 	window.addEventListener('popstate', this.handleLocation.bind(this));
-
-	// 	document.body.addEventListener('click', (e) => {
-	// 		const link = e.target.closest('[data-link]');
-	// 		if (link) {
-	// 			e.preventDefault();
-	// 			const path = link.getAttribute('data-link');
-	// 			console.log('Navigating to:', path);
-	// 			if (path === '/friends-profile') {
-	// 				this.friendProfile = link.getAttribute('data-username');
-	// 			}
-
-	// 			this.navigateTo(path);
-	// 		}
-	// 	});
-	// },
 };
 
 document.addEventListener('DOMContentLoaded', () => {
