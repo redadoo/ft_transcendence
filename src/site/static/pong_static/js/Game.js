@@ -133,7 +133,7 @@ export default class Game
      */
 	async init()
 	{
-		document.getElementById('profileBtn').classList.add('d-none');
+		router.removeEventListeners();
 
 		await this.setPlayerId();
 
@@ -484,7 +484,7 @@ export default class Game
 
 	game_ended(isGamefinished)
 	{
-		document.getElementById('profileBtn').classList.remove('d-none');
+		router.setupEventListeners();
 
 		console.log("Game ending...");
 

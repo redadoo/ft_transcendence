@@ -43,8 +43,11 @@ const router = {
 		document.getElementById('header').innerHTML = html.header;
 
 		this.tournament = new Tournament();
-
 		this.overlay = new overlayManager();
+
+		this.onPopState = this.handleLocation.bind(this);
+		this.onBodyClick = this.handleBodyClick.bind(this);
+
 		this.setupEventListeners();
 
 		this.navigateTo(window.location.pathname);
@@ -74,6 +77,31 @@ const router = {
 		}
 	},
 
+	setupEventListeners: function() {
+		window.addEventListener('popstate', this.onPopState);
+		document.body.addEventListener('click', this.onBodyClick);
+	},
+
+	removeEventListeners: function() {
+		window.removeEventListener('popstate', this.onPopState);
+		document.body.removeEventListener('click', this.onBodyClick);
+		console.log('Event listeners removed');
+	},
+
+	handleBodyClick: function(e) {
+		const link = e.target.closest('[data-link]');
+		if (link) {
+			e.preventDefault();
+			const path = link.getAttribute('data-link');
+			console.log('Navigating to:', path);
+			if (path === '/friends-profile') {
+				this.friendProfile = link.getAttribute('data-username');
+			}
+			this.navigateTo(path);
+		}
+	},
+
+
 	navigateTo: async function(url) {
 		if (window.location.pathname !== url) {
 			history.pushState(null, null, url);
@@ -97,23 +125,23 @@ const router = {
 		this.handleLocation();
 	},
 
-	setupEventListeners: function() {
-		window.addEventListener('popstate', this.handleLocation.bind(this));
+	// setupEventListeners: function() {
+	// 	window.addEventListener('popstate', this.handleLocation.bind(this));
 
-		document.body.addEventListener('click', (e) => {
-			const link = e.target.closest('[data-link]');
-			if (link) {
-				e.preventDefault();
-				const path = link.getAttribute('data-link');
-				console.log('Navigating to:', path);
-				if (path === '/friends-profile') {
-					this.friendProfile = link.getAttribute('data-username');
-				}
+	// 	document.body.addEventListener('click', (e) => {
+	// 		const link = e.target.closest('[data-link]');
+	// 		if (link) {
+	// 			e.preventDefault();
+	// 			const path = link.getAttribute('data-link');
+	// 			console.log('Navigating to:', path);
+	// 			if (path === '/friends-profile') {
+	// 				this.friendProfile = link.getAttribute('data-username');
+	// 			}
 
-				this.navigateTo(path);
-			}
-		});
-	},
+	// 			this.navigateTo(path);
+	// 		}
+	// 	});
+	// },
 };
 
 document.addEventListener('DOMContentLoaded', () => {
