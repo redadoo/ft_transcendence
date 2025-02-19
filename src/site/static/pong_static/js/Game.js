@@ -156,7 +156,6 @@ export default class Game
 		}
 
 		const modeFromPath = SocketManager.getModeFromPath();
-		console.log("Mode from path:", modeFromPath);
 		switch (modeFromPath)
 		{
 			case 'singleplayer':
@@ -210,8 +209,6 @@ export default class Game
 
 				this.sceneManager.scene.add(this.ball.mesh);
 
-
-				console.log("bound, ball and dbackground are initialized");
 				this.isSceneCreated = true;
 			} catch (error) {
 				console.error("An error occurred during game initialization:", error);
@@ -374,10 +371,10 @@ export default class Game
 				this.ball.updatePosition(data.ball);
 			if (data.players)
 			{
-				console.log("this.pongPlayer , ", this.pongPlayer);
-				this.pongPlayer.updatePosition(data.players[this.pongPlayer.playerId].y);
-				console.log("this.pongOpponent , ", this.pongOpponent);
-				this.pongOpponent.updatePosition(data.players[this.pongOpponent.playerId].y);
+				if (data.players[this.pongPlayer.playerId] != undefined)
+					this.pongPlayer.updatePosition(data.players[this.pongPlayer.playerId].y);
+				if (data.players[this.pongOpponent.playerId] != undefined)
+					this.pongOpponent.updatePosition(data.players[this.pongOpponent.playerId].y);
 			}
 
 			if(data.scores)
@@ -448,24 +445,17 @@ export default class Game
 		if (newPlayer_id == this.player_id)
 		{
 			if (this.pongPlayer != null)
-			{
-				console.log("client player already init");
 				return;
-			}
+
 			this.pongPlayer = new PongPlayer(socket, this.player_id, playerData);
 			this.sceneManager.scene.add(this.pongPlayer.paddle.mesh);
-			console.log("player initialized:", this.pongPlayer);
 		}
 		else
 		{
 			if (this.pongOpponent != null)
-			{
-				console.log("opponent player already init");
 				return;
-			}
 			this.pongOpponent = new PongPlayer(null, newPlayer_id, playerData);
 			this.sceneManager.scene.add(this.pongOpponent.paddle.mesh);
-			console.log("new player initialized:", this.pongOpponent);
 		}
 	}
 
@@ -485,9 +475,6 @@ export default class Game
 	game_ended(isGamefinished)
 	{
 		router.setupEventListeners();
-
-		console.log("Game ending...");
-
 		if (this.sceneManager) {
 			this.sceneManager.dispose();
 			this.sceneManager = null;
@@ -517,15 +504,23 @@ export default class Game
 
 	reset()
 	{
-		console.log("reset game.js");
-		this.pongPlayer.setPosition(0);
-		this.pongOpponent.setPosition(0);
-		this.ball.setPosition(0,0);
-		delete this.pongPlayer;
-		delete this.pongOpponent;
-		this.pongPlayer = null;
-		this.pongOpponent = null;
-
+		if (this.ball != null)
+			this.ball.setPosition(0,0);
+		if (this.sceneManager != null)
+		{
+			if (this.pongPlayer != null)
+			{
+				this.pongPlayer.deletePaddle(this.sceneManager.scene);
+				delete this.pongOpponent;
+				this.pongPlayer = null;
+			}
+			if (this.pongOpponent != null)
+			{
+				this.pongOpponent.deletePaddle(this.sceneManager.scene);
+				delete this.pongOpponent;
+				this.pongOpponent = null;
+			}
+		}
 		this.handleScoreSprites({"player1": 0, "player2": 0});
 	}
 }

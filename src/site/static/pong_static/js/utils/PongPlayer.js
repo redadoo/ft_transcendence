@@ -94,4 +94,14 @@ export default class PongPlayer {
 			}
 		}
 	}
+
+	deletePaddle(scene) 
+	{
+		if (this.paddle) 
+		{
+			this.paddle.deleteMesh(scene);
+			this.paddle = null;
+		}
+	}
+	
 }

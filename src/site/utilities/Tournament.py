@@ -36,7 +36,6 @@ class Tournament():
 		if not event_type:
 			print("Event type is missing in the received data.")
 			return
-		print(f"manage_event {event_type}")
 		match event_type:
 			case "init_player":
 				await self.add_player_to_tournament(data)
@@ -51,7 +50,6 @@ class Tournament():
 
 	def setup_first_round(self):
 		"""Builds the first round from the joined players."""
-		print("setup_first_round")
 		if len(self.players) < MATCH_PLAYER_NUMBER:
 			print("Not enough players to start a tournament.")
 			return
@@ -61,27 +59,26 @@ class Tournament():
 		while len(players_queue) >= MATCH_PLAYER_NUMBER:
 			match = [players_queue.pop(0), players_queue.pop(0)]
 			matches.append(match)
-		print(f"matches {matches}")
 		# The bracket is a list of rounds; here, round 0:
 		self.bracket = [matches]
 		self.current_round_winners = []
 		self.current_round_index = 0
 
-	def setup_next_round(self, winners: list):
+	async def setup_next_round(self, winners: list):
 		"""Creates the next round from the winners of the previous round.
 		   If there's an odd number of winners, the last one gets a bye."""
-		print("setup_next_round")
 		if len(winners) < MATCH_PLAYER_NUMBER:
-			# Only one winner remains: tournament over.
+			snapshot = self.to_dict()
+			await self.broadcast_message({
+				"type": "lobby_state",
+				"event": "tournament_finished",
+				"winner_id": self.current_round_winners[0],
+				"tournament_snapshot": snapshot,
+			})
 			return
 
 		next_round_matches = []
 		winners_queue = winners[:]  # Copy the list
-
-		# If odd, give a bye to the last player.
-		bye_player = None
-		if len(winners_queue) % 2 == 1:
-			bye_player = winners_queue.pop()
 
 		while len(winners_queue) >= MATCH_PLAYER_NUMBER:
 			match = [winners_queue.pop(0), winners_queue.pop(0)]
@@ -89,8 +86,6 @@ class Tournament():
 
 		# Reset the winners for the new round; if there was a bye, that player automatically advances.
 		self.current_round_winners = []
-		if bye_player is not None:
-			self.current_round_winners.append(bye_player)
 
 		if next_round_matches:
 			self.bracket.append(next_round_matches)
@@ -98,7 +93,6 @@ class Tournament():
 
 	async def setup_pong_manager(self):
 		"""Prepares the next match from the current round in the bracket."""
-		print("setup_pong_manager")
 		# Ensure there is a current round.
 		if not self.bracket or self.current_round_index >= len(self.bracket):
 			print("No more matches available in the bracket.")
@@ -110,14 +104,15 @@ class Tournament():
 		if not current_round_matches:
 			# If winners exist from this round, create next round.
 			if self.current_round_winners:
-				self.setup_next_round(self.current_round_winners)
+				await self.setup_next_round(self.current_round_winners)
 				# If only one winner remains, tournament is over.
 				if len(self.current_round_winners) == 1:
+					snapshot = self.to_dict()
 					await self.broadcast_message({
 						"type": "lobby_state",
 						"event": "tournament_finished",
 						"winner_id": self.current_round_winners[0],
-						"tournament_snapshot": self.to_dict(),
+						"tournament_snapshot": snapshot,
 					})
 					return
 				current_round_matches = self.bracket[self.current_round_index]
@@ -129,7 +124,6 @@ class Tournament():
 		match = current_round_matches.pop(0)
 		self.game_manager.reset()
 		self.game_loop_task = None
-		print(f"setup_pong_manager match {match}")
 		self.game_manager.add_player(match[0], False)
 		self.game_manager.add_player(match[1], False)
 		self.tournament_status = self.TournamentStatus.TO_SETUP
@@ -144,11 +138,10 @@ class Tournament():
 
 	async def tournament_start(self):
 		"""Starts the tournament by kicking off the game loop and the first match."""
-		print("tournament_start")
 		if not self.bracket:
 			print("Tournament not set up properly.")
 			return
-		print("self.game_manager.start_game()")
+		
 		await self.setup_pong_manager()
 
 		self.game_manager.start_game()
@@ -163,16 +156,17 @@ class Tournament():
 		})
 
 	async def add_player_to_tournament(self, data: dict):
-		print("add_player_to_tournament")
 		if not data.get("player_id"):
 			raise ValueError("Invalid data: 'player_id' is required.")
 
 		player_id = int(data.get("player_id"))
 		self.players.append(player_id)
+		snapshot = self.to_dict()
 		await self.broadcast_message({
 			"type": "lobby_state",
 			"event_name": "player_join",
 			"player_id": player_id,
+			"tournament_snapshot": snapshot,
 		})
 
 		if len(self.players) == PLAYER_NUMBER:
@@ -184,7 +178,6 @@ class Tournament():
 		After the match concludes, records the winner and moves on.
 		"""
 		try:
-			print("loop")
 			while self.game_manager.game_loop_is_active:
 				async with self.update_lock:
 					await self.game_manager.game_loop()
@@ -199,9 +192,7 @@ class Tournament():
 			print("Game loop task was cancelled.")
 		finally:
 			loser_id = self.game_manager.get_loser()
-			print(f"loser_id {loser_id}")
 			winner_id = self.game_manager.get_winner()
-			print(f"loser_id {winner_id}")
 
 			# Remove the loser from the overall player list.
 			if loser_id in self.players:
