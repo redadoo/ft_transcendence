@@ -133,6 +133,8 @@ export default class Game
      */
 	async init()
 	{
+		document.getElementById('profileBtn').classList.add('d-none');
+
 		await this.setPlayerId();
 
 		//init scene
@@ -177,7 +179,7 @@ export default class Game
 			this.mode.init();
 		this.sceneManager.setExternalFunction(() => this.fixedUpdate());
 
-		
+
 	}
 
 	/**
@@ -195,7 +197,7 @@ export default class Game
 				const ball_data = data?.lobby_info?.ball;
 				const scores_data = data?.lobby_info?.scores;
 
-				if (!bounds_data || !ball_data || !scores_data) 
+				if (!bounds_data || !ball_data || !scores_data)
 					{
 					console.error("Game data is missing or incomplete:", { bounds_data, ball_data, scores_data });
 					return;
@@ -225,16 +227,16 @@ export default class Game
 		  if (!this.scoreSpritesInitialized) {
 			this.createTextSprite(`${scores.player1}`).then((sprite) => {
 			  this.player1ScoreSprite = sprite;
-			  this.player1ScoreSprite.position.set(-10, 18, 0); 
+			  this.player1ScoreSprite.position.set(-10, 18, 0);
 			  this.sceneManager.scene.add(this.player1ScoreSprite);
 			}).catch((error) => console.error("Failed to create Player 1 sprite:", error));
-	  
+
 			this.createTextSprite(`${scores.player2}`).then((sprite) => {
 			  this.player2ScoreSprite = sprite;
-			  this.player2ScoreSprite.position.set(10, 18, 0); 
+			  this.player2ScoreSprite.position.set(10, 18, 0);
 			  this.sceneManager.scene.add(this.player2ScoreSprite);
 			}).catch((error) => console.error("Failed to create Player 2 sprite:", error));
-	  
+
 			this.scoreSpritesInitialized = true;
 		  } else {
 			if (this.player1ScoreSprite) {
@@ -242,7 +244,7 @@ export default class Game
 			} else {
 			  console.warn("Player 1 score sprite is not ready yet");
 			}
-	  
+
 			if (this.player2ScoreSprite) {
 			  this.updateSpriteTexture(this.player2ScoreSprite, `${scores.player2}`);
 			} else {
@@ -253,7 +255,7 @@ export default class Game
 		  console.error("An error occurred while handling score sprites:", error);
 		}
 	}
-	  
+
 	  /**
      * Initializes the sprites for the score
 	 * * @param {string} text - The value of the score
@@ -262,30 +264,30 @@ export default class Game
 		return new Promise((resolve, reject) => {
 		  const canvas = document.createElement('canvas');
 		  const context = canvas.getContext('2d');
-	  
+
 		  canvas.width = 256;
 		  canvas.height = 150;
-	  
+
 		  document.fonts.load('150px "Press Start 2P"').then(() => {
 			context.font = '150px "Press Start 2P"';
 			context.fillStyle = 'white';
 			context.textAlign = 'center';
 			context.textBaseline = 'middle';
 			context.fillText(text, canvas.width / 2, canvas.height / 2);
-	  
+
 			const texture = new THREE.CanvasTexture(canvas);
 			const material = new THREE.SpriteMaterial({ map: texture });
 			const sprite = new THREE.Sprite(material);
 			sprite.scale.set(5, 2.5, 1);
-	  
-			resolve(sprite); 
+
+			resolve(sprite);
 		  }).catch((error) => {
 			console.error('Failed to load font:', error);
 			reject(error);
 		  });
 		});
 	}
-	  
+
 	/**
      * Initializes the lighting system for the game scene.
      */
@@ -393,24 +395,24 @@ export default class Game
      * Updates the sprites for the score
 	 * * @param {string} text - The value of the score
      */
-	updateSpriteTexture(sprite, text) 
+	updateSpriteTexture(sprite, text)
 	{
 		if (!sprite || !sprite.material || !sprite.material.map) {
 		  console.warn("Sprite or texture is not defined yet.");
 		  return;
 		}
-	  
+
 		const texture = sprite.material.map;
 		const canvas = texture.image;
 		const context = canvas.getContext('2d');
-	  
+
 		if (!context) {
 		  console.error("Failed to get 2D context from canvas.");
 		  return;
 		}
-	  
+
 		context.clearRect(0, 0, canvas.width, canvas.height);
-	  
+
 		if (document.fonts.check('150px "Press Start 2P"')) {
 		  this.drawTextOnCanvas(context, canvas, text, texture);
 		} else {
@@ -421,18 +423,18 @@ export default class Game
 		  });
 		}
 	}
-	  
-	drawTextOnCanvas(context, canvas, text, texture) 
+
+	drawTextOnCanvas(context, canvas, text, texture)
 	{
 		context.font = '150px "Press Start 2P"';
 		context.fillStyle = 'white';
-		context.textAlign = 'center'; 
-		context.textBaseline = 'middle'; 
-		context.fillText(text, canvas.width / 2, canvas.height / 2); 
-		
+		context.textAlign = 'center';
+		context.textBaseline = 'middle';
+		context.fillText(text, canvas.width / 2, canvas.height / 2);
+
 		texture.needsUpdate = true;
 	}
-	  
+
 	/**
 	 * Adds a new player to the lobby, initializing either the client player or the opponent.
 	 *
@@ -482,6 +484,8 @@ export default class Game
 
 	game_ended(isGamefinished)
 	{
+		document.getElementById('profileBtn').classList.remove('d-none');
+
 		console.log("Game ending...");
 
 		if (this.sceneManager) {
@@ -521,7 +525,7 @@ export default class Game
 		delete this.pongOpponent;
 		this.pongPlayer = null;
 		this.pongOpponent = null;
-		
+
 		this.handleScoreSprites({"player1": 0, "player2": 0});
 	}
 }

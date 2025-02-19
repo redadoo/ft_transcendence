@@ -265,6 +265,15 @@ const html = {
 		</div>
 	`,
 
+	// <div id="pong-container" class="container-fluid game-container d-flex justify-content-center align-items-center">
+	// 	<div class="text-center">
+	// 		<h1 class="pixel-font multiplayer">LIAR'S BAR</h1>
+	// 		<p id="matchmakingStatus" class="hundin-font text-up multiplayer">Click below to start matchmaking</p>
+	// 		<button id="startMatchmaking" class="btn btn-matchmaking">
+	// 			START MATCHMAKING
+	// 		</button>
+	// 	</div>
+	// </div>
 	liarsbar: `
 		<div> </div>
 	`,
