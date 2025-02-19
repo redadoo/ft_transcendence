@@ -71,6 +71,7 @@ export default class TournamentPongMode extends PongMode {
 			return;
 		}
 
+		console.log("stanco", parsedData);
 		switch (lobby_info.current_tournament_status)
 		{
 			case 'TO_SETUP':
@@ -96,35 +97,45 @@ export default class TournamentPongMode extends PongMode {
 
 		if (event_info.event_name === "player_to_setup")
 		{
-			const players = data.lobby_info.players;
+			console.log("player_to_setup");
 
+			const players = data.lobby_info.players;
 			for (const [key, value] of Object.entries(players))
 			{
 				if (this.game.player_id == key)
+				{
+					console.log("im a player", key);
+					document.getElementById('pongOverlay').classList.add('d-none');
 					this.isPlaying = true;
-
+				}
+				console.log("AddUserToLobby");
 				this.game.AddUserToLobby(key,value, this.socket);
 			}
+			this.game.initGameEnvironment(data);
 		}
-
 	}
 
 	manageMatch(data)
 	{
 		const { event_info, lobby_info } = data;
-
-
+		console.log("stanco 123", this.isPlaying);
 		if (event_info.event_name === "match_start")
 		{
+			console.log("stanco 543");
+
 			if (this.isPlaying == true)
 			{
-				this.game.initGameEnvironment(data);
+				console.log("i love");
 				router.navigateTo('/tournament/playing');
 			}
 		}
 		else
 		{
-			this.game.updateGameState(lobby_info);
+			if (this.isPlaying == true)
+			{
+				console.log("update ");
+				this.game.updateGameState(lobby_info);
+			}
 		}
 	}
 
@@ -134,11 +145,21 @@ export default class TournamentPongMode extends PongMode {
 
 		if (this.isPlaying == true)
 		{
+			console.log("finish match with me", this.isPlaying);
+			this.isPlaying = false;
 			if(event_info.loser_id == this.game.player_id)
 				this.game.game_ended(true);
 			else
+			{
 				document.getElementById('pongOverlay').classList.remove('d-none');
-			this.isPlaying = false;
+				// setTimeout(check, 1000);
+				this.socket.send(JSON.stringify({
+					type: 'waiting_next_match',
+				}));
+				console.log("waiting_next_match");
+				this.game.reset();
+			}
+			console.log("set false");
 		}
 	}
 }

@@ -180,8 +180,6 @@ export default class Game
 		
 	}
 
-	
-
 	/**
      * Initializes the game environment with given data.
      * @param {Object} data - The data used to set up the game environment.
@@ -256,12 +254,11 @@ export default class Game
 		}
 	}
 	  
-	  
 	  /**
      * Initializes the sprites for the score
 	 * * @param {string} text - The value of the score
      */
-	  createTextSprite(text) {
+	createTextSprite(text) {
 		return new Promise((resolve, reject) => {
 		  const canvas = document.createElement('canvas');
 		  const context = canvas.getContext('2d');
@@ -289,7 +286,6 @@ export default class Game
 		});
 	}
 	  
-
 	/**
      * Initializes the lighting system for the game scene.
      */
@@ -368,7 +364,6 @@ export default class Game
      * Updates the game state with new data.
      * @param {Object} data - The game state data.
      */
-
 	updateGameState(data)
 	{
 		try
@@ -377,7 +372,9 @@ export default class Game
 				this.ball.updatePosition(data.ball);
 			if (data.players)
 			{
+				console.log("this.pongPlayer , ", this.pongPlayer);
 				this.pongPlayer.updatePosition(data.players[this.pongPlayer.playerId].y);
+				console.log("this.pongOpponent , ", this.pongOpponent);
 				this.pongOpponent.updatePosition(data.players[this.pongOpponent.playerId].y);
 			}
 
@@ -435,7 +432,6 @@ export default class Game
 		
 		texture.needsUpdate = true;
 	}
-	  
 	  
 	/**
 	 * Adds a new player to the lobby, initializing either the client player or the opponent.
@@ -513,5 +509,19 @@ export default class Game
 			router.navigateTo('/match-result');
 		else
 			router.navigateTo('/multiplayer/pong_selection');
+	}
+
+	reset()
+	{
+		console.log("reset game.js");
+		this.pongPlayer.setPosition(0);
+		this.pongOpponent.setPosition(0);
+		this.ball.setPosition(0,0);
+		delete this.pongPlayer;
+		delete this.pongOpponent;
+		this.pongPlayer = null;
+		this.pongOpponent = null;
+		
+		this.handleScoreSprites({"player1": 0, "player2": 0});
 	}
 }

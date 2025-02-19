@@ -44,4 +44,10 @@ export default class Ball
 		this.mesh.position.x = this.newPosX;
 		this.mesh.position.y = this.newPosY;
 	}
+
+	setPosition(y, x)
+	{
+		this.mesh.position.x = y;
+		this.mesh.position.y = x;
+	}
 }

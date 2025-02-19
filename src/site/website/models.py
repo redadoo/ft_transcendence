@@ -180,7 +180,7 @@ class UserStats(models.Model):
 			self.lose += 1
 		self.total_points_scored += match.get_player_point_scored(self.user)
 		game_duration = match.end_date - match.start_date
-		if game_duration > self.longest_game_duration:
+		if self.longest_game_duration != None and game_duration > self.longest_game_duration:
 			self.longest_game_duration = game_duration
 		if not self.time_on_site:
 			self.time_on_site = game_duration

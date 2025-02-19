@@ -46,6 +46,11 @@ export default class PongPlayer {
 		this.paddle.mesh.position.y = this.newY;
 	}
 
+	setPosition(y) 
+	{
+		this.paddle.mesh.position.y = y;
+	}
+
 	/**
 	 * Sets up key bindings for player control and event listeners for key actions.
 	 */

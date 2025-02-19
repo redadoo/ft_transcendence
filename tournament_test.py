@@ -11,8 +11,8 @@ def on_message(ws, message):
 def on_error(ws, error):
     print(f"Error: {error}")
 
-def on_close(ws, close_status_code, close_msg):
-    print("Connection closed")
+def on_close(ws, player_id):
+    print(f"Connection closed for {player_id}")
 
 def on_open(ws, player_id):
     print(f"Connection opened for player {player_id}")
@@ -28,7 +28,7 @@ def create_connection(player_id):
         on_open=lambda ws: on_open(ws, player_id),
         on_message=on_message,
         on_error=on_error,
-        on_close=on_close
+        on_close=lambda ws: on_close(ws, player_id),
     )
     ws.run_forever()
 
