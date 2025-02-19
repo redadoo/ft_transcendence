@@ -28,6 +28,8 @@ export default class SocialOverlayManager {
 			inviteToGame: this.sendInviteToGame.bind(this),
 			acceptInviteToGame: this.acceptInviteToGame.bind(this),
 			acceptInviteToTournament: this.acceptInviteToTournament.bind(this),
+			declineInviteToGame: this.declineInviteToGame.bind(this),
+			declineInviteToTournament: this.declineInviteToTournament.bind(this)
 		}
 		this.initializeUIElements();
 		this.notificationManager = new NotificationManager();
@@ -314,6 +316,7 @@ export default class SocialOverlayManager {
 	}
 
 	acceptInviteToGame(inviteData) {
+
 		window.localStorage[`room_name`] = inviteData.room_name;
 		window.localStorage[`invited_username`] = inviteData.username;
 
@@ -325,6 +328,14 @@ export default class SocialOverlayManager {
 		window.localStorage[`invited_username`] = inviteData.username;
 
 		router.navigateTo('/tournament/guest');
+	}
+
+	declineInviteToGame(inviteData) {
+		console.log('Declining invite to game:', inviteData);
+	}
+
+	declineInviteToTournament(inviteData) {
+		console.log('Declining invite to tournament:', inviteData);
 	}
 
 	// Socket message senders

@@ -463,7 +463,10 @@ const html = {
 	header: `
 		<span class="px-4"><div id="header_text"></div></span>
 		<div class="d-flex">
-			<div class="header-button notification d-none" id="notificationBtn"></div>
+			<div class="header-button notification d-none" id="notificationBtn">
+				👥/🔔
+				<div id="notificationCounter" class="notification-badge">0</div>
+			</div>
 
 			<div class="header-button profile d-none" id="profileBtn" data-link="/profile">
 				<div class="d-flex flex-column">
@@ -870,7 +873,7 @@ const html = {
 									<span class="pixel-font stat-value" id="player1Score">0</span>
 								</div>
 								<div class="stat-line">
-									<span class="pixel-font stat-label">MMR: </span>
+									<span class="pixel-font stat-label">RP: </span>
 									<span class="pixel-font stat-value" id="player1MMR">0</span>
 								</div>
 							</div>
@@ -882,7 +885,7 @@ const html = {
 									<span class="pixel-font stat-value" id="player2Score">0</span>
 								</div>
 								<div class="stat-line">
-									<span class="pixel-font stat-label">MMR: </span>
+									<span class="pixel-font stat-label">RP: </span>
 									<span class="pixel-font stat-value" id="player2MMR">0</span>
 								</div>
 							</div>

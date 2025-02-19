@@ -160,9 +160,26 @@ body {
 }
 
 .header-button.notification {
+	font-size: 32px;
 	width: 120px;
 	z-index: 10000;
 	position: relative;
+}
+
+.notification-badge {
+    position: absolute;
+    bottom: -5px;
+    right: -5px;
+    background-color: #de4f5d;
+    color: white;
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+    font-size: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: "Press Start 2P";
 }
 
 .header-button.profile {
