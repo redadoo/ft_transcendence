@@ -100,12 +100,9 @@ class Tournament():
 
 		current_round_matches = self.bracket[self.current_round_index]
 
-		# If the current round is finished, set up the next round.
 		if not current_round_matches:
-			# If winners exist from this round, create next round.
 			if self.current_round_winners:
 				await self.setup_next_round(self.current_round_winners)
-				# If only one winner remains, tournament is over.
 				if len(self.current_round_winners) == 1:
 					snapshot = self.to_dict()
 					await self.broadcast_message({

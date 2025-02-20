@@ -191,13 +191,12 @@ export default class Game
 		{
 			try {
 				this.setupScene();
-				console.log(data);
 				const bounds_data = data?.lobby_info?.bounds;
 				const ball_data = data?.lobby_info?.ball;
 				const scores_data = data?.lobby_info?.scores;
 
 				if (!bounds_data || !ball_data || !scores_data)
-					{
+				{
 					console.error("Game data is missing or incomplete:", { bounds_data, ball_data, scores_data });
 					return;
 				}
