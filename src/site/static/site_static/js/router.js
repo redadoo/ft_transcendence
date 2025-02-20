@@ -40,6 +40,7 @@ const router = {
 		document.getElementById('overlay').innerHTML = html.overlay;
 		document.getElementById('statusOverlay').innerHTML = html.statusOverlay;
 		document.getElementById('pongOverlay').innerHTML = html.pongOverlay;
+		document.getElementById('liarsbarOverlay').innerHTML = html.liarsbarOverlay;
 		document.getElementById('header').innerHTML = html.header;
 
 		this.tournament = new Tournament();
