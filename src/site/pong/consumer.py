@@ -292,16 +292,14 @@ class PongTournament(AsyncWebsocketConsumer):
 
 		await self.tournament.manage_event(data)
 
-		if data.get("type") == "quit_game":
-			match_manager.remove_match(self.lobby.room_group_name)
-
-
 	async def lobby_state(self, event: dict):
 		"""Aggiorna lo stato lato client."""
+		
+		tournament_info = event.get("tournament_snapshot") or self.tournament.to_dict()
 
 		data_to_send = {
 			"event_info": event,
-			"lobby_info": self.tournament.to_dict()
+			"lobby_info": tournament_info
 		}
 
 		event_name = event.get("event_name")
@@ -318,4 +316,3 @@ class PongTournament(AsyncWebsocketConsumer):
 				await self.send(text_data=json.dumps(data_to_send))
 			except Disconnected:
 				print(f"Attempted to send a message on a closed websocket connection. data : {data_to_send}")
-				

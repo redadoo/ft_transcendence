@@ -4,7 +4,13 @@ export default class NotificationManager {
 		this.notificationCount = 0;
 		this.notificationContainer = document.getElementById('notifications');
 		this.notificationCountDisplay = document.getElementById('notificationCount');
+		this.notificationCounter = document.getElementById('notificationCounter');
 		this.setupWindowHandlers();
+	}
+
+	playNotificationSound() {
+		const audio = new Audio('/static/site_static/media/audio/notification.mp3');
+		audio.play();
 	}
 
 	setupWindowHandlers() {
@@ -26,10 +32,11 @@ export default class NotificationManager {
 
 		this.notifications.unshift(notificationData);
 		this.notificationCount++;
+		this.playNotificationSound();
 		this.updateNotificationDisplay();
 
 		if (!notification.actions) {
-			setTimeout(() => this.removeNotification(notificationId), 5000);
+			setTimeout(() => this.removeNotification(notificationId), 25000);
 		}
 	}
 
@@ -44,6 +51,7 @@ export default class NotificationManager {
 
 	updateNotificationDisplay() {
 		this.notificationCountDisplay.textContent = this.notificationCount;
+		this.notificationCounter.textContent = this.notificationCount;
 
 		this.notificationContainer.innerHTML = this.notifications.map(notification => `
 			<div class="notification-item ${notification.type}" id="notification-${notification.id}">

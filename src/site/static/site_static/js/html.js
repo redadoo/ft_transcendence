@@ -265,6 +265,15 @@ const html = {
 		</div>
 	`,
 
+	// <div id="pong-container" class="container-fluid game-container d-flex justify-content-center align-items-center">
+	// 	<div class="text-center">
+	// 		<h1 class="pixel-font multiplayer">LIAR'S BAR</h1>
+	// 		<p id="matchmakingStatus" class="hundin-font text-up multiplayer">Click below to start matchmaking</p>
+	// 		<button id="startMatchmaking" class="btn btn-matchmaking">
+	// 			START MATCHMAKING
+	// 		</button>
+	// 	</div>
+	// </div>
 	liarsbar: `
 		<div> </div>
 	`,
@@ -493,7 +502,10 @@ const html = {
 	header: `
 		<span class="px-4"><div id="header_text"></div></span>
 		<div class="d-flex">
-			<div class="header-button notification d-none" id="notificationBtn"></div>
+			<div class="header-button notification d-none" id="notificationBtn">
+				👥/🔔
+				<div id="notificationCounter" class="notification-badge">0</div>
+			</div>
 
 			<div class="header-button profile d-none" id="profileBtn" data-link="/profile">
 				<div class="d-flex flex-column">
@@ -793,88 +805,8 @@ const html = {
 	lobby: `
 		<div class="container-fluid game-container">
 			<div class="row h-100">
-				<div class="col-2 px-0">
-					<nav class="nav-wrapper">
-						<div class="d-flex flex-column">
-							<div class="nav-link-left back" data-link="/multiplayer/pong">
-								<span class="hundin-font back">BACK</span>
-							</div>
-						</div>
-					</nav>
-				</div>
 
-				<div class="col-10 px-0">
-					<div class="lobby-container">
-						<div class="lobby-header">
-							<span class="pixel-font lobby-title">GAME LOBBY</span>
-							<div class="lobby-code-container">
-								<span class="pixel-font lobby-code-label">LOBBY CODE:</span>
-								<span class="pixel-font lobby-code" id="lobbyCode">...</span>
-								<button class="copy-button pixel-font" id="copyCode">COPY</button>
-							</div>
-						</div>
-
-						<div class="lobby-content">
-							<div class="players-container">
-								<div class="player-slot">
-									<div class="player-avatar">
-										<img src="" alt="Player 1" id="player1Avatar">
-									</div>
-									<span class="pixel-font player-name" id="player1Name">WAITING...</span>
-									<span class="pixel-font player-status host">HOST</span>
-								</div>
-								<div class="player-slot empty">
-									<div class="player-avatar">
-										<img src="" alt="Player 2" id="player2Avatar">
-									</div>
-									<span class="pixel-font player-name" id="player2Name">WAITING...</span>
-									<span class="pixel-font player-status">GUEST</span>
-								</div>
-							</div>
-
-							<div class="lobby-controls">
-								<button class="start-button pixel-font" id="startGame" disabled>
-									START GAME
-								</button>
-								<div class="game-settings">
-									<div class="setting-item">
-										<span class="pixel-font setting-label">GAME MODE</span>
-										<select class="pixel-font setting-select" id="gameMode">
-											<option value="classic">CLASSIC</option>
-											<option value="modern">MODERN</option>
-										</select>
-									</div>
-									<div class="setting-item">
-										<span class="pixel-font setting-label">POINTS TO WIN</span>
-										<select class="pixel-font setting-select" id="pointsToWin">
-											<option value="5">5</option>
-											<option value="10">10</option>
-											<option value="15">15</option>
-										</select>
-									</div>
-								</div>
-							</div>
-						</div>
-					</div>
-				</div>
-			</div>
-		</div>
-	`,
-
-	lobby: `
-		<div class="container-fluid game-container">
-			<div class="row h-100">
-				<div class="col-2 px-0">
-					<nav class="nav-wrapper">
-						<div class="d-flex flex-column">
-							<div class="nav-link-left back" data-link="/multiplayer/pong_selection" id="backButton">
-								<span class="hundin-font back">BACK</span>
-							</div>
-						</div>
-					</nav>
-				</div>
-
-				<div class="col-10 px-0">
+				<div class="col-12 px-0">
 					<div class="lobby-container">
 						<div class="lobby-header">
 							<span class="pixel-font lobby-title">GAME LOBBY</span>
@@ -917,17 +849,7 @@ const html = {
 	lobbyGuest: `
 		<div class="container-fluid game-container">
 			<div class="row h-100">
-				<div class="col-2 px-0">
-					<nav class="nav-wrapper">
-						<div class="d-flex flex-column">
-							<div class="nav-link-left back" data-link="/multiplayer/pong_selection" id="backButton">
-								<span class="hundin-font back">BACK</span>
-							</div>
-						</div>
-					</nav>
-				</div>
-
-				<div class="col-10 px-0">
+				<div class="col-12 px-0">
 					<div class="lobby-container">
 						<div class="lobby-header">
 							<span class="pixel-font lobby-title">GAME LOBBY</span>
@@ -990,7 +912,7 @@ const html = {
 									<span class="pixel-font stat-value" id="player1Score">0</span>
 								</div>
 								<div class="stat-line">
-									<span class="pixel-font stat-label">MMR: </span>
+									<span class="pixel-font stat-label">RP: </span>
 									<span class="pixel-font stat-value" id="player1MMR">0</span>
 								</div>
 							</div>
@@ -1002,7 +924,7 @@ const html = {
 									<span class="pixel-font stat-value" id="player2Score">0</span>
 								</div>
 								<div class="stat-line">
-									<span class="pixel-font stat-label">MMR: </span>
+									<span class="pixel-font stat-label">RP: </span>
 									<span class="pixel-font stat-value" id="player2MMR">0</span>
 								</div>
 							</div>
@@ -1041,17 +963,8 @@ const html = {
 	tournament: `
 		<div class="container-fluid game-container">
 			<div class="row h-100">
-				<div class="col-2 px-0">
-					<nav class="nav-wrapper">
-						<div class="d-flex flex-column">
-							<div class="nav-link-left back" data-link="/multiplayer/pong_selection">
-								<span class="hundin-font back">BACK</span>
-							</div>
-						</div>
-					</nav>
-				</div>
 
-				<div class="col-10 px-0">
+				<div class="col-12 px-0">
 					<nav class="nav-wrapper">
 						<div class="tournament-container">
 							<div class="tournament-header">
@@ -1124,17 +1037,8 @@ const html = {
 	tournamentGuest: `
 		<div class="container-fluid game-container">
 			<div class="row h-100">
-				<div class="col-2 px-0">
-					<nav class="nav-wrapper">
-						<div class="d-flex flex-column">
-							<div class="nav-link-left back" data-link="/multiplayer/pong_selection">
-								<span class="hundin-font back">BACK</span>
-							</div>
-						</div>
-					</nav>
-				</div>
 
-				<div class="col-10 px-0">
+				<div class="col-12 px-0">
 					<nav class="nav-wrapper">
 						<div class="tournament-container">
 							<div class="tournament-header">

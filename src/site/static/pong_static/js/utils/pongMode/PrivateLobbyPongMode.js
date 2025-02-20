@@ -60,8 +60,10 @@ export default class PrivateLobbyPongMode extends PongMode {
 	 */
 	setUpLobby(data) 
   	{
+		this.game.initGameEnvironment(data);
+		  
 		const { event_info, lobby_info } = data;
-
+		  
 		if (event_info.event_name === "host_started_game") 
 		{
 			this.sendStart();

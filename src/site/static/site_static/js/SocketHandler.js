@@ -51,11 +51,6 @@ export default class SocketHandler {
 		if (friend) {
 			friend.status = newStatus;
 			this.friendListManager.updateFriendLists(this.socialData);
-			this.notificationManager.addNotification({
-				type: 'status_update',
-				title: 'Friend Status Update',
-				message: `${username} is now ${newStatus}`
-			});
 		} else {
 			console.warn(`⚠️ Friend not found: ${username}`);
 		}

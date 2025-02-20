@@ -55,7 +55,6 @@ export default class ChatManager {
 							<span class="back-to-friends pixel-font" id="backToFriends">←</span>
 							<span class="pixel-font" id="chatTitle">CHAT</span>
 						</div>
-						<span class="pixel-font" id="chatStatus"></span>
 					</div>
 				</div>
 

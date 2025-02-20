@@ -56,4 +56,19 @@ export default class Paddle {
             this.mesh.position.y = bounds.yMax - this.mesh.geometry.parameters.height / 2;
         }
     }
+
+    deleteMesh(scene) 
+    {
+        if (this.mesh) 
+        {
+            if (scene)
+                scene.remove(this.mesh);
+    
+            this.mesh.geometry.dispose();
+            this.mesh.material.dispose();
+    
+            this.mesh = null;
+        }
+    }
+    
 }

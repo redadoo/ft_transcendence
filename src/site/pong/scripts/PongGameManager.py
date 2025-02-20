@@ -11,6 +11,7 @@ from channels.db import database_sync_to_async
 from django.utils import timezone
 
 class PongGameManager(GameManager):
+	
 	def __init__(self):
 		"""
 		Initialize the Pong game manager with a maximum of 2 players, ball, and score tracking.
@@ -71,10 +72,10 @@ class PongGameManager(GameManager):
 		await database_sync_to_async(first_player_stats.save)()
 		await database_sync_to_async(second_player_stats.save)()
 
-		player1_history, _ = await database_sync_to_async(MatchHistory.objects.get)(user=first_player)
-		player2_history, _ = await database_sync_to_async(MatchHistory.objects.get)(user=second_player)
+		player1_history, _ = await database_sync_to_async(MatchHistory.objects.get_or_create)(user=first_player)
+		player2_history, _ = await database_sync_to_async(MatchHistory.objects.get_or_create)(user=second_player)
 		async def add_match_to_history(history):
-			history.add_pong_match(match)
+			await database_sync_to_async(history.add_pong_match)(match)
 			await database_sync_to_async(history.save)()
 		await add_match_to_history(player1_history)
 		await add_match_to_history(player2_history)
@@ -156,6 +157,7 @@ class PongGameManager(GameManager):
 			self.ball.reset()
 
 		if any(score >= constants.MAX_SCORE for score in self.scores.values()):
+			print(f"game ginis {self.scores}")
 			await self.clear_and_save(True)
 			return
 
@@ -165,6 +167,20 @@ class PongGameManager(GameManager):
 		if self.scores["player1"] > self.scores["player2"]:
 			return player_list[1]
 		return player_list[0]
+
+	def get_winner(self):
+		player_list = list(self.players)
+
+		if self.scores["player1"] > self.scores["player2"]:
+			return player_list[0]
+		return player_list[1]
+
+	def reset(self):
+		print("reset manager")
+		self.players.clear()
+		self.ball.reset()
+		self.scores = {"player1": 0, "player2": 0}
+		self.game_loop_is_active = False
 
 	def to_dict(self) -> dict:
 		"""

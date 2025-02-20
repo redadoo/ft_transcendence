@@ -31,7 +31,6 @@ const views = {
 		return html.home;
 	},
 
-
 	async login() {
 		if (await api.checkAuth()) { return router.navigateTo('/already-logged-in'); }
 		return html.login;
@@ -96,6 +95,7 @@ const views = {
 
 	async logout() {
 		router.overlay.cleanup();
+		router.init();
 		await api.logout();
 		['profileBtn', 'notificationBtn'].forEach(id => document.getElementById(id).classList.add('d-none'));
 		router.navigateTo('/login');

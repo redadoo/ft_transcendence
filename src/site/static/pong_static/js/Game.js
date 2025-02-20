@@ -133,6 +133,8 @@ export default class Game
      */
 	async init()
 	{
+		router.removeEventListeners();
+
 		await this.setPlayerId();
 
 		//init scene
@@ -154,7 +156,6 @@ export default class Game
 		}
 
 		const modeFromPath = SocketManager.getModeFromPath();
-		console.log("Mode from path:", modeFromPath);
 		switch (modeFromPath)
 		{
 			case 'singleplayer':
@@ -177,10 +178,8 @@ export default class Game
 			this.mode.init();
 		this.sceneManager.setExternalFunction(() => this.fixedUpdate());
 
-		
-	}
 
-	
+	}
 
 	/**
      * Initializes the game environment with given data.
@@ -197,7 +196,7 @@ export default class Game
 				const ball_data = data?.lobby_info?.ball;
 				const scores_data = data?.lobby_info?.scores;
 
-				if (!bounds_data || !ball_data || !scores_data) 
+				if (!bounds_data || !ball_data || !scores_data)
 					{
 					console.error("Game data is missing or incomplete:", { bounds_data, ball_data, scores_data });
 					return;
@@ -210,8 +209,6 @@ export default class Game
 
 				this.sceneManager.scene.add(this.ball.mesh);
 
-
-				console.log("bound, ball and dbackground are initialized");
 				this.isSceneCreated = true;
 			} catch (error) {
 				console.error("An error occurred during game initialization:", error);
@@ -227,16 +224,16 @@ export default class Game
 		  if (!this.scoreSpritesInitialized) {
 			this.createTextSprite(`${scores.player1}`).then((sprite) => {
 			  this.player1ScoreSprite = sprite;
-			  this.player1ScoreSprite.position.set(-10, 18, 0); 
+			  this.player1ScoreSprite.position.set(-10, 18, 0);
 			  this.sceneManager.scene.add(this.player1ScoreSprite);
 			}).catch((error) => console.error("Failed to create Player 1 sprite:", error));
-	  
+
 			this.createTextSprite(`${scores.player2}`).then((sprite) => {
 			  this.player2ScoreSprite = sprite;
-			  this.player2ScoreSprite.position.set(10, 18, 0); 
+			  this.player2ScoreSprite.position.set(10, 18, 0);
 			  this.sceneManager.scene.add(this.player2ScoreSprite);
 			}).catch((error) => console.error("Failed to create Player 2 sprite:", error));
-	  
+
 			this.scoreSpritesInitialized = true;
 		  } else {
 			if (this.player1ScoreSprite) {
@@ -244,7 +241,7 @@ export default class Game
 			} else {
 			  console.warn("Player 1 score sprite is not ready yet");
 			}
-	  
+
 			if (this.player2ScoreSprite) {
 			  this.updateSpriteTexture(this.player2ScoreSprite, `${scores.player2}`);
 			} else {
@@ -255,40 +252,38 @@ export default class Game
 		  console.error("An error occurred while handling score sprites:", error);
 		}
 	}
-	  
-	  
+
 	  /**
      * Initializes the sprites for the score
 	 * * @param {string} text - The value of the score
      */
-	  createTextSprite(text) {
+	createTextSprite(text) {
 		return new Promise((resolve, reject) => {
 		  const canvas = document.createElement('canvas');
 		  const context = canvas.getContext('2d');
-	  
+
 		  canvas.width = 256;
 		  canvas.height = 150;
-	  
+
 		  document.fonts.load('150px "Press Start 2P"').then(() => {
 			context.font = '150px "Press Start 2P"';
 			context.fillStyle = 'white';
 			context.textAlign = 'center';
 			context.textBaseline = 'middle';
 			context.fillText(text, canvas.width / 2, canvas.height / 2);
-	  
+
 			const texture = new THREE.CanvasTexture(canvas);
 			const material = new THREE.SpriteMaterial({ map: texture });
 			const sprite = new THREE.Sprite(material);
 			sprite.scale.set(5, 2.5, 1);
-	  
-			resolve(sprite); 
+
+			resolve(sprite);
 		  }).catch((error) => {
 			console.error('Failed to load font:', error);
 			reject(error);
 		  });
 		});
 	}
-	  
 
 	/**
      * Initializes the lighting system for the game scene.
@@ -368,7 +363,6 @@ export default class Game
      * Updates the game state with new data.
      * @param {Object} data - The game state data.
      */
-
 	updateGameState(data)
 	{
 		try
@@ -377,8 +371,10 @@ export default class Game
 				this.ball.updatePosition(data.ball);
 			if (data.players)
 			{
-				this.pongPlayer.updatePosition(data.players[this.pongPlayer.playerId].y);
-				this.pongOpponent.updatePosition(data.players[this.pongOpponent.playerId].y);
+				if (data.players[this.pongPlayer.playerId] != undefined)
+					this.pongPlayer.updatePosition(data.players[this.pongPlayer.playerId].y);
+				if (data.players[this.pongOpponent.playerId] != undefined)
+					this.pongOpponent.updatePosition(data.players[this.pongOpponent.playerId].y);
 			}
 
 			if(data.scores)
@@ -396,24 +392,24 @@ export default class Game
      * Updates the sprites for the score
 	 * * @param {string} text - The value of the score
      */
-	updateSpriteTexture(sprite, text) 
+	updateSpriteTexture(sprite, text)
 	{
 		if (!sprite || !sprite.material || !sprite.material.map) {
 		  console.warn("Sprite or texture is not defined yet.");
 		  return;
 		}
-	  
+
 		const texture = sprite.material.map;
 		const canvas = texture.image;
 		const context = canvas.getContext('2d');
-	  
+
 		if (!context) {
 		  console.error("Failed to get 2D context from canvas.");
 		  return;
 		}
-	  
+
 		context.clearRect(0, 0, canvas.width, canvas.height);
-	  
+
 		if (document.fonts.check('150px "Press Start 2P"')) {
 		  this.drawTextOnCanvas(context, canvas, text, texture);
 		} else {
@@ -424,19 +420,18 @@ export default class Game
 		  });
 		}
 	}
-	  
-	drawTextOnCanvas(context, canvas, text, texture) 
+
+	drawTextOnCanvas(context, canvas, text, texture)
 	{
 		context.font = '150px "Press Start 2P"';
 		context.fillStyle = 'white';
-		context.textAlign = 'center'; 
-		context.textBaseline = 'middle'; 
-		context.fillText(text, canvas.width / 2, canvas.height / 2); 
-		
+		context.textAlign = 'center';
+		context.textBaseline = 'middle';
+		context.fillText(text, canvas.width / 2, canvas.height / 2);
+
 		texture.needsUpdate = true;
 	}
-	  
-	  
+
 	/**
 	 * Adds a new player to the lobby, initializing either the client player or the opponent.
 	 *
@@ -450,24 +445,17 @@ export default class Game
 		if (newPlayer_id == this.player_id)
 		{
 			if (this.pongPlayer != null)
-			{
-				console.log("client player already init");
 				return;
-			}
+
 			this.pongPlayer = new PongPlayer(socket, this.player_id, playerData);
 			this.sceneManager.scene.add(this.pongPlayer.paddle.mesh);
-			console.log("player initialized:", this.pongPlayer);
 		}
 		else
 		{
 			if (this.pongOpponent != null)
-			{
-				console.log("opponent player already init");
 				return;
-			}
 			this.pongOpponent = new PongPlayer(null, newPlayer_id, playerData);
 			this.sceneManager.scene.add(this.pongOpponent.paddle.mesh);
-			console.log("new player initialized:", this.pongOpponent);
 		}
 	}
 
@@ -486,8 +474,7 @@ export default class Game
 
 	game_ended(isGamefinished)
 	{
-		console.log("Game ending...");
-
+		router.setupEventListeners();
 		if (this.sceneManager) {
 			this.sceneManager.dispose();
 			this.sceneManager = null;
@@ -513,5 +500,27 @@ export default class Game
 			router.navigateTo('/match-result');
 		else
 			router.navigateTo('/multiplayer/pong_selection');
+	}
+
+	reset()
+	{
+		if (this.ball != null)
+			this.ball.setPosition(0,0);
+		if (this.sceneManager != null)
+		{
+			if (this.pongPlayer != null)
+			{
+				this.pongPlayer.deletePaddle(this.sceneManager.scene);
+				delete this.pongOpponent;
+				this.pongPlayer = null;
+			}
+			if (this.pongOpponent != null)
+			{
+				this.pongOpponent.deletePaddle(this.sceneManager.scene);
+				delete this.pongOpponent;
+				this.pongOpponent = null;
+			}
+		}
+		this.handleScoreSprites({"player1": 0, "player2": 0});
 	}
 }

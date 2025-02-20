@@ -97,34 +97,31 @@ export default class TournamentPongMode extends PongMode {
 		if (event_info.event_name === "player_to_setup")
 		{
 			const players = data.lobby_info.players;
-
 			for (const [key, value] of Object.entries(players))
 			{
 				if (this.game.player_id == key)
+				{
+					document.getElementById('pongOverlay').classList.add('d-none');
 					this.isPlaying = true;
-
+				}
 				this.game.AddUserToLobby(key,value, this.socket);
 			}
+			this.game.initGameEnvironment(data);
 		}
-
 	}
 
 	manageMatch(data)
 	{
 		const { event_info, lobby_info } = data;
-
-
 		if (event_info.event_name === "match_start")
 		{
 			if (this.isPlaying == true)
-			{
-				this.game.initGameEnvironment(data);
 				router.navigateTo('/tournament/playing');
-			}
 		}
 		else
 		{
-			this.game.updateGameState(lobby_info);
+			if (this.isPlaying == true)
+				this.game.updateGameState(lobby_info);
 		}
 	}
 
@@ -132,13 +129,29 @@ export default class TournamentPongMode extends PongMode {
 	{
 		const { event_info, lobby_info } = data;
 
+		if (event_info.event_name === "tournament_finished")
+		{
+			this.game.game_ended(true);
+			return;
+		}
+
 		if (this.isPlaying == true)
 		{
-			if(event_info.loser_id == this.game.player_id)
-				this.game.game_ended(true);
-			else
-				document.getElementById('pongOverlay').classList.remove('d-none');
 			this.isPlaying = false;
+			if(event_info.loser_id == this.game.player_id)
+			{
+				this.game.game_ended(true);
+				return;
+			}
+			else
+			{
+				document.getElementById('pongOverlay').classList.remove('d-none');
+				// setTimeout(check, 1000);
+				this.socket.send(JSON.stringify({
+					type: 'waiting_next_match',
+				}));
+			}
+			this.game.reset();
 		}
 	}
 }
