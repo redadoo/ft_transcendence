@@ -4,12 +4,13 @@ FROM python:alpine3.21
 ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
 
-RUN mkdir -p /home/app && \
-    adduser -D -H app && \
-    chown -R app:app /home/app
+# Create user evocatur with correct UID and GID
+RUN mkdir -p /home/evocatur && \
+    adduser -D -H -u 13449 -G 2022_rome evocatur && \
+    chown -R evocatur:2022_rome /home/evocatur
 
-ENV HOME=/home/app
-ENV APP_HOME=/home/app/ft_transcendence
+ENV HOME=/home/evocatur
+ENV APP_HOME=/home/evocatur/ft_transcendence
 RUN mkdir -p $APP_HOME
 
 WORKDIR $APP_HOME
@@ -17,19 +18,23 @@ WORKDIR $APP_HOME
 COPY ./config/requirements.txt .
 
 RUN pip install --upgrade pip && \
-pip install --no-cache-dir -r requirements.txt
+    pip install --no-cache-dir -r requirements.txt
 
 COPY ./tools/entrypoint.sh .
 
 RUN chmod +x entrypoint.sh
 
-COPY --chown=app:app . $APP_HOME
+# Ensure all files belong to evocatur
+COPY --chown=13449:4222 . $APP_HOME
 
-RUN mkdir -p /var/log/gunicorn
-RUN mkdir -p /var/run/gunicorn
-RUN chown -R app:app /var/log/gunicorn
-RUN chown -R app:app /var/run/gunicorn
+# Use home directory for logs since /var is not writable in rootless mode
+RUN mkdir -p $HOME/logs/gunicorn
+RUN mkdir -p $HOME/run/gunicorn
+RUN chown -R evocatur:2022_rome $HOME/logs/gunicorn
+RUN chown -R evocatur:2022_rome $HOME/run/gunicorn
 
 EXPOSE 8000
 
-ENTRYPOINT ["/home/app/ft_transcendence/entrypoint.sh"]
+USER evocatur
+
+ENTRYPOINT ["./entrypoint.sh"]

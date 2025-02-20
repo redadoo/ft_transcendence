@@ -65,7 +65,7 @@ CSRF_COOKIE_HTTPONLY = False
 CSRF_COOKIE_NAME = 'csrftoken'
 CSRF_TRUSTED_ORIGINS = [
     "https://transcendence", "https://localhost", "https://localhost:443",
-    "https://localhost:1337", "http://localhost:8000"
+    "https://localhost:1337", "http://localhost:8000",  "http://localhost:8080"
 ]
 
 # Templates configuration
