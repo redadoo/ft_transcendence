@@ -92,6 +92,8 @@ export default class TournamentPongMode extends PongMode {
 
 	setUpLobby(data)
   	{
+		this.game.initGameEnvironment(data);
+
 		const { event_info, lobby_info } = data;
 
 		if (event_info.event_name === "player_to_setup")
@@ -106,22 +108,20 @@ export default class TournamentPongMode extends PongMode {
 				}
 				this.game.AddUserToLobby(key,value, this.socket);
 			}
-			this.game.initGameEnvironment(data);
 		}
 	}
 
 	manageMatch(data)
 	{
-		const { event_info, lobby_info } = data;
-		if (event_info.event_name === "match_start")
+		if (this.isPlaying == true)
 		{
-			if (this.isPlaying == true)
+			const { event_info, lobby_info } = data;
+			if (event_info.event_name === "match_start")
+			{
 				router.navigateTo('/tournament/playing');
-		}
-		else
-		{
-			if (this.isPlaying == true)
-				this.game.updateGameState(lobby_info);
+				return;
+			}
+			this.game.updateGameState(lobby_info);
 		}
 	}
 
@@ -146,7 +146,7 @@ export default class TournamentPongMode extends PongMode {
 			else
 			{
 				document.getElementById('pongOverlay').classList.remove('d-none');
-				// setTimeout(check, 1000);
+				setTimeout(check, 1000);
 				this.socket.send(JSON.stringify({
 					type: 'waiting_next_match',
 				}));
