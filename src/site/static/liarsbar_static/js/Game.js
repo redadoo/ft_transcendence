@@ -137,7 +137,7 @@ class Game
 		this.pointLight.castShadow = true;
 		this.pointLight.shadow.camera.near = 1;
 		this.pointLight.shadow.camera.far = 2000;
-		this.pointLight.shadow.mapSize.set(4096, 4096);
+		this.pointLight.shadow.mapSize.set(512, 512);
 		this.pointLight.shadow.bias = -0.0001;
 
 		// Helper per visualizzare la PointLight
@@ -152,7 +152,7 @@ class Game
 		this.yellowLight.castShadow = true;
 		this.yellowLight.shadow.camera.near = 1;
 		this.yellowLight.shadow.camera.far = 2000;
-		this.yellowLight.shadow.mapSize.set(4096, 4096);
+		this.yellowLight.shadow.mapSize.set(512, 512);
 		this.yellowLight.shadow.bias = -0.0001;
 		this.yellowLight.shadow.filter = THREE.PCFSoftShadowFilter;
 		const yellowLightHelper = new THREE.PointLightHelper(this.yellowLight, 50);
