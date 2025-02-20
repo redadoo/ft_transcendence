@@ -4,8 +4,9 @@ FROM alpine:3.20.0
 RUN apk update && apk upgrade && \
     apk add nginx openssl
 
-# Create evocatur user with correct UID and GID
-RUN adduser -D -H -u 13449 -G 2022_rome evocatur && \
+# Create group 2022_rome with GID 4222 and user evocatur with UID 13449
+RUN addgroup -g 4222 2022_rome && \
+    adduser -D -H -u 13449 -G 2022_rome evocatur && \
     mkdir -p /home/evocatur/nginx/ssl /home/evocatur/nginx/conf && \
     chown -R evocatur:2022_rome /home/evocatur/nginx
 
