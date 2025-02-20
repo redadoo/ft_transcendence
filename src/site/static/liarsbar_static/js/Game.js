@@ -6,11 +6,14 @@ import SocketManager from '../../common_static/js/SocketManager.js';
 
 
 const cardTextures = {
-    'ACE': 'images/ace.png',
-    'QUEEN': 'images/queen.png',
-    'KING': 'images/king.png',
-    'JOLLY': 'images/jolly.png'
+    'ACE': 'http://127.0.0.1:8000/media/png/pox.png',
+    'QUEEN': 'http://127.0.0.1:8000/media/png/momo.png',
+    'KING': 'http://127.0.0.1:8000/media/png/glim.png',
+    'JOLLY': 'http://127.0.0.1:8000/media/png/master.png'
 };
+
+
+
 /**
  * Game class for managing the Liar's Bar multiplayer game environment.
  * Handles player setup, scene management, lighting, and WebSocket communication.
@@ -23,7 +26,16 @@ class Game
 		this.lightHelper = null;
 		this.gameSocket = null;
 		this.players = {};
+		this.currentPlayer = null;
+		this.lastHand = null;
+		this.lastRequiredCard = null;
 
+		this.previousPlayerState = {
+            selection_index: -1,
+            doubting: false,
+            card_sent: false,
+            status: ''
+        };
 	}
 
 	/**
@@ -115,7 +127,7 @@ class Game
 	 */
 	initLights() 
 	{
-		this.ambientLight = new THREE.AmbientLight(0xb0e0e6, 10.1);
+		this.ambientLight = new THREE.AmbientLight(0xb0e0e6, 1.1);
 
 		// PointLight che si propaga in tutte le direzioni
 		this.pointLight = new THREE.PointLight(0xFFB84D, 500000, 1500); // (Colore, Intensità, Distanza massima)
@@ -125,7 +137,7 @@ class Game
 		this.pointLight.castShadow = true;
 		this.pointLight.shadow.camera.near = 1;
 		this.pointLight.shadow.camera.far = 2000;
-		this.pointLight.shadow.mapSize.set(2048, 2048);
+		this.pointLight.shadow.mapSize.set(4096, 4096);
 		this.pointLight.shadow.bias = -0.0001;
 
 		// Helper per visualizzare la PointLight
@@ -135,13 +147,14 @@ class Game
 		this.sceneManager.scene.add(pointLightHelper);
 
 		// Seconda PointLight (gialla)
-		this.yellowLight = new THREE.PointLight(0xFFD700, 1500000, 1500); // Giallo dorato
+		this.yellowLight = new THREE.PointLight(0xFFD700, 700000, 1500); // Giallo dorato
 		this.yellowLight.position.set(0, 400, 500);
 		this.yellowLight.castShadow = true;
 		this.yellowLight.shadow.camera.near = 1;
 		this.yellowLight.shadow.camera.far = 2000;
-		this.yellowLight.shadow.mapSize.set(2048, 2048);
+		this.yellowLight.shadow.mapSize.set(4096, 4096);
 		this.yellowLight.shadow.bias = -0.0001;
+		this.yellowLight.shadow.filter = THREE.PCFSoftShadowFilter;
 		const yellowLightHelper = new THREE.PointLightHelper(this.yellowLight, 50);
 		this.sceneManager.scene.add(this.yellowLight);
 		this.sceneManager.scene.add(yellowLightHelper);
@@ -168,9 +181,9 @@ class Game
 		bo.scene.position.set(120, 150, 620);
 
 		const slimegun = this.sceneManager.modelManager.getModel("slimegun");
-		slimegun.scene.scale.set(4000, 4000, 4000);
+		slimegun.scene.scale.set(40, 40, 40);
 		slimegun.scene.rotation.y = 1.571;
-		slimegun.scene.position.set(0, 160, 740);
+		slimegun.scene.position.set(-20, 96, 730);
 
 		const bo3 = this.sceneManager.modelManager.getModel("rimuru");
 		bo3.scene.scale.set(30, 30, 30);
@@ -200,12 +213,7 @@ class Game
 	 */
 	AddUserToLobby(data) 
 	{
-		const userLobbyModel = this.sceneManager.modelManager.getClone("human");
-		userLobbyModel.scale.set(0.2, 0.2, 0.2);
-		userLobbyModel.rotation.y = Math.PI / 8;
-		userLobbyModel.position.set((Object.keys(this.players).length + 1) * 50, -20, 10);
-		
-		this.sceneManager.scene.add(userLobbyModel);
+
 		
 		const joinedPlayerId = data.event_info.player_id;
 		if (this.player_id == joinedPlayerId)
@@ -213,8 +221,13 @@ class Game
 		else
 			this.players[joinedPlayerId] = new LiarsBarPlayer(null, joinedPlayerId);
 		if (Object.keys(this.players).length === 4) 
+		{
 			this.gameSocket.send(JSON.stringify({ type: 'client_ready' }));
+			this.setCameraForPlayer(data);
+			document.getElementById('liarsbarOverlay').classList.remove('d-none');
+		}
 	}
+
 
 	setCameraForPlayer(data) {
 		// Ottieni l'array dei giocatori
@@ -222,25 +235,25 @@ class Game
 	
 		// Trova l'indice del giocatore locale (quello con player_id)
 		const playerIndex = playersArray.findIndex(player => player.player_id === this.player_id);
+		console.log(playerIndex);
 		if (playerIndex === -1) {
 			console.warn("Player ID non trovato nella lista dei giocatori!");
 			return;
 		}
-	
 		// Definiamo le posizioni della camera per ciascun giocatore
 		const cameraPositions = [
-			new THREE.Vector3(315.57587851518224, 195.70035909390145, 994.4429210866258), //rimuru
-			new THREE.Vector3(325.4030018545432, 243.79773664778745, 615.7566110039751), // kuriboh
-			new THREE.Vector3(-36.235102977326164, 239.9165631088926, 524.2427525269686), //king boh
-			new THREE.Vector3(-114.35623802611076, 202.76800820190383, 918.8519282059492), //slimegun
+			new THREE.Vector3(107.80899420126953, 261.37028568763486, 1040.2530466184585), //rimuru
+			new THREE.Vector3(358.8226249419454, 278.7692367678665, 743.608735250403), // kuriboh
+			new THREE.Vector3( -149.23606980454502, 260.49133716451746, 744.2613518306547), //slimegun
+			new THREE.Vector3( 117.94440132977272, 255.2631934316667, 440.5598941686234), //king boh
 		];
 	
 		// Definiamo i target per ciascun giocatore (4 target distinti)
 		const targets = [
-			new THREE.Vector3(-200, 0, 0),      // rimuru
-			new THREE.Vector3(0, 100, 800), // kuriboh
-			new THREE.Vector3(200, 100, 900),    //king boh
-			new THREE.Vector3(300, 150, 600),    //slimegun
+			new THREE.Vector3(118, 10, 467),      // rimuru
+			new THREE.Vector3(-149, 100, 744), // kuriboh
+			new THREE.Vector3(358, 80, 744),    //slimegun
+			new THREE.Vector3(108, 100, 1040),    //king boh
 		];
 	
 		// Prendi la posizione della camera e il target in base all'indice del giocatore
@@ -284,7 +297,6 @@ class Game
 	{
 		if (data.event_info.event_name === "player_join") 
 			this.AddUserToLobby(data);
-		this.setCameraForPlayer(data);
 	}
 
 	/**
@@ -309,7 +321,6 @@ class Game
 			console.error('3Dati non validi o mancanti per aggiornare i giocatori.', data.lobby_info);
 			return;
 		}
-		console.log('Eccomi', data.lobby_info);
 
 		// Converti l'oggetto players in un array
 		const playersArray = Object.values(data.lobby_info.players);
@@ -329,9 +340,11 @@ class Game
 			{
 				console.warn(`Giocatore con ID ${playerId} non trovato.`);
 			}
-		});
 
-		console.log('Stato dei giocatori aggiornato:', this.players);
+			if (playerId === this.player_id) {
+				this.currentPlayer = playerData;
+			}
+		});
 	}
 
 	
@@ -353,6 +366,89 @@ class Game
 			console.error("data:", data);
 		}
 	}
+	updatePlayerCards(playerHand) {
+		const cardSlots = document.querySelectorAll('.col-1 .card'); // Seleziona tutte le carte esistenti
+		
+		cardSlots.forEach((slot, index) => {
+			const shouldBeVisible = index < playerHand.length;
+			if(shouldBeVisible && slot.style.visibility !== 'visible') {
+				slot.style.visibility = 'visible';
+				slot.style.opacity = '1';
+			}
+		});
+
+		playerHand.forEach((card, index) => {
+			if(cardSlots[index]) { 
+				const cardType = card.card;
+				const img = cardSlots[index].querySelector('img');
+				
+				if(img.src !== cardTextures[cardType]) {
+					img.src = cardTextures[cardType] || 'http://127.0.0.1:8000/media/png/pox.png';
+					img.alt = cardType;
+					cardSlots[index].dataset.cardType = cardType;
+				}
+			}
+		});
+	
+
+		for(let i = playerHand.length; i < cardSlots.length; i++) {
+			cardSlots[i].style.visibility = 'hidden'; 
+		}
+	}
+
+	selected_card(player) {
+        const cardSlots = document.querySelectorAll('.col-1 .card');
+        const selectedIndex = player.selection_index;
+
+        const selectionChanged = this.previousPlayerState.selection_index !== selectedIndex;
+        const doubtingChanged = this.previousPlayerState.doubting !== player.doubting;
+        const statusChanged = this.previousPlayerState.status !== player.status;
+        const cardSentChanged = this.previousPlayerState.card_sent !== player.card_sent;
+
+        cardSlots.forEach((slot, index) => {
+            if (selectionChanged && slot.classList.contains('selected')) {
+                slot.classList.remove('selected');
+            }
+            if ((doubtingChanged || selectionChanged) && slot.classList.contains('pulsate')) {
+                slot.classList.remove('pulsate');
+            }
+            if ((cardSentChanged || selectionChanged) && slot.classList.contains('glow')) {
+                slot.classList.remove('glow');
+            }
+            if (statusChanged) {
+                slot.classList.toggle('grayscale', player.status === 'DIED');
+                slot.classList.toggle('disabled', player.status === 'DIED');
+            }
+        });
+
+        if (selectedIndex >= 0 && selectedIndex < cardSlots.length) {
+            const selectedSlot = cardSlots[selectedIndex];
+
+            if (!selectedSlot.classList.contains('selected')) {
+                selectedSlot.classList.add('selected');
+            }
+            if (player.doubting && !selectedSlot.classList.contains('pulsate')) {
+                selectedSlot.classList.add('pulsate');
+            } else if (!player.doubting) {
+                selectedSlot.classList.remove('pulsate');
+            }
+            if (!player.card_sent && !selectedSlot.classList.contains('glow')) {
+                selectedSlot.classList.add('glow');
+            } else if (player.card_sent) {
+                selectedSlot.classList.remove('glow');
+            }
+            if (statusChanged) {
+                selectedSlot.classList.toggle('ghost', player.status === 'DIED');
+            }
+        }
+
+        this.previousPlayerState = {
+            selection_index: selectedIndex,
+            doubting: player.doubting,
+            card_sent: player.card_sent,
+            status: player.status
+        };
+    }
 
 	/**
 	 * Handles incoming WebSocket messages.
@@ -360,19 +456,24 @@ class Game
 	 */
 	handleSocketMessage(event) 
 	{
-		console.log(this.sceneManager.camera);
 		try {
 			const data = JSON.parse(event.data);
+			console.log(data);
 			switch (data.lobby_info.current_lobby_status) 
 			{
 				case 'TO_SETUP':
-					console.log("to setup");	
 					this.setUpLobby(data);
 					break;
 					case 'PLAYING':
-					console.log("playing");	
-
-					//this.updateGameState(data);
+					this.updateGameState(data);
+					if (this.currentPlayer.hand) {
+						const hasHandChanged = JSON.stringify(this.currentPlayer.hand) !== JSON.stringify(this.lastHand);
+						if (hasHandChanged) {
+							this.updatePlayerCards(this.currentPlayer.hand);
+							this.lastHand = this.currentPlayer.hand;
+						}
+					}
+					this.selected_card(this.currentPlayer);
 					break;
 				case 'ENDED':
 					break;

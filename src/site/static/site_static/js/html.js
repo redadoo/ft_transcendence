@@ -278,6 +278,45 @@ const html = {
 		<div> </div>
 	`,
 
+	liarsbarOverlay: `
+	
+	<div class="container-fluid"> 
+	<div class="card-container">
+	<div class="row h-100"> 
+				<div class="col-1"> </div>
+				<div class="col-1"> 
+					<div class="card" data-card-type="ACE">
+						<img src="http://127.0.0.1:8000/media/png/pox.png" alt="ACE">
+					</div>
+				</div>
+				<div class="col-1">
+					<div class="card" data-card-type="QUEEN">
+						<img src="http://127.0.0.1:8000/media/png/momo.png" alt="QUEEN">
+					</div>
+				</div>	
+				<div class="col-1">
+					<div class="card" data-card-type="KING">
+						<img src="http://127.0.0.1:8000/media/png/glim.png" alt="KING">
+					</div>
+				</div>
+				<div class="col-1">
+				
+					<div class="card" data-card-type="JOLLY">
+						<img src="http://127.0.0.1:8000/media/png/master.png" alt="JOLLY">
+					</div>
+				</div>
+				
+				<div class="col-1">
+				
+					<div class="card" data-card-type="JOLLY">
+						<img src="http://127.0.0.1:8000/media/png/master.png" alt="JOLLY">
+					</div>
+				</div>
+				<div class="col-6"> </div>
+			</div>
+		</div>
+	</div>
+	`,
 	profile: `
 		<div class="container-fluid game-container">
 			<div class="row">
