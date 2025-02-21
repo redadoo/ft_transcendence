@@ -3,7 +3,7 @@ import LiarsBarPlayer from './utils/LiarsBarPlayer.js';
 import SceneManager from '../../common_static/js/SceneManager.js';
 import SocketManager from '../../common_static/js/SocketManager.js';
 
-
+import router from '../../site_static/js/router.js';
 
 const cardTextures = {
     'ACE': 'http://127.0.0.1:8000/media/png/pox.png',
@@ -472,6 +472,38 @@ class Game
 		}	
     }
 
+	cleanupWindowClose()
+	{
+		window.removeEventListener('beforeunload', this.close_window_event_beforeunload);
+		window.removeEventListener('unload', this.close_window_event_unload);
+		window.removeEventListener('popstate', this.close_window_event_popstate);
+	}
+
+	game_ended(isGamefinished)
+	{
+		router.setupEventListeners();
+		if (this.sceneManager) {
+			this.sceneManager.dispose();
+			this.sceneManager = null;
+		}
+
+		this.players = null;
+
+		let event_name = isGamefinished === true ? "quit_game" : "unexpected_quit";
+
+		if (this.gameSocket && this.gameSocketsocket) {
+			this.gameSocketocket.send(JSON.stringify({
+				type: event_name,
+				player_id: this.player_id
+			}));
+			this.mode.socket.close();
+		}
+
+		this.cleanupWindowClose();
+
+		router.navigateTo('/multiplayer');
+	}
+
 	/**
 	 * Handles incoming WebSocket messages.
 	 * @param {MessageEvent} event - The WebSocket message event.
@@ -498,6 +530,7 @@ class Game
 					this.selected_card(this.currentPlayer);
 					break;
 				case 'ENDED':
+					game_ended(true);
 					break;
 				case 'PLAYER_DISCONNECTED':
 					break;

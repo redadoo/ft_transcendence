@@ -73,9 +73,9 @@ class LiarsBarConsumer(AsyncWebsocketConsumer):
 		await self.channel_layer.group_add(self.lobby.room_group_name, self.channel_name)
 		await self.accept()
 
-		await self.lobby.add_player_to_lobby({"player_id": "123"}, True)
-		await self.lobby.add_player_to_lobby({"player_id": "124"}, True)
-		await self.lobby.add_player_to_lobby({"player_id": "125"}, True)
+		await self.lobby.add_player_to_lobby({"player_id": "-2"}, True)
+		await self.lobby.add_player_to_lobby({"player_id": "-3"}, True)
+		await self.lobby.add_player_to_lobby({"player_id": "-4"}, True)
 	
 	async def disconnect(self, close_code):
 		await self.lobby.broadcast_message({"type": "lobby_state"})

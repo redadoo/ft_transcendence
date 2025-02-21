@@ -55,7 +55,8 @@ class LiarsBarMatch(models.Model):
     end_date = models.DateTimeField(
         null=True,
         blank=True,
-        help_text="Timestamp when the match ended."
+        help_text="Timestamp when the match ended.",
+        auto_now=True
     )
 
     def __str__(self):
@@ -85,3 +86,8 @@ class LiarsBarMatch(models.Model):
             return f"{start_date_formatted} {minutes}m {seconds}s"
         else:
             return "Match is still ongoing"
+
+    def get_player_xp_gained(self, username: str):
+        if username == self.user_winner.username:
+            return 100
+        return 10

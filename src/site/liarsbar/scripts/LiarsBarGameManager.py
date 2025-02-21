@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timezone
 import random
 import asyncio
 import time
@@ -7,7 +7,9 @@ from .card import Card
 from .LiarsBarPlayer import LiarsBarPlayer
 from utilities.GameManager import GameManager
 from utilities.Player import Player
-
+from website.models import User, MatchHistory, UserStats
+from channels.db import database_sync_to_async
+from liarsbar.models import LiarsBarMatch
 
 class LiarsBarGameManager(GameManager):
 	"""
@@ -25,6 +27,8 @@ class LiarsBarGameManager(GameManager):
 		self.current_time_stamp = time.time()
 		self.player_turn_index = 0
 		self.players_alive = 4
+		self.time_elapsed = 0
+		self.turn_duration = 1
 
 	def start_game(self):
 		"""Marks the game as started."""
@@ -164,11 +168,12 @@ class LiarsBarGameManager(GameManager):
 		"""
 		
 		if self.players_alive == 1:
-			print("mi blocco qua?")
 			for player in self.players.values():
 				if player.status == LiarsBarPlayer.PlayerStatus.ALIVE:
 					print(player.player_id)
-			return
+					print(f"game ginis")
+					await self.clear_and_save(True, player)
+					return
 		if(self.started != True):
 			self.init_round()
 			self.started = True
@@ -176,7 +181,8 @@ class LiarsBarGameManager(GameManager):
 			print("turn handle")
 			self.handle_palyer_turn(self.players[self.player_turn_index])
 		elif not self.players[self.player_turn_index].card_sent and self.players[self.player_turn_index].status == LiarsBarPlayer.PlayerStatus.ALIVE:
-			if time.time() - self.turn_start > 5:
+			self.time_elapsed = time.time() - self.turn_start
+			if self.time_elapsed > self.turn_duration:
 				print("timeout")
 				if self.players[self.player_turn_index].shoot_yourself():
 					self.players[self.player_turn_index].status = LiarsBarPlayer.PlayerStatus.DIED
@@ -240,8 +246,85 @@ class LiarsBarGameManager(GameManager):
 					self.player_turn_index = 0
 
 			
-		
-		
+	
+	async def clear_and_save(self, is_game_ended: bool, player_disconnected_id: int = None):
+			"""Saves the match results and updates players' match history."""
+			"""to do: controlli se ci sono tutti i player, se il player si disconnette"""
+			players_list = list(self.players.keys())
+			if len(players_list) < 4:
+				print("Not enough players to save the match.")
+				return
+			users = []
+			winner_user = None
+			print("0 prova")
+			for player in self.players.values():
+				print("1 eooo")
+				user = await database_sync_to_async(User.objects.get)(id=player.player_id)
+				print("1 aaaaaaaaoo")
+				users.append(user)
+				print("1 edobast")
+				if player.status == LiarsBarPlayer.PlayerStatus.ALIVE:
+					winner_user = user
+				print("nemico pub")
+			print("1 prova")
+
+			""" if not is_game_ended:
+				if player_disconnected_id == players_list[0]:
+					self.scores["player1"], self.scores["player2"] = 0, 5
+				else:
+					self.scores["player1"], self.scores["player2"] = 5, 0 """
+
+			match = await database_sync_to_async(LiarsBarMatch.objects.create)(
+				first_user=users[0],
+				second_user=users[1],
+				third_user=users[2],
+				fourth_user=users[3],
+    			user_winner=winner_user,
+				start_date=self.start_match_timestamp
+			)
+			print("2 prova")
+			await database_sync_to_async(match.save)()
+
+			try:
+				first_player_stats = await database_sync_to_async(
+					lambda: UserStats.objects.select_related('user').get(user=users[0])
+				)()
+				second_player_stats = await database_sync_to_async(
+					lambda: UserStats.objects.select_related('user').get(user=users[1])
+				)()
+				third_player_stats = await database_sync_to_async(
+					lambda: UserStats.objects.select_related('user').get(user=users[2])
+				)()
+				fourth_player_stats = await database_sync_to_async(
+					lambda: UserStats.objects.select_related('user').get(user=users[3])
+				)()
+			except UserStats.DoesNotExist:
+				print(f"UserStats not found for user:")
+				return
+			print("3 prova")
+			first_player_stats.update_with_match_info_liarsbar(match)
+			second_player_stats.update_with_match_info_liarsbar(match)
+			third_player_stats.update_with_match_info_liarsbar(match)
+			fourth_player_stats.update_with_match_info_liarsbar(match)
+
+			await database_sync_to_async(first_player_stats.save)()
+			await database_sync_to_async(second_player_stats.save)()
+			await database_sync_to_async(third_player_stats.save)()
+			await database_sync_to_async(fourth_player_stats.save)()
+   
+			player1_history, _ = await database_sync_to_async(MatchHistory.objects.get_or_create)(user=users[0])
+			player2_history, _ = await database_sync_to_async(MatchHistory.objects.get_or_create)(user=users[1])
+			player3_history, _ = await database_sync_to_async(MatchHistory.objects.get_or_create)(user=users[2])
+			player4_history, _ = await database_sync_to_async(MatchHistory.objects.get_or_create)(user=users[3])
+			async def add_match_to_history(history):
+				await database_sync_to_async(history.add_liarsbar_match)(match)
+				await database_sync_to_async(history.save)()
+			await add_match_to_history(player1_history)
+			await add_match_to_history(player2_history)
+			await add_match_to_history(player3_history)
+			await add_match_to_history(player4_history)
+			self.game_loop_is_active = False
+			
 
 	def to_dict(self) -> dict[str, any]:
 		"""
@@ -253,5 +336,6 @@ class LiarsBarGameManager(GameManager):
 		base_dict = super().to_dict()
 		base_dict.update({
 			"deck": [card.to_dict() for card in self.deck],
+			"time": int(self.time_elapsed)
 		})
 		return base_dict

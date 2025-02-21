@@ -129,6 +129,8 @@ class UserStats(models.Model):
 	longest_winstreak = models.PositiveIntegerField(default=0, validators=[MinValueValidator(0)])
 	total_points_scored = models.PositiveIntegerField(default=0, validators=[MinValueValidator(0)])
 	longest_game_duration = models.DurationField(null=True, blank=True)
+	liarsbar_win = models.PositiveIntegerField(default=0, validators=[MinValueValidator(0)])
+	liarsbar_lose = models.PositiveIntegerField(default=0, validators=[MinValueValidator(0)])
 	time_on_site = models.DurationField(null=True, blank=True)
 
 	created_at = models.DateTimeField(default=now, blank=True)
@@ -182,6 +184,23 @@ class UserStats(models.Model):
 		game_duration = match.end_date - match.start_date
 		if self.longest_game_duration != None and game_duration > self.longest_game_duration:
 			self.longest_game_duration = game_duration
+		if not self.time_on_site:
+			self.time_on_site = game_duration
+		else:
+			self.time_on_site += game_duration
+	def update_with_match_info_liarsbar(self, match: LiarsBarMatch):
+		"""
+		Update user statistics based on the outcome of a match.
+		
+		Args:
+			match (LiarsBarMatch): The match instance containing match data.
+		"""
+		self.exp += match.get_player_xp_gained(self.user.username)
+		if match.user_winner == self.user:
+			self.liarsbar_win += 1
+		else:
+			self.liarsbar_lose += 1
+		game_duration = match.end_date - match.start_date
 		if not self.time_on_site:
 			self.time_on_site = game_duration
 		else:
@@ -311,6 +330,26 @@ class MatchHistory(models.Model):
 
 		self.pong_matches.add(match)
 		return True
+
+	def add_liarsbar_match(self, match):
+			"""
+			Adds a LiarsBar to the user's match history if not already added.
+			
+			Args:
+				match (LiarsBar): The match to be added.
+			
+			Returns:
+				bool: True if the match was added, False if it was already in the history.
+			"""
+			if not isinstance(match, LiarsBarMatch):
+				raise ValueError("Expected a LiarsBar instance.")
+
+			if self.liarsbar_matches.filter(id=match.id).exists():
+				return False
+
+			self.liarsbar_matches.add(match)
+			return True
+
 
 	def get_all_matches(self):
 		"""
