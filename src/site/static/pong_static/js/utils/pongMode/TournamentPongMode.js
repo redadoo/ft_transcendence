@@ -146,7 +146,6 @@ export default class TournamentPongMode extends PongMode {
 			else
 			{
 				document.getElementById('pongOverlay').classList.remove('d-none');
-				setTimeout(check, 1000);
 				this.socket.send(JSON.stringify({
 					type: 'waiting_next_match',
 				}));

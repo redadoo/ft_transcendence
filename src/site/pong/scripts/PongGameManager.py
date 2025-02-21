@@ -41,8 +41,12 @@ class PongGameManager(GameManager):
 			else:
 				self.scores["player1"], self.scores["player2"] = 5, 0
 
-		first_user_mmr_gain = PongMatch.static_get_player_mmr_gained(True, self.scores["player1"], self.scores["player2"])	
-		second_user_mmr_gain = PongMatch.static_get_player_mmr_gained(False, self.scores["player1"], self.scores["player2"])
+		if all(val > 0 for val in players_list):
+			first_user_mmr_gain = PongMatch.static_get_player_mmr_gained(True, self.scores["player1"], self.scores["player2"])	
+			second_user_mmr_gain = PongMatch.static_get_player_mmr_gained(False, self.scores["player1"], self.scores["player2"])
+		else:
+			first_user_mmr_gain = 0
+			second_user_mmr_gain = 0
 
 		match = await database_sync_to_async(PongMatch.objects.create)(
 			first_user=first_player,
