@@ -53,7 +53,6 @@ class Tournament():
 		if len(self.players) < MATCH_PLAYER_NUMBER:
 			print("Not enough players to start a tournament.")
 			return
-
 		matches = []
 		players_queue = self.players[:]  # Work on a copy
 		while len(players_queue) >= MATCH_PLAYER_NUMBER:
@@ -138,13 +137,12 @@ class Tournament():
 		if not self.bracket:
 			print("Tournament not set up properly.")
 			return
-		
 		await self.setup_pong_manager()
 
 		self.game_manager.start_game()
 		self.tournament_status = self.TournamentStatus.PLAYING
 		self.game_loop_task = asyncio.create_task(self.game_loop())
-
+		
 		snapshot = self.to_dict()
 		await self.broadcast_message({
 			"type": "lobby_state",
