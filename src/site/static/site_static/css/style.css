@@ -2122,6 +2122,13 @@ label {
     z-index: 10;
 }
 
+.card.selected-active {
+    transform: translateY(-15%) scale(1.08);
+    filter: drop-shadow(0 0 12px rgba(30, 144, 255, 0.7));
+    outline: 2px solid rgba(30, 144, 255, 0.8);
+    z-index: 11;
+}
+
 /* Doubt effect */
 .card.pulsate {
     animation: pulsate 1.5s ease-in-out infinite;

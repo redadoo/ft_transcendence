@@ -31,6 +31,7 @@ class Game
 		this.lastRequiredCard = null;
 
 		this.previousPlayerState = {
+			selected_cards: [],
             selection_index: -1,
             doubting: false,
             card_sent: false,
@@ -404,50 +405,71 @@ class Game
         const doubtingChanged = this.previousPlayerState.doubting !== player.doubting;
         const statusChanged = this.previousPlayerState.status !== player.status;
         const cardSentChanged = this.previousPlayerState.card_sent !== player.card_sent;
+		const selectedCardsChanged = JSON.stringify(this.previousPlayerState.selected_cards) !== JSON.stringify(player.selected_index);
 
-        cardSlots.forEach((slot, index) => {
-            if (selectionChanged && slot.classList.contains('selected')) {
-                slot.classList.remove('selected');
-            }
-            if ((doubtingChanged || selectionChanged) && slot.classList.contains('pulsate')) {
-                slot.classList.remove('pulsate');
-            }
-            if ((cardSentChanged || selectionChanged) && slot.classList.contains('glow')) {
-                slot.classList.remove('glow');
-            }
-            if (statusChanged) {
-                slot.classList.toggle('grayscale', player.status === 'DIED');
-                slot.classList.toggle('disabled', player.status === 'DIED');
-            }
-        });
+		if (selectionChanged || doubtingChanged || cardSentChanged || statusChanged || selectedCardsChanged) {
+			cardSlots.forEach((slot, index) => {
+				if (selectionChanged && slot.classList.contains('selected')) {
+					slot.classList.remove('selected');
+				}
+				if ((doubtingChanged || selectionChanged) && slot.classList.contains('pulsate')) {
+					slot.classList.remove('pulsate');
+				}
+				if ((cardSentChanged || selectionChanged) && slot.classList.contains('glow')) {
+					slot.classList.remove('glow');
+				}
+				if (selectedCardsChanged && slot.classList.contains('selected-active')) {
+					slot.classList.remove('selected-active');
+				}
+				if (statusChanged) {
+					slot.classList.toggle('grayscale', player.status === 'DIED');
+					slot.classList.toggle('disabled', player.status === 'DIED');
+				}
+			});
+		}
+	
+		// Applica l'effetto di selezione in base a selection_index
+		if (selectedIndex >= 0 && selectedIndex < cardSlots.length) {
+			const selectedSlot = cardSlots[selectedIndex];
+	
+			if (!selectedSlot.classList.contains('selected')) {
+				selectedSlot.classList.add('selected');
+			}
+			if (player.doubting && !selectedSlot.classList.contains('pulsate')) {
+				selectedSlot.classList.add('pulsate');
+			} else if (!player.doubting) {
+				selectedSlot.classList.remove('pulsate');
+			}
+			if (!player.card_sent && !selectedSlot.classList.contains('glow')) {
+				selectedSlot.classList.add('glow');
+			} else if (player.card_sent) {
+				selectedSlot.classList.remove('glow');
+			}
+			if (statusChanged) {
+				selectedSlot.classList.toggle('ghost', player.status === 'DIED');
+			}
+		}
 
-        if (selectedIndex >= 0 && selectedIndex < cardSlots.length) {
-            const selectedSlot = cardSlots[selectedIndex];
+		if (selectedCardsChanged && player.selected_index && player.selected_index.length > 0) {
+			player.selected_index.forEach((cardIndex) => {
+				if (cardIndex >= 0 && cardIndex < cardSlots.length) {
+					const slot = cardSlots[cardIndex];
+					if (!slot.classList.contains('selected-active')) {
+						slot.classList.add('selected-active');
+					}
+				}
+			});
+		}
 
-            if (!selectedSlot.classList.contains('selected')) {
-                selectedSlot.classList.add('selected');
-            }
-            if (player.doubting && !selectedSlot.classList.contains('pulsate')) {
-                selectedSlot.classList.add('pulsate');
-            } else if (!player.doubting) {
-                selectedSlot.classList.remove('pulsate');
-            }
-            if (!player.card_sent && !selectedSlot.classList.contains('glow')) {
-                selectedSlot.classList.add('glow');
-            } else if (player.card_sent) {
-                selectedSlot.classList.remove('glow');
-            }
-            if (statusChanged) {
-                selectedSlot.classList.toggle('ghost', player.status === 'DIED');
-            }
-        }
-
-        this.previousPlayerState = {
-            selection_index: selectedIndex,
-            doubting: player.doubting,
-            card_sent: player.card_sent,
-            status: player.status
-        };
+		if (selectionChanged || doubtingChanged || cardSentChanged || statusChanged || selectedCardsChanged) {
+			this.previousPlayerState = {
+				selected_cards: [...player.selected_index],
+				selection_index: selectedIndex,
+				doubting: player.doubting,
+				card_sent: player.card_sent,
+				status: player.status
+			};
+		}	
     }
 
 	/**
