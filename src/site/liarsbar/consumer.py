@@ -83,14 +83,23 @@ class LiarsBarConsumer(AsyncWebsocketConsumer):
 
 	async def receive(self, text_data):
 		data = json.loads(text_data)
+		print("sto a ???")
 		await self.lobby.manage_event(data)
+
+		print("sto a chidue")
+		event_type = data.get("event_name")
+		if event_type == "game_finished":
+			match_manager.remove_match(self.lobby.room_group_name)
+
 
 	async def lobby_state(self, event: dict):
 		"""Aggiorna lo stato lato client."""
 
+		lobby_info = event.get("lobby_snapshot") or self.lobby.to_dict()
+
 		data_to_send = {
 			"event_info": event,
-			"lobby_info": self.lobby.to_dict()
+			"lobby_info": lobby_info
 		}
 
 		await self.send(text_data=json.dumps(data_to_send))

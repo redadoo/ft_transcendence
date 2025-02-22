@@ -490,17 +490,14 @@ class Game
 		this.players = null;
 
 		let event_name = isGamefinished === true ? "quit_game" : "unexpected_quit";
-
 		if (this.gameSocket && this.gameSocketsocket) {
-			this.gameSocketocket.send(JSON.stringify({
+			this.gameSocket.send(JSON.stringify({
 				type: event_name,
 				player_id: this.player_id
 			}));
-			this.mode.socket.close();
+			this.gameSocket.close();
 		}
-
 		this.cleanupWindowClose();
-
 		router.navigateTo('/multiplayer');
 	}
 
@@ -512,7 +509,7 @@ class Game
 	{
 		try {
 			const data = JSON.parse(event.data);
-			console.log(data);
+			console.log("xxhahds", data);
 			switch (data.lobby_info.current_lobby_status) 
 			{
 				case 'TO_SETUP':
@@ -530,7 +527,7 @@ class Game
 					this.selected_card(this.currentPlayer);
 					break;
 				case 'ENDED':
-					game_ended(true);
+					this.game_ended(true);
 					break;
 				case 'PLAYER_DISCONNECTED':
 					break;
