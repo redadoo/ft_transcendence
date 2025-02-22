@@ -129,8 +129,10 @@ export default class TournamentPongMode extends PongMode {
 	{
 		const { event_info, lobby_info } = data;
 
-		if (event_info.event_name === "tournament_finished")
+		console.log("tournament_finished emote non del fazzone", data);
+		if (event_info.event === "tournament_finished")
 		{
+			console.log("tournament_finished emote del fazzone");
 			this.game.game_ended(true);
 			return;
 		}

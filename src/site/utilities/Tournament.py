@@ -198,12 +198,22 @@ class Tournament():
 
 			self.tournament_status = self.TournamentStatus.ENDED
 			snapshot = self.to_dict()
-			await self.broadcast_message({
-				"type": "lobby_state",
-				"event": "match_finished",
-				"loser_id": loser_id,
-				"tournament_snapshot": snapshot,
-			})
+			if len(self.players) == 1:
+				print("tournament_finished")
+				await self.broadcast_message({
+					"type": "lobby_state",
+					"event": "tournament_finished",
+					"winner_id": self.current_round_winners[0],
+					"tournament_snapshot": snapshot,
+				})
+			else:
+				print(f"game finish {self.players}")
+				await self.broadcast_message({
+					"type": "lobby_state",
+					"event": "match_finished",
+					"loser_id": loser_id,
+					"tournament_snapshot": snapshot,
+				})
 
 	def to_dict(self) -> dict:
 		tournament_data = {"current_tournament_status": self.tournament_status.name}

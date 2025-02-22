@@ -161,7 +161,6 @@ class PongGameManager(GameManager):
 			self.ball.reset()
 
 		if any(score >= constants.MAX_SCORE for score in self.scores.values()):
-			print(f"game ginis {self.scores}")
 			await self.clear_and_save(True)
 			return
 
@@ -180,7 +179,6 @@ class PongGameManager(GameManager):
 		return player_list[1]
 
 	def reset(self):
-		print("reset manager")
 		self.players.clear()
 		self.ball.reset()
 		self.scores = {"player1": 0, "player2": 0}

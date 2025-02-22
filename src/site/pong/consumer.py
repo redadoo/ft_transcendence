@@ -96,9 +96,11 @@ class PongMultiplayerConsumer(AsyncWebsocketConsumer):
 	async def lobby_state(self, event: dict):
 		"""Aggiorna lo stato lato client."""
 
+		lobby_info = event.get("lobby_snapshot") or self.lobby.to_dict()
+
 		data_to_send = {
 			"event_info": event,
-			"lobby_info": self.lobby.to_dict()
+			"lobby_info": lobby_info
 		}
 		try:
 			await self.send(text_data=json.dumps(data_to_send))
@@ -137,9 +139,11 @@ class PongSingleplayerConsumer(AsyncWebsocketConsumer):
 	async def lobby_state(self, event: dict):
 		"""Aggiorna lo stato lato client."""
 
+		lobby_info = event.get("lobby_snapshot") or self.lobby.to_dict()
+
 		data_to_send = {
 			"event_info": event,
-			"lobby_info": self.lobby.to_dict()
+			"lobby_info": lobby_info
 		}
 
 		try:
@@ -226,9 +230,11 @@ class PongLobbyConsumer(AsyncWebsocketConsumer):
 						  It may also include 'event_name' and 'player_id' if the event is related
 						  to a player joining.
 		"""
+		lobby_info = event.get("lobby_snapshot") or self.lobby.to_dict()
+
 		data_to_send = {
 			"event_info": event,
-			"lobby_info": self.lobby.to_dict()
+			"lobby_info": lobby_info
 		}
 
 		event_name = event.get("event_name")

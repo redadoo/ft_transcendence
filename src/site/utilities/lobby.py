@@ -146,17 +146,21 @@ class Lobby:
 				async with self.update_lock:
 					await self.game_manager.game_loop()
 				await asyncio.sleep(1 / 60)
+				snapshot = self.to_dict()
 				await self.broadcast_message({
 					"type": "lobby_state",
-					"event": "game_loop"
+					"event": "game_loop",
+					"lobby_snapshot": snapshot,
 				})
 		except asyncio.CancelledError:
 			print("Game loop task was cancelled.")
 		finally:
 			self.lobby_status = self.LobbyStatus.ENDED
+			snapshot = self.to_dict()
 			await self.broadcast_message({
 				"type": "lobby_state",
-				"event": "game_finished"
+				"event": "game_finished",
+				"lobby_snapshot": snapshot,
 			})
 
 	async def close_lobby(self, data: dict):
