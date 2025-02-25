@@ -10,10 +10,16 @@ from django.middleware.csrf import get_token
 from django.core.validators import validate_slug
 from django.core.exceptions import ValidationError
 from django.contrib.auth.password_validation import validate_password
+from django.utils.crypto import get_random_string
 
 def main_page(request, unused_path=None):
-	csrf_token = get_token(request)
-	return render(request,'main.html', {'csrf_token': csrf_token})
+    nonce = get_random_string(16)
+    csrf_token = get_token(request)
+    csp_policy = (f"script-src 'self' 'nonce-{nonce}' blob:; ")
+    response = render(request, 'main.html', {'csrf_token': csrf_token, 'nonce': nonce})
+    response["Content-Security-Policy"] = csp_policy  
+    return response
+
 
 class UploadUserImageView(APIView):
 	permission_classes = [IsAuthenticated]

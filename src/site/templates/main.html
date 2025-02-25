@@ -3,38 +3,57 @@
 <html lang="en">
 <head>
 	<meta name="csrf-token" content="{{ csrf_token }}">
-	<link rel="shortcut icon" type="image/png" href="{% static 'site_static/media/favicon.ico' %}" />
-	<meta charset="UTF-8" />
-	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<title>Transcendence</title>
-	<link rel="stylesheet" href="{% static 'lib/bootstrap/css/bootstrap.css' %}" />
-	<link rel="stylesheet" href="{% static 'site_static/css/style.css' %}" />
-	<script type="importmap">
+
+	<!-- Favicon -->
+	<link rel="shortcut icon" type="image/png" href="{% static 'site_static/media/favicon.ico' %}">
+
+	<!-- Stylesheets -->
+	<link rel="stylesheet" href="{% static 'lib/bootstrap/css/bootstrap.css' %}">
+	<link rel="stylesheet" href="{% static 'site_static/css/style.css' %}">
+
+	<!-- Inline Script with Nonce -->
+	<script nonce="{{ nonce }}">
+		console.log("Inline script allowed by nonce");
+	</script>
+
+	<!-- Importmap with Nonce -->
+	<script type="importmap" nonce="{{ nonce }}">
 		{
 			"imports": {
-				"three": "../../static/lib/threejs/src/Three.js",
-				"FontLoader": "../../static/lib/threejs/examples/jsm/loaders/FontLoader.js",
-				"TextGeometry": "../../static/lib/threejs/examples/jsm/geometries/TextGeometry.js",
-				"Ball": "../../static/pong_static/js/Scritps/Class/Background.js",
-				"Bounds": "../../static/pong_static/js/Scritps/Bounds.js",
-				"Paddle": "../../static/pong_static/js/Scritps/Class/Paddle.js",
-				"InputHandler": "../../static/pong_static/js/Scritps/Class/InputHandler.js",
-				"Background": "../../static/pong_static/js/Scritps/Class/Background.js"
+				"three": "{% static 'lib/threejs/src/Three.js' %}",
+				"FontLoader": "{% static 'lib/threejs/examples/jsm/loaders/FontLoader.js' %}",
+				"TextGeometry": "{% static 'lib/threejs/examples/jsm/geometries/TextGeometry.js' %}",
+				"Ball": "{% static 'pong_static/js/Scripts/Class/Background.js' %}",
+				"Bounds": "{% static 'pong_static/js/Scripts/Bounds.js' %}",
+				"Paddle": "{% static 'pong_static/js/Scripts/Class/Paddle.js' %}",
+				"InputHandler": "{% static 'pong_static/js/Scripts/Class/InputHandler.js' %}",
+				"Background": "{% static 'pong_static/js/Scripts/Class/Background.js' %}"
 			}
 		}
 	</script>
+
+	<!-- External Scripts -->
+	<script type="module" src="{% static 'site_static/js/router.js' %}" nonce="{{ nonce }}"></script>
+	<script src="{% static 'lib/bootstrap/js/bootstrap.js' %}" nonce="{{ nonce }}"></script>
+
 </head>
 <body>
+	<!-- Overlays -->
 	<div id="overlay" class="overlay d-none"></div>
 	<div id="statusOverlay" class="status-overlay d-none"></div>
 	<div id="pongOverlay" class="overlay d-none"></div>
 	<div id="liarsbarOverlay" class="d-none"></div>
 
+	<!-- Header -->
 	<header id="header" class="header d-flex align-items-start justify-content-between px-2 fixed-top"></header>
-		<div id="app"></div>
-	<footer id="footer" class="footer d-flex align-items-center px-4 fixed-bottom"></footer>
 
-	<script type="module" src="{% static 'site_static/js/router.js' %}"></script>
-	<script src="{% static 'lib/bootstrap/js/bootstrap.js' %}"></script>
+	<!-- Main App Container -->
+	<div id="app"></div>
+
+	<!-- Footer -->
+	<footer id="footer" class="footer d-flex align-items-center px-4 fixed-bottom"></footer>
 </body>
 </html>
