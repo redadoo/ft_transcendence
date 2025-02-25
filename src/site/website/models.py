@@ -7,6 +7,9 @@ from datetime import datetime
 from django.contrib.auth.models import AbstractUser, Group, Permission
 from django.core.validators import MinLengthValidator, RegexValidator, MinValueValidator
 from django.utils.timezone import now
+from itertools import chain
+from datetime import datetime
+
 
 class User(AbstractUser):
 	"""
@@ -350,18 +353,15 @@ class MatchHistory(models.Model):
 			self.liarsbar_matches.add(match)
 			return True
 
-
 	def get_all_matches(self):
 		"""
-		Combines and sorts all matches by start date.
+		Combines and sorts all matches by start date in descending order.
 		"""
-
-		pong_matches = list(self.pong_matches.all())
-		liarsbar_matches = list(self.liarsbar_matches.all())
-
-		all_matches = pong_matches + liarsbar_matches
-		all_matches.sort(key=lambda match: getattr(match, 'start_date', datetime.min))
-		return all_matches
+		return sorted(
+			chain(self.pong_matches.all(), self.liarsbar_matches.all()),
+			key=lambda match: match.start_date or datetime.min,
+			reverse=True
+		)
 
 	def __str__(self):
 		"""
