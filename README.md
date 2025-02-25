@@ -9,56 +9,57 @@
 
 - [About](#about)
 - [Usage](#usage)
-- [Ressources](#ressources)
+- [Resources](#resources)
 
 ## About
 
-this project is part of the common core of 42 and was done in collaboration with @[Fborroto](https://github.com/Fborroto) and and @[ffursini](https://github.com/ffursini).
+This project is part of the common core of 42 and was done in collaboration with @[Fborroto](https://github.com/Fborroto) and @[ffursini](https://github.com/ffursini).
 
-read [Subject](https://github.com/redadoo/ft_transcendence/blob/master/en.subject.pdf) for more info
+Read the [Subject](https://github.com/redadoo/ft_transcendence/blob/master/en.subject.pdf) for more information.
 
 ## Usage
 
-## Ressources
+## Resources
 
-[Django tutorial](https://docs.djangoproject.com/en/5.1/intro/tutorial01/)
+The following resources were reviewed during the project. They were not necessarily used directly in this project but were read for reference and learning purposes.
 
-[Store image](https://stackoverflow.com/questions/9722603/storing-image-in-database-directly-or-as-base64-data)
+- **Django**
+  - [Django tutorial](https://docs.djangoproject.com/en/5.1/intro/tutorial01/)
+  - [Django-Styleguide-Example](https://github.com/HackSoftware/Django-Styleguide-Example)
+  - [Django-Styleguide](https://github.com/HackSoftware/Django-Styleguide)
+  - [Deep dive into Django views](https://great-devxy.medium.com/deep-dive-django-views-4aab0e8d289c)
+  - [API throttling](https://www.django-rest-framework.org/api-guide/throttling/)
 
-[saving images as base64](https://dba.stackexchange.com/questions/266746/saving-images-as-base64-encoded-strings-why-is-it-bad)
+- **Database & Image Storage**
+  - [Store image](https://stackoverflow.com/questions/9722603/storing-image-in-database-directly-or-as-base64-data)
+  - [Saving images as base64](https://dba.stackexchange.com/questions/266746/saving-images-as-base64-encoded-strings-why-is-it-bad)
+  - [Should I store image paths in one table or multiple tables?](https://stackoverflow.com/questions/24843404/should-i-store-image-paths-in-one-table-or-multiple-tables-based-on-image-type)
+  - [Should user credentials and user info be stored in separate tables?](https://security.stackexchange.com/questions/266399/should-user-credentials-and-user-info-be-stored-in-separate-tables)
+  - [Improving database accessibility](https://dev.to/slavkus/django-41-improving-database-accessibility-4hbh)
 
-[should-i-store-image-paths-in-one-table-or-multiple-tables] (https://stackoverflow.com/questions/24843404/should-i-store-image-paths-in-one-table-or-multiple-tables-based-on-image-type)
+- **Docker & Deployment**
+  - [Dockerizing Django with Postgres and Gunicorn](https://testdriven.io/blog/dockerizing-django-with-postgres-gunicorn-and-nginx/)
+  - [Dockerignore](https://docs.docker.com/build/concepts/context/#dockerignore-files)
+  - [Docker monitoring with Prometheus](https://last9.io/blog/docker-monitoring-with-prometheus-a-step-by-step-guide/)
 
-[should-user-credentials-and-user-info-be-stored-in-seperate-tables] (https://security.stackexchange.com/questions/266399/should-user-credentials-and-user-info-be-stored-in-seperate-tables)
+- **Authentication & OAuth**
+  - [Getting started with 42 API](https://api.intra.42.fr/apidoc/guides/getting_started)
+  - [OAuth2 web application flow](https://api.intra.42.fr/apidoc/guides/web_application_flow)
 
-[dockerizing-django-with-postgres-gunicorn](https://testdriven.io/blog/dockerizing-django-with-postgres-gunicorn-and-nginx/)
+- **Real-time & WebSockets**
+  - [Channels tutorial](https://channels.readthedocs.io/en/latest/tutorial/part_1.html)
+  - [Channel Layers](https://channels.readthedocs.io/en/latest/topics/channel_layers.html)
 
-[Django-Styleguide-Example](https://github.com/HackSoftware/Django-Styleguide-Example)
-[Django-Styleguide](https://github.com/HackSoftware/Django-Styleguide)
-[deep-dive-django-views](https://great-devxy.medium.com/deep-dive-django-views-4aab0e8d289c)
+- **Game Development & Networking**
+  - [Pong with Django Channels](https://www.reddit.com/r/Python/comments/i1qdjg/online_multiplayer_pong_with_django_channels_and/?tl=it)
+  - [Three.js tutorial](https://github.com/SuboptimalEng/three-js-tutorials/tree/main)
+  - [Example Three.js game](https://github.com/Rikki407/threejs-projects/blob/master/projects/shootout/Game.js#L256)
+  - [Client-side prediction and server reconciliation](https://www.gabrielgambetta.com/client-side-prediction-server-reconciliation.html)
 
+- **Monitoring & Performance**
+  - [Prometheus and Grafana](https://rezakhademix.medium.com/a-complete-guide-to-monitor-postgresql-with-prometheus-and-grafana-5611af229882)
+  - [Prometheus and Grafana (alternative)](https://nelsoncode.medium.com/how-to-monitor-posgresql-with-prometheus-and-grafana-docker-36d216532ea2)
 
-[getting_started](https://api.intra.42.fr/apidoc/guides/getting_started)
-[This is a description of the OAuth2 flow from 3rd party web sites.](https://api.intra.42.fr/apidoc/guides/web_application_flow)
+- **Additional Reads**
+  - [Comparing ASGI servers: Uvicorn, Hypercorn, and Daphne](https://medium.com/@onegreyonewhite/2024-comparing-asgi-servers-uvicorn-hypercorn-and-daphne-addb2fd70c57)
 
-[to read](https://medium.com/@onegreyonewhite/2024-comparing-asgi-servers-uvicorn-hypercorn-and-daphne-addb2fd70c57)
-
-[channels tutorial](https://channels.readthedocs.io/en/latest/tutorial/part_1.html)
-[Channel Layers](https://channels.readthedocs.io/en/latest/topics/channel_layers.html)
-
-
-[Pong django](https://www.reddit.com/r/Python/comments/i1qdjg/online_multiplayer_pong_with_django_channels_and/?tl=it)
-[asdas](https://www.jacksondunstan.com/articles/4824)
-[example threejs](https://github.com/Rikki407/threejs-projects/blob/master/projects/shootout/Game.js#L256)
-[threejs  tutorial](https://github.com/SuboptimalEng/three-js-tutorials/tree/main)
-[client-side-prediction](https://www.gabrielgambetta.com/client-side-prediction-server-reconciliation.html)
-[improving-database-accessibility](https://dev.to/slavkus/django-41-improving-database-accessibility-4hbh)
-
-[dockerignore](https://docs.docker.com/build/concepts/context/#dockerignore-files)
-
-[prometheus-and-grafana](https://rezakhademix.medium.com/a-complete-guide-to-monitor-postgresql-with-prometheus-and-grafana-5611af229882)
-
-[prometheus-and-grafana 2](https://nelsoncode.medium.com/how-to-monitor-posgresql-with-prometheus-and-grafana-docker-36d216532ea2)
-
-[api-throttling](https://www.django-rest-framework.org/api-guide/throttling/)
-[docker-monitoring-with-prometheus](https://last9.io/blog/docker-monitoring-with-prometheus-a-step-by-step-guide/)
