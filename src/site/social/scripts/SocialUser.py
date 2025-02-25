@@ -68,7 +68,7 @@ class SocialUser:
 			ValueError: If the username is not provided, the user doesn't exist, or there is no existing friendship.
 		"""
 		new_status = data.get("new_status")
-
+		
 		if new_status is None:
 			raise ValueError(f"bad dict cant retrieve new_status")
 

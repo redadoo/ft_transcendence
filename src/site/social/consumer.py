@@ -114,6 +114,7 @@ class SocialConsumer(AsyncWebsocketConsumer):
 		await self.send_event("get_friend_removed", username=event["username"])
 
 	async def get_friend_request_accepted(self, event: dict):
+		await self.user.notify_friends_status()
 		await self.send_event("get_friend_request_accepted", username=event["username"])
 
 	async def get_message(self, event: dict):
