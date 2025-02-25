@@ -41,6 +41,7 @@ The following resources were reviewed during the project. They were not necessar
   - [Dockerizing Django with Postgres and Gunicorn](https://testdriven.io/blog/dockerizing-django-with-postgres-gunicorn-and-nginx/)
   - [Dockerignore](https://docs.docker.com/build/concepts/context/#dockerignore-files)
   - [Docker monitoring with Prometheus](https://last9.io/blog/docker-monitoring-with-prometheus-a-step-by-step-guide/)
+  - [setup django-nginx-gunicorn](https://realpython.com/django-nginx-gunicorn/)
 
 - **Authentication & OAuth**
   - [Getting started with 42 API](https://api.intra.42.fr/apidoc/guides/getting_started)
