@@ -16,6 +16,8 @@ from rest_framework.response import Response
 from rest_framework.decorators import action
 from django.shortcuts import redirect, render
 from django.urls import resolve
+from asgiref.sync import async_to_sync
+from social.consumer import send_event_to_all_consumer
 
 class UserViewSet(viewsets.ModelViewSet):
 	serializer_class = UserSerializer
@@ -37,7 +39,11 @@ class UserViewSet(viewsets.ModelViewSet):
 			new_user = form.save()
 			UserStats.objects.create(user=new_user)
 			UserImage.objects.create(user=new_user)
+
+			async_to_sync(send_event_to_all_consumer)("get_update_users", {"username": new_user.username})
+
 			return Response({"success": "true"})
+		
 		return Response({"success": "false", "errors": form.errors})
 
 	@action(detail=False, methods=['post'])

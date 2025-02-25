@@ -1,6 +1,36 @@
 import json
 from channels.generic.websocket import AsyncWebsocketConsumer
 from social.scripts.SocialUser import SocialUser
+from channels.layers import get_channel_layer
+from website.models import User
+from asgiref.sync import sync_to_async
+
+async def get_active_users():
+    """Fetch active users asynchronously (Online, Away, Busy, Matchmaking, Playing)."""
+    active_statuses = [
+        User.UserStatus.ONLINE,
+        User.UserStatus.AWAY,
+        User.UserStatus.BUSY,
+        User.UserStatus.MATCHMAKING,
+        User.UserStatus.PLAYING,
+    ]
+    return await sync_to_async(lambda: list(User.objects.filter(status__in=active_statuses).values_list('id', flat=True)))()
+
+
+async def send_event_to_all_consumer(event_type: str, message: dict):
+    """Send a WebSocket event to all active users."""
+    channel_layer = get_channel_layer()
+    active_user_ids = await get_active_users()
+
+    for user_id in active_user_ids:
+        group_name = f"user_{user_id}"
+        payload = {"type": event_type, **message}
+
+        try:
+            await channel_layer.group_send(group_name, payload)
+        except Exception as e:
+            print(f"Failed to send event to {group_name}: {e}")
+
 
 class SocialConsumer(AsyncWebsocketConsumer):
 	async def connect(self):
