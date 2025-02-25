@@ -443,16 +443,11 @@ export default class Game
 	{
 		if (newPlayer_id == this.player_id)
 		{
-			if (this.pongPlayer != null)
-				return;
-
 			this.pongPlayer = new PongPlayer(socket, this.player_id, playerData);
 			this.sceneManager.scene.add(this.pongPlayer.paddle.mesh);
 		}
 		else
 		{
-			if (this.pongOpponent != null)
-				return;
 			this.pongOpponent = new PongPlayer(null, newPlayer_id, playerData);
 			this.sceneManager.scene.add(this.pongOpponent.paddle.mesh);
 		}
@@ -510,7 +505,7 @@ export default class Game
 			if (this.pongPlayer != null)
 			{
 				this.pongPlayer.deletePaddle(this.sceneManager.scene);
-				delete this.pongOpponent;
+				delete this.pongPlayer;
 				this.pongPlayer = null;
 			}
 			if (this.pongOpponent != null)

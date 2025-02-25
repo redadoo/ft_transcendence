@@ -100,6 +100,7 @@ export default class PongPlayer {
 		if (this.paddle) 
 		{
 			this.paddle.deleteMesh(scene);
+			delete this.paddle;
 			this.paddle = null;
 		}
 	}

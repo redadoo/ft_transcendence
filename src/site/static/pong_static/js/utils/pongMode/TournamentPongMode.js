@@ -18,7 +18,6 @@ export default class TournamentPongMode extends PongMode {
 			this.room_name = window.localStorage.getItem('room_name');
 		else
 		{
-			console.log("Generating new room name...");
 			this.room_name = "test-room"//crypto.randomUUID();
 			window.localStorage.setItem('room_name', this.room_name);
 		}
@@ -99,14 +98,13 @@ export default class TournamentPongMode extends PongMode {
 		if (event_info.event_name === "player_to_setup")
 		{
 			const players = data.lobby_info.players;
-			for (const [key, value] of Object.entries(players))
+			if (Object.hasOwn(players, this.game.player_id)) 
 			{
-				if (this.game.player_id == key)
-				{
-					document.getElementById('pongOverlay').classList.add('d-none');
-					this.isPlaying = true;
-				}
-				this.game.AddUserToLobby(key,value, this.socket);
+				document.getElementById('pongOverlay').classList.add('d-none');
+				this.isPlaying = true;
+			
+				for (const [key, value] of Object.entries(players))
+					this.game.AddUserToLobby(key,value, this.socket);
 			}
 		}
 	}
@@ -129,10 +127,8 @@ export default class TournamentPongMode extends PongMode {
 	{
 		const { event_info, lobby_info } = data;
 
-		console.log("tournament_finished emote non del fazzone", data);
 		if (event_info.event === "tournament_finished")
 		{
-			console.log("tournament_finished emote del fazzone");
 			this.game.game_ended(true);
 			return;
 		}
