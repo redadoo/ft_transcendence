@@ -40,7 +40,8 @@ export default class SocialOverlayManager {
 			acceptInviteToGame: this.acceptInviteToGame.bind(this),
 			acceptInviteToTournament: this.acceptInviteToTournament.bind(this),
 			declineInviteToGame: this.declineInviteToGame.bind(this),
-			declineInviteToTournament: this.declineInviteToTournament.bind(this)
+			declineInviteToTournament: this.declineInviteToTournament.bind(this),
+			addNewRegisteredUser: this.addNewRegisteredUser.bind(this),
 		}
 		this.initializeUIElements();
 		this.notificationManager = new NotificationManager();
@@ -254,6 +255,11 @@ export default class SocialOverlayManager {
 
 				return matchesSearch;
 			});
+	}
+
+	addNewRegisteredUser(user) {
+		this.socialData.registeredUsers.push(user);
+		this.handleUserSearch('');
 	}
 
 	updateUserStatus(statusOption) {

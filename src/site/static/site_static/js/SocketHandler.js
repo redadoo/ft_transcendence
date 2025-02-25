@@ -31,6 +31,7 @@ export default class SocketHandler {
 				'get_tournament_room_name': () => this.handleTournamentRoomName(socketData.tournament_room_name),
 				'get_tournament_invite': () => this.handleTournamentInvite(socketData),
 				'get_tournament_player_joined': () => this.handleTournamentPlayerJoined(socketData),
+				'get_update_users': () => this.userActions.addNewRegisteredUsers(socketData.username)
 			};
 
 			const handler = messageHandlers[socketData.type];

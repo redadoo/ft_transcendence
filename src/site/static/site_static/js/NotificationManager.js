@@ -1,3 +1,5 @@
+import Sound from './Sound.js';
+
 export default class NotificationManager {
 	constructor() {
 		this.notifications = [];
@@ -6,11 +8,6 @@ export default class NotificationManager {
 		this.notificationCountDisplay = document.getElementById('notificationCount');
 		this.notificationCounter = document.getElementById('notificationCounter');
 		this.setupWindowHandlers();
-	}
-
-	playNotificationSound() {
-		const audio = new Audio('/static/site_static/media/audio/notification.mp3');
-		audio.play();
 	}
 
 	setupWindowHandlers() {
@@ -30,9 +27,10 @@ export default class NotificationManager {
 			...notification
 		};
 
+		Sound.play('notificationSound');
 		this.notifications.unshift(notificationData);
 		this.notificationCount++;
-		this.playNotificationSound();
+
 		this.updateNotificationDisplay();
 
 		if (!notification.actions) {
