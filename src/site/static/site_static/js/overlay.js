@@ -239,6 +239,8 @@ export default class SocialOverlayManager {
 	searchUsers(searchTerm) {
 		const term = searchTerm.toLowerCase();
 		const { registeredUsers, activeFriends, blockedContacts } = this.socialData;
+		console.log('Searching for:', term);
+		console.log('Registered users:', registeredUsers);
 
 		return registeredUsers
 			.filter(user => {
@@ -257,9 +259,17 @@ export default class SocialOverlayManager {
 			});
 	}
 
-	addNewRegisteredUser(user) {
-		this.socialData.registeredUsers.push(user);
-		this.handleUserSearch('');
+	addNewRegisteredUser() {
+		api.getAllUsers().then(users => {
+			this.socialData.registeredUsers = users;
+			this.socketHandler = new SocketHandler(
+				this.socialData,
+				this.userActions,
+				this.notificationManager,
+				this.friendListManager,
+				this.chatManager
+			);
+		});
 	}
 
 	updateUserStatus(statusOption) {

@@ -31,7 +31,7 @@ export default class SocketHandler {
 				'get_tournament_room_name': () => this.handleTournamentRoomName(socketData.tournament_room_name),
 				'get_tournament_invite': () => this.handleTournamentInvite(socketData),
 				'get_tournament_player_joined': () => this.handleTournamentPlayerJoined(socketData),
-				'get_update_users': () => this.userActions.addNewRegisteredUsers(socketData.username)
+				'get_update_users': () => this.userActions.addNewRegisteredUser(socketData.username)
 			};
 
 			const handler = messageHandlers[socketData.type];
@@ -223,5 +223,11 @@ export default class SocketHandler {
 			console.log('👥 Handling tournament player joined:', playerData);
 			router.tournament.addNewPlayer(playerData.username);
 		}
+	}
+
+	handleNewRegisteredUser(username) {
+		console.log(`👤 Handling new registered user: ${username}`);
+		this.socialData.registeredUsers.push({ username });
+		this.friendListManager.updateFriendLists(this.socialData);
 	}
 }
