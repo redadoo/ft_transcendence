@@ -28,7 +28,7 @@ class LiarsBarGameManager(GameManager):
 		self.player_turn_index = 0
 		self.players_alive = 4
 		self.time_elapsed = 0
-		self.turn_duration = 1
+		self.turn_duration = 10
 
 	def start_game(self):
 		"""Marks the game as started."""
@@ -336,6 +336,7 @@ class LiarsBarGameManager(GameManager):
 		base_dict = super().to_dict()
 		base_dict.update({
 			"deck": [card.to_dict() for card in self.deck],
-			"time": int(self.time_elapsed)
+			"time": int(self.time_elapsed),
+			"turn_duration": self.turn_duration
 		})
 		return base_dict

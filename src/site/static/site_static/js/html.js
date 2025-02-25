@@ -280,42 +280,49 @@ const html = {
 
 	liarsbarOverlay: `
 	
-	<div class="container-fluid"> 
-	<div class="card-container">
-	<div class="row h-100"> 
-				<div class="col-1"> </div>
-				<div class="col-1"> 
-					<div class="card" data-card-type="ACE">
-						<img src="http://127.0.0.1:8000/media/png/pox.png" alt="ACE">
-					</div>
-				</div>
-				<div class="col-1">
-					<div class="card" data-card-type="QUEEN">
-						<img src="http://127.0.0.1:8000/media/png/momo.png" alt="QUEEN">
-					</div>
-				</div>	
-				<div class="col-1">
-					<div class="card" data-card-type="KING">
-						<img src="http://127.0.0.1:8000/media/png/glim.png" alt="KING">
-					</div>
-				</div>
-				<div class="col-1">
-				
-					<div class="card" data-card-type="JOLLY">
-						<img src="http://127.0.0.1:8000/media/png/master.png" alt="JOLLY">
-					</div>
-				</div>
-				
-				<div class="col-1">
-				
-					<div class="card" data-card-type="JOLLY">
-						<img src="http://127.0.0.1:8000/media/png/master.png" alt="JOLLY">
-					</div>
-				</div>
-				<div class="col-6"> </div>
+		<div class="container-fluid">
+		 <!-- Orologio posizionato in alto al centro -->
+		<div id="clockOverlay" style="position: fixed; top: 80px; left: 50%; transform: translateX(-50%); z-index: 1000;">
+			<div id="clockContainer" style="position: relative; width: 120px; height: 120px;">
+				<img id="clockImage" src="http://127.0.0.1:8000/media/png/timer.png" alt="Orologio">
+				<div id="clockText"></div>
 			</div>
 		</div>
-	</div>
+		<div class="card-container">
+		<div class="row h-100"> 
+					<div class="col-1"> </div>
+					<div class="col-1"> 
+						<div class="card" data-card-type="ACE">
+							<img src="http://127.0.0.1:8000/media/png/pox.png" alt="ACE">
+						</div>
+					</div>
+					<div class="col-1">
+						<div class="card" data-card-type="QUEEN">
+							<img src="http://127.0.0.1:8000/media/png/momo.png" alt="QUEEN">
+						</div>
+					</div>	
+					<div class="col-1">
+						<div class="card" data-card-type="KING">
+							<img src="http://127.0.0.1:8000/media/png/glim.png" alt="KING">
+						</div>
+					</div>
+					<div class="col-1">
+					
+						<div class="card" data-card-type="JOLLY">
+							<img src="http://127.0.0.1:8000/media/png/master.png" alt="JOLLY">
+						</div>
+					</div>
+					
+					<div class="col-1">
+					
+						<div class="card" data-card-type="JOLLY">
+							<img src="http://127.0.0.1:8000/media/png/master.png" alt="JOLLY">
+						</div>
+					</div>
+					<div class="col-6"> </div>
+				</div>
+			</div>
+		</div>
 	`,
 	profile: `
 		<div class="container-fluid game-container">

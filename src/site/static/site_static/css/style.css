@@ -2154,4 +2154,38 @@ label {
     50% { transform: translateY(-20%) scale(1.1); }
     100% { transform: translateY(-20%) scale(1); }
 }
+
+@keyframes pulsatered {
+    0% { transform: scale(1); opacity: 0.7; }
+    50% { transform: scale(1.1); opacity: 1; }
+    100% { transform: scale(1); opacity: 0.7; }
+}
+
+/* Applica l'animazione al contenitore */
+#clockOverlay .pulsatered {
+    animation: pulsatered 1s infinite;
+}
+
+
+/* Stile per il testo */
+#clockText {
+    position: absolute;
+    top: 57%;
+    left: 50%;
+    transform: translate(-50%, -50%); /* Centra il testo */
+    font-family: 'PRESS START 2P', sans-serif;
+    font-size: 32px;
+    color: #fff;
+}
+
+#clockText.red {
+    color: red !important; /* Colore rosso */
+    text-shadow: 0 0 8px rgba(255, 0, 0, 0.8); /* Ombra rossa */
+}
+
+/* Stile per l'immagine */
+#clockImage {
+    width: 120px;
+    height: 120px;
+}
 /* ----------------------------------------------------------------------------------- */

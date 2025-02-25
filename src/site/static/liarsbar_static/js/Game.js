@@ -29,6 +29,7 @@ class Game
 		this.currentPlayer = null;
 		this.lastHand = null;
 		this.lastRequiredCard = null;
+		this.lastElapsedTime = null;
 
 		this.previousPlayerState = {
 			selected_cards: [],
@@ -348,7 +349,48 @@ class Game
 		});
 	}
 
+
+	  /**
+   * Aggiorna il contenuto dell'elemento DOM del timer.
+   * @param {number} timeLeft - Il tempo rimanente (in secondi) da mostrare.
+   */
+	updateClockDisplay(timeLeft) {
+		const clockContainer = document.getElementById('clockContainer');
+		const clockText = document.getElementById('clockText');
 	
+		if (clockContainer && clockText) {
+			clockText.textContent = timeLeft;
+	
+			// Controlla se mancano 5 secondi o meno
+			if (timeLeft <= 5) {
+				// Aggiungi la classe per far pulsare il contenitore e cambiare il colore del testo
+				clockContainer.classList.add('pulsatered');
+				clockText.classList.add('red');
+			} else {
+				// Rimuovi le classi se il tempo è superiore a 5 secondi
+				clockContainer.classList.remove('pulsatered');
+				clockText.classList.remove('red');
+			}
+		}
+	}
+	/**
+	 * Funzione dedicata all'aggiornamento del timer del turno.
+	 * Controlla se il tempo trascorso è cambiato e, in tal caso, aggiorna il display.
+	 * @param {Object} lobbyInfo - L'oggetto contenente le informazioni sulla lobby, inclusi time e turn_duration.
+	 */
+	updateTurnTimer(lobbyInfo) {
+		if (lobbyInfo.turn_duration !== undefined && lobbyInfo.time !== undefined) {
+			const totalTurnTime = lobbyInfo.turn_duration;
+			const elapsedTime = lobbyInfo.time;
+			
+			if (this.lastElapsedTime !== elapsedTime) {
+			this.lastElapsedTime = elapsedTime;
+			const remainingTime = totalTurnTime - elapsedTime;
+			this.updateClockDisplay(remainingTime);
+			}
+		}
+		}
+
 	updateGameState(data)
 	{
 		try
@@ -357,10 +399,9 @@ class Game
 				this.updatePlayers(data);
 
 
-			if(data)
-			{
-				//update UI overlay
-			}
+			if (data.lobby_info) {
+				this.updateTurnTimer(data.lobby_info);
+			  }
 		}
 		catch (error) {
 			console.error("An error occurred during game update state:", error);
