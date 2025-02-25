@@ -11,6 +11,7 @@ class SocialUser:
 
 	def __init__(self, user):
 		self.user = user
+		self.channel_layer = get_channel_layer()
 
 	async def _validate_user(self, username):
 		if username == self.user.username:
@@ -37,7 +38,6 @@ class SocialUser:
 			).select_related("first_user", "second_user")
 		)
 
-		channel_layer = get_channel_layer()
 		notifications = []
 		for friendship in friendships:
 			
@@ -55,7 +55,7 @@ class SocialUser:
 			notifications.append((f"user_{recipient.id}", payload))
 
 		for group, payload in notifications:
-			await channel_layer.group_send(group, payload)
+			await self.channel_layer.group_send(group, payload)
 
 	async def change_status(self, data: dict):
 		"""
@@ -114,13 +114,11 @@ class SocialUser:
 
 		await sync_to_async(friendship.save)(update_fields=["status"])
 
-		channel_layer = get_channel_layer()
-
 		payload = {
 			"type": "get_blocked",
 			"username": self.user.username,
 		}
-		await channel_layer.group_send(f"user_{block_target.id}", payload)
+		await self.channel_layer.group_send(f"user_{block_target.id}", payload)
 
 	async def unblock_user(self, data: dict):
 		"""
@@ -147,13 +145,12 @@ class SocialUser:
 		friendship.status = Friendships.FriendshipsStatus.FRIENDS
 		await sync_to_async(friendship.save)(update_fields=["status"])
 
-		channel_layer = get_channel_layer()
 		payload = {
 			"type": "get_unblocked",
 			"username": self.user.username,
 		}
 
-		await channel_layer.group_send(f"user_{unblock_target.id}", payload)
+		await self.channel_layer.group_send(f"user_{unblock_target.id}", payload)
 
 	async def send_friend_request(self, data: dict):
 		target_username = await self._validate_user(data.get("username"))
@@ -179,13 +176,12 @@ class SocialUser:
 			status=Friendships.FriendshipsStatus.PENDING
 		)
 
-		channel_layer = get_channel_layer()
 		payload = {
 			"type": "get_friend_request",
 			"username": self.user.username,
 		}
 
-		await channel_layer.group_send(f"user_{target_user.id}", payload)
+		await self.channel_layer.group_send(f"user_{target_user.id}", payload)
 
 	async def remove_friend(self, data: dict, event_name: str):
 		"""
@@ -211,13 +207,12 @@ class SocialUser:
 
 		await sync_to_async(friendship.delete)()
 
-		channel_layer = get_channel_layer()
 		payload = {
 			"type": event_name,
 			"username": self.user.username,
 		}
 
-		await channel_layer.group_send(f"user_{target_user.id}", payload)
+		await self.channel_layer.group_send(f"user_{target_user.id}", payload)
 
 	async def accept_friend_request(self, data: dict):
 		target_username = await self._validate_user(data.get("username"))
@@ -234,13 +229,12 @@ class SocialUser:
 		friendship.status = Friendships.FriendshipsStatus.FRIENDS
 		await sync_to_async(friendship.save)(update_fields=["status"])
 
-		channel_layer = get_channel_layer()
 		payload = {
 			"type": "get_friend_request_accepted",
 			"username": self.user.username,
 		}
 
-		await channel_layer.group_send(f"user_{target_user.id}", payload)
+		await self.channel_layer.group_send(f"user_{target_user.id}", payload)
 
 	async def send_message(self, data: dict):
 		target_username = await self._validate_user(data.get("username"))
@@ -271,14 +265,12 @@ class SocialUser:
 			message_text=message
 		)
 
-		# Send a message to the target user's WebSocket group
-		channel_layer = get_channel_layer()
 		payload = {
 			"type": "get_message",
 			"message": message,
 			"username": self.user.username,
 		}
-		await channel_layer.group_send(f"user_{target_user.id}", payload)
+		await self.channel_layer.group_send(f"user_{target_user.id}", payload)
 
 	async def send_lobby_invite(self, data: dict):
 		target_username = await self._validate_user(data.get("username"))
@@ -288,14 +280,13 @@ class SocialUser:
 		except User.DoesNotExist:
 			raise ValueError(f"User '{target_username}' does not exist.")
 
-		channel_layer = get_channel_layer()
 		payload = {
 			"type": "get_lobby_invite",
 			"room_name": data.get("room_name"),
 			"username": self.user.username 
 		}
 
-		await channel_layer.group_send(f"user_{target_user.id}", payload)
+		await self.channel_layer.group_send(f"user_{target_user.id}", payload)
 
 	async def send_tournament_invite(self, data: dict):
 		target_username = await self._validate_user(data.get("username"))
@@ -305,11 +296,10 @@ class SocialUser:
 		except User.DoesNotExist:
 			raise ValueError(f"User '{target_username}' does not exist.")
 
-		channel_layer = get_channel_layer()
 		payload = {
 			"type": "get_tournament_invite",
 			"room_name": data.get("room_name"),
 			"username": self.user.username
 		}
 
-		await channel_layer.group_send(f"user_{target_user.id}", payload)
+		await self.channel_layer.group_send(f"user_{target_user.id}", payload)
