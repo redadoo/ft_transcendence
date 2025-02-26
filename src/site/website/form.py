@@ -15,6 +15,6 @@ class UserImageForm(forms.ModelForm):
 
         if user_avatar:
             if user_avatar.size > self.MAX_IMAGE_SIZE:
-                raise ValidationError("The image file is too large. Max size is 5MB.")
+                raise ValidationError("The image file is too large. Max size is 2MB.")
 
         return user_avatar
