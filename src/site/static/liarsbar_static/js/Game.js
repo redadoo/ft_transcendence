@@ -38,6 +38,43 @@ class Game
             card_sent: false,
             status: ''
         };
+
+		this.manageWindowClose();
+	}
+
+	handleExit(event)
+	{
+		const leavePage = window.confirm("Do you want to leave?");
+		if (leavePage)
+			this.game_ended(false);
+		else
+			history.pushState(null, document.title, location.href);
+	}
+
+	/**
+     * Handles the event of closing or navigating away from the game window.
+     * Ensures that the game socket is closed properly before leaving.
+     */
+	manageWindowClose()
+	{
+		history.pushState(null, document.title, location.href);
+
+		this.close_window_event_popstate = this.handleExit.bind(this);
+		this.close_window_event_beforeunload = (event) => {
+			event.preventDefault();
+			event.returnValue = "Are you sure you want to leave?";
+
+			this.shouldCleanupOnExit = true;
+		};
+
+		this.close_window_event_unload = () => {
+			if (this.shouldCleanupOnExit)
+				this.game_ended(false);
+		};
+
+		window.addEventListener("beforeunload", this.close_window_event_beforeunload);
+		window.addEventListener("unload", this.close_window_event_unload);
+		window.addEventListener('popstate', this.close_window_event_popstate, false);
 	}
 
 	/**
@@ -522,8 +559,10 @@ class Game
 
 	game_ended(isGamefinished)
 	{
+		document.getElementById('liarsbarOverlay').classList.add('d-none');
 		router.setupEventListeners();
-		if (this.sceneManager) {
+		if (this.sceneManager) 
+		{
 			this.sceneManager.dispose();
 			this.sceneManager = null;
 		}
@@ -567,6 +606,7 @@ class Game
 					this.selected_card(this.currentPlayer);
 					break;
 				case 'ENDED':
+					console.log("fffufuufufufuufufufufuufu");
 					this.game_ended(true);
 					break;
 				case 'PLAYER_DISCONNECTED':
