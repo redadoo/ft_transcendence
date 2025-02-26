@@ -65,7 +65,7 @@ class Game
 	 */
 	async setupMultiplayerLiarsBarSocket() 
 	{
-		this.gameSocket = new SocketManager();
+		this.gameSocket = new SocketManager(true);
 
 		const onOpen = () => {
 			this.gameSocket.send(JSON.stringify({ 
@@ -546,10 +546,9 @@ class Game
 	 * Handles incoming WebSocket messages.
 	 * @param {MessageEvent} event - The WebSocket message event.
 	 */
-	handleSocketMessage(event) 
+	handleSocketMessage(data) 
 	{
 		try {
-			const data = JSON.parse(event.data);
 			console.log("xxhahds", data);
 			switch (data.lobby_info.current_lobby_status) 
 			{

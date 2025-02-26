@@ -52,17 +52,8 @@ export default class TournamentPongMode extends PongMode {
 		 }));
 	}
 
-	handleSocketMessage(event)
+	handleSocketMessage(parsedData)
 	{
-		let parsedData;
-		try {
-			parsedData = JSON.parse(event.data);
-		} catch (error) {
-			console.error("Error parsing WebSocket message:", error);
-			console.log("Raw received data:", event.data);
-			return;
-		}
-
 		const {lobby_info, event_info } = parsedData;
 		if (!lobby_info || !event_info)
 		{

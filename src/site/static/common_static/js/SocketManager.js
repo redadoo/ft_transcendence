@@ -4,9 +4,17 @@
  */
 export default class SocketManager 
 {
-	constructor() {
+	constructor(activePing) {
 		this.socket = undefined;
 		this.connected = false;
+		this.activePing = activePing;
+		this.pingInterval = null;
+		this.lastPingTime = 0;
+		this.pingThreshold = 200; // ms threshold for slow connection
+		this.isSlowConnection = false;
+		// Optional callbacks for handling slow/normal connection events
+		this.onSlowConnection = null;    // Called when ping > pingThreshold
+		this.onNormalConnection = null;  // Called when ping returns to normal
 	}
 
 	/**
@@ -35,7 +43,7 @@ export default class SocketManager
 			this.socket.onopen = () => {
 				console.log('WebSocket connection opened');
 				this.connected = true;
-	
+				this.startPing();
 				if (onSocketOpen) 
 					onSocketOpen();
 			};
@@ -43,7 +51,7 @@ export default class SocketManager
 			this.socket.onclose = () => {
 				console.log('WebSocket connection closed');
 				this.connected = false;
-	
+				this.stopPing();
 				if (onSocketClose)
 					onSocketClose();
 			};
@@ -55,7 +63,21 @@ export default class SocketManager
 					onSocketError(error);
 			};
 
-			this.socket.onmessage = handleSocketMessage;
+			this.socket.onmessage = (event) => {
+				let data;
+				try {
+					data = JSON.parse(event.data);
+				} catch (e) {
+					console.error("Error parsing message:", e);
+					console.log("Raw received data:", event.data);
+					return;
+				}
+			
+				if (this.processPingMessage(data)) 
+					return;
+			
+				handleSocketMessage(data);
+			};
 		} catch (error) {
 			console.error('Failed to initialize WebSocket:', error.message);
 		}
@@ -88,7 +110,7 @@ export default class SocketManager
 			this.socket.onopen = () => {
 				console.log('WebSocket connection opened');
 				this.connected = true;
-	
+				this.startPing();
 				if (onSocketOpen) 
 					onSocketOpen();
 			};
@@ -96,7 +118,7 @@ export default class SocketManager
 			this.socket.onclose = () => {
 				console.log('WebSocket connection closed');
 				this.connected = false;
-	
+				this.stopPing();
 				if (onSocketClose)
 					onSocketClose();
 			};
@@ -108,7 +130,21 @@ export default class SocketManager
 					onSocketError(error);
 			};
 
-			this.socket.onmessage = handleSocketMessage;
+			this.socket.onmessage = (event) => {
+				let data;
+				try {
+					data = JSON.parse(event.data);
+				} catch (e) {
+					console.error("Error parsing message:", e);
+					console.log("Raw received data:", event.data);
+					return;
+				}
+			
+				if (this.processPingMessage(data)) 
+					return;
+			
+				handleSocketMessage(data);
+			};
 		} catch (error) {
 			console.error('Failed to initialize WebSocket:', error.message);
 		}
@@ -212,20 +248,100 @@ export default class SocketManager
 		return pathSegments[0] || 'default';
 	}
 
-	send(data) 
+	/**
+	 * Processes ping/pong messages.
+	 * @param {Object} data - The parsed message data.
+	 * @returns {boolean} - Returns true if the message was a ping/pong message.
+	 */
+	processPingMessage(data) 
 	{
-		if (!this.connected) 
+		if (this.activePing === false)
+			return;
+		
+		if (data.type && data.type === 'pong' && data.time) 
 		{
-			// console.warn('Cannot send data. WebSocket is not connected.');
-			// console.warn('data tryed to send.', data);
+			const currentPing = Date.now() - data.time;
+			console.log('Ping:', currentPing, 'ms');
+
+			if (currentPing > this.pingThreshold) 
+			{
+				if (!this.isSlowConnection) 
+				{
+					this.isSlowConnection = true;
+					console.warn("High ping detected. Disabling actions.");
+					if (this.onSlowConnection)
+						this.onSlowConnection(currentPing);
+				}
+			} 
+			else 
+			{
+				if (this.isSlowConnection) 
+				{
+					this.isSlowConnection = false;
+					console.log("Ping back to normal.");
+					if (this.onNormalConnection)
+						this.onNormalConnection(currentPing);
+				}
+			}
+			return true;
+		}
+		return false;
+	}
+
+	/**
+	 * Starts the ping mechanism.
+	 */
+	startPing() 
+	{
+		if (this.activePing === false)
+			return;
+		
+		this.sendPing();
+		this.pingInterval = setInterval(() => {
+			this.sendPing();
+		}, 5000);
+	}
+
+	/**
+	 * Stops the ping mechanism.
+	 */
+	stopPing() 
+	{
+		if (this.activePing === false)
+			return;
+
+		if (this.pingInterval) 
+		{
+			clearInterval(this.pingInterval);
+			this.pingInterval = null;
+		}
+	}
+
+	/**
+	 * Sends a ping message over the WebSocket.
+	 */
+	sendPing() {
+		if (!this.connected || this.activePing === false) return;
+		this.lastPingTime = Date.now();
+		const pingMessage = JSON.stringify({ type: 'ping', time: this.lastPingTime });
+		this.send(pingMessage);
+	}
+
+	/**
+	 * Sends data over the WebSocket connection.
+	 * @param {string} data - The data to send.
+	 */
+	send(data) {
+		if (!this.connected) {
 			return;
 		}
-		// console.log("send to socket this data : " + data);
 		this.socket.send(data);
 	}
 
-	close()
-	{
+	/**
+	 * Closes the WebSocket connection.
+	 */
+	close() {
 		if (this.socket) {
 			this.socket.close();
 			this.connected = false;

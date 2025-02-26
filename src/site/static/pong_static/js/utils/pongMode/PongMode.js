@@ -13,7 +13,9 @@ export default class PongMode {
 	constructor(game) 
 	{
 		this.game = game;
-		this.socket = new SocketManager();
+		this.socket = new SocketManager(true);
+		this.socket.onSlowConnection = this.handleSlowConnection.bind(this);
+		this.socket.onNormalConnection = this.handleNormalConnection.bind(this);
 	}
 
 	/**
@@ -40,17 +42,8 @@ export default class PongMode {
 	 * Handles incoming socket messages.
 	 * @param {Object} data - The incoming data from the socket.
 	 */
-	handleSocketMessage(event) 
+	handleSocketMessage(parsedData) 
 	{
-		let parsedData;
-		try {
-			parsedData = JSON.parse(event.data);
-		} catch (error) {
-			console.error("Error parsing WebSocket message:", error);
-			console.log("Raw received data:", event.data);
-			return;
-		}
-
 		const { lobby_info, event_info } = parsedData;
 		if (!lobby_info || !event_info) 
 		{
@@ -116,5 +109,15 @@ export default class PongMode {
 			const playerData = data.lobby_info.players[data.event_info.player_id];
 			this.game.AddUserToLobby(newPlayerId, playerData, this.socket);
 		}
+	}
+
+	handleSlowConnection(ping) 
+	{
+		console.warn(`High ping detected: ${ping} ms. Disabling player actions.`);
+	}
+
+	handleNormalConnection(ping) 
+	{
+		console.log(`Ping back to normal: ${ping} ms. Enabling player actions.`);
 	}
 }

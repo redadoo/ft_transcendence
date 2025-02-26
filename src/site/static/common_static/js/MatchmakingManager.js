@@ -38,7 +38,7 @@ export default class MatchmakingManager
 	 */
 	setupMatchmakingSocket()
 	{
-		this.gameSocket = new SocketManager();
+		this.gameSocket = new SocketManager(false);
 		this.gameSocket.initWebSocket(
 			`multiplayer/${this.gameName}/matchmaking`,
 			this.handleMatchmakingSocketMessage.bind(this),
@@ -50,11 +50,10 @@ export default class MatchmakingManager
 	 * Handles incoming messages from the matchmaking WebSocket.
 	 * @param {MessageEvent} event - The WebSocket message event.
 	 */
-	handleMatchmakingSocketMessage(event)
+	handleMatchmakingSocketMessage(data)
 	{
 		try
 		{
-			const data = JSON.parse(event.data);
 			switch (data.type) 
 			{
 				case 'setup_pong_lobby':

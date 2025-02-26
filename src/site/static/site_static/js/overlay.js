@@ -86,7 +86,7 @@ export default class SocialOverlayManager {
 			this.chatManager.currentUsername = currentUsername;
 
 			this.displayUsername.textContent = currentUsername;
-			this.socialData.socket = new SocketManager();
+			this.socialData.socket = new SocketManager(false);
 
 			this.socketHandler = new SocketHandler(
 				this.socialData,
@@ -98,7 +98,7 @@ export default class SocialOverlayManager {
 
 			this.socialData.socket.initWebSocket(
 				'social/',
-				this.socketHandler.handleSocketMessage.bind(this.socketHandler)
+				this.socketHandler.handleSocketMessage.bind(this.socketHandler),
 			);
 
 			this.chatManager.initialize();

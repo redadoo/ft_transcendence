@@ -101,6 +101,7 @@ class BasePongConsumer(AsyncWebsocketConsumer):
 		data = await self.parse_json(text_data)
 		if data.get("type") == "ping":
 			await self.safe_send({'type': 'pong', 'time': data.get('time')})
+			return
 		await self.handle_event(data)
 
 	async def handle_event(self, data: dict):

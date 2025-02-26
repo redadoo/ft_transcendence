@@ -11,11 +11,9 @@ export default class SocketHandler {
 		console.log('🔌 SocketHandler initialized');
 	}
 
-	handleSocketMessage(event) {
+	handleSocketMessage(socketData) {
 		try {
-			const socketData = JSON.parse(event.data);
 			console.log('🔍 Parsed socket data:', socketData);
-
 			const messageHandlers = {
 				'get_status_change': () => this.handleFriendStatusUpdate(socketData.friend_username, socketData.new_status),
 				'get_blocked': () => this.handleUserBlocked(socketData.username),
