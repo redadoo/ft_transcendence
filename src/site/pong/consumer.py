@@ -173,8 +173,6 @@ class PongSingleplayerConsumer(BasePongConsumer):
 		
 		if event_type == "init_player":
 			await self.lobby.add_player_to_lobby({"player_id": "-1"}, True)
-		if event_type == "quit_game":
-			match_manager.remove_match(self.lobby.room_group_name)
 
 class PongLobbyConsumer(BasePongConsumer):
 	async def connect(self):

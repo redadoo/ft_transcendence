@@ -3,9 +3,8 @@ import html from './html.js';
 import matchHistory from './matchHistory.js';
 import router from './router.js';
 import setupConfigEventListeners from './Config.js';
-import SocialOverlayManager from './overlay.js';
-import SocketHandler from './SocketHandler.js';
-import Game from '../../pong_static/js/Game.js';
+import PongGame from '../../pong_static/js/Game.js';
+import LiarsGame from '../../liarsbar_static/js/Game.js';
 import dateFormatter from './dateFormatter.js';
 import './Tournament.js';
 
@@ -143,20 +142,21 @@ const views = {
 	},
 
 	async pongScripts() {
-		const game = new Game();
-		await game.init();
-		game.sceneManager.animate();
+		const pongGame = new PongGame();
+		await pongGame.init();
+		pongGame.sceneManager.animate();
 	},
 
 	async singleplayerPongScripts() {
-		const game = new Game();
-		await game.init();
-		game.sceneManager.animate();
+		const pongGame = new PongGame();
+		await pongGame.init();
+		pongGame.sceneManager.animate();
 	},
 
-	liarsbarScripts() {
-		import('../../liarsbar_static/js/Game.js')
-		.catch(e => console.error('Liars bar script error:', e));
+	async liarsbarScripts() {
+		const liarsGame = new LiarsGame();
+		await liarsGame.init();
+		liarsGame.sceneManager.animate();
 	},
 
 	// Profile views
@@ -278,9 +278,9 @@ const views = {
 		const startButton = document.getElementById('startGame');
 		const backButton = document.getElementById('backButton');
 
-		const game = new Game();
-		await game.init();
-		game.sceneManager.animate();
+		const pongGame = new PongGame();
+		await pongGame.init();
+		pongGame.sceneManager.animate();
 
 		await new Promise(resolve => setTimeout(resolve, 1000));
 		console.log("room_name:", window.localStorage['room_name']);
@@ -329,9 +329,9 @@ const views = {
 			player1Avatar.src = data.image_url.avatar_url;
 		});
 
-		const game = new Game();
-		await game.init();
-		game.sceneManager.animate();
+		const pongGame = new PongGame();
+		await pongGame.init();
+		pongGame.sceneManager.animate();
 
 		backButton.addEventListener('click', () => {
 			game.game_ended(false);
@@ -374,9 +374,9 @@ const views = {
 	async tournamentScripts() {
 		const startButton = document.getElementById('startTournament');
 
-		const game = new Game();
-		await game.init();
-		game.sceneManager.animate();
+		const pongGame = new PongGame();
+		await pongGame.init();
+		pongGame.sceneManager.animate();
 
 
 		await new Promise(resolve => setTimeout(resolve, 1000));
@@ -395,9 +395,9 @@ const views = {
 	},
 
 	async tournamentGuestScripts() {
-		const game = new Game();
-		await game.init();
-		game.sceneManager.animate();
+		const pongGame = new PongGame();
+		await pongGame.init();
+		pongGame.sceneManager.animate();
 
 		await new Promise(resolve => setTimeout(resolve, 1000));
 		console.log("room_name:", window.localStorage['room_name']);

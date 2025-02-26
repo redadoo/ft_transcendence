@@ -68,7 +68,7 @@ class LiarsBarConsumer(AsyncWebsocketConsumer):
 	
 		self.lobby: Lobby = match_manager.get_match(self.room_name) 
 		if self.lobby == None:
-			self.lobby = match_manager.create_match("liarsbar", self.room_name,  LiarsBarGameManager(), "Lobby")
+			self.lobby = match_manager.create_match("liarsbar", self.room_name,  LiarsBarGameManager(), "lobby")
 
 		await self.channel_layer.group_add(self.lobby.room_group_name, self.channel_name)
 		await self.accept()
@@ -83,14 +83,7 @@ class LiarsBarConsumer(AsyncWebsocketConsumer):
 
 	async def receive(self, text_data):
 		data = json.loads(text_data)
-		print("sto a ???")
 		await self.lobby.manage_event(data)
-
-		print("sto a chidue")
-		event_type = data.get("event_name")
-		if event_type == "game_finished":
-			match_manager.remove_match(self.lobby.room_group_name)
-
 
 	async def lobby_state(self, event: dict):
 		"""Aggiorna lo stato lato client."""

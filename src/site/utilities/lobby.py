@@ -3,7 +3,6 @@ from enum import Enum
 from channels.layers import get_channel_layer
 from utilities.GameManager import GameManager
 
-
 class Lobby:
 	"""
 	A class representing a multiplayer lobby for managing the game state, players, and events.
@@ -16,7 +15,7 @@ class Lobby:
 		ENDED = "ended"
 		PLAYER_DISCONNECTED = "PLAYER_DISCONNECTED"
 
-	def __init__(self, game_name: str, room_name: str, game_manager: GameManager):
+	def __init__(self, game_name: str, room_name: str, game_manager: GameManager, match_manager):
 		"""
 		Initializes a new lobby with the specified room name and game manager.
 
@@ -28,9 +27,11 @@ class Lobby:
 		self.room_group_name = f"{game_name}_lobby_{room_name}"
 		self.lobby_status = Lobby.LobbyStatus.TO_SETUP
 		self.channel_layer = get_channel_layer()
+		self.match_manager = match_manager
 		self.update_lock = asyncio.Lock()
 		self.game_manager = game_manager
 		self.ready_players = set()
+		self.room_name = room_name
 
 	async def broadcast_message(self, message: dict):
 		"""
@@ -63,7 +64,7 @@ class Lobby:
 			case "unexpected_quit":
 				await self.close_lobby(data)
 			case "quit_game":
-				pass
+				await self.close_lobby(data)
 			case _:
 				print(f"Unhandled event type: {event_type}. Full data: {data}")
 	
@@ -177,6 +178,8 @@ class Lobby:
 				"event_name": "close_lobby",
 			}
 			await self.broadcast_message(data_to_send)
+
+		self.match_manager.remove_match(self.room_name)
 
 	def to_dict(self) -> dict:
 		"""

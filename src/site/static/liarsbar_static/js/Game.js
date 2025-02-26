@@ -18,7 +18,7 @@ const cardTextures = {
  * Game class for managing the Liar's Bar multiplayer game environment.
  * Handles player setup, scene management, lighting, and WebSocket communication.
  */
-class Game 
+export default class Game 
 {
 	constructor() {
 		this.ambientLight = null;
@@ -30,6 +30,12 @@ class Game
 		this.lastHand = null;
 		this.lastRequiredCard = null;
 		this.lastElapsedTime = null;
+
+		this.close_window_event_beforeunload = null;
+		this.close_window_event_popstate = null;
+		this.close_window_event_unload = null;
+		this.shouldCleanupOnExit = false;
+		this.isSceneCreated = false;
 
 		this.previousPlayerState = {
 			selected_cards: [],
@@ -370,7 +376,7 @@ class Game
 			const playerId = playerData.player_id;
 
 			// Verifica se il giocatore esiste già
-			if (this.players[playerId]) 
+			if (this.players && this.players[playerId]) 
 			{
 				// Aggiorna lo stato del giocatore esistente
 				this.players[playerId].updateState(data.lobby_info);
@@ -561,6 +567,7 @@ class Game
 	{
 		document.getElementById('liarsbarOverlay').classList.add('d-none');
 		router.setupEventListeners();
+
 		if (this.sceneManager) 
 		{
 			this.sceneManager.dispose();
@@ -568,17 +575,23 @@ class Game
 		}
 
 		this.players = null;
-
 		let event_name = isGamefinished === true ? "quit_game" : "unexpected_quit";
-		if (this.gameSocket && this.gameSocketsocket) {
+
+		if (this.gameSocket) 
+		{
 			this.gameSocket.send(JSON.stringify({
 				type: event_name,
 				player_id: this.player_id
 			}));
 			this.gameSocket.close();
 		}
+
 		this.cleanupWindowClose();
-		router.navigateTo('/multiplayer');
+		
+		if (isGamefinished === true)
+			router.navigateTo('/match-result');
+		else
+			router.navigateTo('/multiplayer');
 	}
 
 	/**
@@ -588,7 +601,6 @@ class Game
 	handleSocketMessage(data) 
 	{
 		try {
-			console.log("xxhahds", data);
 			switch (data.lobby_info.current_lobby_status) 
 			{
 				case 'TO_SETUP':
@@ -606,7 +618,6 @@ class Game
 					this.selected_card(this.currentPlayer);
 					break;
 				case 'ENDED':
-					console.log("fffufuufufufuufufufufuufu");
 					this.game_ended(true);
 					break;
 				case 'PLAYER_DISCONNECTED':
@@ -619,8 +630,3 @@ class Game
 		}
 	}
 }
-
-// Initialize and start the game
-const game = new Game();
-await game.init();
-game.sceneManager.animate();

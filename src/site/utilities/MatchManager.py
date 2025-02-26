@@ -29,9 +29,9 @@ class MatchManager:
 		"""
 		if room_name not in self.matches:
 			if match_type == "tournament":
-				self.matches[room_name] = Tournament(game_name, room_name, game_manager)
+				self.matches[room_name] = Tournament(game_name, room_name, game_manager,  self)
 			else:
-				self.matches[room_name] = Lobby(game_name, room_name, game_manager)
+				self.matches[room_name] = Lobby(game_name, room_name, game_manager, self)
 		return self.matches[room_name]
 
 	def get_match(self, room_name: str):
@@ -53,5 +53,6 @@ class MatchManager:
 		Args:
 			room_name (str): The name of the match room to remove.
 		"""
-		if room_name in self.matches:
-			del self.matches[room_name]
+		removed_match = self.matches.pop(room_name, None)
+		if removed_match is None:
+			print(f"Match room '{room_name}' not found.")

@@ -3,13 +3,12 @@ from django.conf import settings
 from django.forms import ValidationError
 from pong.models import PongMatch
 from liarsbar.models import LiarsBarMatch
-from datetime import datetime
+from datetime import datetime, timezone
 from django.contrib.auth.models import AbstractUser, Group, Permission
 from django.core.validators import MinLengthValidator, RegexValidator, MinValueValidator
 from django.utils.timezone import now
 from itertools import chain
-from datetime import datetime
-
+from django.utils import timezone
 
 class User(AbstractUser):
 	"""
@@ -203,6 +202,11 @@ class UserStats(models.Model):
 			self.liarsbar_win += 1
 		else:
 			self.liarsbar_lose += 1
+		if match.end_date.tzinfo is None:
+			match.end_date = timezone.make_aware(match.end_date)
+
+		if match.start_date.tzinfo is None:
+			match.start_date = timezone.make_aware(match.start_date)
 		game_duration = match.end_date - match.start_date
 		if not self.time_on_site:
 			self.time_on_site = game_duration
