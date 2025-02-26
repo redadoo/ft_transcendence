@@ -9,7 +9,6 @@ from utilities.MatchManager import MatchManager
 from autobahn.websocket.protocol import Disconnected
 from pong.scripts.PongGameManager import PongGameManager
 from channels.generic.websocket import AsyncWebsocketConsumer
-match_manager = MatchManager()
 
 class PongMatchmaking(AsyncWebsocketConsumer):
 	matchmaking_queue = set()
@@ -73,252 +72,192 @@ class PongMatchmaking(AsyncWebsocketConsumer):
 			"room_name": room_name
 		}))
 
-class PongMultiplayerConsumer(AsyncWebsocketConsumer):
+match_manager = MatchManager()
 
+class BasePongConsumer(AsyncWebsocketConsumer):
+	"""
+	Base consumer that provides common functionality for joining/leaving groups,
+	sending messages safely, and parsing incoming JSON.
+	"""
+	async def join_group(self, group_name: str):
+		await self.channel_layer.group_add(group_name, self.channel_name)
+
+	async def leave_group(self, group_name: str):
+		await self.channel_layer.group_discard(group_name, self.channel_name)
+
+	async def safe_send(self, data: dict):
+		try:
+			await self.send(text_data=json.dumps(data))
+		except Disconnected:
+			print(f"Attempted to send on closed connection. Data: {data}")
+
+	async def parse_json(self, text_data: str) -> dict:
+		try:
+			return json.loads(text_data)
+		except json.JSONDecodeError as e:
+			print(f"Error decoding JSON: {e}")
+			return {}
+	async def receive(self, text_data: str):
+		data = await self.parse_json(text_data)
+		if data.get("type") == "ping":
+			await self.safe_send({'type': 'pong', 'time': data.get('time')})
+		await self.handle_event(data)
+
+	async def handle_event(self, data: dict):
+		"""
+		This method should be overridden in each subclass to handle
+		consumer-specific events.
+		"""
+		pass
+
+	async def send_to_social(self, data: dict):
+		if hasattr(self, "user_id"):
+			await self.channel_layer.group_send(f"user_{self.user_id}", data)
+
+	async def lobby_state(self, event: dict):
+		"""
+		Sends updated state information to the client.
+		Falls back to self.lobby.to_dict() if no snapshot is provided.
+		"""
+		snapshot_key = "lobby_snapshot" if "lobby_snapshot" in event else "tournament_snapshot"
+		state_info = event.get(snapshot_key) or (self.lobby.to_dict() if self.lobby else {})
+		data_to_send = {
+			"event_info": event,
+			"lobby_info": state_info,
+		}
+		await self.safe_send(data_to_send)
+
+class PongMultiplayerConsumer(BasePongConsumer):
 	async def connect(self):
 		self.user_id = self.scope["user"].id
-		
 		self.room_name = self.scope["url_route"]["kwargs"]["room_name"]
-		self.lobby = match_manager.get_match(self.room_name)
-		if self.lobby == None:
-			self.lobby = match_manager.create_match("pong", self.room_name,  PongGameManager(), "lobby")
-
-		await self.channel_layer.group_add(self.lobby.room_group_name, self.channel_name)
-		await self.accept()
-
-	async def disconnect(self, close_code):
-		await self.channel_layer.group_discard(self.lobby.room_group_name, self.channel_name)
-
-	async def receive(self, text_data):
-		data = json.loads(text_data)
-		await self.lobby.manage_event(data)
-
-	async def lobby_state(self, event: dict):
-		"""Aggiorna lo stato lato client."""
-
-		lobby_info = event.get("lobby_snapshot") or self.lobby.to_dict()
-
-		data_to_send = {
-			"event_info": event,
-			"lobby_info": lobby_info
-		}
-		try:
-			await self.send(text_data=json.dumps(data_to_send))
-		except Disconnected:
-			print(f"Attempted to send a message on a closed websocket connection. data : {data_to_send}")
-
-class PongSingleplayerConsumer(AsyncWebsocketConsumer):
-
-	def generate_random_room_name(self) -> str:
-		room_name_dict = self.scope["url_route"]["kwargs"]
-		room_name_components = [str(value) for value in room_name_dict.values()]
-		room_name_components.append(str(uuid.uuid4()))
-		return "_".join(room_name_components)
-
-	async def connect(self):
-		self.room_name = self.generate_random_room_name()
-		self.lobby: Lobby = match_manager.create_match("pong", self.room_name,  PongGameManager(), "Lobby")
-
-		await self.channel_layer.group_add(self.lobby.room_group_name, self.channel_name)
-		await self.accept()
-
-	async def disconnect(self, close_code):
-		await self.channel_layer.group_discard(self.lobby.room_group_name, self.channel_name)
-
-	async def receive(self, text_data):
-		data = json.loads(text_data)
-		if data.get("type") == "client_ready":
-			await self.lobby.mark_player_ready({"player_id" : "-1"})
-		await self.lobby.manage_event(data)
-		if data.get("type") == "init_player":
-			await self.lobby.add_player_to_lobby({"player_id" : "-1"}, True)
-		if data.get("type") == "quit_game":
-			match_manager.remove_match(self.lobby.room_group_name)
-
-
-	async def lobby_state(self, event: dict):
-		"""Aggiorna lo stato lato client."""
-
-		lobby_info = event.get("lobby_snapshot") or self.lobby.to_dict()
-
-		data_to_send = {
-			"event_info": event,
-			"lobby_info": lobby_info
-		}
-
-		try:
-			await self.send(text_data=json.dumps(data_to_send))
-		except Disconnected:
-			print(f"Attempted to send a message on a closed websocket connection. data : {data_to_send}")
-
-class PongLobbyConsumer(AsyncWebsocketConsumer):
-	
-	async def send_to_social(self, data):
-		await self.channel_layer.group_send(f"user_{self.user_id}", data)
-
-	async def connect(self):
-		"""
-		Connects the user to a Pong lobby.
-
-		If no room name is provided via the URL route, a new unique room name is generated.
-		In that case, the consumer sends a notification to the social consumer so that it
-		can forward lobby invites. Then, the consumer retrieves or creates a lobby for the
-		room, adds the connection to the lobby's group, and accepts the WebSocket.
-		"""
-		self.user = self.scope["user"]
-		self.user_id = self.user.id
-		self.room_name = self.scope["url_route"]["kwargs"].get("room_name")
-		
-		#if room_name is not in url_route we are host of the lobby
-		if self.room_name is None:
-			self.room_name = str(uuid.uuid4())
-			await self.send_to_social({
-					"type": "send_pong_lobby",
-					"room_name": self.room_name,
-				})
 
 		self.lobby: Lobby = match_manager.get_match(self.room_name)
 		if self.lobby is None:
 			self.lobby: Lobby = match_manager.create_match("pong", self.room_name, PongGameManager(), "lobby")
 
-		await self.channel_layer.group_add(self.lobby.room_group_name, self.channel_name)
+		await self.join_group(self.lobby.room_group_name)
 		await self.accept()
 
 	async def disconnect(self, close_code):
-		"""
-		Disconnects the user from the lobby by removing them from the lobby group.
-		"""
-		await self.channel_layer.group_discard(self.lobby.room_group_name, self.channel_name)
+		if self.lobby:
+			await self.leave_group(self.lobby.room_group_name)
 
-	async def receive(self, text_data: str):
-		"""
-		Receives a JSON-formatted message from the WebSocket and delegates event handling to the lobby.
+	async def handle_event(self, data: dict):
+		if self.lobby:
+			await self.lobby.manage_event(data)
 
-		Args:
-			text_data (str): The JSON message received from the client.
-		"""
-		try:
-			data = json.loads(text_data)
-		except json.JSONDecodeError as e:
-			print(f"Error decoding JSON: {e}")
-			return
+class PongSingleplayerConsumer(BasePongConsumer):
+	def generate_random_room_name(self) -> str:
+		room_components = [str(v) for v in self.scope["url_route"]["kwargs"].values()]
+		room_components.append(str(uuid.uuid4()))
+		return "_".join(room_components)
 
+	async def connect(self):
+		self.room_name = self.generate_random_room_name()
+		self.lobby: Lobby = match_manager.create_match("pong", self.room_name, PongGameManager(), "Lobby")
+		await self.join_group(self.lobby.room_group_name)
+		await self.accept()
+
+	async def disconnect(self, close_code):
+		if self.lobby:
+			await self.leave_group(self.lobby.room_group_name)
+
+	async def handle_event(self, data: dict):
 		event_type = data.get("type")
 		if event_type == "client_ready":
-			data_to_send = {
-				"type": "lobby_state",
-				"event_name": "host_started_game",
-			}
-			await self.lobby.broadcast_message(data_to_send)
+			await self.lobby.mark_player_ready({"player_id": "-1"})
 		
 		await self.lobby.manage_event(data)
-
-		event_type = data.get("event_name")
-		if event_type == "game_finished":
+		
+		if event_type == "init_player":
+			await self.lobby.add_player_to_lobby({"player_id": "-1"}, True)
+		if event_type == "quit_game":
 			match_manager.remove_match(self.lobby.room_group_name)
 
-	async def lobby_state(self, event: dict):
-		"""
-		Sends updated lobby state information to the client.
-
-		Additionally, if the event indicates that a new player has joined (via the 'player_join'
-		event name), it fetches the player's username and notifies the social consumer so that
-		related UI updates can be triggered on the client side.
-
-		Args:
-			event (dict): The event data containing at least an 'event_info' key.
-						  It may also include 'event_name' and 'player_id' if the event is related
-						  to a player joining.
-		"""
-		lobby_info = event.get("lobby_snapshot") or self.lobby.to_dict()
-
-		data_to_send = {
-			"event_info": event,
-			"lobby_info": lobby_info
-		}
-
-		event_name = event.get("event_name")
-		player_id = event.get("player_id")
-
-		if event_name == "player_join" and player_id:
-			user = await sync_to_async(User.objects.get)(id=player_id)
-			await self.send_to_social({
-					"type": "user_join_lobby",
-					"username": user.username,
-				})
-		try:
-			await self.send(text_data=json.dumps(data_to_send))
-		except Disconnected:
-			print(f"Attempted to send a message on a closed websocket connection. data : {data_to_send}")
-
-class PongTournament(AsyncWebsocketConsumer):
-
-	async def send_to_social(self, data):
-		await self.channel_layer.group_send(f"user_{self.user_id}", data)
-
+class PongLobbyConsumer(BasePongConsumer):
 	async def connect(self):
 		self.user = self.scope["user"]
 		self.user_id = self.user.id
 		self.room_name = self.scope["url_route"]["kwargs"].get("room_name")
 
-		#if room_name is not in url_route we are host of the tournament
+		# If no room_name is provided, generate one and notify via the social channel(for manage lobby invite).
 		if self.room_name is None:
 			self.room_name = str(uuid.uuid4())
 			await self.send_to_social({
-					"type": "send_pong_tournament",
-					"room_name": self.room_name,
-				})
+				"type": "send_pong_lobby",
+				"room_name": self.room_name,
+			})
 
-		self.tournament: Tournament = match_manager.get_match(self.room_name) 
-		if self.tournament is None:
-			self.tournament: Tournament = match_manager.create_match("pong", self.room_name, PongGameManager(), "tournament")
+		self.lobby: Lobby = match_manager.get_match(self.room_name)
+		if self.lobby is None:
+			self.lobby: Lobby = match_manager.create_match("pong", self.room_name, PongGameManager(), "lobby")
 
-		await self.channel_layer.group_add(self.tournament.room_group_name, self.channel_name)
+		await self.join_group(self.lobby.room_group_name)
 		await self.accept()
 
 	async def disconnect(self, close_code):
-		"""
-		Disconnects the user from the lobby by removing them from the lobby group.
-		"""
-		await self.channel_layer.group_discard(self.tournament.room_group_name, self.channel_name)
+		if self.lobby:
+			await self.leave_group(self.lobby.room_group_name)
 
-	async def receive(self, text_data: str):
-		"""
-		Receives a JSON-formatted message from the WebSocket and delegates event handling to the tournament.
+	async def handle_event(self, data: dict):
+		event_type = data.get("type")
+		if event_type == "client_ready":
+			await self.lobby.broadcast_message({
+				"type": "lobby_state",
+				"event_name": "host_started_game",
+			})
 
-		Args:
-			text_data (str): The JSON message received from the client.
-		"""
-		
-		try:
-			data = json.loads(text_data)
-		except json.JSONDecodeError as e:
-			print(f"Error decoding JSON: {e}")
-			return
+		await self.lobby.manage_event(data)
 
+		if data.get("event_name") == "game_finished":
+			match_manager.remove_match(self.lobby.room_group_name)
+
+	async def lobby_state(self, event: dict):
+		if event.get("event_name") == "player_join" and event.get("player_id"):
+			user = await sync_to_async(User.objects.get)(id=event["player_id"])
+			await self.send_to_social({
+				"type": "user_join_lobby",
+				"username": user.username,
+			})
+		await super().lobby_state(event)
+
+class PongTournament(BasePongConsumer):
+	async def connect(self):
+		self.user = self.scope["user"]
+		self.user_id = self.user.id
+		self.room_name = self.scope["url_route"]["kwargs"].get("room_name")
+
+		if self.room_name is None:
+			self.room_name = str(uuid.uuid4())
+			await self.send_to_social({
+				"type": "send_pong_tournament",
+				"room_name": self.room_name,
+			})
+
+		self.tournament: Tournament = match_manager.get_match(self.room_name)
+		if self.tournament is None:
+			self.tournament: Tournament = match_manager.create_match("pong", self.room_name, PongGameManager(), "tournament")
+
+		await self.join_group(self.tournament.room_group_name)
+		await self.accept()
+
+	async def disconnect(self, close_code):
+		if self.tournament:
+			await self.leave_group(self.tournament.room_group_name)
+
+	async def handle_event(self, data: dict):
 		await self.tournament.manage_event(data)
 
 	async def lobby_state(self, event: dict):
-		"""Aggiorna lo stato lato client."""
-		
-		tournament_info = event.get("tournament_snapshot") or self.tournament.to_dict()
-
-		data_to_send = {
-			"event_info": event,
-			"lobby_info": tournament_info
-		}
-
-		event_name = event.get("event_name")
-		player_id = event.get("player_id")
-
-		if event_name == "player_join" and player_id:
-			user = await sync_to_async(User.objects.get)(id=player_id)
+		if event.get("event_name") == "player_join" and event.get("player_id"):
+			user = await sync_to_async(User.objects.get)(id=event["player_id"])
 			await self.send_to_social({
-					"type": "user_join_tournament",
-					"username": user.username,
-				})
+				"type": "user_join_tournament",
+				"username": user.username,
+			})
 		else:
-			try:
-				await self.send(text_data=json.dumps(data_to_send))
-			except Disconnected:
-				print(f"Attempted to send a message on a closed websocket connection. data : {data_to_send}")
+			await self.safe_send({
+				"event_info": event,
+				"lobby_info": event.get("tournament_snapshot") or self.tournament.to_dict(),
+			})
