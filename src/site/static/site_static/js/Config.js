@@ -36,8 +36,15 @@ const setupConfigEventListeners = async () => {
 			try {
 				const formData = new FormData();
 				formData.append('user_avatar', fileInput.files[0]);
-				await api.updateProfileImage(formData);
-				alert('Image updated successfully. Go to the homepage to see changes');
+				await api.updateProfileImage(formData).then((response) => {
+					console.log('Image upload response:', response);
+					if (response == false) {
+						alert('Error uploading image');
+					}
+					else {
+						alert('Image uploaded successfully');
+					}
+				});
 			} catch (error) {
 				console.error('Error uploading image:', error);
 				alert('Error uploading image');
