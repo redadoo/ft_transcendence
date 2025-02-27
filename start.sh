@@ -58,14 +58,14 @@ function stop_spinner {
 }
 
 disable_local_database() {
-	if sudo lsof -i :5432 > /dev/null; then
-		sudo systemctl stop postgresql
+	if lsof -i :5432 > /dev/null; then
+		systemctl stop postgresql
 	fi
 }
 
 enable_local_database() {
-	if ! sudo lsof -i :5432 > /dev/null; then
-		sudo systemctl start postgresql
+	if ! lsof -i :5432 > /dev/null; then
+		systemctl start postgresql
 	fi
 }
 

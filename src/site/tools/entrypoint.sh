@@ -32,4 +32,4 @@ echo "Collecting static files..."
 python manage.py collectstatic --noinput
 
 echo "Starting Gunicorn..."
-exec gunicorn -c config/gunicorn/dev.py
+exec gunicorn -c /home/evocatur/gunicorn/dev.py

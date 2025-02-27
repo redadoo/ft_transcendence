@@ -121,13 +121,29 @@ export default class SceneManager
 	 * @param {Object} options - Renderer options.
 	 * @param {number} options.shadowMapType - Shadow map type.
 	 */
-	initializeRenderer(shadowMapType) 
-	{
-		this.renderer = new THREE.WebGLRenderer({ antialias: true });
-		this.renderer.setSize(window.innerWidth, window.innerHeight);
-		this.renderer.shadowMap.enabled = true;
-		this.renderer.shadowMap.type = shadowMapType;
-		document.body.appendChild(this.renderer.domElement);
+	initializeRenderer(shadowMapType) {
+		try {
+			const canvas = document.createElement('canvas');
+			
+			const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
+			if (!gl) {
+				console.error('WebGL not supported on this device/browser.');
+				return;
+			}
+
+			const contextOptions = { antialias: true, powerPreference: "high-performance" };
+			this.renderer = new THREE.WebGLRenderer(contextOptions);
+			if (!this.renderer) {
+				throw new Error('Failed to initialize WebGLRenderer');
+			}
+			this.renderer.setPixelRatio(window.devicePixelRatio);  // Handles high-DPI displays
+			this.renderer.setSize(window.innerWidth, window.innerHeight);
+			this.renderer.shadowMap.enabled = true;
+			this.renderer.shadowMap.type = shadowMapType;
+			document.body.appendChild(this.renderer.domElement);
+		} catch (error) {
+			console.error("WebGLRenderer error:", error);
+		}
 	}
 
 	/**

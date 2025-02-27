@@ -35,8 +35,8 @@ services:
     networks: 
       - backend
     volumes:
-      - static_volume:/home/app/ft_transcendence/staticfiles
-      - media_volume:/home/app/ft_transcendence/media
+      - static_volume:/home/evocatur/ft_transcendence/staticfiles
+      - media_volume:/home/evocatur/ft_transcendence/media
     depends_on:
       - postgres
       - redis
@@ -55,8 +55,8 @@ services:
     depends_on: 
       - gunicorn
     volumes:
-      - static_volume:/home/app/ft_transcendence/staticfiles
-      - media_volume:/home/app/ft_transcendence/media
+      - static_volume:/home/evocatur/ft_transcendence/staticfiles
+      - media_volume:/home/evocatur/ft_transcendence/media
   daphne:
     image: daphne
     build:
@@ -74,22 +74,10 @@ services:
 volumes:
   pg_data:
     driver: local
-    driver_opts:
-      type: none
-      device: /home/evocatur/goinfree/data/pg_data
-      o: bind
   static_volume:
     driver: local
-    driver_opts:
-      type: none
-      device: /home/evocatur/goinfree/data/static_volume
-      o: bind
   media_volume:
     driver: local
-    driver_opts:
-      type: none
-      device: /home/evocatur/goinfree/data/media_volume
-      o: bind
 
 networks:
   backend:
