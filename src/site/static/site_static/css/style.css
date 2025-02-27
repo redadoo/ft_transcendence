@@ -2100,8 +2100,6 @@ label {
 .card-container {
 	position: absolute;
 	bottom: 0;
-	
-
 }
 
 .black-bar {
@@ -2188,4 +2186,131 @@ label {
     width: 120px;
     height: 120px;
 }
+
+#verticalIcons {
+    position: fixed;
+    top: 9vh; /* Posizione dall'alto relativa all'altezza dello schermo */
+    right: 2vw; /* Posizione dal bordo destro relativa alla larghezza dello schermo */
+    display: flex;
+    flex-direction: column;
+    gap: 1.5vh; /* Spazio tra le icone */
+    z-index: 1000;
+}
+
+/* Contenitore icona + testo */
+.icon-container {
+    display: flex;
+    align-items: center;
+    gap: 10px; /* Spazio tra testo e icona */
+	justify-content: flex-end; /* Testo sempre accanto all'icona */
+}
+
+/* Testo accanto alle icone */
+.icon-text {
+    font-family: 'PRESS START 2P', sans-serif;
+    font-size: 0.8vw; /* Adatta alla dimensione dello schermo */
+    font-weight: bold;
+    color: white;
+    text-shadow: 0 0 5px rgba(0, 0, 0, 0.7);
+    white-space: nowrap; /* Evita che il testo vada a capo */
+	text-align: right; /* Allinea il testo a destra */
+	visibility: hidden;
+}
+
+.icon-text .number {
+    color: yellow;
+    font-weight: bold;
+    text-shadow: 0 0 5px rgba(255, 215, 0, 0.8); /* Glow giallo */
+}
+
+
+.icon {
+    width: 8vw; /* Larghezza delle icone relativa alla larghezza dello schermo */
+    max-width: 70px; /* Impedisce che diventino troppo grandi su schermi grandi */
+    min-width: 30px; /* Impedisce che diventino troppo piccole su schermi piccoli */
+    height: auto;
+}
+
+/* Stato ATTIVO - Effetto glow blu con leggera espansione */
+.icon.active {
+    transform: scale(1.1);
+    filter: drop-shadow(0 0 12px rgba(30, 144, 255, 0.7));
+    outline: 2px solid rgba(30, 144, 255, 0.8);
+    transition: all 0.3s ease-in-out;
+    z-index: 10;
+	animation: iconPulsate 1.5s ease-in-out infinite;
+}
+
+@keyframes iconDiedFast {
+    0% {
+        transform: scale(1);
+        filter: brightness(1);
+        opacity: 1;
+    }
+    30% {
+        filter: brightness(2) drop-shadow(0 0 10px red);
+        transform: scale(1.2);
+        opacity: 1;
+    }
+    60% {
+        filter: grayscale(100%) brightness(0.6);
+        transform: scale(0.9);
+        opacity: 0.8;
+    }
+    100% {
+        filter: grayscale(100%) brightness(0.3);
+        transform: scale(0.85);
+        opacity: 0.5;
+    }
+}
+
+/* Applica l'animazione quando l'icona diventa "morta" */
+.icon.died {
+    animation: iconDiedFast 0.5s ease-out forwards;
+}
+/* Effetto pulsante per lo stato attivo */
+@keyframes iconPulsate {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.15); }
+    100% { transform: scale(1); }
+}
+
+
+/* Stile per il testo centrale */
+.central-text {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-family: 'PRESS START 2P', sans-serif;
+    font-size: 10vw;
+    text-align: center;
+    z-index: 9999;
+    color: white;
+    font-weight: bold;
+    opacity: 0;
+    pointer-events: none; /* Non interagibile quando invisibile */
+    transition: opacity 0.3s ease;
+}
+
+/* Animazione che rende visibile la scritta e la fa sparire */
+@keyframes fadeInOut {
+    0% { opacity: 0; }
+    20% { opacity: 1; }
+    80% { opacity: 1; }
+    100% { opacity: 0; }
+}
+
+/* Testo per "DOUBT!" */
+.central-text.doubt {
+    color: red;
+    font-size: 4.5vw; /* Più grande per "DOUBT!" */
+}
+
+/* Testo per "CARDS SENT" */
+.central-text.cards-sent {
+    color: white;
+    font-size: 2.5vw;  /* Più piccolo per "CARDS SENT" */
+}
+
 /* ----------------------------------------------------------------------------------- */

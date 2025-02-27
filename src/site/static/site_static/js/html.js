@@ -279,7 +279,7 @@ const html = {
 	`,
 
 	liarsbarOverlay: `
-	
+
 		<div class="container-fluid">
 		 <!-- Orologio posizionato in alto al centro -->
 		<div id="clockOverlay" style="position: fixed; top: 80px; left: 50%; transform: translateX(-50%); z-index: 1000;">
@@ -287,6 +287,25 @@ const html = {
 				<img id="clockImage" src="http://127.0.0.1:8000/media/png/timer.png" alt="Orologio">
 				<div id="clockText"></div>
 			</div>
+		</div>
+		<div id="centralText" class="central-text">CARDS SENT</div>
+		<div id="verticalIcons">
+			    <div class="icon-container">
+					<span class="icon-text">Claims <span class="number">5</span> <span class="card-name">Ace</span></span>
+					<img src="http://127.0.0.1:8000/media/png/rimuru.png" alt="Icon 0" class="icon ">
+				</div>
+				<div class="icon-container">
+					<span class="icon-text">Claims <span class="number">3</span> <span class="card-name">Ace</span></span>
+					<img src="http://127.0.0.1:8000/media/png/kuriboh.png" alt="Icon 1" class="icon">
+				</div>
+				<div class="icon-container">
+					<span class="icon-text">Claims <span class="number">7</span> <span class="card-name">Ace</span></span>
+					<img src="http://127.0.0.1:8000/media/png/amongus.png" alt="Icon 2" class="icon">
+				</div>
+				<div class="icon-container">
+					<span class="icon-text">Claims <span class="number">2</span> <span class="card-name">Ace</span></span>
+					<img src="http://127.0.0.1:8000/media/png/kingboh.png" alt="Icon 3" class="icon">
+				</div>
 		</div>
 		<div class="card-container">
 		<div class="row h-100"> 

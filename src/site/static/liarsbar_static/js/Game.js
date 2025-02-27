@@ -26,6 +26,7 @@ export default class Game
 		this.lightHelper = null;
 		this.gameSocket = null;
 		this.players = {};
+		this.playersOrder = [];
 		this.currentPlayer = null;
 		this.lastHand = null;
 		this.lastRequiredCard = null;
@@ -256,30 +257,33 @@ export default class Game
 	 * Adds a user to the lobby by cloning the human model and updating the scene.
 	 * @param {Object} data - Data about the joining player.
 	 */
-	AddUserToLobby(data) 
-	{
-
-		
+	AddUserToLobby(data) {
 		const joinedPlayerId = data.event_info.player_id;
+	
+		// Se il player non è già nell'array di ordine, lo aggiungiamo
+		if (!this.playersOrder.includes(joinedPlayerId)) {
+			this.playersOrder.push(joinedPlayerId);
+		}
+	
+		// Creiamo il nuovo giocatore
 		if (this.player_id == joinedPlayerId)
 			this.players[joinedPlayerId] = new LiarsBarPlayer(this.gameSocket, joinedPlayerId);
 		else
 			this.players[joinedPlayerId] = new LiarsBarPlayer(null, joinedPlayerId);
-		if (Object.keys(this.players).length === 4) 
-		{
+	
+		// Se la lobby è completa, avviamo il gioco
+		if (this.playersOrder.length === 4) {
 			this.gameSocket.send(JSON.stringify({ type: 'client_ready' }));
 			this.setCameraForPlayer(data);
 			document.getElementById('liarsbarOverlay').classList.remove('d-none');
 		}
 	}
+	
 
 
 	setCameraForPlayer(data) {
-		// Ottieni l'array dei giocatori
-		const playersArray = Object.values(data.lobby_info.players);
-	
 		// Trova l'indice del giocatore locale (quello con player_id)
-		const playerIndex = playersArray.findIndex(player => player.player_id === this.player_id);
+		const playerIndex = this.playersOrder.indexOf(this.player_id);
 		console.log(playerIndex);
 		if (playerIndex === -1) {
 			console.warn("Player ID non trovato nella lista dei giocatori!");
@@ -433,6 +437,53 @@ export default class Game
 			}
 		}
 		}
+	
+		updateIcons(data) {
+			const icons = document.querySelectorAll("#verticalIcons .icon");
+			const iconTexts = document.querySelectorAll("#verticalIcons .icon-text");
+		
+			if (!data || !data.lobby_info || !data.lobby_info.card_required) {
+				console.error("Errore: lobby_info non definito o mancante.");
+				return;
+			}
+		
+			const cardRequired = data.lobby_info.card_required;
+		
+			// Iteriamo usando l'ordine fisso salvato in playersOrder
+			this.playersOrder.forEach((playerId, index) => {
+				const player = this.players[playerId];
+		
+				if (!player || !icons[index] || !iconTexts[index]) return;
+		
+				const icon = icons[index];
+				const iconText = iconTexts[index];
+		
+				// Stato attivo (turno attuale)
+				const isActive = player.playerTurn;
+				if (icon.classList.contains("active") !== isActive) {
+					icon.classList.toggle("active", isActive);
+				}
+		
+				// Stato morto
+				const isDead = player.status === "DIED";
+				if (icon.classList.contains("died") !== isDead) {
+					icon.classList.toggle("died", isDead);
+				}
+		
+				// Aggiornamento testo solo se cambia
+				const newText = player.selectedCards.length > 0 
+					? `Claims <span class="number">${player.selectedCards.length}</span> <span class="card-name">${cardRequired}</span>` 
+					: "";
+		
+				if (iconText.innerHTML !== newText) {
+					iconText.innerHTML = newText;
+					iconText.style.visibility = newText ? "visible" : "hidden";
+				}
+			});
+		}
+		
+		
+		
 
 	updateGameState(data)
 	{
@@ -440,8 +491,8 @@ export default class Game
 		{
 			if (data)
 				this.updatePlayers(data);
-
-
+			
+			this.updateIcons(data);
 			if (data.lobby_info) {
 				this.updateTurnTimer(data.lobby_info);
 			  }
@@ -605,8 +656,9 @@ export default class Game
 			{
 				case 'TO_SETUP':
 					this.setUpLobby(data);
+					console.log(data);
 					break;
-					case 'PLAYING':
+				case 'PLAYING':
 					this.updateGameState(data);
 					if (this.currentPlayer.hand) {
 						const hasHandChanged = JSON.stringify(this.currentPlayer.hand) !== JSON.stringify(this.lastHand);
