@@ -63,3 +63,4 @@ read [Subject](https://github.com/redadoo/ft_transcendence/blob/master/en.subjec
 [api-throttling](https://www.django-rest-framework.org/api-guide/throttling/)
 [docker-monitoring-with-prometheus](https://last9.io/blog/docker-monitoring-with-prometheus-a-step-by-step-guide/)
 [threejs trick](https://discoverthreejs.com/tips-and-tricks/#models-meshes-and-other-visible-thing)
+[threejs how to improve](https://discourse.threejs.org/t/how-to-improve-performance-on-my-site/52039/6)
