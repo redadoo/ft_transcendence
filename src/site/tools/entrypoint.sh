@@ -27,6 +27,12 @@ else:
     print("Superuser already exists.")
 EOF
 
+echo -e "${YELLOW}Creating bot user if they doesn't exist...${NONE}"
+python3 manage.py create_bot_user
+
+echo -e "${YELLOW}Creating super user if it doesn't exist...${NONE}"
+python3 manage.py create_super_user
+
 # Collect static files
 echo "Collecting static files..."
 python manage.py collectstatic --noinput

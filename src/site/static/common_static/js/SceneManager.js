@@ -35,7 +35,7 @@ export default class SceneManager
 
 		this.fov = 45;
 		this.nearPlane = 1;
-		this.farPlane = 10000;
+		this.farPlane = 1000;
 
 		this.needOrbital = needOrbital;
 		this.accumulatedTime = 0;
@@ -136,8 +136,8 @@ export default class SceneManager
 			if (!this.renderer) {
 				throw new Error('Failed to initialize WebGLRenderer');
 			}
-			this.renderer.setPixelRatio(window.devicePixelRatio);  // Handles high-DPI displays
-			this.renderer.setSize(window.innerWidth, window.innerHeight);
+			this.renderer.setPixelRatio(0.4);  // Handles high-DPI displays
+			this.renderer.setSize(window.innerWidth * 0.4, window.innerHeight * 0.4,false);
 			this.renderer.shadowMap.enabled = true;
 			this.renderer.shadowMap.type = shadowMapType;
 			document.body.appendChild(this.renderer.domElement);
@@ -153,7 +153,7 @@ export default class SceneManager
 	{
 		this.camera = new THREE.PerspectiveCamera(
 			this.fov,
-			window.innerWidth / window.innerHeight,
+			(window.innerWidth * 0.4) / (window.innerHeight * 0.4),
 			this.nearPlane,
 			this.farPlane
 		);
