@@ -308,6 +308,7 @@ const html = {
 				</div>
 		</div>
 		<div class="card-container">
+		<div class="your-turn-text">Your Turn!</div>
 		<div class="row h-100"> 
 					<div class="col-1"> </div>
 					<div class="col-1"> 

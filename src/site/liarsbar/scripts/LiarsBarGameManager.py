@@ -28,7 +28,7 @@ class LiarsBarGameManager(GameManager):
 		self.player_turn_index = 0
 		self.players_alive = 4
 		self.time_elapsed = 0
-		self.turn_duration = 10
+		self.turn_duration = 3
 		self.card_required = None
 
 	def start_game(self):
@@ -203,7 +203,7 @@ class LiarsBarGameManager(GameManager):
 				self.players[self.player_turn_index].doubting = False
 				for i in range(1, 4):
 					check_index = (self.player_turn_index - i) % 4
-					# print(f"{self.players[check_index].player_id}, {self.players[check_index].status}, {self.players[check_index].card_sent} ")
+					#print(f"{self.players[check_index].player_id}, {self.players[check_index].status}, {self.players[check_index].card_sent} ")
 					if self.players[check_index].status == LiarsBarPlayer.PlayerStatus.ALIVE and self.players[check_index].card_sent:
 						card_names = [card.to_dict() for card in self.players[check_index].selected_cards]
 						# print(f"Player {self.players[check_index].player_id} has the following cards: {card_names}")

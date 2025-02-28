@@ -441,14 +441,15 @@ export default class Game
 		updateIcons(data) {
 			const icons = document.querySelectorAll("#verticalIcons .icon");
 			const iconTexts = document.querySelectorAll("#verticalIcons .icon-text");
-		
+			const yourTurnText = document.querySelector(".your-turn-text"); 
+
 			if (!data || !data.lobby_info || !data.lobby_info.card_required) {
 				console.error("Errore: lobby_info non definito o mancante.");
 				return;
 			}
 		
 			const cardRequired = data.lobby_info.card_required;
-		
+			let isMyTurn = false;
 			// Iteriamo usando l'ordine fisso salvato in playersOrder
 			this.playersOrder.forEach((playerId, index) => {
 				const player = this.players[playerId];
@@ -469,7 +470,18 @@ export default class Game
 				if (icon.classList.contains("died") !== isDead) {
 					icon.classList.toggle("died", isDead);
 				}
-		
+				if (isActive && player.playerId === this.player_id) {
+					isMyTurn = true;
+					console.log("player turn true")
+				}
+
+				if (yourTurnText) {
+					const shouldBeVisible = isMyTurn ? "visible" : "hidden";
+					if (yourTurnText.style.visibility !== shouldBeVisible) {
+						yourTurnText.style.visibility = shouldBeVisible;
+					}
+				}
+
 				// Aggiornamento testo solo se cambia
 				const newText = player.selectedCards.length > 0 
 					? `Claims <span class="number">${player.selectedCards.length}</span> <span class="card-name">${cardRequired}</span>` 

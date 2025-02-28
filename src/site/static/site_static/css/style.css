@@ -2146,6 +2146,24 @@ label {
     border: 2px solid rgba(255, 255, 255, 0.5);
 }
 
+.your-turn-text {
+    position: absolute;
+    bottom: 38vh; /* Usa unità relative per adattarsi allo schermo */
+    left: 20%;
+    transform: translateX(-50%);
+    font-family: 'PRESS START 2P', sans-serif;
+    font-size: 1.5vw; /* Scala in base alla larghezza dello schermo */
+    font-weight: bold;
+    
+    color: white;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
+    opacity: 0.9;
+    visibility: hidden;
+    text-align: center;
+    white-space: nowrap; /* Evita il testo su due righe */
+	pointer-events: none;
+}
+
 /* Animations */
 @keyframes pulsate {
     0% { transform: translateY(-20%) scale(1); }
