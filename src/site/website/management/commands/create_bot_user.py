@@ -12,8 +12,14 @@ class Command(BaseCommand):
             email=email,
             status=User.UserStatus.ONLINE
         )
-        bot_user.set_password("bot")
-        bot_user.save()
+        if username != "admin":
+            bot_user.set_password("bot")
+            bot_user.save()
+        else:
+            bot_user.is_staff = True
+            bot_user.is_superuser = True
+            bot_user.set_password("admin")
+            bot_user.save()
 
         UserStats.objects.create(user=bot_user)
         UserImage.objects.create(user=bot_user)
@@ -26,6 +32,7 @@ class Command(BaseCommand):
             {'id': -2, 'username': 'bot_2', 'email': 'bot_2@example.com'},
             {'id': -3, 'username': 'bot_3', 'email': 'bot_3@example.com'},
             {'id': -4, 'username': 'bot_4', 'email': 'bot_4@example.com'},
+            {'id': 1, 'username': 'admin', 'email': 'admin@example.com'},
             {'id': 2, 'username': 'edo', 'email': 'edo@example.com'},
         ]
 

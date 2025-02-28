@@ -23,10 +23,15 @@ class UserStatsSerializer(serializers.ModelSerializer):
 		]
 
 class UserImageSerializer(serializers.ModelSerializer):
-	avatar_url = serializers.ImageField(source='user_avatar', read_only=True)
+	avatar_url = serializers.SerializerMethodField()
+	
 	class Meta:
 		model = UserImage
 		fields = ['avatar_url']
+	
+	def get_avatar_url(self, userImage):
+		avatar_url = userImage.user_avatar.url
+		return avatar_url
 
 class MatchHistorySerializer(serializers.ModelSerializer):
 	pong_matches = PongMatchSerializer(many=True, read_only=True)

@@ -6,10 +6,10 @@ import SocketManager from '../../common_static/js/SocketManager.js';
 
 
 const cardTextures = {
-    'ACE': 'http://127.0.0.1:8000/media/png/pox.png',
-    'QUEEN': 'http://127.0.0.1:8000/media/png/momo.png',
-    'KING': 'http://127.0.0.1:8000/media/png/glim.png',
-    'JOLLY': 'http://127.0.0.1:8000/media/png/master.png'
+    'ACE': '/media/png/pox.png',
+    'QUEEN': '/media/png/momo.png',
+    'KING': '/media/png/glim.png',
+    'JOLLY': '/media/png/master.png'
 };
 
 
@@ -383,7 +383,7 @@ class Game
 				const img = cardSlots[index].querySelector('img');
 				
 				if(img.src !== cardTextures[cardType]) {
-					img.src = cardTextures[cardType] || 'http://127.0.0.1:8000/media/png/pox.png';
+					img.src = cardTextures[cardType] || '/media/png/pox.png';
 					img.alt = cardType;
 					cardSlots[index].dataset.cardType = cardType;
 				}

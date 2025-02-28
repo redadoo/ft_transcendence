@@ -6,6 +6,8 @@ USER root
 ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
 
+RUN apk add curl
+
 # Ensure the home directory exists and set permissions
 RUN mkdir -p /home/evocatur && \
     chown -R 13449:4222 /home/evocatur

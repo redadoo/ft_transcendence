@@ -219,37 +219,37 @@ export default class Game
      * Initializes the score system for the game scene.
      */
 	handleScoreSprites(scores) {
-		// try {
-		//   if (!this.scoreSpritesInitialized) {
-		// 	this.createTextSprite(`${scores.player1}`).then((sprite) => {
-		// 	  this.player1ScoreSprite = sprite;
-		// 	  this.player1ScoreSprite.position.set(-10, 18, 0);
-		// 	  this.sceneManager.scene.add(this.player1ScoreSprite);
-		// 	}).catch((error) => console.error("Failed to create Player 1 sprite:", error));
+		try {
+		  if (!this.scoreSpritesInitialized) {
+			this.createTextSprite(`${scores.player1}`).then((sprite) => {
+			  this.player1ScoreSprite = sprite;
+			  this.player1ScoreSprite.position.set(-10, 18, 0);
+			  this.sceneManager.scene.add(this.player1ScoreSprite);
+			}).catch((error) => console.error("Failed to create Player 1 sprite:", error));
 
-		// 	this.createTextSprite(`${scores.player2}`).then((sprite) => {
-		// 	  this.player2ScoreSprite = sprite;
-		// 	  this.player2ScoreSprite.position.set(10, 18, 0);
-		// 	  this.sceneManager.scene.add(this.player2ScoreSprite);
-		// 	}).catch((error) => console.error("Failed to create Player 2 sprite:", error));
+			this.createTextSprite(`${scores.player2}`).then((sprite) => {
+			  this.player2ScoreSprite = sprite;
+			  this.player2ScoreSprite.position.set(10, 18, 0);
+			  this.sceneManager.scene.add(this.player2ScoreSprite);
+			}).catch((error) => console.error("Failed to create Player 2 sprite:", error));
 
-		// 	this.scoreSpritesInitialized = true;
-		//   } else {
-		// 	if (this.player1ScoreSprite) {
-		// 	  this.updateSpriteTexture(this.player1ScoreSprite, `${scores.player1}`);
-		// 	} else {
-		// 	  console.warn("Player 1 score sprite is not ready yet");
-		// 	}
+			this.scoreSpritesInitialized = true;
+		  } else {
+			if (this.player1ScoreSprite) {
+			  this.updateSpriteTexture(this.player1ScoreSprite, `${scores.player1}`);
+			} else {
+			  console.warn("Player 1 score sprite is not ready yet");
+			}
 
-		// 	if (this.player2ScoreSprite) {
-		// 	  this.updateSpriteTexture(this.player2ScoreSprite, `${scores.player2}`);
-		// 	} else {
-		// 	  console.warn("Player 2 score sprite is not ready yet");
-		// 	}
-		//   }
-		// } catch (error) {
-		//   console.error("An error occurred while handling score sprites:", error);
-		// }
+			if (this.player2ScoreSprite) {
+			  this.updateSpriteTexture(this.player2ScoreSprite, `${scores.player2}`);
+			} else {
+			  console.warn("Player 2 score sprite is not ready yet");
+			}
+		  }
+		} catch (error) {
+		  console.error("An error occurred while handling score sprites:", error);
+		}
 	}
 
 	  /**
@@ -257,31 +257,31 @@ export default class Game
 	 * * @param {string} text - The value of the score
      */
 	createTextSprite(text) {
-		// return new Promise((resolve, reject) => {
-		//   const canvas = document.createElement('canvas');
-		//   const context = canvas.getContext('2d');
+		return new Promise((resolve, reject) => {
+		  const canvas = document.createElement('canvas');
+		  const context = canvas.getContext('2d');
 
-		//   canvas.width = 256;
-		//   canvas.height = 150;
+		  canvas.width = 256;
+		  canvas.height = 150;
 
-		//   document.fonts.load('150px "Press Start 2P"').then(() => {
-		// 	context.font = '150px "Press Start 2P"';
-		// 	context.fillStyle = 'white';
-		// 	context.textAlign = 'center';
-		// 	context.textBaseline = 'middle';
-		// 	context.fillText(text, canvas.width / 2, canvas.height / 2);
+		  document.fonts.load('150px "Press Start 2P"').then(() => {
+			context.font = '150px "Press Start 2P"';
+			context.fillStyle = 'white';
+			context.textAlign = 'center';
+			context.textBaseline = 'middle';
+			context.fillText(text, canvas.width / 2, canvas.height / 2);
 
-		// 	const texture = new THREE.CanvasTexture(canvas);
-		// 	const material = new THREE.SpriteMaterial({ map: texture });
-		// 	const sprite = new THREE.Sprite(material);
-		// 	sprite.scale.set(5, 2.5, 1);
+			const texture = new THREE.CanvasTexture(canvas);
+			const material = new THREE.SpriteMaterial({ map: texture });
+			const sprite = new THREE.Sprite(material);
+			sprite.scale.set(5, 2.5, 1);
 
-		// 	resolve(sprite);
-		//   }).catch((error) => {
-		// 	console.error('Failed to load font:', error);
-		// 	reject(error);
-		//   });
-		// });
+			resolve(sprite);
+		  }).catch((error) => {
+			console.error('Failed to load font:', error);
+			reject(error);
+		  });
+		});
 	}
 
 	/**
@@ -349,13 +349,13 @@ export default class Game
      */
 	setupScene()
 	{
-		// const room = this.sceneManager.modelManager.getModel('Scene');
+		const room = this.sceneManager.modelManager.getModel('Scene');
 
-		// room.scene.scale.set(10, 10, 10);
-		// room.scene.position.set(800, -134, 191);
-		// room.scene.rotation.y = -Math.PI / 2;
+		room.scene.scale.set(10, 10, 10);
+		room.scene.position.set(800, -134, 191);
+		room.scene.rotation.y = -Math.PI / 2;
 
-		// this.sceneManager.scene.add(room.scene);
+		this.sceneManager.scene.add(room.scene);
 	}
 
 	/**
@@ -376,10 +376,10 @@ export default class Game
 					this.pongOpponent.updatePosition(data.players[this.pongOpponent.playerId].y);
 			}
 
-			// if(data.scores)
-			// {
-			// 	this.handleScoreSprites(data.scores);
-			// }
+			if(data.scores)
+			{
+				this.handleScoreSprites(data.scores);
+			}
 		}
 		catch (error) {
 			console.error("An error occurred during game update state:", error);
@@ -393,31 +393,31 @@ export default class Game
      */
 	updateSpriteTexture(sprite, text)
 	{
-		// if (!sprite || !sprite.material || !sprite.material.map) {
-		//   console.warn("Sprite or texture is not defined yet.");
-		//   return;
-		// }
+		if (!sprite || !sprite.material || !sprite.material.map) {
+		  console.warn("Sprite or texture is not defined yet.");
+		  return;
+		}
 
-		// const texture = sprite.material.map;
-		// const canvas = texture.image;
-		// const context = canvas.getContext('2d');
+		const texture = sprite.material.map;
+		const canvas = texture.image;
+		const context = canvas.getContext('2d');
 
-		// if (!context) {
-		//   console.error("Failed to get 2D context from canvas.");
-		//   return;
-		// }
+		if (!context) {
+		  console.error("Failed to get 2D context from canvas.");
+		  return;
+		}
 
-		// context.clearRect(0, 0, canvas.width, canvas.height);
+		context.clearRect(0, 0, canvas.width, canvas.height);
 
-		// if (document.fonts.check('150px "Press Start 2P"')) {
-		//   this.drawTextOnCanvas(context, canvas, text, texture);
-		// } else {
-		//   document.fonts.load('150px "Press Start 2P"').then(() => {
-		// 	this.drawTextOnCanvas(context, canvas, text, texture);
-		//   }).catch((error) => {
-		// 	console.error('Failed to load font:', error);
-		//   });
-		// }
+		if (document.fonts.check('150px "Press Start 2P"')) {
+		  this.drawTextOnCanvas(context, canvas, text, texture);
+		} else {
+		  document.fonts.load('150px "Press Start 2P"').then(() => {
+			this.drawTextOnCanvas(context, canvas, text, texture);
+		  }).catch((error) => {
+			console.error('Failed to load font:', error);
+		  });
+		}
 	}
 
 	drawTextOnCanvas(context, canvas, text, texture)

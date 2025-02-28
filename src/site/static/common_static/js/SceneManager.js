@@ -136,8 +136,9 @@ export default class SceneManager
 			if (!this.renderer) {
 				throw new Error('Failed to initialize WebGLRenderer');
 			}
-			this.renderer.setPixelRatio(0.4);  // Handles high-DPI displays
-			this.renderer.setSize(window.innerWidth * 0.4, window.innerHeight * 0.4,false);
+
+			this.renderer.setPixelRatio( window.devicePixelRatio );
+			this.renderer.setSize(window.innerWidth, window.innerHeight,false);
 			this.renderer.shadowMap.enabled = true;
 			this.renderer.shadowMap.type = shadowMapType;
 			document.body.appendChild(this.renderer.domElement);
@@ -153,7 +154,7 @@ export default class SceneManager
 	{
 		this.camera = new THREE.PerspectiveCamera(
 			this.fov,
-			(window.innerWidth * 0.4) / (window.innerHeight * 0.4),
+			(window.innerWidth) / (window.innerHeight),
 			this.nearPlane,
 			this.farPlane
 		);
