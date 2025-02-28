@@ -284,7 +284,7 @@ const html = {
 		 <!-- Orologio posizionato in alto al centro -->
 		<div id="clockOverlay" style="position: fixed; top: 80px; left: 50%; transform: translateX(-50%); z-index: 1000;">
 			<div id="clockContainer" style="position: relative; width: 120px; height: 120px;">
-				<img id="clockImage" src="http://127.0.0.1:8000/media/png/timer.png" alt="Orologio">
+				<img id="clockImage" src="/media/png/timer.png" alt="Orologio">
 				<div id="clockText"></div>
 			</div>
 		</div>
@@ -292,19 +292,19 @@ const html = {
 		<div id="verticalIcons">
 			    <div class="icon-container">
 					<span class="icon-text">Claims <span class="number">5</span> <span class="card-name">Ace</span></span>
-					<img src="http://127.0.0.1:8000/media/png/rimuru.png" alt="Icon 0" class="icon ">
+					<img src="/media/png/rimuru.png" alt="Icon 0" class="icon ">
 				</div>
 				<div class="icon-container">
 					<span class="icon-text">Claims <span class="number">3</span> <span class="card-name">Ace</span></span>
-					<img src="http://127.0.0.1:8000/media/png/kuriboh.png" alt="Icon 1" class="icon">
+					<img src="/media/png/kuriboh.png" alt="Icon 1" class="icon">
 				</div>
 				<div class="icon-container">
 					<span class="icon-text">Claims <span class="number">7</span> <span class="card-name">Ace</span></span>
-					<img src="http://127.0.0.1:8000/media/png/amongus.png" alt="Icon 2" class="icon">
+					<img src="/media/png/amongus.png" alt="Icon 2" class="icon">
 				</div>
 				<div class="icon-container">
 					<span class="icon-text">Claims <span class="number">2</span> <span class="card-name">Ace</span></span>
-					<img src="http://127.0.0.1:8000/media/png/kingboh.png" alt="Icon 3" class="icon">
+					<img src="/media/png/kingboh.png" alt="Icon 3" class="icon">
 				</div>
 		</div>
 		<div class="card-container">
@@ -313,30 +313,30 @@ const html = {
 					<div class="col-1"> </div>
 					<div class="col-1"> 
 						<div class="card" data-card-type="ACE">
-							<img src="http://127.0.0.1:8000/media/png/pox.png" alt="ACE">
+							<img src="/media/png/pox.png" alt="ACE">
 						</div>
 					</div>
 					<div class="col-1">
 						<div class="card" data-card-type="QUEEN">
-							<img src="http://127.0.0.1:8000/media/png/momo.png" alt="QUEEN">
+							<img src="/media/png/momo.png" alt="QUEEN">
 						</div>
 					</div>	
 					<div class="col-1">
 						<div class="card" data-card-type="KING">
-							<img src="http://127.0.0.1:8000/media/png/glim.png" alt="KING">
+							<img src="/media/png/glim.png" alt="KING">
 						</div>
 					</div>
 					<div class="col-1">
 					
 						<div class="card" data-card-type="JOLLY">
-							<img src="http://127.0.0.1:8000/media/png/master.png" alt="JOLLY">
+							<img src="/media/png/master.png" alt="JOLLY">
 						</div>
 					</div>
 					
 					<div class="col-1">
 					
 						<div class="card" data-card-type="JOLLY">
-							<img src="http://127.0.0.1:8000/media/png/master.png" alt="JOLLY">
+							<img src="/media/png/master.png" alt="JOLLY">
 						</div>
 					</div>
 					<div class="col-6"> </div>

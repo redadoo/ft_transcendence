@@ -1,16 +1,39 @@
-FROM alpine:3.20.0
 
-RUN apk update && apk upgrade
-RUN apk add nginx openssl
+FROM nginxinc/nginx-unprivileged:stable-alpine
 
-RUN mkdir -p /etc/nginx/ssl
+# # Install required packages
+USER root
 
+RUN apk update && apk upgrade && \
+    apk add nginx openssl
+
+# Create group 2022_rome with GID 4222 and user evocatur with UID 13449
+RUN addgroup -g 4222 2022_rome && \
+    adduser -D -H -u 13449 -G 2022_rome evocatur && \
+    mkdir -p /home/evocatur/nginx/ssl /home/evocatur/nginx/conf && \
+    chown -R nginx:nginx /home/evocatur/nginx
+
+# # Ensure the nginx user can access /var/cache/nginx (optional if using default location)
+RUN mkdir -p /var/cache/nginx && \
+    chown -R nginx:nginx /var/cache/nginx
+
+# Generate SSL certificates in user's home directory (not /etc/nginx/)
 RUN openssl req -newkey rsa:4096 -x509 -sha256 -days 365 -nodes \
-    -out /etc/nginx/ssl/evocatur.crt \
-    -keyout /etc/nginx/ssl/evocatur.key \
+    -out /home/evocatur/nginx/ssl/evocatur.crt \
+    -keyout /home/evocatur/nginx/ssl/evocatur.key \
     -subj "/C=IT/ST=Rome/L=Rome/O=42 Roma Luiss/OU=evocatur/CN=evocatur"
 
-COPY config/default.conf /etc/nginx/http.d/default.conf
-EXPOSE 443
+# Ensure SSL files are accessible by the Nginx user
+RUN chmod 644 /home/evocatur/nginx/ssl/evocatur.crt /home/evocatur/nginx/ssl/evocatur.key
 
-CMD ["nginx", "-g", "daemon off;"]
+# # Copy Nginx configuration to user's home directory
+COPY config/default.conf /home/evocatur/nginx/conf/default.conf
+
+# # Set Nginx to listen on an unprivileged port (443 → 8080)
+EXPOSE 8080
+
+# # Switch to non-root user
+USER nginx
+
+# # Start Nginx
+CMD ["nginx", "-c", "/home/evocatur/nginx/conf/default.conf", "-g", "daemon off;"]

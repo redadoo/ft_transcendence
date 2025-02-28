@@ -3,6 +3,7 @@ services:
     build: postgres/
     image: postgres
     container_name: postgres
+    user: ${USER}
     env_file: postgres/env/.env.prod.db
     restart: always
     ports:
@@ -20,6 +21,7 @@ services:
     build: redis/
     image: redis
     container_name: redis
+    user: ${USER}
     restart: always
     networks: 
       - backend
@@ -27,13 +29,14 @@ services:
     build: site/
     image: gunicorn
     container_name: gunicorn
+    user: ${USER}
     env_file: site/env/.env.backend
     restart: always
     networks: 
       - backend
     volumes:
-      - static_volume:/home/app/ft_transcendence/staticfiles
-      - media_volume:/home/app/ft_transcendence/media
+      - static_volume:/home/${USER}/ft_transcendence/staticfiles
+      - media_volume:/home/${USER}/ft_transcendence/media
     depends_on:
       - postgres
       - redis
@@ -41,8 +44,9 @@ services:
     container_name: nginx
     image: nginx
     build: nginx/
+    user: ${USER}
     ports:
-      - 443:443
+      - 8080:8080
     restart: always
     expose:
       - 80
@@ -51,81 +55,87 @@ services:
     depends_on: 
       - gunicorn
     volumes:
-      - static_volume:/home/app/ft_transcendence/staticfiles
-      - media_volume:/home/app/ft_transcendence/media
+      - static_volume:/home/${USER}/ft_transcendence/staticfiles
+      - media_volume:/home/${USER}/ft_transcendence/media
   daphne:
     image: daphne
     build:
       context: ./
       dockerfile: daphne/Dockerfile
     container_name: daphne
+    user: ${USER}
     env_file: site/env/.env.backend
     restart: always
     networks: 
       - backend
     depends_on: 
       - gunicorn
-  prometheus:
-    build: monitoring/prometheus/
-    image: prometheus
-    container_name: prometheus
-    volumes:
-       - prometheus:/prometheus
-    command:
-      - '--config.file=/etc/prometheus/prometheus.yml'
-      - '--storage.tsdb.path=/prometheus'
-      - '--web.console.libraries=/usr/share/prometheus/console_libraries'
-      - '--web.console.templates=/usr/share/prometheus/consoles'
-    networks:
-      - backend
-    ports:
-      - 9090:9090
-  grafana:
-    build: monitoring/grafana/
-    image: grafana
-    container_name: grafana
-    env_file: monitoring/.env.monitoring
-    volumes:
-        - grafana:/var/lib/grafana
-    ports:
-        - "3000:3000"
-    restart: unless-stopped
-    networks:
-        - backend
-  postgres-exporter:
-      build: monitoring/postgres-exporter
-      image: postgres-exporter
-      container_name: postgres-exporter
-      ports:
-          - "9187:9187"
-      env_file: postgres/env/.env.prod.db
-      depends_on:
-          prometheus:
-              condition: service_started
-          postgres:
-              condition: service_healthy
-      restart: unless-stopped
-      networks:
-          - backend
-  nginx-exporter:
-    image: nginx/nginx-prometheus-exporter:latest
-    command:
-      - '-nginx.scrape-uri=http://nginx:8080/stub_status'
-    ports:
-      - 9113:9113
-  node-exporter:
-    image: prom/node-exporter:latest
-    container_name: node-exporter
-    ports:
-      - 9100:9100
-    volumes:
-      - /proc:/host/proc:ro
-      - /sys:/host/sys:ro
-      - /:/rootfs:ro
-    command:
-      - '--path.procfs=/host/proc'
-      - '--path.sysfs=/host/sys'
-      - '--collector.filesystem.ignored-mount-points="^/(sys|proc|dev|host|etc)($$|/)"'
+  # prometheus:
+  #   build: monitoring/prometheus/
+  #   image: prometheus
+  #   user: ${USER}
+  #   container_name: prometheus
+  #   volumes:
+  #      - prometheus:/prometheus
+  #   command:
+  #     - '--config.file=/etc/prometheus/prometheus.yml'
+  #     - '--storage.tsdb.path=/prometheus'
+  #     - '--web.console.libraries=/usr/share/prometheus/console_libraries'
+  #     - '--web.console.templates=/usr/share/prometheus/consoles'
+  #   networks:
+  #     - backend
+  #   ports:
+  #     - 9090:9090
+  # grafana:
+  #   build: monitoring/grafana/
+  #   image: grafana
+  #   user: ${USER}
+  #   container_name: grafana
+  #   env_file: monitoring/.env.monitoring
+  #   volumes:
+  #       - grafana:/var/lib/grafana
+  #   ports:
+  #       - "3000:3000"
+  #   restart: unless-stopped
+  #   networks:
+  #       - backend
+  # postgres-exporter:
+  #     build: monitoring/postgres-exporter
+  #     image: postgres-exporter
+  #     user: ${USER}
+  #     container_name: postgres-exporter
+  #     ports:
+  #         - "9187:9187"
+  #     env_file: postgres/env/.env.prod.db
+  #     depends_on:
+  #         prometheus:
+  #             condition: service_started
+  #         postgres:
+  #             condition: service_healthy
+  #     restart: unless-stopped
+  #     networks:
+  #         - backend
+  # nginx-exporter:
+  #   image: nginx/nginx-prometheus-exporter:latest
+  #   user: ${USER}
+  #   command:
+  #     - '-nginx.scrape-uri=http://nginx:8080/stub_status'
+  #   ports:
+  #     - 9113:9113
+  # node-exporter:
+  #   image: prom/node-exporter:latest
+  #   user: ${USER}
+  #   container_name: node-exporter
+  #   ports:
+  #     - 9100:9100
+  #   volumes:
+  #     - /proc:/host/proc:ro
+  #     - /sys:/host/sys:ro
+  #     - /:/rootfs:ro
+  #   command:
+  #     - '--path.procfs=/host/proc'
+  #     - '--path.sysfs=/host/sys'
+  #     - '--collector.filesystem.ignored-mount-points="^/(sys|proc|dev|host|etc)($$|/)"'
 
 
 volumes:
@@ -134,22 +144,10 @@ volumes:
   prometheus:
   pg_data:
     driver: local
-    driver_opts:
-      type: none
-      device: /home/data/pg_data
-      o: bind
   static_volume:
     driver: local
-    driver_opts:
-      type: none
-      device: /home/data/static_volume
-      o: bind
   media_volume:
       driver: local
-      driver_opts:
-        type: none
-        device: /home/data/media_volume
-        o: bind
 
 networks:
   backend:
