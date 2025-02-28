@@ -3,7 +3,7 @@ services:
     build: postgres/
     image: postgres
     container_name: postgres
-    user: "13449:4222"
+    user: ${USER}
     env_file: postgres/env/.env.prod.db
     restart: always
     ports:
@@ -21,7 +21,7 @@ services:
     build: redis/
     image: redis
     container_name: redis
-    user: "13449:4222"
+    user: ${USER}
     restart: always
     networks: 
       - backend
@@ -29,14 +29,14 @@ services:
     build: site/
     image: gunicorn
     container_name: gunicorn
-    user: "13449:4222"
+    user: ${USER}
     env_file: site/env/.env.backend
     restart: always
     networks: 
       - backend
     volumes:
-      - static_volume:/home/evocatur/ft_transcendence/staticfiles
-      - media_volume:/home/evocatur/ft_transcendence/media
+      - static_volume:/home/${USER}/ft_transcendence/staticfiles
+      - media_volume:/home/${USER}/ft_transcendence/media
     depends_on:
       - postgres
       - redis
@@ -44,7 +44,7 @@ services:
     container_name: nginx
     image: nginx
     build: nginx/
-    user: "13449:4222"
+    user: ${USER}
     ports:
       - 8080:8080
     restart: always
@@ -55,15 +55,15 @@ services:
     depends_on: 
       - gunicorn
     volumes:
-      - static_volume:/home/evocatur/ft_transcendence/staticfiles
-      - media_volume:/home/evocatur/ft_transcendence/media
+      - static_volume:/home/${USER}/ft_transcendence/staticfiles
+      - media_volume:/home/${USER}/ft_transcendence/media
   daphne:
     image: daphne
     build:
       context: ./
       dockerfile: daphne/Dockerfile
     container_name: daphne
-    user: "13449:4222"
+    user: ${USER}
     env_file: site/env/.env.backend
     restart: always
     networks: 

@@ -9,6 +9,9 @@ ENV PYTHONUNBUFFERED=1
 RUN apk add curl
 
 # Ensure the home directory exists and set permissions
+RUN addgroup -g 4222 2022_rome && \
+    adduser -D -H -u 13449 -G 2022_rome evocatur
+    
 RUN mkdir -p /home/evocatur && \
     chown -R 13449:4222 /home/evocatur
 
