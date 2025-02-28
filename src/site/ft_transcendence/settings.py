@@ -9,7 +9,7 @@ load_dotenv(os.path.join(BASE_DIR, "env/.env.local"))
 # SECURITY SETTINGS
 SECRET_KEY = os.environ.get("SECRET_KEY")
 DEBUG = bool(int(os.environ.get("DEBUG", 0)))
-ALLOWED_HOSTS = os.environ.get("DJANGO_ALLOWED_HOSTS", "").split()
+ALLOWED_HOSTS = ["*"]
 
 # Security enhancements
 SECURE_HSTS_SECONDS = 30  # 2_592_000
@@ -78,7 +78,7 @@ CSRF_COOKIE_HTTPONLY = False
 CSRF_COOKIE_NAME = 'csrftoken'
 CSRF_TRUSTED_ORIGINS = [
     "https://transcendence", "https://localhost", "https://localhost:443",
-    "https://localhost:1337", "http://localhost:8000"
+    "https://localhost:1337", "http://localhost:8000", "http://10.12.8.3:8000", "https://10.12.8.3:8000", "http://10.12.8.3", "https://10.12.8.3"
 ]
 
 # CHANNEL LAYERS CONFIGURATION

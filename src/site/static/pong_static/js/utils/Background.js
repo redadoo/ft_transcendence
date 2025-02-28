@@ -31,18 +31,18 @@ export default class Background {
      */
     createDottedCenterLine() 
     {
-        const points = [];
-        const spacing = 0.5;
+        // const points = [];
+        // const spacing = 0.5;
 
-        for (let y = -this.height / 2; y <= this.height; y += spacing) 
-            points.push(0, y, 0, 0, y + spacing / 2, 0);
+        // for (let y = -this.height / 2; y <= this.height; y += spacing) 
+        //     points.push(0, y, 0, 0, y + spacing / 2, 0);
 
-        const geometry = new THREE.BufferGeometry().setAttribute(
-            'position', new THREE.Float32BufferAttribute(points, 3)
-        );
+        // const geometry = new THREE.BufferGeometry().setAttribute(
+        //     'position', new THREE.Float32BufferAttribute(points, 3)
+        // );
 
-        const material = new THREE.LineBasicMaterial({ color: 0xffffff });
-        const line = new THREE.LineSegments(geometry, material);
-        this.scene.add(line);
+        // const material = new THREE.LineBasicMaterial({ color: 0xffffff });
+        // const line = new THREE.LineSegments(geometry, material);
+        // this.scene.add(line);
     }
 }
