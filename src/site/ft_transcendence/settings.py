@@ -9,7 +9,17 @@ load_dotenv(os.path.join(BASE_DIR, "env/.env.local"))
 # SECURITY SETTINGS
 SECRET_KEY = os.environ.get("SECRET_KEY")
 DEBUG = bool(int(os.environ.get("DEBUG", 0)))
-ALLOWED_HOSTS = ["*"]
+ALLOWED_HOSTS = os.getenv('DJANGO_ALLOWED_HOSTS', '').split(',')
+
+
+def add_ip_range_to_allowed_hosts(ip_range="10.12"):
+    """ Adds IP range like 10.12.*.* to the ALLOWED_HOSTS dynamically """
+    ip_base = f"{ip_range}."
+    allowed_ips = [f"{ip_base}{i}" for i in range(256)]
+    return allowed_ips
+
+ALLOWED_HOSTS.extend(add_ip_range_to_allowed_hosts("10.12"))
+ALLOWED_HOSTS = list(set(ALLOWED_HOSTS)) 
 
 # Security enhancements
 SECURE_HSTS_SECONDS = 30  # 2_592_000
