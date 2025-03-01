@@ -9,6 +9,7 @@ from django.core.validators import MinLengthValidator, RegexValidator, MinValueV
 from django.utils.timezone import now
 from itertools import chain
 from django.utils import timezone
+from datetime import timedelta
 
 class User(AbstractUser):
 	"""
@@ -133,8 +134,8 @@ class UserStats(models.Model):
 	longest_game_duration = models.DurationField(null=True, blank=True)
 	liarsbar_win = models.PositiveIntegerField(default=0, validators=[MinValueValidator(0)])
 	liarsbar_lose = models.PositiveIntegerField(default=0, validators=[MinValueValidator(0)])
-	time_on_site = models.DurationField(null=True, blank=True)
-
+	time_on_site = models.DurationField(null=True, blank=True, default=timedelta(0))
+	
 	created_at = models.DateTimeField(default=now, blank=True)
 	date_updated = models.DateTimeField(auto_now=True)
 
