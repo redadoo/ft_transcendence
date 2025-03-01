@@ -124,7 +124,8 @@ export default class SceneManager
 	initializeRenderer(shadowMapType) 
 	{
 		this.renderer = new THREE.WebGLRenderer({ antialias: true });
-		this.renderer.setSize(window.innerWidth, window.innerHeight);
+		this.renderer.setPixelRatio(0.5); // Lower pixel density
+		this.renderer.setSize(window.innerWidth * 0.5, window.innerHeight * 0.5, false);
 		this.renderer.shadowMap.enabled = true;
 		this.renderer.shadowMap.type = shadowMapType;
 		document.body.appendChild(this.renderer.domElement);
@@ -196,11 +197,12 @@ export default class SceneManager
 	onWindowResize() 
 	{
 		if (!this.camera || !this.renderer) return;
-
+	
 		this.camera.aspect = window.innerWidth / window.innerHeight;
 		this.camera.updateProjectionMatrix();
-		this.renderer.setSize(window.innerWidth, window.innerHeight);
+		this.renderer.setSize(window.innerWidth * 0.5, window.innerHeight * 0.5, false);
 	}
+	
 
 	/**
 	 * Disposes resources and removes event listeners.

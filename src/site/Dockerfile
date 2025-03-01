@@ -1,60 +1,44 @@
 FROM python:alpine3.21
 
-USER root
+ARG HOST_UID
+ARG HOST_GID
+ARG HOST_USER
+ARG HOST_GROUP
 
-# Prevent Python from writing pyc files and enable unbuffered output.
-ENV PYTHONDONTWRITEBYTECODE=1
-ENV PYTHONUNBUFFERED=1
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1 \
+    HOST_UID=${HOST_UID} \
+    HOST_GID=${HOST_GID} \
+    HOST_USER=${HOST_USER} \
+    HOST_GROUP=${HOST_GROUP} \
+    HOME=/home/$HOST_USER \
+    APP_HOME=/home/ft_transcendence \
+    GUNICORN_PATH=/home/gunicorn
 
-RUN apk add curl
+RUN apk add --no-cache curl
 
-# Ensure the home directory exists and set permissions
-RUN addgroup -g 4222 2022_rome && \
-    adduser -D -H -u 13449 -G 2022_rome evocatur
-    
-RUN mkdir -p /home/evocatur && \
-    chown -R 13449:4222 /home/evocatur
+RUN addgroup -g $HOST_GID $HOST_GROUP && \
+    adduser -D -H -u $HOST_UID -G $HOST_GROUP $HOST_USER
 
-ENV HOME=/home/evocatur
-ENV APP_HOME=/home/evocatur/ft_transcendence
-RUN mkdir -p $APP_HOME
-
-
-# Create staticfiles directory and set appropriate permissions
-RUN mkdir -p /home/evocatur/ft_transcendence/staticfiles && \
-    chown -R 13449:4222 /home/evocatur/ft_transcendence/staticfiles
-
-# Ensure the /home/gunicorn directory exists and has appropriate permissions
-RUN mkdir -p /home/evocatur/gunicorn && \
-    chown -R 13449:4222 /home/evocatur/gunicorn
+RUN mkdir -p $APP_HOME/staticfiles \
+    $GUNICORN_PATH/logs \
+    $GUNICORN_PATH/run \
+    && chown -R $HOST_UID:$HOST_GID $APP_HOME $GUNICORN_PATH
 
 WORKDIR $APP_HOME
 
-# Copy requirements file and install dependencies
-COPY ./config/requirements.txt .
-
+COPY --chown=$HOST_UID:$HOST_GID ./config/requirements.txt .
 RUN pip install --upgrade pip && \
     pip install --no-cache-dir -r requirements.txt
 
-# Copy entrypoint script
-COPY ./tools/entrypoint.sh .
-
+COPY --chown=$HOST_UID:$HOST_GID ./tools/entrypoint.sh .
 RUN chmod +x entrypoint.sh
 
-# Copy Gunicorn config
-COPY ./config/gunicorn/dev.py /home/evocatur/gunicorn/dev.py
-
-# Ensure all application files belong to the user with UID 13449 and GID 4222
-COPY --chown=13449:4222 . $APP_HOME
-
-# Use home directory for logs since /var is not writable in rootless mode
-RUN mkdir -p $HOME/gunicorn/logs && \
-    mkdir -p $HOME/gunicorn/run && \
-    chown -R 13449:4222 $HOME/gunicorn/logs && \
-    chown -R 13449:4222 $HOME/gunicorn/run
+COPY --chown=$HOST_UID:$HOST_GID ./config/gunicorn/dev.py /home/gunicorn/dev.py
+COPY --chown=$HOST_UID:$HOST_GID . .
 
 EXPOSE 8000
 
-# USER evocatur
+USER $HOST_USER
 
 ENTRYPOINT ["./entrypoint.sh"]

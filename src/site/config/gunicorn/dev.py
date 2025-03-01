@@ -6,7 +6,7 @@ forwarded_allow_ips = "*"
 workers = 2
 bind = "0.0.0.0:8000"
 reload = False
-accesslog = errorlog = "/home/evocatur/gunicorn/logs/dev.log"
+accesslog = errorlog = "/home/gunicorn/logs/dev.log"
 capture_output = True
-pidfile = "/home/evocatur/gunicorn/logs/dev.pid"
+pidfile = "/home/gunicorn/logs/dev.pid"
 daemon = False

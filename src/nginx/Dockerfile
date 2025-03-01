@@ -1,39 +1,35 @@
 
 FROM nginxinc/nginx-unprivileged:stable-alpine
 
-# # Install required packages
 USER root
 
-RUN apk update && apk upgrade && \
-    apk add nginx openssl
+ARG HOST_UID
+ARG HOST_GID
+ARG HOST_USER
+ARG HOST_GROUP
 
-# Create group 2022_rome with GID 4222 and user evocatur with UID 13449
-RUN addgroup -g 4222 2022_rome && \
-    adduser -D -H -u 13449 -G 2022_rome evocatur && \
-    mkdir -p /home/evocatur/nginx/ssl /home/evocatur/nginx/conf && \
-    chown -R nginx:nginx /home/evocatur/nginx
 
-# # Ensure the nginx user can access /var/cache/nginx (optional if using default location)
-RUN mkdir -p /var/cache/nginx && \
+ENV HOST_UID=${HOST_UID} \
+    HOST_GID=${HOST_GID} \
+    HOST_USER=${HOST_USER} \
+    HOST_GROUP=${HOST_GROUP}
+
+RUN addgroup -g $HOST_GID $HOST_GROUP && \
+    adduser -D -H -u $HOST_UID -G $HOST_GROUP $HOST_USER && \
+    mkdir -p /home/nginx/ssl && \
+    apk add openssl && \
+    mkdir -p /var/cache/nginx && \
     chown -R nginx:nginx /var/cache/nginx
 
-# Generate SSL certificates in user's home directory (not /etc/nginx/)
 RUN openssl req -newkey rsa:4096 -x509 -sha256 -days 365 -nodes \
-    -out /home/evocatur/nginx/ssl/evocatur.crt \
-    -keyout /home/evocatur/nginx/ssl/evocatur.key \
-    -subj "/C=IT/ST=Rome/L=Rome/O=42 Roma Luiss/OU=evocatur/CN=evocatur"
+    -out /home/nginx/ssl/out.crt \
+    -keyout /home/nginx/ssl/keyout.key \
+    -subj "/C=IT/ST=Rome/L=Rome/O=42 Roma Luiss/OU=$HOST_USER/CN=$HOST_USER"
 
-# Ensure SSL files are accessible by the Nginx user
-RUN chmod 644 /home/evocatur/nginx/ssl/evocatur.crt /home/evocatur/nginx/ssl/evocatur.key
+RUN chmod 644 /home/nginx/ssl/out.crt /home/nginx/ssl/keyout.key
+COPY config/default.conf /home/nginx/conf/default.conf
 
-# # Copy Nginx configuration to user's home directory
-COPY config/default.conf /home/evocatur/nginx/conf/default.conf
-
-# # Set Nginx to listen on an unprivileged port (443 → 8080)
 EXPOSE 8080
-
-# # Switch to non-root user
 USER nginx
 
-# # Start Nginx
-CMD ["nginx", "-c", "/home/evocatur/nginx/conf/default.conf", "-g", "daemon off;"]
+CMD ["nginx", "-c", "/home/nginx/conf/default.conf", "-g", "daemon off;"]

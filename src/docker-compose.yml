@@ -1,13 +1,19 @@
 services:
+  # === DATABASE SERVICES ===
   postgres:
-    build: postgres/
     image: postgres
-    container_name: postgres
-    user: ${USER}
-    env_file: postgres/env/.env.prod.db
+    build:
+      context: ./postgres
+      args:
+        HOST_USER: "${HOST_USER}"
+        HOST_GROUP: "${HOST_GROUP}"
+        HOST_UID: "${HOST_UID}"
+        HOST_GID: "${HOST_GID}"
     restart: always
-    ports:
-      - "5432:5432"
+    container_name: postgres
+    env_file: 
+      - postgres/env/.env.prod.db
+      - .env
     volumes:
       - pg_data:/var/lib/postgresql/data
     networks: 
@@ -17,126 +23,185 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
-  redis:
-    build: redis/
-    image: redis
-    container_name: redis
-    user: ${USER}
-    restart: always
-    networks: 
-      - backend
+
+  # === BACKEND SERVICES ===
   gunicorn:
-    build: site/
+    build:
+      context: site/
+      args:
+        HOST_USER: "${HOST_USER}"
+        HOST_GROUP: "${HOST_GROUP}"
+        HOST_UID: "${HOST_UID}"
+        HOST_GID: "${HOST_GID}"
     image: gunicorn
+    user: "${USER}"
+    restart: always
     container_name: gunicorn
-    user: ${USER}
-    env_file: site/env/.env.backend
-    restart: always
+    env_file: 
+      - site/env/.env.django
+      - .env
     networks: 
       - backend
     volumes:
-      - static_volume:/home/${USER}/ft_transcendence/staticfiles
-      - media_volume:/home/${USER}/ft_transcendence/media
+      - static_volume:/home/ft_transcendence/staticfiles
+      - media_volume:/home/ft_transcendence/media
     depends_on:
-      - postgres
-      - redis
-  nginx:
-    container_name: nginx
-    image: nginx
-    build: nginx/
-    user: ${USER}
-    ports:
-      - 8080:8080
-    restart: always
-    expose:
-      - 80
-    networks: 
-      - backend
-    depends_on: 
-      - gunicorn
-    volumes:
-      - static_volume:/home/${USER}/ft_transcendence/staticfiles
-      - media_volume:/home/${USER}/ft_transcendence/media
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
   daphne:
     image: daphne
+    user: "${USER}"
+    restart: always
+    container_name: daphne
     build:
       context: ./
       dockerfile: daphne/Dockerfile
-    container_name: daphne
-    user: ${USER}
-    env_file: site/env/.env.backend
-    restart: always
+      args:
+        HOST_USER: "${HOST_USER}"
+        HOST_GROUP: "${HOST_GROUP}"
+        HOST_UID: "${HOST_UID}"
+        HOST_GID: "${HOST_GID}"
+    env_file: 
+      - site/env/.env.django
+      - .env
     networks: 
       - backend
     depends_on: 
-      - gunicorn
-  # prometheus:
-  #   build: monitoring/prometheus/
-  #   image: prometheus
-  #   user: ${USER}
-  #   container_name: prometheus
-  #   volumes:
-  #      - prometheus:/prometheus
-  #   command:
-  #     - '--config.file=/etc/prometheus/prometheus.yml'
-  #     - '--storage.tsdb.path=/prometheus'
-  #     - '--web.console.libraries=/usr/share/prometheus/console_libraries'
-  #     - '--web.console.templates=/usr/share/prometheus/consoles'
-  #   networks:
-  #     - backend
-  #   ports:
-  #     - 9090:9090
-  # grafana:
-  #   build: monitoring/grafana/
-  #   image: grafana
-  #   user: ${USER}
-  #   container_name: grafana
-  #   env_file: monitoring/.env.monitoring
-  #   volumes:
-  #       - grafana:/var/lib/grafana
-  #   ports:
-  #       - "3000:3000"
-  #   restart: unless-stopped
-  #   networks:
-  #       - backend
-  # postgres-exporter:
-  #     build: monitoring/postgres-exporter
-  #     image: postgres-exporter
-  #     user: ${USER}
-  #     container_name: postgres-exporter
-  #     ports:
-  #         - "9187:9187"
-  #     env_file: postgres/env/.env.prod.db
-  #     depends_on:
-  #         prometheus:
-  #             condition: service_started
-  #         postgres:
-  #             condition: service_healthy
-  #     restart: unless-stopped
-  #     networks:
-  #         - backend
-  # nginx-exporter:
-  #   image: nginx/nginx-prometheus-exporter:latest
-  #   user: ${USER}
-  #   command:
-  #     - '-nginx.scrape-uri=http://nginx:8080/stub_status'
-  #   ports:
-  #     - 9113:9113
-  # node-exporter:
-  #   image: prom/node-exporter:latest
-  #   user: ${USER}
-  #   container_name: node-exporter
-  #   ports:
-  #     - 9100:9100
-  #   volumes:
-  #     - /proc:/host/proc:ro
-  #     - /sys:/host/sys:ro
-  #     - /:/rootfs:ro
-  #   command:
-  #     - '--path.procfs=/host/proc'
-  #     - '--path.sysfs=/host/sys'
-  #     - '--collector.filesystem.ignored-mount-points="^/(sys|proc|dev|host|etc)($$|/)"'
+      gunicorn:
+        condition: service_started
+  
+  redis:
+    image: redis
+    user: "${USER}"
+    build:
+      context: redis/
+      args:
+        HOST_USER: "${HOST_USER}"
+        HOST_GROUP: "${HOST_GROUP}"
+        HOST_UID: "${HOST_UID}"
+        HOST_GID: "${HOST_GID}"
+    restart: always
+    container_name: redis
+    env_file: 
+      - .env
+    networks: 
+      - backend
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
 
+  # === WEB SERVER SERVICES ===
+  nginx:
+    image: nginx
+    build:
+      context: nginx/
+      args:
+        HOST_USER: "${HOST_USER}"
+        HOST_GROUP: "${HOST_GROUP}"
+        HOST_UID: "${HOST_UID}"
+        HOST_GID: "${HOST_GID}"
+    user: "${USER}"
+    restart: always
+    container_name: nginx
+    env_file: 
+      - .env
+    ports:
+      - "8080:8080"
+    networks: 
+      - backend
+    depends_on: 
+      gunicorn:
+        condition: service_started
+    volumes:
+      - static_volume:/home/ft_transcendence/staticfiles
+      - media_volume:/home/ft_transcendence/media
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+
+  # === MONITORING SERVICES ===
+  prometheus:
+    user: "${USER}"
+    image: prometheus
+    container_name: prometheus
+    build:
+      context: monitoring/prometheus/
+      args:
+        HOST_USER: "${HOST_USER}"
+        HOST_GROUP: "${HOST_GROUP}"
+        HOST_UID: "${HOST_UID}"
+        HOST_GID: "${HOST_GID}"
+    env_file: 
+      - .env
+    volumes:
+       - prometheus:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+    networks:
+      - monitoring
+    ports:
+      - "9090:9090"
+
+  grafana:
+    user: "${USER}"
+    image: grafana
+    container_name: grafana
+    build:  
+      context: monitoring/grafana/
+      args:
+        HOST_USER: "${HOST_USER}"
+        HOST_GROUP: "${HOST_GROUP}"
+        HOST_UID: "${HOST_UID}"
+        HOST_GID: "${HOST_GID}"
+    env_file: 
+      - .env
+      - monitoring/.env.monitoring
+    volumes:
+        - grafana:/var/lib/grafana
+    ports:
+        - "3000:3000"
+    restart: unless-stopped
+    networks:
+        - monitoring
+
+  postgres-exporter:
+    user: "${USER}"
+    restart: unless-stopped
+    image: postgres-exporter
+    build: 
+      context: monitoring/postgres-exporter
+      args:
+        HOST_USER: "${HOST_USER}"
+        HOST_GROUP: "${HOST_GROUP}"
+        HOST_UID: "${HOST_UID}"
+        HOST_GID: "${HOST_GID}"
+    container_name: postgres-exporter
+    env_file: 
+      - postgres/env/.env.prod.db
+      - .env
+    ports:
+        - "9187:9187"
+    depends_on:
+        prometheus:
+            condition: service_started
+        postgres:
+            condition: service_healthy
+    networks:
+        - monitoring
+
+networks:
+  backend:
+    driver: bridge
+  monitoring:
+    driver: bridge
 
 volumes:
   grafana:
@@ -147,8 +212,4 @@ volumes:
   static_volume:
     driver: local
   media_volume:
-      driver: local
-
-networks:
-  backend:
-    driver: bridge
+    driver: local
