@@ -74,7 +74,7 @@ class Auth42(View):
 	def __init__(self, **kwargs):
 		super().__init__(**kwargs)
 		self.params_auth = {
-			"client_id": "u-s4t2ud-7913cbc4cbaed9a2d5e9b33fcd888a0d3c5d00ba256b7844ef00714c3e9580cf",
+			"client_id": str(os.environ.get("42_CLIENT_ID")),
 			"redirect_uri": "oauth_callback",
 			"response_type": "code",
 			"state": self.state
@@ -82,7 +82,7 @@ class Auth42(View):
 
 		self.params_token = {
 			"grant_type": "authorization_code",
-			"client_id": "u-s4t2ud-7913cbc4cbaed9a2d5e9b33fcd888a0d3c5d00ba256b7844ef00714c3e9580cf",
+			"client_id": str(os.environ.get("42_CLIENT_ID")),
 			"client_secret": str(os.environ.get("42_AUTH_CLIENT_SECRET")),
 			"redirect_uri": self.params_auth["redirect_uri"]
 		}
