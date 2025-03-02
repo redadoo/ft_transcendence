@@ -124,8 +124,8 @@ export default class SceneManager
 	initializeRenderer(shadowMapType) 
 	{
 		this.renderer = new THREE.WebGLRenderer({ antialias: true });
-		this.renderer.setPixelRatio(0.5); // Lower pixel density
-		this.renderer.setSize(window.innerWidth * 0.5, window.innerHeight * 0.5, false);
+		this.renderer.setPixelRatio(1); // Lower pixel density
+		this.renderer.setSize(window.innerWidth * 1, window.innerHeight * 1, false);
 		this.renderer.shadowMap.enabled = true;
 		this.renderer.shadowMap.type = shadowMapType;
 		document.body.appendChild(this.renderer.domElement);

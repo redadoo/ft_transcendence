@@ -179,23 +179,24 @@ export default class Game
 	 */
 	initLights() 
 	{
-		this.ambientLight = new THREE.AmbientLight(0xb0e0e6, 1);
+		// Luce ambientale blu scuro (notturna)
+		this.ambientLight = new THREE.AmbientLight(0x0d1b2a, 0.4);
 
+		// Luce lunare (PointLight azzurra)
+		this.moonLight = new THREE.PointLight(0xADD8E6, 1.2, 10); 
+		this.moonLight.position.set(2, 3, -1);
+		this.moonLight.castShadow = true;
+		this.moonLight.shadow.camera.near = 1;
+		this.moonLight.shadow.camera.far = 100;
+		this.moonLight.shadow.mapSize.set(256, 256);
+		this.moonLight.shadow.bias = -0.0002;
+		this.moonLight.shadow.filter = THREE.PCFSoftShadowFilter;
 
-		//Seconda PointLight (gialla)
-		this.yellowLight = new THREE.PointLight(0xFFD700, 20, 10); // Giallo dorato
-		this.yellowLight.position.set(1, 1, 0);
-		this.yellowLight.castShadow = true;
-		this.yellowLight.shadow.camera.near = 1;
-		this.yellowLight.shadow.camera.far = 100;
-		this.yellowLight.shadow.mapSize.set(128, 128);
-		this.yellowLight.shadow.bias = -0.0001;
-		this.yellowLight.shadow.filter = THREE.PCFSoftShadowFilter;
-		const yellowLightHelper = new THREE.PointLightHelper(this.yellowLight, 50);
-		this.sceneManager.scene.add(this.yellowLight);
-		this.sceneManager.scene.add(yellowLightHelper);
+		const moonLightHelper = new THREE.PointLightHelper(this.moonLight, 30);
+		this.sceneManager.scene.add(this.moonLight);
+		this.sceneManager.scene.add(moonLightHelper);
 
-
+		// Aggiunta della luce ambientale
 		this.sceneManager.scene.add(this.ambientLight);
 		//-----------------------------------------heavy graphics-------------------------
 		/* this.ambientLight = new THREE.AmbientLight(0xb0e0e6, 1.1);
