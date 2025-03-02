@@ -143,14 +143,20 @@ export default class Game
 
 		this.initLights();
 
-		// await this.sceneManager.modelManager.loadModel({
-		// 	'/static/liarsbar_static/assets/liarsbar/liars_room.glb': 'LobbyScene',
-		// 	'/static/liarsbar_static/assets/liarsbar/human.glb': 'human',
-		// 	'/static/liarsbar_static/assets/liarsbar/king_boo.glb': 'kingboo',
-		// 	'/static/liarsbar_static/assets/liarsbar/rimuru_slime.glb': 'rimuru',
-		// 	'/static/liarsbar_static/assets/liarsbar/winged_kuriboh.glb': 'kuriboh',
-		// 	'/static/liarsbar_static/assets/liarsbar/slime_gun.glb': 'slimegun'
-		// });
+		await this.sceneManager.modelManager.loadModel({
+			'/static/liarsbar_static/assets/liarsbar/Island.glb': 'LobbyScene',
+			'/static/liarsbar_static/assets/liarsbar/Porygon.glb': 'Porygon',
+			'/static/liarsbar_static/assets/liarsbar/Mew.glb': 'Mew',
+			'/static/liarsbar_static/assets/liarsbar/Cubone.glb': 'Cubone',
+			'/static/liarsbar_static/assets/liarsbar/Magikarp.glb': 'Magikarp',
+			//--------------------------------OLD MODELS------------------------
+			// '/static/liarsbar_static/assets/liarsbar/liars_room.glb': 'LobbyScene',
+			// '/static/liarsbar_static/assets/liarsbar/human.glb': 'human',
+			// '/static/liarsbar_static/assets/liarsbar/king_boo.glb': 'kingboo',
+			// '/static/liarsbar_static/assets/liarsbar/rimuru_slime.glb': 'rimuru',
+			// '/static/liarsbar_static/assets/liarsbar/winged_kuriboh.glb': 'kuriboh',
+			// '/static/liarsbar_static/assets/liarsbar/slime_gun.glb': 'slimegun'
+		});
 
 		this.initLobbyScene();
 
@@ -173,40 +179,59 @@ export default class Game
 	 */
 	initLights() 
 	{
-		// this.ambientLight = new THREE.AmbientLight(0xb0e0e6, 1.1);
-
-		// // PointLight che si propaga in tutte le direzioni
-		// this.pointLight = new THREE.PointLight(0xFFB84D, 500000, 1500); // (Colore, Intensità, Distanza massima)
-		// this.pointLight.position.set(-300, 250, -40);
-
-		// // Abilita le ombre
-		// this.pointLight.castShadow = true;
-		// this.pointLight.shadow.camera.near = 1;
-		// this.pointLight.shadow.camera.far = 2000;
-		// this.pointLight.shadow.mapSize.set(512, 512);
-		// this.pointLight.shadow.bias = -0.0001;
-
-		// // Helper per visualizzare la PointLight
-		// const pointLightHelper = new THREE.PointLightHelper(this.pointLight, 50);
-
-		// this.sceneManager.scene.add(this.pointLight);
-		// this.sceneManager.scene.add(pointLightHelper);
-
-		// // Seconda PointLight (gialla)
-		// this.yellowLight = new THREE.PointLight(0xFFD700, 700000, 1500); // Giallo dorato
-		// this.yellowLight.position.set(0, 400, 500);
-		// this.yellowLight.castShadow = true;
-		// this.yellowLight.shadow.camera.near = 1;
-		// this.yellowLight.shadow.camera.far = 2000;
-		// this.yellowLight.shadow.mapSize.set(512, 512);
-		// this.yellowLight.shadow.bias = -0.0001;
-		// this.yellowLight.shadow.filter = THREE.PCFSoftShadowFilter;
-		// const yellowLightHelper = new THREE.PointLightHelper(this.yellowLight, 50);
-		// this.sceneManager.scene.add(this.yellowLight);
-		// this.sceneManager.scene.add(yellowLightHelper);
+		this.ambientLight = new THREE.AmbientLight(0xb0e0e6, 1);
 
 
-		// this.sceneManager.scene.add(this.ambientLight);
+		//Seconda PointLight (gialla)
+		this.yellowLight = new THREE.PointLight(0xFFD700, 20, 10); // Giallo dorato
+		this.yellowLight.position.set(1, 1, 0);
+		this.yellowLight.castShadow = true;
+		this.yellowLight.shadow.camera.near = 1;
+		this.yellowLight.shadow.camera.far = 100;
+		this.yellowLight.shadow.mapSize.set(128, 128);
+		this.yellowLight.shadow.bias = -0.0001;
+		this.yellowLight.shadow.filter = THREE.PCFSoftShadowFilter;
+		const yellowLightHelper = new THREE.PointLightHelper(this.yellowLight, 50);
+		this.sceneManager.scene.add(this.yellowLight);
+		this.sceneManager.scene.add(yellowLightHelper);
+
+
+		this.sceneManager.scene.add(this.ambientLight);
+		//-----------------------------------------heavy graphics-------------------------
+		/* this.ambientLight = new THREE.AmbientLight(0xb0e0e6, 1.1);
+
+		// PointLight che si propaga in tutte le direzioni
+		this.pointLight = new THREE.PointLight(0xFFB84D, 500000, 1500); // (Colore, Intensità, Distanza massima)
+		this.pointLight.position.set(-300, 250, -40);
+
+		// Abilita le ombre
+		this.pointLight.castShadow = true;
+		this.pointLight.shadow.camera.near = 1;
+		this.pointLight.shadow.camera.far = 2000;
+		this.pointLight.shadow.mapSize.set(512, 512);
+		this.pointLight.shadow.bias = -0.0001;
+
+		// Helper per visualizzare la PointLight
+		const pointLightHelper = new THREE.PointLightHelper(this.pointLight, 50);
+
+		this.sceneManager.scene.add(this.pointLight);
+		this.sceneManager.scene.add(pointLightHelper);
+
+		// Seconda PointLight (gialla)
+		this.yellowLight = new THREE.PointLight(0xFFD700, 700000, 1500); // Giallo dorato
+		this.yellowLight.position.set(0, 400, 500);
+		this.yellowLight.castShadow = true;
+		this.yellowLight.shadow.camera.near = 1;
+		this.yellowLight.shadow.camera.far = 2000;
+		this.yellowLight.shadow.mapSize.set(512, 512);
+		this.yellowLight.shadow.bias = -0.0001;
+		this.yellowLight.shadow.filter = THREE.PCFSoftShadowFilter;
+		const yellowLightHelper = new THREE.PointLightHelper(this.yellowLight, 50);
+		this.sceneManager.scene.add(this.yellowLight);
+		this.sceneManager.scene.add(yellowLightHelper); */
+
+
+		this.sceneManager.scene.add(this.ambientLight);
 	}
 
 	/**
@@ -214,42 +239,70 @@ export default class Game
 	 */
 	initLobbyScene() 
 	{
-		// const LobbyScene = this.sceneManager.modelManager.getModel("LobbyScene");
-		// LobbyScene.scene.scale.set(10000, 10000, 10000);
-		// LobbyScene.scene.rotation.y = 0;
-		// LobbyScene.scene.position.set(0, 0, 0);
+		const LobbyScene = this.sceneManager.modelManager.getModel("LobbyScene");
+		LobbyScene.scene.scale.setScalar(3);
+		LobbyScene.scene.rotation.y = 0;
+		LobbyScene.scene.position.set(0, -2.3, 0);
 
-		// this.sceneManager.scene.add(LobbyScene.scene);
+		this.sceneManager.scene.add(LobbyScene.scene);
 
-		// const bo = this.sceneManager.modelManager.getModel("kingboo");
-		// bo.scene.scale.set(170, 170, 170);
-		// bo.scene.rotation.y = 0;
-		// bo.scene.position.set(120, 150, 620);
+		const bo = this.sceneManager.modelManager.getModel("Mew");
+		bo.scene.scale.setScalar(0.5);
+		bo.scene.rotation.y = 0;
+		bo.scene.position.set(0, 0.2, 0.5);
 
-		// const slimegun = this.sceneManager.modelManager.getModel("slimegun");
-		// slimegun.scene.scale.set(40, 40, 40);
-		// slimegun.scene.rotation.y = 1.571;
-		// slimegun.scene.position.set(-20, 96, 730);
+		const slimegun = this.sceneManager.modelManager.getModel("Porygon");
+		slimegun.scene.scale.setScalar(0.002);
+		slimegun.scene.rotation.y = 1.571;
+		slimegun.scene.position.set(-0.5, 0.03, 0);
 
-		// const bo3 = this.sceneManager.modelManager.getModel("rimuru");
-		// bo3.scene.scale.set(30, 30, 30);
-		// bo3.scene.rotation.y =  200;
-		// bo3.scene.position.set(120, 96, 840);
+		const bo3 = this.sceneManager.modelManager.getModel("Magikarp");
+		bo3.scene.scale.setScalar(0.5);
+		bo3.scene.rotation.y = -1.571;
+		bo3.scene.position.set(0.5, 0.05, 0)
 
-		// const bo4 = this.sceneManager.modelManager.getModel("kuriboh");
-		// bo4.scene.scale.set(3, 3, 3);
-		// bo4.scene.rotation.y = -1.571;
-		// bo4.scene.position.set(240, 150, 750);
+		const bo4 = this.sceneManager.modelManager.getModel("Cubone");
+		bo4.scene.scale.setScalar(0.5);
+		bo4.scene.rotation.y =  3.142;
+		bo4.scene.position.set(0, 0.15, -0.5);
+		//------------------------------OLD MODELS----------------------------------
+	/* 	const LobbyScene = this.sceneManager.modelManager.getModel("LobbyScene");
+		LobbyScene.scene.scale.set(10000, 10000, 10000);
+		LobbyScene.scene.rotation.y = 0;
+		LobbyScene.scene.position.set(0, 0, 0);
 
-		// const axesHelper = new THREE.AxesHelper(500); // La dimensione determina la lunghezza degli assi
-		// this.sceneManager.scene.add(axesHelper);
-		// const gridHelper = new THREE.GridHelper(10000, 10); // (Dimensione, Divisioni)
-		// this.sceneManager.scene.add(gridHelper);
+		this.sceneManager.scene.add(LobbyScene.scene);
 
-		// this.sceneManager.scene.add(bo.scene);
-		// this.sceneManager.scene.add(slimegun.scene);
-		// this.sceneManager.scene.add(bo3.scene);
-		// this.sceneManager.scene.add(bo4.scene);
+		const bo = this.sceneManager.modelManager.getModel("kingboo");
+		bo.scene.scale.set(170, 170, 170);
+		bo.scene.rotation.y = 0;
+		bo.scene.position.set(120, 150, 620);
+
+		const slimegun = this.sceneManager.modelManager.getModel("slimegun");
+		slimegun.scene.scale.set(40, 40, 40);
+		slimegun.scene.rotation.y = 1.571;
+		slimegun.scene.position.set(-20, 96, 730);
+
+		const bo3 = this.sceneManager.modelManager.getModel("rimuru");
+		bo3.scene.scale.set(30, 30, 30);
+		bo3.scene.rotation.y =  200;
+		bo3.scene.position.set(120, 96, 840);
+
+		const bo4 = this.sceneManager.modelManager.getModel("kuriboh");
+		bo4.scene.scale.set(3, 3, 3);
+		bo4.scene.rotation.y = -1.571;
+		bo4.scene.position.set(240, 150, 750); */
+		
+		this.sceneManager.scene.add(bo.scene);
+		this.sceneManager.scene.add(slimegun.scene);
+		this.sceneManager.scene.add(bo3.scene);
+		this.sceneManager.scene.add(bo4.scene);
+
+		const axesHelper = new THREE.AxesHelper(500); // La dimensione determina la lunghezza degli assi
+		this.sceneManager.scene.add(axesHelper);
+		const gridHelper = new THREE.GridHelper(10000, 10); // (Dimensione, Divisioni)
+		this.sceneManager.scene.add(gridHelper);
+
 	
 	}
 
@@ -289,8 +342,22 @@ export default class Game
 			console.warn("Player ID non trovato nella lista dei giocatori!");
 			return;
 		}
-		// Definiamo le posizioni della camera per ciascun giocatore
 		const cameraPositions = [
+				new THREE.Vector3(107.80899420126953, 261.37028568763486, 1040.2530466184585), //rimuru
+				new THREE.Vector3(358.8226249419454, 278.7692367678665, 743.608735250403), // kuriboh
+				new THREE.Vector3( -149.23606980454502, 260.49133716451746, 744.2613518306547), //slimegun
+				new THREE.Vector3(2.5, 1.7, 0.5), //Magikarp
+			];
+		
+			// Definiamo i target per ciascun giocatore (4 target distinti)
+			const targets = [
+				new THREE.Vector3(118, 10, 467),      // rimuru
+				new THREE.Vector3(-149, 100, 744), // kuriboh
+				new THREE.Vector3(358, 80, 744),    //slimegun
+				new THREE.Vector3(0, 0, 0),    //Magikarp
+			];
+		// ---------------------OLD CAMERA---------------------------
+		/* const cameraPositions = [
 			new THREE.Vector3(107.80899420126953, 261.37028568763486, 1040.2530466184585), //rimuru
 			new THREE.Vector3(358.8226249419454, 278.7692367678665, 743.608735250403), // kuriboh
 			new THREE.Vector3( -149.23606980454502, 260.49133716451746, 744.2613518306547), //slimegun
@@ -303,7 +370,7 @@ export default class Game
 			new THREE.Vector3(-149, 100, 744), // kuriboh
 			new THREE.Vector3(358, 80, 744),    //slimegun
 			new THREE.Vector3(108, 100, 1040),    //king boh
-		];
+		]; */
 	
 		// Prendi la posizione della camera e il target in base all'indice del giocatore
 		const cameraPos = cameraPositions[playerIndex];
