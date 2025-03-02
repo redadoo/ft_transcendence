@@ -10,12 +10,10 @@ PURPLE="\033[0;35m"
 GRAY="\033[0;37m"
 CURSIVE="\033[3m"
 
-# Define URLs to download Bootstrap and Three.js
+# Define URLs to download Bootstrap
 BOOTSTRAP_URL="https://github.com/twbs/bootstrap/releases/download/v5.3.3/bootstrap-5.3.3-dist.zip"
-THREEJS_URL="https://github.com/mrdoob/three.js/archive/master.zip"
 
 BOOTSTRAP_DIR="src/site/static/lib/bootstrap"
-THREEJS_DIR="src/site/static/lib/threejs"
 
 DOCKER_PRODUCTION_COMPOSE_FILE="src/docker-compose.yml"
 
@@ -100,23 +98,6 @@ check_dependencies() {
 		echo -e "${GREEN}\nBootstrap installed${NONE}"
 	else
 		echo -e "${GREEN}Bootstrap folder already exists. Skipping download.${NONE}"
-	fi
-
-	# Install Three.js if not already installed
-	if [ ! -d "$THREEJS_DIR" ]; then
-		trap stop_spinner EXIT
-		start_spinner "Downloading Three.js! "
-		mkdir -p tmp
-		curl -s -LO "$THREEJS_URL" || { echo "Error downloading Three.js"; exit 1; }
-		mv master.zip tmp/ > /dev/null
-		unzip tmp/master.zip -d tmp > /dev/null
-		mkdir -p "$THREEJS_DIR" 
-		mv tmp/three.js-master/* "$THREEJS_DIR/" > /dev/null
-		rm -rf tmp
-		stop_spinner
-		echo -e "${GREEN}\nBootstrap  Three.js${NONE}"
-	else
-		echo -e "${GREEN}Three.js folder already exists. Skipping download.${NONE}"
 	fi
 }
 

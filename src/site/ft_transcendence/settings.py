@@ -76,12 +76,12 @@ MIDDLEWARE = [
 ]
 
 CSP_DEFAULT_SRC = ("'self'", "blob:")
-CSP_SCRIPT_SRC = ("'self'", "'unsafe-inline'", "https://cdn.jsdelivr.net", "https://auth.42.fr")
+CSP_SCRIPT_SRC = ("'self'","https://cdn.jsdelivr.net", "https://auth.42.fr")
 CSP_CONNECT_SRC = ("'self'", "blob:")
 CSP_IMG_SRC = ("'self'", "data:")
 CSP_MEDIA_SRC = ("'self'", "blob:")
 CSP_FONT_SRC = ("'self'", "data:")
-CSP_STYLE_SRC = ("'self'", "'unsafe-inline'")
+CSP_STYLE_SRC = ("'self'")
 
 # CSRF SETTINGS
 CSRF_COOKIE_HTTPONLY = False

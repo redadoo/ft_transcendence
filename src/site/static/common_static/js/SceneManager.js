@@ -1,6 +1,6 @@
-import * as THREE from '../../lib/threejs/src/Three.js';
-import { OrbitControls } from '../../lib/threejs/examples/jsm/controls/OrbitControls.js';
-import Stats from '../../lib/threejs/examples/jsm/libs/stats.module.js';
+import * as THREE from "https://cdn.jsdelivr.net/npm/three@latest/build/three.module.js";
+import { OrbitControls } from 'https://cdn.jsdelivr.net/npm/three@latest/examples/jsm/controls/OrbitControls.js';
+import Stats from 'https://cdn.jsdelivr.net/npm/three@latest/examples/jsm/libs/stats.module.js';
 import ModelManager from './ModelManager.js';
 import AudioManager from './AudioManager.js';
 

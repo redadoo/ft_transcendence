@@ -1,4 +1,4 @@
-import * as THREE from '../../../lib/threejs/src/Three.js';
+import * as THREE from "https://cdn.jsdelivr.net/npm/three@latest/build/three.module.js";
 
 /**
  * Class that creates a background with a dotted center line in a Three.js scene.
