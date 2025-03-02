@@ -75,8 +75,8 @@ MIDDLEWARE = [
     "csp.middleware.CSPMiddleware"
 ]
 
-CSP_DEFAULT_SRC = ("'self'",)
-CSP_SCRIPT_SRC = ("'self'", "blob:")
+CSP_DEFAULT_SRC = ("'self'", "blob:")
+CSP_SCRIPT_SRC = ("'self'", "'unsafe-inline'", "https://cdn.jsdelivr.net", "https://auth.42.fr")
 CSP_CONNECT_SRC = ("'self'", "blob:")
 CSP_IMG_SRC = ("'self'", "data:")
 CSP_MEDIA_SRC = ("'self'", "blob:")
