@@ -3,7 +3,7 @@ import MultiplayerPongMode from './utils/pongMode/MultiplayerPongMode.js';
 import PrivateLobbyPongMode from './utils/pongMode/PrivateLobbyPongMode.js';
 import TournamentPongMode from './utils/pongMode/TournamentPongMode.js';
 
-import * as THREE from '../../lib/threejs/src/Three.js';
+import * as THREE from "https://cdn.jsdelivr.net/npm/three@latest/build/three.module.js";
 import SceneManager from '../../common_static/js/SceneManager.js';
 import Bounds from './utils/Bounds.js';
 import Ball from './utils/Ball.js';

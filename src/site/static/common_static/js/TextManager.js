@@ -1,5 +1,7 @@
-import { TextGeometry } from '../../lib/threejs/examples/jsm/geometries/TextGeometry.js';
-import { FontLoader } from '../../lib/threejs/examples/jsm/loaders/FontLoader.js';
+import * as THREE from "https://cdn.jsdelivr.net/npm/three@latest/build/three.module.js";
+import { TextGeometry } from "https://cdn.jsdelivr.net/npm/three@latest/examples/jsm/geometries/TextGeometry.js";
+import { FontLoader } from "https://cdn.jsdelivr.net/npm/three@latest/examples/jsm/loaders/FontLoader.js";
+
 
 export default class TextManager {
 	/**
