@@ -87,8 +87,8 @@ CSP_STYLE_SRC = ("'self'", "'unsafe-inline'")
 CSRF_COOKIE_HTTPONLY = False
 CSRF_COOKIE_NAME = 'csrftoken'
 CSRF_TRUSTED_ORIGINS = [
-    "https://transcendence", "https://localhost", "https://localhost:443",
-    "https://localhost:1337", "http://localhost:8000", "http://10.12.8.3:8000", "https://10.12.8.3:8000", "http://10.12.8.3", "https://10.12.8.3"
+    "https://transcendence", "https://localhost", "http://localhost:8000", "http://10.12.8.3:8000", 
+    "https://10.12.8.3:8000", "http://10.12.8.3", "https://10.12.8.3"
 ]
 
 # CHANNEL LAYERS CONFIGURATION

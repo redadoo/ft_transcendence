@@ -160,19 +160,15 @@ export default class Game
 		switch (modeFromPath)
 		{
 			case 'singleplayer':
-				console.log("cap singleplayer");
 				this.mode = new SinglePlayerPongMode(this);
 				break;
 			case 'multiplayer':
-				console.log("cap multiplayer");
 				this.mode = new MultiplayerPongMode(this);
 				break;
 			case 'lobby':
-				console.log("cap lobby");
 				this.mode = new PrivateLobbyPongMode(this);
 				break;
 			case 'tournament':
-				console.log("cap tournament");
 				this.mode = new TournamentPongMode(this);
 				break;
 			default:
@@ -181,7 +177,6 @@ export default class Game
 
 		if (this.mode)
 			this.mode.init();
-		console.log("cap 2");
 		this.sceneManager.setExternalFunction(() => this.fixedUpdate());
 
 
