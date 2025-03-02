@@ -23,7 +23,6 @@ class User(AbstractUser):
 		MATCHMAKING = 5, "In Matchmaking"
 		PLAYING = 6, "playing"
 
-
 	id = models.AutoField(primary_key=True)
 	username = models.CharField(
 		max_length=12,
@@ -35,16 +34,14 @@ class User(AbstractUser):
 		help_text="User's unique username."
 	)
 	email = models.EmailField(max_length=100, unique=True)
-	
 	status = models.IntegerField(
 		choices=UserStatus.choices,
 		default=UserStatus.OFFLINE,
 		help_text="The current status of the user."
 	)
-
+	account42Nickname = models.CharField(blank=True, null=True, unique=True)
 	created_at = models.DateField(auto_now_add=True, help_text="The date and time when the object was created.")
 	updated_at = models.DateField(auto_now=True, help_text="The date and time when the object was last updated.")
- 
 	groups = models.ManyToManyField(
 		Group,
 		related_name="User_groups",  

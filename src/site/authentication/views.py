@@ -133,8 +133,9 @@ class Auth42(View):
 		user_data = user_data_response.json()
 		username, email = user_data.get("login"), user_data.get("email")
 
-		user42, created = User.objects.get_or_create(username=username, defaults={"email": email})
+		user42, created = User.objects.get_or_create(account42Nickname=username, defaults={"email": email})
 		if created:
+			user42.username = user42.account42Nickname
 			UserStats.objects.create(user=user42)
 			UserImage.objects.create(user=user42)
 
