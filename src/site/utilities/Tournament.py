@@ -14,7 +14,7 @@ class Tournament():
 		ENDED = "ended"
 		PLAYER_DISCONNECTED = "PLAYER_DISCONNECTED"
 
-	def __init__(self, game_name: str, room_name: str, game_manager: GameManager):
+	def __init__(self, game_name: str, room_name: str, game_manager: GameManager, matchManager):
 		self.room_group_name = f"{game_name}_tournament_{room_name}"
 		self.tournament_status = self.TournamentStatus.TO_SETUP
 		self.game_manager: GameManager = game_manager
@@ -22,11 +22,12 @@ class Tournament():
 		self.tournament_player = PLAYER_NUMBER
 		self.update_lock = asyncio.Lock()
 
-		self.players: list = []           # All players that joined
-		self.bracket: list = []           # List of rounds; each round is a list of matches (each match is a pair of players)
-		self.current_round_winners: list = []  # Winners of the current round
-		self.current_round_index: int = 0      # Index into self.bracket for the current round
+		self.players: list = []           
+		self.bracket: list = []           
+		self.current_round_winners: list = []  
+		self.current_round_index: int = 0 
 		self.game_loop_task = None
+		self.matchManager = matchManager
 
 	async def broadcast_message(self, message: dict):
 		await self.channel_layer.group_send(self.room_group_name, message)
