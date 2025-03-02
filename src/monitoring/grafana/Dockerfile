@@ -1,4 +1,4 @@
-FROM grafana/grafana:latest
+FROM grafana/grafana:11.5.2-ubuntu
 
 USER root
 
@@ -12,10 +12,10 @@ ENV HOST_UID=${HOST_UID} \
     HOST_USER=${HOST_USER} \
     HOST_GROUP=${HOST_GROUP}
 
-RUN addgroup -g $HOST_GID $HOST_GROUP && \
-    adduser -D -H -u $HOST_UID -G $HOST_GROUP $HOST_USER
+RUN groupadd -g $HOST_GID $HOST_GROUP && \
+    useradd -m -u $HOST_UID -g $HOST_GROUP $HOST_USER
 
-RUN apk add --no-cache jq curl
+RUN apt update && apt install -y jq curl && rm -rf /var/lib/apt/lists/*
 
 COPY tools/entrypoint.sh /usr/local/bin/entrypoint.sh
 COPY conf/15489_rev2.json /usr/local/bin/15489_rev2.json

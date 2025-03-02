@@ -1,4 +1,4 @@
-FROM python:alpine3.21
+FROM python:3.11-alpine3.21
 
 ARG HOST_UID
 ARG HOST_GID
@@ -15,8 +15,6 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
     APP_HOME=/home/ft_transcendence \
     GUNICORN_PATH=/home/gunicorn
 
-RUN apk add --no-cache curl
-
 RUN addgroup -g $HOST_GID $HOST_GROUP && \
     adduser -D -H -u $HOST_UID -G $HOST_GROUP $HOST_USER
 
@@ -28,8 +26,10 @@ RUN mkdir -p $APP_HOME/staticfiles \
 WORKDIR $APP_HOME
 
 COPY --chown=$HOST_UID:$HOST_GID ./config/requirements.txt .
+
+
 RUN pip install --upgrade pip && \
-    pip install --no-cache-dir -r requirements.txt
+pip install --no-cache-dir -r requirements.txt
 
 COPY --chown=$HOST_UID:$HOST_GID ./tools/entrypoint.sh .
 RUN chmod +x entrypoint.sh

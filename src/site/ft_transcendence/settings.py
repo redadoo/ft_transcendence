@@ -20,7 +20,7 @@ def add_ip_range_to_allowed_hosts(ip_range="10.12"):
 
 ALLOWED_HOSTS.extend(add_ip_range_to_allowed_hosts("10.12"))
 ALLOWED_HOSTS = list(set(ALLOWED_HOSTS)) 
-print(ALLOWED_HOSTS)
+
 # Security enhancements
 SECURE_HSTS_SECONDS = 30  # 2_592_000
 SECURE_HSTS_PRELOAD = True
