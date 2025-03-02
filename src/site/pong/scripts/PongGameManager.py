@@ -1,4 +1,3 @@
-from asgiref.sync import sync_to_async
 from pong.scripts import constants
 from pong.models import *
 from pong.scripts.ball import Ball

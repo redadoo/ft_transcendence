@@ -1,4 +1,3 @@
-from django.forms import CharField
 from rest_framework import serializers
 from .models import Friendships, UserStats, UserImage, MatchHistory, User
 from rest_framework import serializers
