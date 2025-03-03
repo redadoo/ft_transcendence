@@ -43,8 +43,8 @@ class UserViewSet(viewsets.ModelViewSet):
 				async_to_sync(send_event_to_all_consumer)("get_update_users", {"username": new_user.username})
 				return Response({"success": "true"})
 			return Response({"success": "false", "errors": form.errors})
-		except DatabaseError:
-			return Response(status=503)
+		except (DatabaseError, OperationalError) as e:
+			return Response({"server_error": "Database is offline"}, status=503)
 
 	@action(detail=False, methods=['post'])
 	def login(self, request):
@@ -54,24 +54,28 @@ class UserViewSet(viewsets.ModelViewSet):
 				login(request, user)
 				return Response({"success": "true"})
 			return Response({"success": "false"})
-		except DatabaseError:
-			return Response(status=503)
+		except (DatabaseError, OperationalError) as e:
+			return Response({"server_error": "Database is offline"}, status=503)
 
 	@action(detail=False, methods=['get'])
 	def logout(self, request):
 		try:
 			logout(request)
 			return Response({"success": "true"})
-		except DatabaseError:
-			return Response(status=503)
+		except (DatabaseError, OperationalError) as e:
+			return Response({"server_error": "Database is offline"}, status=503)
 
 	@action(detail=False, methods=['get'])
 	def is_logged_in(self, request):
+		print(f" persone",flush=True)
+
 		try:
-			# Check if the user is authenticated without hitting the database
 			is_logged = request.user.is_authenticated
 			return Response({"success": "true" if is_logged else "false"})
-		except DatabaseError:
+		except (DatabaseError, OperationalError) as e:
+			return Response({"server_error": "Database is offline"}, status=503)
+		except Exception as e:
+			print(f"leggend {e}",flush=True)
 			return Response(status=503)
 
 

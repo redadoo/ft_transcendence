@@ -129,7 +129,7 @@ services:
       test: ["CMD", "curl", "-f", "http://localhost"]
       interval: 10s
       timeout: 3s
-      retries: 5
+      retries: 3
 
   # === MONITORING SERVICES ===
   prometheus:

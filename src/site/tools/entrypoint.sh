@@ -23,4 +23,4 @@ echo "Collecting static files..."
 python manage.py collectstatic --noinput
 
 echo "Starting Gunicorn..."
-exec gunicorn -c /home/gunicorn/dev.py
+exec gunicorn -c /home/gunicorn/dev.py --capture-output --enable-stdio-inheritance

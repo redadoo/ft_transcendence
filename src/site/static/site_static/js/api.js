@@ -42,17 +42,21 @@ const api = {
 				}
 			};
 
+			console.log("before fetch");
 			const response = await fetch(url, mergedOptions);
+			console.log("after fetch", response);
+
 			if (response.status === 503)
 			{
-				if (window.location.pathname !== '/logout')
+				if (window.location.pathname !== '/login')
+					alert("Server connection failed. Please try again later.");
+				if (window.location.pathname !== '/logout' || window.location.pathname !== '/login')
 					router.navigateTo('/logout');
-				alert(`Server error`);
+				throw new Error(`HTTP error! status: ${response.status}`);
 			}
 
 			if (!response.ok)
 				throw new Error(`HTTP error! status: ${response.status}`);
-
 
 			return await response.json();
 		} catch (error) {

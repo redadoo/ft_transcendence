@@ -2,6 +2,7 @@
 
 import multiprocessing
 
+
 wsgi_app = "ft_transcendence.wsgi:application"
 
 # Worker settings
@@ -18,9 +19,14 @@ timeout = 30
 graceful_timeout = 20
 
 # Logging
-accesslog = errorlog = "/home/gunicorn/logs/dev.log"
+loglevel = "debug"
+# accesslog = errorlog = "/home/gunicorn/logs/dev.log"
+accesslog = "-"
+errorlog = "-"
 capture_output = True
 
 # PID file
-pidfile = "/home/gunicorn/logs/dev.pid"
-daemon = False
+# pidfile = "/home/gunicorn/logs/dev.pid"
+# pidfile = None  # Avoid writing a PID file in a container
+daemon = False  # Must be False for Dockerpidfile = "/home/gunicorn/logs/dev.pid"
+

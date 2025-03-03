@@ -31,7 +31,6 @@ const views = {
 	},
 
 	async login() {
-		if (await api.checkAuth()) { return router.navigateTo('/already-logged-in'); }
 		return html.login;
 	},
 
