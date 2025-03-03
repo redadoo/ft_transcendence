@@ -72,7 +72,6 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'ft_transcendence.middleware.CheckDBConnectionMiddleware',
     "csp.middleware.CSPMiddleware"
 ]
 
