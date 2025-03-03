@@ -12,6 +12,7 @@ from utilities.lobby import Lobby
 from utilities.Tournament import Tournament
 from .scripts.PongGameManager import PongGameManager
 from website.models import User
+from django.db.utils import DatabaseError, OperationalError
 
 class PongPlayersList(APIView):
 	def get(self, request):
@@ -33,6 +34,8 @@ class PongPlayersList(APIView):
 				usernames.append(user.username)
 			except (User.DoesNotExist, ValueError):
 				usernames.append("Unknown")
+			except (DatabaseError, OperationalError) as e:
+				return Response({"server_error": "Database is offline"}, status=status.HTTP_503_SERVICE_UNAVAILABLE)
 		return Response({"usernames": usernames}, status=status.HTTP_200_OK)
 
 class PongRoomState(APIView):
@@ -74,6 +77,8 @@ class PongCheckLobby(APIView):
 				{"success": "false", "error": "Host not found."},
 				status=status.HTTP_404_NOT_FOUND
 			)
+		except (DatabaseError, OperationalError) as e:
+			return Response({"server_error": "Database is offline"}, status=status.HTTP_503_SERVICE_UNAVAILABLE)
 
 		return Response(
 			{"success": "true", "host": host_username},
@@ -96,7 +101,6 @@ class PongStartLobbyView(APIView):
 		return Response({"lobby_info": match.to_dict()}, status=status.HTTP_201_CREATED)
 
 class PongInitView(APIView):
-	# permission_classes = [IsAuthenticated]
 	def post(self, request):
 		"""
 		Create a new game.
@@ -104,7 +108,6 @@ class PongInitView(APIView):
 		room_name = str(uuid.uuid4())
 		match: Lobby = match_manager.create_match("pong", room_name, PongGameManager(), "Lobby")
 
-		# Wrap asynchronous calls to run synchronously
 		async_to_sync(match.add_player_to_lobby)({"player_id": "-1"}, False)
 		async_to_sync(match.mark_player_ready)({"player_id": "-1"})
 
@@ -114,7 +117,6 @@ class PongInitView(APIView):
 		)
 
 class PongPlayerControlView(APIView):
-	# permission_classes = [IsAuthenticated]
 
 	def post(self, request):
 		"""
@@ -138,15 +140,21 @@ class PongPlayerControlView(APIView):
 
 class LastPongMatchView(APIView):
 
-	permission_classes = [IsAuthenticated]
-	def get(self, request):
-		user = request.user
+    permission_classes = [IsAuthenticated]
 
-		last_match = PongMatch.objects.filter(
-			Q(first_user=user) | Q(second_user=user)
-		).last()
+    def get(self, request):
+        user = request.user
+        
+        try:
+            last_match = PongMatch.objects.filter(
+                Q(first_user=user) | Q(second_user=user)
+            ).last()
+        except (DatabaseError, OperationalError) as e:
+            return Response({"server_error": f"Database error: {str(e)}"}, status=status.HTTP_503_SERVICE_UNAVAILABLE)
 
-		if last_match:
-			serializer = PongMatchSerializer(last_match)
-			return Response(serializer.data)
-		return Response({"detail": "No matches found"}, status=status.HTTP_400_BAD_REQUEST)
+        if last_match:
+            serializer = PongMatchSerializer(last_match)
+            return Response(serializer.data)
+        
+        # If no match is found
+        return Response({"detail": "No matches found"}, status=status.HTTP_400_BAD_REQUEST)

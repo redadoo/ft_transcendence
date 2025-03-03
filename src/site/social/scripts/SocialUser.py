@@ -4,6 +4,7 @@ from website.models import Friendships, User
 from channels.layers import get_channel_layer
 from social.models import ChatMessage
 from django.utils.html import escape
+from django.db.utils import OperationalError, DatabaseError
 
 MAX_MESSAGE_LENGTH = 500
 
@@ -20,6 +21,8 @@ class SocialUser:
 			return await database_sync_to_async(User.objects.get)(username=username)
 		except User.DoesNotExist:
 			raise ValueError(f"User '{username}' does not exist.")
+		except (DatabaseError, OperationalError) as e:
+			raise ValueError(f"Database error while retrieving user: {str(e)}")
 
 	async def _get_friendship(self, target_user):
 		try:
@@ -29,14 +32,19 @@ class SocialUser:
 			)
 		except Friendships.DoesNotExist:
 			raise ValueError(f"a relationship between '{self.user.username}' and '{target_user.username}' does not exist")
+		except (DatabaseError, OperationalError) as e:
+			raise ValueError(f"Database error while retrieving user: {str(e)}")		
 		return friendship
 
 	async def notify_friends_status(self):
-		friendships = await database_sync_to_async(list)(
-			Friendships.objects.filter(
-				Q(first_user=self.user) | Q(second_user=self.user)
-			).select_related("first_user", "second_user")
-		)
+		try:
+			friendships = await database_sync_to_async(list)(
+				Friendships.objects.filter(
+					Q(first_user=self.user) | Q(second_user=self.user)
+				).select_related("first_user", "second_user")
+			)
+		except (DatabaseError, OperationalError) as e:
+			raise ValueError(f"Database error while retrieving user: {str(e)}")
 
 		notifications = []
 		for friendship in friendships:
@@ -80,7 +88,10 @@ class SocialUser:
 			raise ValueError(f"Invalid status: {new_status}")
 
 		self.user.status = status_key
-		await database_sync_to_async(self.user.save)(update_fields=["status"])
+		try:
+			await database_sync_to_async(self.user.save)(update_fields=["status"])
+		except (DatabaseError, OperationalError) as e:
+			raise ValueError(f"Database error while retrieving user: {str(e)}")
 		await self.notify_friends_status()
 
 	async def block_user(self, data: dict):
@@ -101,18 +112,16 @@ class SocialUser:
 
 		try:
 			block_target = await database_sync_to_async(User.objects.get)(username=user_to_block)
+			first_user = await database_sync_to_async(lambda: friendship.first_user)()
+			if first_user.username == self.user.username:
+				friendship.status = Friendships.FriendshipsStatus.FIRST_USER_BLOCK
+			else:
+				friendship.status = Friendships.FriendshipsStatus.SECOND_USER_BLOCK
+			await database_sync_to_async(friendship.save)(update_fields=["status"])
 		except User.DoesNotExist:
 			raise ValueError(f"User '{user_to_block}' does not exist.")
-
-
-		first_user = await database_sync_to_async(lambda: friendship.first_user)()
-
-		if first_user.username == self.user.username:
-			friendship.status = Friendships.FriendshipsStatus.FIRST_USER_BLOCK
-		else:
-			friendship.status = Friendships.FriendshipsStatus.SECOND_USER_BLOCK
-
-		await database_sync_to_async(friendship.save)(update_fields=["status"])
+		except (DatabaseError, OperationalError) as e:
+			raise ValueError(f"Database error while retrieving user: {str(e)}")
 
 		payload = {
 			"type": "get_blocked",
@@ -138,12 +147,12 @@ class SocialUser:
 
 		try:
 			unblock_target = await database_sync_to_async(User.objects.get)(username=user_to_unblock)
+			friendship.status = Friendships.FriendshipsStatus.FRIENDS
+			await database_sync_to_async(friendship.save)(update_fields=["status"])
 		except User.DoesNotExist:
 			raise ValueError(f"User '{user_to_unblock}' does not exist.")
-
-
-		friendship.status = Friendships.FriendshipsStatus.FRIENDS
-		await database_sync_to_async(friendship.save)(update_fields=["status"])
+		except (DatabaseError, OperationalError) as e:
+			raise ValueError(f"Database error while retrieving user: {str(e)}")
 
 		payload = {
 			"type": "get_unblocked",
@@ -157,24 +166,26 @@ class SocialUser:
 
 		try:
 			target_user = await database_sync_to_async(User.objects.get)(username=target_username)
+			existing_friendship = await database_sync_to_async(
+				lambda: Friendships.objects.filter(
+					Q(first_user=self.user, second_user=target_user) |
+					Q(first_user=target_user, second_user=self.user)
+				).exists()
+			)()
+
+			if existing_friendship:
+				raise ValueError(f"A friendship or pending request already exists with '{target_username}'.")
+
+			await database_sync_to_async(Friendships.objects.create)(
+				first_user=self.user,
+				second_user=target_user,
+				status=Friendships.FriendshipsStatus.PENDING
+			)
 		except User.DoesNotExist:
 			raise ValueError(f"User '{target_username}' does not exist.")
+		except (DatabaseError, OperationalError) as e:
+			raise ValueError(f"Database error while retrieving user: {str(e)}")
 
-		existing_friendship = await database_sync_to_async(
-			lambda: Friendships.objects.filter(
-				Q(first_user=self.user, second_user=target_user) |
-				Q(first_user=target_user, second_user=self.user)
-			).exists()
-		)()
-
-		if existing_friendship:
-			raise ValueError(f"A friendship or pending request already exists with '{target_username}'.")
-
-		await database_sync_to_async(Friendships.objects.create)(
-			first_user=self.user,
-			second_user=target_user,
-			status=Friendships.FriendshipsStatus.PENDING
-		)
 
 		payload = {
 			"type": "get_friend_request",
@@ -202,10 +213,11 @@ class SocialUser:
 
 		try:
 			target_user = await database_sync_to_async(User.objects.get)(username=target_username)
+			await database_sync_to_async(friendship.delete)()
 		except User.DoesNotExist:
 			raise ValueError(f"User '{target_username}' does not exist.")
-
-		await database_sync_to_async(friendship.delete)()
+		except (DatabaseError, OperationalError) as e:
+			raise ValueError(f"Database error while retrieving user: {str(e)}")
 
 		payload = {
 			"type": event_name,
@@ -223,11 +235,12 @@ class SocialUser:
 
 		try:
 			target_user = await database_sync_to_async(User.objects.get)(username=target_username)
+			friendship.status = Friendships.FriendshipsStatus.FRIENDS
+			await database_sync_to_async(friendship.save)(update_fields=["status"])
 		except User.DoesNotExist:
 			raise ValueError(f"User '{target_username}' does not exist.")
-
-		friendship.status = Friendships.FriendshipsStatus.FRIENDS
-		await database_sync_to_async(friendship.save)(update_fields=["status"])
+		except (DatabaseError, OperationalError) as e:
+			raise ValueError(f"Database error while retrieving user: {str(e)}")
 
 		payload = {
 			"type": "get_friend_request_accepted",
@@ -243,7 +256,9 @@ class SocialUser:
 			target_user = await database_sync_to_async(User.objects.get)(username=target_username)
 		except User.DoesNotExist:
 			raise ValueError(f"User '{target_username}' does not exist.")
-		
+		except (DatabaseError, OperationalError) as e:
+			raise ValueError(f"Database error while retrieving user: {str(e)}")
+				
 		_friendship =  await self._get_friendship(target_username)
 
 		if _friendship.status != Friendships.FriendshipsStatus.FRIENDS:
@@ -259,11 +274,14 @@ class SocialUser:
 		if len(message) > MAX_MESSAGE_LENGTH:
 			raise ValueError("Message is too long.")
 
-		await database_sync_to_async(ChatMessage.objects.create)(
-			friendship=_friendship,
-			sender=self.user,
-			message_text=message
-		)
+		try:
+			await database_sync_to_async(ChatMessage.objects.create)(
+				friendship=_friendship,
+				sender=self.user,
+				message_text=message
+			)
+		except (DatabaseError, OperationalError) as e:
+			raise ValueError(f"Database error while retrieving user: {str(e)}")
 
 		payload = {
 			"type": "get_message",
@@ -279,7 +297,8 @@ class SocialUser:
 			target_user = await database_sync_to_async(User.objects.get)(username=target_username)
 		except User.DoesNotExist:
 			raise ValueError(f"User '{target_username}' does not exist.")
-
+		except (DatabaseError, OperationalError) as e:
+			raise ValueError(f"Database error while retrieving user: {str(e)}")
 		payload = {
 			"type": "get_lobby_invite",
 			"room_name": data.get("room_name"),
@@ -295,7 +314,8 @@ class SocialUser:
 			target_user = await database_sync_to_async(User.objects.get)(username=target_username)
 		except User.DoesNotExist:
 			raise ValueError(f"User '{target_username}' does not exist.")
-
+		except (DatabaseError, OperationalError) as e:
+			raise ValueError(f"Database error while retrieving user: {str(e)}")
 		payload = {
 			"type": "get_tournament_invite",
 			"room_name": data.get("room_name"),

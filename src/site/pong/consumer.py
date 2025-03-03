@@ -8,6 +8,7 @@ from utilities.Tournament import Tournament
 from utilities.MatchManager import MatchManager
 from autobahn.websocket.protocol import Disconnected
 from pong.scripts.PongGameManager import PongGameManager
+from django.db.utils import OperationalError, DatabaseError
 from channels.generic.websocket import AsyncWebsocketConsumer
 
 class PongMatchmaking(AsyncWebsocketConsumer):
@@ -214,7 +215,10 @@ class PongLobbyConsumer(BasePongConsumer):
 
 	async def lobby_state(self, event: dict):
 		if event.get("event_name") == "player_join" and event.get("player_id"):
-			user = await database_sync_to_async(User.objects.get)(id=event["player_id"])
+			try:
+				user = await database_sync_to_async(User.objects.get)(id=event["player_id"])
+			except (DatabaseError, OperationalError) as e:
+				raise ValueError(f"Database error while retrieving user: {str(e)}")
 			await self.send_to_social({
 				"type": "user_join_lobby",
 				"username": user.username,
@@ -250,7 +254,10 @@ class PongTournament(BasePongConsumer):
 
 	async def lobby_state(self, event: dict):
 		if event.get("event_name") == "player_join" and event.get("player_id"):
-			user = await database_sync_to_async(User.objects.get)(id=event["player_id"])
+			try:
+				user = await database_sync_to_async(User.objects.get)(id=event["player_id"])
+			except (DatabaseError, OperationalError) as e:
+				raise ValueError(f"Database error while retrieving user: {str(e)}")
 			await self.send_to_social({
 				"type": "user_join_tournament",
 				"username": user.username,
