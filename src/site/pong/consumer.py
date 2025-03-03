@@ -3,7 +3,7 @@ import uuid
 
 from website.models import User
 from utilities.lobby import Lobby
-from asgiref.sync import sync_to_async
+from channels.db import database_sync_to_async
 from utilities.Tournament import Tournament
 from utilities.MatchManager import MatchManager
 from autobahn.websocket.protocol import Disconnected
@@ -214,7 +214,7 @@ class PongLobbyConsumer(BasePongConsumer):
 
 	async def lobby_state(self, event: dict):
 		if event.get("event_name") == "player_join" and event.get("player_id"):
-			user = await sync_to_async(User.objects.get)(id=event["player_id"])
+			user = await database_sync_to_async(User.objects.get)(id=event["player_id"])
 			await self.send_to_social({
 				"type": "user_join_lobby",
 				"username": user.username,
@@ -250,7 +250,7 @@ class PongTournament(BasePongConsumer):
 
 	async def lobby_state(self, event: dict):
 		if event.get("event_name") == "player_join" and event.get("player_id"):
-			user = await sync_to_async(User.objects.get)(id=event["player_id"])
+			user = await database_sync_to_async(User.objects.get)(id=event["player_id"])
 			await self.send_to_social({
 				"type": "user_join_tournament",
 				"username": user.username,

@@ -3,7 +3,7 @@ from channels.generic.websocket import AsyncWebsocketConsumer
 from social.scripts.SocialUser import SocialUser
 from channels.layers import get_channel_layer
 from website.models import User
-from asgiref.sync import sync_to_async
+from channels.db import database_sync_to_async
 
 async def get_active_users():
 	"""Fetch active users asynchronously (Online, Away, Busy, Matchmaking, Playing)."""
@@ -14,7 +14,7 @@ async def get_active_users():
 		User.UserStatus.MATCHMAKING,
 		User.UserStatus.PLAYING,
 	]
-	return await sync_to_async(lambda: list(User.objects.filter(status__in=active_statuses).values_list('id', flat=True)))()
+	return await database_sync_to_async(lambda: list(User.objects.filter(status__in=active_statuses).values_list('id', flat=True)))()
 
 
 async def send_event_to_all_consumer(event_type: str, message: dict):
