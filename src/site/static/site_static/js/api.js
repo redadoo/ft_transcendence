@@ -1,4 +1,6 @@
 
+import router from "./router";
+
 function getCookie(name) {
 	let cookieValue = null;
 	if (document.cookie && document.cookie !== '') {
@@ -42,8 +44,17 @@ const api = {
 
 			const response = await fetch(url, mergedOptions);
 
+			if (response.server_error )
+			{
+				if (window.location.pathname !== '/logout')
+					router.navigateTo('/logout');
+				alert(`Server error: ${response.server_error}`);
+			}
+
 			if (!response.ok)
 				throw new Error(`HTTP error! status: ${response.status}`);
+
+
 			return await response.json();
 		} catch (error) {
 			throw error;
