@@ -59,8 +59,7 @@ class UserViewSet(viewsets.ModelViewSet):
 		try:
 			is_logged = request.user.is_authenticated
 		except DatabaseError as e:
-			Response({"error": "database error"})
-		
+			Response({"server_error": "database is offline"})
 		return Response({"success": "true" if is_logged else "false"})
 
 
