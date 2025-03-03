@@ -14,7 +14,8 @@ export default class SinglePlayerPongMode extends PongMode {
         this.socket.initWebSocket(
 			'singleplayer/pong/',
 			this.handleSocketMessage.bind(this),
-			this.onSocketOpen.bind(this)
+			this.onSocketOpen.bind(this),
+			this.onSocketClose.bind(this)
 		);
 	}
 }

@@ -1,3 +1,5 @@
+import router from '../../site_static/js/router.js';
+
 
 /**
  * Manages WebSocket connections for the game.
@@ -57,8 +59,8 @@ export default class SocketManager
 			};
 
 			this.socket.onerror = (error) => {
-				console.error('WebSocket error:', error);
-	
+				alert("WebSocket error : " + error);
+				router.navigateTo('/');
 				if (onSocketError)
 					onSocketError(error);
 			};
@@ -124,8 +126,8 @@ export default class SocketManager
 			};
 
 			this.socket.onerror = (error) => {
-				console.error('WebSocket error:', error);
-	
+				alert("WebSocket error : " + error);
+				router.navigateTo('/');
 				if (onSocketError)
 					onSocketError(error);
 			};

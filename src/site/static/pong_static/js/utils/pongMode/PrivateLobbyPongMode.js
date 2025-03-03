@@ -39,7 +39,8 @@ export default class PrivateLobbyPongMode extends PongMode {
 			'pong',
 			this.handleSocketMessage.bind(this),
 			this.room_name,
-			this.onSocketOpen.bind(this)
+			this.onSocketOpen.bind(this),
+			this.onSocketClose.bind(this)
 		);
 	}
 

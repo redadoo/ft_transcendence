@@ -27,7 +27,8 @@ export default class MultiplayerPongMode extends PongMode
 			'pong',
 			this.handleSocketMessage.bind(this),
 			data.room_name,
-			this.onSocketOpen.bind(this)
+			this.onSocketOpen.bind(this),
+			this.onSocketClose.bind(this)
 		);
 		console.log("setupGameSocket  1 ");
 

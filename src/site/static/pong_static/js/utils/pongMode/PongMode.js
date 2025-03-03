@@ -1,4 +1,5 @@
 import SocketManager from '../../../../common_static/js/SocketManager.js';
+import router from '../../../../site_static/js/router.js';
 
 /**
  * Represents the base class for Pong game modes, handling socket communication and game state updates.
@@ -36,6 +37,18 @@ export default class PongMode {
 			type: 'init_player',
 			player_id: this.game.player_id
 		}));
+	}
+
+	/**
+	 * Handles
+	 */
+	onSocketClose() 
+	{
+		if(this.game.pongPlayer != null)
+		{
+			alert("the server is temporarily down");
+			this.game.game_ended(false);
+		}
 	}
 
 	/**
