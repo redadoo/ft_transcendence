@@ -21,7 +21,8 @@ RUN addgroup -g $HOST_GID $HOST_GROUP && \
 RUN mkdir -p $APP_HOME/staticfiles \
     $GUNICORN_PATH/logs \
     $GUNICORN_PATH/run \
-    && chown -R $HOST_UID:$HOST_GID $APP_HOME $GUNICORN_PATH
+    && chown -R $HOST_UID:$HOST_GID $APP_HOME $GUNICORN_PATH && \
+    apk add curl
 
 WORKDIR $APP_HOME
 
@@ -29,7 +30,7 @@ COPY --chown=$HOST_UID:$HOST_GID ./config/requirements.txt .
 
 
 RUN pip install --upgrade pip && \
-pip install --no-cache-dir -r requirements.txt
+    pip install --no-cache-dir -r requirements.txt
 
 COPY --chown=$HOST_UID:$HOST_GID ./tools/entrypoint.sh .
 RUN chmod +x entrypoint.sh

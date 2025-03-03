@@ -50,7 +50,12 @@ services:
         condition: service_healthy
       redis:
         condition: service_healthy
-
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/"]
+      interval: 5s
+      retries: 3
+      start_period: 10s
+      timeout: 5s
   daphne:
     image: daphne
     user: "${USER}"
@@ -116,7 +121,7 @@ services:
       - backend
     depends_on: 
       gunicorn:
-        condition: service_started
+        condition: service_healthy
     volumes:
       - static_volume:/home/ft_transcendence/staticfiles
       - media_volume:/home/ft_transcendence/media
