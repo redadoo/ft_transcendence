@@ -18,49 +18,63 @@ from social.consumer import send_event_to_all_consumer
 from website.models import User, UserStats, UserImage
 from .form import UserCreationForm
 from .serializers import UserSerializer
-from urllib.parse import quote, urlencode
-from django.db import transaction, DatabaseError 
+from urllib.parse import urlencode
+from django.db import DatabaseError, OperationalError
+from rest_framework.response import Response
+from rest_framework.decorators import action
 
 class UserViewSet(viewsets.ModelViewSet):
-	serializer_class = UserSerializer
-	queryset = User.objects.all()
+    serializer_class = UserSerializer
+    queryset = User.objects.all()
 
-	def get_queryset(self):
-		username = self.request.query_params.get('username')
-		return self.queryset.filter(username=username) if username else self.queryset
+    def get_queryset(self):
+        username = self.request.query_params.get('username')
+        try:
+            return self.queryset.filter(username=username) if username else self.queryset
+        except OperationalError:
+            return Response(status=503)
 
-	@action(detail=False, methods=['post'])
-	def register(self, request):
-		form = UserCreationForm(request.data)
-		if form.is_valid():
-			new_user = form.save()
-			UserStats.objects.create(user=new_user)
-			UserImage.objects.create(user=new_user)
-			async_to_sync(send_event_to_all_consumer)("get_update_users", {"username": new_user.username})
-			return Response({"success": "true"})
-		return Response({"success": "false", "errors": form.errors})
+    @action(detail=False, methods=['post'])
+    def register(self, request):
+        try:
+            form = UserCreationForm(request.data)
+            if form.is_valid():
+                new_user = form.save()
+                UserStats.objects.create(user=new_user)
+                UserImage.objects.create(user=new_user)
+                async_to_sync(send_event_to_all_consumer)("get_update_users", {"username": new_user.username})
+                return Response({"success": "true"})
+            return Response({"success": "false", "errors": form.errors})
+        except DatabaseError:
+            return Response(status=503)
 
-	@action(detail=False, methods=['post'])
-	def login(self, request):
-		user = authenticate(username=request.data.get('username'), password=request.data.get('password'))
-		if user:
-			login(request, user)
-			return Response({"success": "true"})
-		return Response({"success": "false"})
+    @action(detail=False, methods=['post'])
+    def login(self, request):
+        try:
+            user = authenticate(username=request.data.get('username'), password=request.data.get('password'))
+            if user:
+                login(request, user)
+                return Response({"success": "true"})
+            return Response({"success": "false"})
+        except DatabaseError:
+            return Response(status=503)
 
-	@action(detail=False, methods=['get'])
-	def logout(self, request):
-		logout(request)
-		return Response({"success": "true"})
+    @action(detail=False, methods=['get'])
+    def logout(self, request):
+        try:
+            logout(request)
+            return Response({"success": "true"})
+        except DatabaseError:
+            return Response(status=503)
 
-	@action(detail=False, methods=['get'])
-	@transaction.atomic
-	def is_logged_in(self, request):
-		try:
-			is_logged = request.user.is_authenticated
-		except DatabaseError as e:
-			Response({"server_error": "database is offline"})
-		return Response({"success": "true" if is_logged else "false"})
+    @action(detail=False, methods=['get'])
+    def is_logged_in(self, request):
+        try:
+            # Check if the user is authenticated without hitting the database
+            is_logged = request.user.is_authenticated
+            return Response({"success": "true" if is_logged else "false"})
+        except DatabaseError:
+            return Response(status=503)
 
 
 class Auth42(View):
