@@ -19,6 +19,7 @@ from website.models import User, UserStats, UserImage
 from .form import UserCreationForm
 from .serializers import UserSerializer
 from urllib.parse import quote, urlencode
+from django.db import transaction, DatabaseError 
 
 class UserViewSet(viewsets.ModelViewSet):
 	serializer_class = UserSerializer
@@ -53,8 +54,14 @@ class UserViewSet(viewsets.ModelViewSet):
 		return Response({"success": "true"})
 
 	@action(detail=False, methods=['get'])
+	@transaction.atomic
 	def is_logged_in(self, request):
-		return Response({"success": "true" if request.user.is_authenticated else "false"})
+		try:
+			is_logged = request.user.is_authenticated
+		except DatabaseError as e:
+			Response({"error": "database error"})
+		
+		return Response({"success": "true" if is_logged else "false"})
 
 
 class Auth42(View):
