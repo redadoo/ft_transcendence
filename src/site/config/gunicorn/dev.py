@@ -20,13 +20,10 @@ graceful_timeout = 20
 
 # Logging
 loglevel = "debug"
-# accesslog = errorlog = "/home/gunicorn/logs/dev.log"
-accesslog = "-"
-errorlog = "-"
+accesslog = errorlog = "/home/gunicorn/logs/dev.log"
 capture_output = True
 
 # PID file
-# pidfile = "/home/gunicorn/logs/dev.pid"
-# pidfile = None  # Avoid writing a PID file in a container
-daemon = False  # Must be False for Dockerpidfile = "/home/gunicorn/logs/dev.pid"
+pidfile = "/home/gunicorn/logs/dev.pid"
+daemon = False
 
