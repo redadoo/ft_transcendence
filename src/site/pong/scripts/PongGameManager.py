@@ -84,8 +84,8 @@ class PongGameManager(GameManager):
 			await add_match_to_history(player1_history)
 			await add_match_to_history(player2_history)
 
-		except (DatabaseError, OperationalError) as e:
-			raise ValueError(f"Database error while retrieving user: {str(e)}")
+		except Exception as e:
+			raise ValueError(f"error while saving the match: {str(e)}")
 
 		self.game_loop_is_active = False
 

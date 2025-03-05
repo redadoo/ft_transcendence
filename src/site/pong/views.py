@@ -34,8 +34,8 @@ class PongPlayersList(APIView):
 				usernames.append(user.username)
 			except (User.DoesNotExist, ValueError):
 				usernames.append("Unknown")
-			except (DatabaseError, OperationalError) as e:
-				return Response({"server_error": "Database is offline"}, status=status.HTTP_503_SERVICE_UNAVAILABLE)
+			except Exception as e:
+				return Response({"server_error": f"{str(e)}"}, status=503)
 		return Response({"usernames": usernames}, status=status.HTTP_200_OK)
 
 class PongRoomState(APIView):
@@ -77,8 +77,8 @@ class PongCheckLobby(APIView):
 				{"success": "false", "error": "Host not found."},
 				status=status.HTTP_404_NOT_FOUND
 			)
-		except (DatabaseError, OperationalError) as e:
-			return Response({"server_error": "Database is offline"}, status=status.HTTP_503_SERVICE_UNAVAILABLE)
+		except Exception as e:
+			return Response({"server_error": f"{str(e)}"}, status=503)
 
 		return Response(
 			{"success": "true", "host": host_username},
@@ -140,21 +140,21 @@ class PongPlayerControlView(APIView):
 
 class LastPongMatchView(APIView):
 
-    permission_classes = [IsAuthenticated]
+	permission_classes = [IsAuthenticated]
 
-    def get(self, request):
-        user = request.user
-        
-        try:
-            last_match = PongMatch.objects.filter(
-                Q(first_user=user) | Q(second_user=user)
-            ).last()
-        except (DatabaseError, OperationalError) as e:
-            return Response({"server_error": f"Database error: {str(e)}"}, status=status.HTTP_503_SERVICE_UNAVAILABLE)
+	def get(self, request):
+		user = request.user
+		
+		try:
+			last_match = PongMatch.objects.filter(
+				Q(first_user=user) | Q(second_user=user)
+			).last()
+		except Exception as e:
+			return Response({"server_error": f"{str(e)}"}, status=503)
 
-        if last_match:
-            serializer = PongMatchSerializer(last_match)
-            return Response(serializer.data)
-        
-        # If no match is found
-        return Response({"detail": "No matches found"}, status=status.HTTP_400_BAD_REQUEST)
+		if last_match:
+			serializer = PongMatchSerializer(last_match)
+			return Response(serializer.data)
+		
+		# If no match is found
+		return Response({"detail": "No matches found"}, status=status.HTTP_400_BAD_REQUEST)

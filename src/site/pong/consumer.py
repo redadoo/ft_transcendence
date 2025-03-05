@@ -217,8 +217,8 @@ class PongLobbyConsumer(BasePongConsumer):
 		if event.get("event_name") == "player_join" and event.get("player_id"):
 			try:
 				user = await database_sync_to_async(User.objects.get)(id=event["player_id"])
-			except (DatabaseError, OperationalError) as e:
-				raise ValueError(f"Database error while retrieving user: {str(e)}")
+			except Exception as e:
+				raise ValueError(f"error while retrieving user: {str(e)}")
 			await self.send_to_social({
 				"type": "user_join_lobby",
 				"username": user.username,
@@ -256,8 +256,8 @@ class PongTournament(BasePongConsumer):
 		if event.get("event_name") == "player_join" and event.get("player_id"):
 			try:
 				user = await database_sync_to_async(User.objects.get)(id=event["player_id"])
-			except (DatabaseError, OperationalError) as e:
-				raise ValueError(f"Database error while retrieving user: {str(e)}")
+			except Exception as e:
+				raise ValueError(f"error while retrieving user: {str(e)}")
 			await self.send_to_social({
 				"type": "user_join_tournament",
 				"username": user.username,

@@ -23,8 +23,8 @@ async def send_event_to_all_consumer(event_type: str, message: dict):
 	channel_layer = get_channel_layer()
 	try:
 		active_user_ids = await get_active_users()
-	except (DatabaseError, OperationalError) as e:
-		raise ValueError(f"Database error while retrieving user: {str(e)}")
+	except Exception as e:
+		raise ValueError(f"error while retrieving user: {str(e)}")
 	for user_id in active_user_ids:
 		group_name = f"user_{user_id}"
 		payload = {"type": event_type, **message}

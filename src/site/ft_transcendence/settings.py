@@ -65,6 +65,7 @@ INSTALLED_APPS = [
 
 # Middleware configuration
 MIDDLEWARE = [
+    "ft_transcendence.middleware.DatabaseExceptionMiddleware",
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -72,7 +73,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    "csp.middleware.CSPMiddleware"
+    "csp.middleware.CSPMiddleware",
 ]
 
 CSP_DEFAULT_SRC = ("'self'", "blob:")

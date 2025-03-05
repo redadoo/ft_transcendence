@@ -28,5 +28,5 @@ class ChatView(APIView):
 			serializer = FriendshipSerializer(chats, many=True, context={'request': request})
 			return Response(serializer.data)
 
-		except (DatabaseError, OperationalError) as e:
-			return Response({"server_error": "Database is offline"}, status=503)
+		except Exception as e:
+			return Response({"server_error": f"{str(e)}"}, status=503)

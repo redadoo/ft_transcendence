@@ -34,8 +34,6 @@ const router = {
 			'/register': 'register',
 			'/singleplayer/pong': 'singleplayerPong',
 		};
-
-		this.firstLoad = true;
 		this.friendProfile = null;
 
 		document.getElementById('overlay').innerHTML = html.overlay;
@@ -51,7 +49,6 @@ const router = {
 		this.onBodyClick = this.handleBodyClick.bind(this);
 
 		this.setupEventListeners();
-
 		this.navigateTo(window.location.pathname);
 	},
 
@@ -104,26 +101,23 @@ const router = {
 	},
 
 
-	navigateTo: async function(url) {
-		if (window.location.pathname !== url) {
+	navigateTo: async function(url, isFirst=true) {
+		if (window.location.pathname !== url) 
 			history.pushState(null, null, url);
-		} else {
+		else 
 			history.replaceState(null, null, url);
+
+		if (isFirst === true)
+		{
+			let isAuth = await api.checkAuth(); 
+	
+			if (isAuth === false && url !== '/login' && url !== '/register' && url !== '/login42') 
+			{
+				console.log('Not authenticated, redirecting to login');
+				this.navigateTo('/login', false);
+				return;
+			}
 		}
-
-
-		if (!await api.checkAuth() && url !== '/login' && url !== '/register' && url !== '/login42') {
-			console.log('Not authenticated, redirecting to login');
-			this.navigateTo('/login');
-			return;
-		}
-
-		if (this.firstLoad) {
-			this.firstLoad = false;
-			this.navigateTo('/');
-			return;
-		}
-
 		this.handleLocation();
 	},
 };

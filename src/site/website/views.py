@@ -36,8 +36,8 @@ class UploadUserImageView(APIView):
 				return Response({"message": "Image uploaded successfully", "image_url": user_image.user_avatar.url}, status=status.HTTP_200_OK)
 
 			return Response({"error": form.errors}, status=status.HTTP_400_BAD_REQUEST)
-		except (DatabaseError, OperationalError) as e:
-			return Response({"server_error": "Database is offline"}, status=503)
+		except Exception as e:
+			return Response({"server_error": f"{str(e)}"}, status=503)
 
 class ChangePasswordView(APIView):
 	"""
@@ -65,8 +65,8 @@ class ChangePasswordView(APIView):
 				return Response({"error": e.messages}, status=status.HTTP_400_BAD_REQUEST)
 			user.set_password(new_password)
 			user.save()
-		except (DatabaseError, OperationalError) as e:
-			return Response({"server_error": "Database is offline"}, status=503)
+		except Exception as e:
+			return Response({"server_error": f"{str(e)}"}, status=503)
 		return Response({"message": "Password updated successfully"}, status=status.HTTP_200_OK)
 
 class UserProfileView(APIView):
@@ -97,8 +97,8 @@ class UserProfileView(APIView):
 					status=status.HTTP_200_OK,
 				)
 			return Response({"error": serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
-		except (DatabaseError, OperationalError) as e:
-			return Response({"server_error": "Database is offline"}, status=503)
+		except Exception as e:
+			return Response({"server_error": f"{str(e)}"}, status=503)
 
 	def get(self, request, *args, **kwargs):
 		"""
@@ -115,8 +115,8 @@ class UserProfileView(APIView):
 			serializer = UserProfileSerializer(user, fields=fields, context={'request': request})
 
 			return Response(serializer.data, status=status.HTTP_200_OK)
-		except (DatabaseError, OperationalError) as e:
-			return Response({"server_error": "Database is offline"}, status=503)
+		except Exception as e:
+			return Response({"server_error": f"{str(e)}"}, status=503)
 	
 class UsersView(APIView):
 	"""
@@ -166,5 +166,5 @@ class UsersView(APIView):
 					fields=['username', 'image_url', 'stat', 'status', 'created_at', 'history']
 				)
 			return Response(serializer.data, status=status.HTTP_200_OK)
-		except (DatabaseError, OperationalError) as e:
-			return Response({"server_error": "Database is offline"}, status=503)
+		except Exception as e:
+			return Response({"server_error": f"{str(e)}"}, status=503)
