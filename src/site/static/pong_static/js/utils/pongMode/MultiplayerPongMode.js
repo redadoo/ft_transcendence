@@ -21,8 +21,6 @@ export default class MultiplayerPongMode extends PongMode
 
 	setupGameSocket(data)
 	{
-		console.log("setupGameSocket");
-
 		this.socket.initGameWebSocket(
 			'pong',
 			this.handleSocketMessage.bind(this),
@@ -30,7 +28,5 @@ export default class MultiplayerPongMode extends PongMode
 			this.onSocketOpen.bind(this),
 			this.onSocketClose.bind(this)
 		);
-		console.log("setupGameSocket  1 ");
-
 	}
 }

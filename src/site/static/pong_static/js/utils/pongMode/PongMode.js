@@ -67,7 +67,6 @@ export default class PongMode {
 		switch (lobby_info.current_lobby_status) 
 		{
 			case 'TO_SETUP':
-				console.log("TO_SETUP");
 				this.setUpLobby(parsedData);
 				break;
 			case 'PLAYING':

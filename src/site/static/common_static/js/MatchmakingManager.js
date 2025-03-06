@@ -75,24 +75,49 @@ export default class MatchmakingManager
 	 */
 	cleanUp()
 	{
-		const matchmakingButton = document.getElementById("startMatchmaking");
-		const matchmakingStatus = document.getElementById("matchmakingStatus");
+		console.log("Cleaning up matchmaking UI...");
+	
+		setTimeout(() => {
+			const matchmakingButton = document.getElementById("startMatchmaking");
+			const matchmakingStatus = document.getElementById("matchmakingStatus");
+	
+			if (matchmakingButton) 
+			{
+				console.log("Resetting matchmaking button");
+				matchmakingButton.innerText = "START MATCHMAKING";
+				matchmakingButton.disabled = false;
+			}
 
-		if (matchmakingButton) {
-			matchmakingButton.innerText = "START MATCHMAKING";
-			matchmakingButton.disabled = false;
-		}
-		if (matchmakingStatus) {
-			matchmakingStatus.innerText = "Click below to start matchmaking";
-		}
+			if (matchmakingStatus) 
+			{
+				console.log("Resetting matchmaking status");
+				matchmakingStatus.innerText = "Click below to start matchmaking";
+			}
+	
+			const pongContainer = document.getElementById('pong-container');
+			if (pongContainer) 
+			{
+				console.log("Removing pong-container");
+				pongContainer.remove();
+			} 
+			else 
+			{
+				console.warn("pong-container not found!");
+			}
+	
+			if (this.gameSocket) 
+			{
+				console.log("Closing WebSocket connection...");
+				this.gameSocket.close();
+				this.gameSocket = null;
+			}
 
-		document.getElementById('pong-container')?.remove();
-		if (this.gameSocket)
-		{
-			this.gameSocket.close();
-			this.gameSocket = null;
-		}
+			document.querySelectorAll('#pong-container').forEach(el => el.remove());
+
+		}, 100);
 	}
+	
+	
 
 	/**
 	 * Sets up the lobby based on the provided data.

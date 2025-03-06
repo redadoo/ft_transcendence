@@ -8,7 +8,6 @@ from utilities.Tournament import Tournament
 from utilities.MatchManager import MatchManager
 from autobahn.websocket.protocol import Disconnected
 from pong.scripts.PongGameManager import PongGameManager
-from django.db.utils import OperationalError, DatabaseError
 from channels.generic.websocket import AsyncWebsocketConsumer
 
 class PongMatchmaking(AsyncWebsocketConsumer):
@@ -98,6 +97,7 @@ class BasePongConsumer(AsyncWebsocketConsumer):
 		except json.JSONDecodeError as e:
 			print(f"Error decoding JSON: {e}")
 			return {}
+	
 	async def receive(self, text_data: str):
 		data = await self.parse_json(text_data)
 		if data.get("type") == "ping":

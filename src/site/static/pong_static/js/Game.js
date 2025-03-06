@@ -156,7 +156,6 @@ export default class Game
 		}
 
 		const modeFromPath = SocketManager.getModeFromPath();
-		console.log("cap", modeFromPath);
 		switch (modeFromPath)
 		{
 			case 'singleplayer':
