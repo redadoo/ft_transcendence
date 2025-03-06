@@ -328,19 +328,19 @@ const html = {
 		<div id="verticalIcons">
 			    <div class="icon-container">
 					<span class="icon-text">Claims <span class="number">5</span> <span class="card-name">Ace</span></span>
-					<img src="/media/png/rimuru.png" alt="Icon 0" class="icon ">
+					<img src="/media/png/porygon.png" alt="Icon 0" class="icon ">
 				</div>
 				<div class="icon-container">
 					<span class="icon-text">Claims <span class="number">3</span> <span class="card-name">Ace</span></span>
-					<img src="/media/png/kuriboh.png" alt="Icon 1" class="icon">
+					<img src="/media/png/mew.png" alt="Icon 1" class="icon">
 				</div>
 				<div class="icon-container">
 					<span class="icon-text">Claims <span class="number">7</span> <span class="card-name">Ace</span></span>
-					<img src="/media/png/amongus.png" alt="Icon 2" class="icon">
+					<img src="/media/png/cubone.png" alt="Icon 2" class="icon">
 				</div>
 				<div class="icon-container">
 					<span class="icon-text">Claims <span class="number">2</span> <span class="card-name">Ace</span></span>
-					<img src="/media/png/kingboh.png" alt="Icon 3" class="icon">
+					<img src="/media/png/magikarp.png" alt="Icon 3" class="icon">
 				</div>
 		</div>
 		<div class="card-container">
