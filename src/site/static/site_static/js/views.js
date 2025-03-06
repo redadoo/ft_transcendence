@@ -136,8 +136,16 @@ const views = {
 		return html.singleplayerPong;
 	},
 
+	async singleplayerPongVsBot() {
+		return html.empty;
+	},
+
+	async singleplayerPongSameKeyboard() {
+		return html.empty;
+	},
+
 	async liarsbar() {
-		return html.liarsbar;
+		return html.empty;
 	},
 
 	async pongScripts() {
@@ -147,6 +155,15 @@ const views = {
 	},
 
 	async singleplayerPongScripts() {
+	},
+	
+	async singleplayerPongVsBotScripts() {
+		const pongGame = new PongGame();
+		await pongGame.init();
+		pongGame.sceneManager.animate();
+	},
+
+	async singleplayerPongSameKeyboardScripts() {
 		const pongGame = new PongGame();
 		await pongGame.init();
 		pongGame.sceneManager.animate();

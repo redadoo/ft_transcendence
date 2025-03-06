@@ -65,8 +65,8 @@ class Lobby:
 				await self.close_lobby(data)
 			case "quit_game":
 				await self.close_lobby(data)
-			# case _:
-			# 	print(f"Unhandled event type: {event_type}. Full data: {data}")
+			case _:
+				print(f"Unhandled event type: {event_type}. Full data: {data}")
 	
 	async def force_player_ready(self):
 		self.ready_players.add(list(self.game_manager.players)[1])

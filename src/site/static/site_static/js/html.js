@@ -1,4 +1,8 @@
 const html = {
+	empty: `
+		<div> 
+		</div>
+	`,
 	home: `
 		<div class="main-container container-fluid mt-5 pt-3">
 			<div class="row h-100">
@@ -253,7 +257,42 @@ const html = {
 	`,
 
 	singleplayerPong: `
-		<div></div>
+	<div class="container-fluid game-container">
+			<div class="row h-100">
+
+				<div class="col-2 px-0">
+					<nav class="nav-wrapper">
+						<div class="d-flex flex-column">
+							<a class="nav-link-left back" data-link="/">
+								<span class="hundin-font back">BACK</span>
+							</a>
+						</div>
+					</nav>
+				</div>
+				<div class="col-1"></div>
+
+				<div class="col-9 px-0">
+					<nav class="nav-wrapper">
+						<div class="d-flex flex-column">
+							<a class="nav-link-right Vs-bot" data-link="/singleplayer/pong/selection/vs_bot">
+								<span class="pixel-font Vs-bot">BOT</span>
+								<div class="column-text">
+									<span class="hundin-font Vs-bot text-up">Vs bot</span>
+									<span class="hundin-font Vs-bot text-down">TRAIN YOUR SKILLS</span>
+								</div>
+							</a>
+							<a class="nav-link-right Same-keyboard" data-link="/singleplayer/pong/selection/same_keyboard">
+								<span class="pixel-font Same-keyboard">SK</span>
+								<div class="column-text">
+									<span class="hundin-font Same-keyboard text-up">Same keyboard</span>
+									<span class="hundin-font Same-keyboard text-down">HAVE FUN WITH A FRIEND</span>
+								</div>
+							</a>
+						</div>
+					</nav>
+				</div>
+			</div>
+		</div>
 	`,
 
 	pongOverlay: `
@@ -274,9 +313,6 @@ const html = {
 	// 		</button>
 	// 	</div>
 	// </div>
-	liarsbar: `
-		<div> </div>
-	`,
 
 	liarsbarOverlay: `
 

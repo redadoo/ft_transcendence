@@ -13,7 +13,7 @@ export default class PongPlayer {
 	 * @param {number} playerId - The unique identifier for the player.
 	 * @param {Object} data - The initial data for the player (including paddle attributes).
 	 */
-	constructor(socket, playerId, data) {
+	constructor(socket, playerId, data, isSecondPlayer = false) {
 		this.BaseBotId = '-1';
 
 		this.playerId = parseInt(playerId);
@@ -26,7 +26,7 @@ export default class PongPlayer {
 		this.paddle.mesh.position.y = data.y;
 		this.paddle.mesh.position.x = data.x;
 
-		this.setUpKeys();
+		this.setUpKeys(isSecondPlayer);
 	}
 
 	/**
@@ -54,7 +54,7 @@ export default class PongPlayer {
 	/**
 	 * Sets up key bindings for player control and event listeners for key actions.
 	 */
-	setUpKeys()
+	setUpKeys(test)
 	{
 		if (this.playerId !== this.BaseBotId) 
 		{
@@ -62,6 +62,15 @@ export default class PongPlayer {
 				up: 'KeyW',
 				down: 'KeyS',
 			};
+		
+			if (test)
+			{
+				this.controlKeys = {
+					up: 'ArrowUp',
+					down: 'ArrowDown',
+				};
+			}
+			
 
 			this.input = new BaseInput();
 			this.input.addEvent('keydown', this.handleKey.bind(this, 'key_down'));

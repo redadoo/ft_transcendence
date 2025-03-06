@@ -177,8 +177,6 @@ export default class Game
 		if (this.mode)
 			this.mode.init();
 		this.sceneManager.setExternalFunction(() => this.fixedUpdate());
-
-
 	}
 
 	/**
@@ -493,7 +491,7 @@ export default class Game
 		if (isGamefinished === true)
 			router.navigateTo('/match-result');
 		else
-			router.navigateTo('/multiplayer/pong_selection');
+			router.navigateTo('/');
 	}
 
 	reset()

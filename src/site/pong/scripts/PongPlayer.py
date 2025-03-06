@@ -62,13 +62,13 @@ class PongPlayer(Player):
 			if event_type not in {"key_down", "key_up"}:
 				raise ValueError(f"Invalid action_type: {event_type}. Expected 'key_down' or 'key_up'.")
 			
-			if key not in {"KeyW", "KeyS"}:
+			if key not in {"KeyW", "KeyS", "ArrowUp", "ArrowDown"}:
 				raise ValueError(f"Invalid key: {key}. Expected 'KeyW' or 'KeyS'.")
 
 			is_pressed = event_type == "key_down"
-			if key == "KeyW":
+			if key == "KeyW" or key == "ArrowUp":
 				self.isMovingUp = is_pressed
-			elif key == "KeyS":
+			elif key == "KeyS" or key == "ArrowDown":
 				self.isMovingDown = is_pressed
 
 		except (TypeError, ValueError) as e:

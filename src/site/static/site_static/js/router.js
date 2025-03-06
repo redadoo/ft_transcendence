@@ -4,7 +4,6 @@ import html from './html.js';
 import overlayManager from './overlay.js';
 import views from './views.js';
 import Tournament from './Tournament.js';
-import Sound from './Sound.js';
 
 const router = {
 	init: function() {
@@ -33,6 +32,9 @@ const router = {
 			'/profile': 'profile',
 			'/register': 'register',
 			'/singleplayer/pong': 'singleplayerPong',
+			'/singleplayer/pong/selection/vs_bot': 'singleplayerPongVsBot',
+			'/singleplayer/pong/selection/same_keyboard': 'singleplayerPongSameKeyboard',
+
 		};
 		this.friendProfile = null;
 

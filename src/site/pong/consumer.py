@@ -3,8 +3,8 @@ import uuid
 
 from website.models import User
 from utilities.lobby import Lobby
-from channels.db import database_sync_to_async
 from utilities.Tournament import Tournament
+from channels.db import database_sync_to_async
 from utilities.MatchManager import MatchManager
 from autobahn.websocket.protocol import Disconnected
 from pong.scripts.PongGameManager import PongGameManager
@@ -158,6 +158,7 @@ class PongSingleplayerConsumer(BasePongConsumer):
 	async def connect(self):
 		self.room_name = self.generate_random_room_name()
 		self.lobby: Lobby = match_manager.create_match("pong", self.room_name, PongGameManager(), "Lobby")
+
 		await self.join_group(self.lobby.room_group_name)
 		await self.accept()
 
@@ -167,13 +168,18 @@ class PongSingleplayerConsumer(BasePongConsumer):
 
 	async def handle_event(self, data: dict):
 		event_type = data.get("type")
-		if event_type == "client_ready":
-			await self.lobby.mark_player_ready({"player_id": "-1"})
-		
-		await self.lobby.manage_event(data)
-		
+
 		if event_type == "init_player":
-			await self.lobby.add_player_to_lobby({"player_id": "-1"}, True)
+			self.useBot = data.get("mode") == "vs_bot"
+			
+			if self.useBot:
+				await self.lobby.add_player_to_lobby({"player_id": "-1"}, True)
+			else:
+				await self.lobby.add_player_to_lobby({"player_id": "-1"}, False)
+			
+			await self.lobby.mark_player_ready({"player_id": "-1"})
+
+		await self.lobby.manage_event(data)
 
 class PongLobbyConsumer(BasePongConsumer):
 	async def connect(self):
