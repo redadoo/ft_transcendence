@@ -4,7 +4,6 @@ from rest_framework.response import Response
 from website.models import Friendships
 from django.db.models import Q
 from .serializers import FriendshipSerializer
-from django.db.utils import DatabaseError, OperationalError
 
 class ChatView(APIView):
 	"""

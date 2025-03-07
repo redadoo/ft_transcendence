@@ -12,7 +12,6 @@ from utilities.lobby import Lobby
 from utilities.Tournament import Tournament
 from .scripts.PongGameManager import PongGameManager
 from website.models import User
-from django.db.utils import DatabaseError, OperationalError
 
 class PongPlayersList(APIView):
 	def get(self, request):

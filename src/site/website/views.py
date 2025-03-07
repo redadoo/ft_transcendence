@@ -11,7 +11,6 @@ from django.core.validators import validate_slug
 from django.core.exceptions import ValidationError
 from django.contrib.auth.password_validation import validate_password
 from django.utils.crypto import get_random_string
-from django.db.utils import DatabaseError, OperationalError
 
 def main_page(request, unused_path=None):
 	nonce = get_random_string(16)
