@@ -32,8 +32,8 @@ class Command(BaseCommand):
             {'id': -2, 'username': 'bot_2', 'email': 'bot_2@example.com'},
             {'id': -3, 'username': 'bot_3', 'email': 'bot_3@example.com'},
             {'id': -4, 'username': 'bot_4', 'email': 'bot_4@example.com'},
-            {'id': 1, 'username': 'admin', 'email': 'admin@example.com'},
-            {'id': 2, 'username': 'edo', 'email': 'edo@example.com'},
+            {'id': 9999, 'username': 'admin', 'email': 'admin@example.com'},
+            {'id': 9998, 'username': 'edo', 'email': 'edo@example.com'},
         ]
 
         for bot in bot_users:
