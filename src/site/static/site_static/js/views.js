@@ -251,7 +251,10 @@ const views = {
 		updateElement('profilePageStreak', `${data.stat.longest_winstreak}`);
 		updateElement('profilePagePoint', `${data.stat.total_points_scored}`);
 
-		const longestGameSeconds = parseTimeDelta(data.stat.longest_game_duration);
+		let longestGameSeconds = 0;
+		if (data.stat.longest_game_duration != null)
+			longestGameSeconds = parseTimeDelta(data.stat.longest_game_duration);
+		
 		const longestGame = formatTimeDelta(longestGameSeconds);
 		updateElement('profilePageLongestGame', `${longestGame}`);
 
