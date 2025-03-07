@@ -332,3 +332,4 @@ src/site/website/migrations/__pycache__/0006_rename_user_userimage_user.cpython-
 src/site/website/migrations/__pycache__/0007_alter_userimage_options.cpython-310.pyc
 src/site/media/avatars/HalloweenPauroso.png
 src/.env
+*/.env
