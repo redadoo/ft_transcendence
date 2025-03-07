@@ -2,7 +2,7 @@ import PongMode from './PongMode.js';
 import PongPlayer from '../../utils/PongPlayer.js';
 
 const FIRST_PLAYER_DATA = {
-	"x": 20,
+	"x": 19,
 	"y": 0,
 	"height": 4,
 	"width": 0.7,
@@ -12,7 +12,7 @@ const FIRST_PLAYER_DATA = {
 };
 
 const SECOND_PLAYER_DATA = {
-	"x": -20,
+	"x": -19,
 	"y": 0,
 	"height": 4,
 	"width": 0.7,
@@ -29,7 +29,9 @@ export default class SinglePlayerPongMode extends PongMode {
 		const pathSegments = window.location.pathname.split('/').filter(Boolean);
 
 		this.mode = pathSegments[3] || 'default';
-		this.isVersusBot = this.mode == "vs_bot"; 
+		this.isVersusBot = this.mode == "vs_bot";
+		console.log("mode : ",this.mode);
+		console.log("this.isVersusBot : ",this.isVersusBot);
 	}
 
 	/**
@@ -102,6 +104,8 @@ export default class SinglePlayerPongMode extends PongMode {
 
 		if (this.game.pongOpponent == null && this.game.pongPlayer == null)
 		{
+			console.log("pip");
+			
 			this.socket.send(JSON.stringify({ 
 				type: 'client_ready',
 				player_id: this.game.player_id

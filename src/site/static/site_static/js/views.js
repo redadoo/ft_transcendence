@@ -23,6 +23,11 @@ const views = {
 		await router.overlay.initialize();
 		const data = await api.getHeaderInfo();
 		console.log("Header info data:", data);
+
+		if (data.id != null)
+			window.localStorage.setItem('id', data.id);
+
+		this.player_id = data.id;
 		['profileBtn', 'notificationBtn'].forEach(id => document.getElementById(id).classList.remove('d-none'));
 		document.getElementById('headerUsername').textContent = data.username;
 		document.getElementById('headerLevel').textContent = "LV." + data.stat.level;

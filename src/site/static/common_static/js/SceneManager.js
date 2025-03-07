@@ -32,6 +32,7 @@ export default class SceneManager
 
 		this.modelManager = null;
 		this.audioManager = null;
+		this.haveBadPerformace = false;
 
 		this.fov = 45;
 		this.nearPlane = 1;
@@ -124,11 +125,27 @@ export default class SceneManager
 	initializeRenderer(shadowMapType) 
 	{
 		this.renderer = new THREE.WebGLRenderer({ antialias: true });
-		this.renderer.setPixelRatio(1); // Lower pixel density
+		
+		this.renderer.setPixelRatio(1);
 		this.renderer.setSize(window.innerWidth * 1, window.innerHeight * 1, false);
 		this.renderer.shadowMap.enabled = true;
 		this.renderer.shadowMap.type = shadowMapType;
 		document.body.appendChild(this.renderer.domElement);
+
+		//info
+		const gl = this.renderer.getContext();
+		const extensions = gl.getSupportedExtensions();
+		console.log("Supported Extensions: ", extensions);
+		
+		const maxTextureSize = gl.getParameter(gl.MAX_TEXTURE_SIZE);
+		console.log("Max Texture Size: ", maxTextureSize);
+
+		if (navigator.deviceMemory) {
+			const memory = navigator.deviceMemory;
+			console.log(`Device Memory: ${memory} GB`);
+		} else {
+			console.log('Device memory info not available');
+		}
 	}
 
 	/**

@@ -113,50 +113,37 @@ export default class Game
 		window.removeEventListener('popstate', this.close_window_event_popstate);
 	}
 
-    /**
-     * Fetches and sets the player's ID from the server.
-     */
-	async setPlayerId()
-	{
-		try
-		{
-			const response = await fetch("/api/profile?include=id");
-			const json_response = await response.json();
-			this.player_id = json_response["id"];
-		} catch (error){
-			console.error("An error occurred when call profile api: ", error);
-		}
-	}
-
 	/**
      * Initializes the game scene, mode, and environment.
      */
 	async init()
 	{
 		router.removeEventListeners();
-
-		await this.setPlayerId();
-
-		//init scene
-		this.sceneManager = new SceneManager(true);
-		Object.assign(this.sceneManager, CAMERA_SETTINGS);
-		this.sceneManager.initialize(true, true);
-
-		await this.sceneManager.modelManager.loadModel({ '/static/pong_static/assets/models/Scene.glb': 'Scene' });
-
-		this.sceneManager.camera.position.copy(CAMERA_SETTINGS.POSITION);
-		this.sceneManager.camera.rotation.x = CAMERA_SETTINGS.ROTATION_X;
-
-		this.initializeLights();
-
+		
+		this.player_id = window.localStorage.getItem('id');
 		if (!this.player_id)
 		{
 			console.error("Failed to set player ID. Aborting initialization.");
 			return;
 		}
 
-		const modeFromPath = SocketManager.getModeFromPath();
-		switch (modeFromPath)
+		//init scene
+		this.sceneManager = new SceneManager(true);
+		Object.assign(this.sceneManager, CAMERA_SETTINGS);
+		this.sceneManager.initialize(true, true);
+
+		//load model
+		await this.sceneManager.modelManager.loadModel({ '/static/pong_static/assets/models/Scene.glb': 'Scene' });
+
+		//init camera setting
+		this.sceneManager.camera.position.copy(CAMERA_SETTINGS.POSITION);
+		this.sceneManager.camera.rotation.x = CAMERA_SETTINGS.ROTATION_X;
+		
+		//init light
+		this.ambientLight = new THREE.AmbientLight(0xA2C2E9, 3.2);
+		this.sceneManager.scene.add(this.ambientLight);
+
+		switch (SocketManager.getModeFromPath())
 		{
 			case 'singleplayer':
 				this.mode = new SinglePlayerPongMode(this);
@@ -176,6 +163,7 @@ export default class Game
 
 		if (this.mode)
 			this.mode.init();
+
 		this.sceneManager.setExternalFunction(() => this.fixedUpdate());
 	}
 
@@ -202,7 +190,7 @@ export default class Game
 				this.bounds = new Bounds(bounds_data.xMin, bounds_data.xMax, bounds_data.yMin, bounds_data.yMax);
 				this.ball = new Ball(ball_data.radius);
 				this.background = new Background(this.sceneManager.scene, this.bounds.xMax * 2, this.bounds.yMax * 2);
-				// this.handleScoreSprites(scores_data);
+				this.handleScoreSprites(scores_data);
 
 				this.sceneManager.scene.add(this.ball.mesh);
 
@@ -283,66 +271,6 @@ export default class Game
 	}
 
 	/**
-     * Initializes the lighting system for the game scene.
-     */
-	initializeLights()
-	{
-		this.ambientLight = new THREE.AmbientLight(0xA2C2E9, 0.2);
-		// this.pointLightMagenta = new THREE.SpotLight(0xD56BE3, 600000, 600);
-		// this.pointLightMagenta.position.set(100, 300, 300);
-		// this.pointLightMagenta.target.position.set(0, -1000, 0);
-
-		// this.pointLightMagenta.castShadow = true;
-		// this.pointLightMagenta.shadow.camera.near = 1;
-		// this.pointLightMagenta.shadow.camera.far = 500;
-		// this.pointLightMagenta.shadow.camera.left = -200;
-		// this.pointLightMagenta.shadow.camera.right = 200;
-		// this.pointLightMagenta.shadow.camera.top = 200;
-		// this.pointLightMagenta.shadow.camera.bottom = -200;
-		// this.pointLightMagenta.shadow.mapSize.width = 2048;
-		// this.pointLightMagenta.shadow.mapSize.height = 2048;
-
-		// this.pointLightMagenta.shadow.mapSize.set(512 * 2, 512 * 2);
-		// this.pointLightMagenta.shadow.normalBias = 0.1;
-		// this.pointLightMagenta.shadow.bias = -0.0001;
-
-		// this.pointLightBlue = new THREE.SpotLight(0x3D84FF, 600000, 600);
-		// this.pointLightBlue.position.set(-100, 300, 300);
-		// this.pointLightBlue.target.position.set(0, -1000, 0);
-
-		// this.pointLightBlue.castShadow = true;
-		// this.pointLightBlue.shadow.camera.near = 1;
-		// this.pointLightBlue.shadow.camera.far = 500;
-		// this.pointLightBlue.shadow.camera.left = -200;
-		// this.pointLightBlue.shadow.camera.right = 200;
-		// this.pointLightBlue.shadow.camera.top = 200;
-		// this.pointLightBlue.shadow.camera.bottom = -200;
-		// this.pointLightBlue.shadow.mapSize.width = 2048;
-		// this.pointLightBlue.shadow.mapSize.height = 2048;
-
-		// this.pointLightBlue.shadow.mapSize.set(512 * 2, 512 * 2);
-		// this.pointLightBlue.shadow.normalBias = 0.1;
-		// this.pointLightBlue.shadow.bias = -0.0001;
-
-
-		// this.screenLight = new THREE.PointLight(0xffffff, 1000, 500);
-		// this.screenLight.position.set(0, 28, 1);
-
-		this.sceneManager.scene.add(this.ambientLight);
-		// this.sceneManager.scene.add(this.pointLightMagenta);
-		// this.sceneManager.scene.add(this.pointLightBlue);
-		// this.sceneManager.scene.add(this.screenLight);
-
-		// this.lightHelperMagenta = new THREE.SpotLightHelper(this.pointLightMagenta, 1);
-		// this.lightHelperBlue = new THREE.SpotLightHelper(this.pointLightBlue, 1);
-		// this.lightHelper = new THREE.PointLightHelper(this.screenLight, 5);
-
-		// this.sceneManager.scene.add(this.lightHelperMagenta);
-		// this.sceneManager.scene.add(this.lightHelperBlue);
-		// this.sceneManager.scene.add(this.lightHelper);
-	}
-
-	/**
      * Sets up the game scene with the loaded room model.
      */
 	setupScene()
@@ -374,10 +302,8 @@ export default class Game
 					this.pongOpponent.updatePosition(data.players[this.pongOpponent.playerId].y);
 			}
 
-			// if(data.scores)
-			// {
-			// 	this.handleScoreSprites(data.scores);
-			// }
+			if(data.scores)
+				this.handleScoreSprites(data.scores);
 		}
 		catch (error) {
 			console.error("An error occurred during game update state:", error);
@@ -513,6 +439,6 @@ export default class Game
 				this.pongOpponent = null;
 			}
 		}
-		// this.handleScoreSprites({"player1": 0, "player2": 0});
+		this.handleScoreSprites({"player1": 0, "player2": 0});
 	}
 }
