@@ -35,7 +35,8 @@ export default class PongPlayer {
 	 */
 	updatePosition(newY) 
 	{
-		this.newY = newY;
+		if (this.newY != newY)
+			this.newY = newY;
 	}
 
 	/**
@@ -43,12 +44,14 @@ export default class PongPlayer {
 	 */
 	syncPosition() 
 	{
-		this.paddle.mesh.position.y = this.newY;
+		if (this.newY != this.paddle.mesh.position.y)
+			this.paddle.mesh.position.y = this.newY;
 	}
 
 	setPosition(y) 
 	{
-		this.paddle.mesh.position.y = y;
+		if (this.paddle.mesh.position.y != y)
+			this.paddle.mesh.position.y = y;
 	}
 
 	/**

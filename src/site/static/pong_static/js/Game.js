@@ -190,7 +190,7 @@ export default class Game
 				this.bounds = new Bounds(bounds_data.xMin, bounds_data.xMax, bounds_data.yMin, bounds_data.yMax);
 				this.ball = new Ball(ball_data.radius);
 				this.background = new Background(this.sceneManager.scene, this.bounds.xMax * 2, this.bounds.yMax * 2);
-				this.handleScoreSprites(scores_data);
+				// this.handleScoreSprites(scores_data);
 
 				this.sceneManager.scene.add(this.ball.mesh);
 
@@ -275,13 +275,17 @@ export default class Game
      */
 	setupScene()
 	{
-		// const room = this.sceneManager.modelManager.getModel('Scene');
-
-		// room.scene.scale.set(10, 10, 10);
-		// room.scene.position.set(800, -134, 191);
-		// room.scene.rotation.y = -Math.PI / 2;
-
-		// this.sceneManager.scene.add(room.scene);
+		if (this.sceneManager.is42BadPc === false)
+		{
+			console.log("caricando");
+			const room = this.sceneManager.modelManager.getModel('Scene');
+	
+			room.scene.scale.set(10, 10, 10);
+			room.scene.position.set(800, -134, 191);
+			room.scene.rotation.y = -Math.PI / 2;
+	
+			this.sceneManager.scene.add(room.scene);
+		}
 	}
 
 	/**
@@ -302,8 +306,8 @@ export default class Game
 					this.pongOpponent.updatePosition(data.players[this.pongOpponent.playerId].y);
 			}
 
-			if(data.scores)
-				this.handleScoreSprites(data.scores);
+			// if(data.scores)
+			// 	this.handleScoreSprites(data.scores);
 		}
 		catch (error) {
 			console.error("An error occurred during game update state:", error);
@@ -439,6 +443,6 @@ export default class Game
 				this.pongOpponent = null;
 			}
 		}
-		this.handleScoreSprites({"player1": 0, "player2": 0});
+		// this.handleScoreSprites({"player1": 0, "player2": 0});
 	}
 }

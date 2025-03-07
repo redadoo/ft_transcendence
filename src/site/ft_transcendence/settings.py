@@ -11,13 +11,16 @@ SECRET_KEY = os.environ.get("SECRET_KEY")
 DEBUG = bool(int(os.environ.get("DEBUG", 0)))
 ALLOWED_HOSTS = [host.strip() for host in os.getenv('DJANGO_ALLOWED_HOSTS', '').split(',')]
 
-def add_ip_range_to_allowed_hosts(ip_range="10.12"):
+def add_ip_range_to_allowed_hosts(ip_range="10.12", needHttps=False):
     """ Adds IP range like 10.12.*.* to the ALLOWED_HOSTS dynamically """
     ip_base = f"{ip_range}."
     allowed_ips = []
     for i in range(256):
         for j in range(256):
-            allowed_ips.append(f"{ip_base}{i}.{j}")
+            toAppend = f"{ip_base}{i}.{j}"
+            if needHttps:
+                toAppend = f"https://{ip_base}{i}.{j}:8080"
+            allowed_ips.append(toAppend)
     return allowed_ips
 
 ALLOWED_HOSTS.extend(add_ip_range_to_allowed_hosts("10.12"))
@@ -90,10 +93,9 @@ CSP_STYLE_SRC = ("'self'")
 # CSRF SETTINGS
 CSRF_COOKIE_HTTPONLY = False
 CSRF_COOKIE_NAME = 'csrftoken'
-CSRF_TRUSTED_ORIGINS = [
-    "https://transcendence", "https://localhost", "http://localhost:8000", "http://10.12.8.3:8000", 
-    "https://10.12.8.3:8000", "http://10.12.8.3", "https://10.12.8.3"
-]
+
+CSRF_TRUSTED_ORIGINS = ["https://transcendence", "https://localhost", "http://localhost:8000", "https://localhost:8080"]
+CSRF_TRUSTED_ORIGINS.extend(add_ip_range_to_allowed_hosts("10.12", True))
 
 # CHANNEL LAYERS CONFIGURATION
 CHANNEL_LAYERS = {

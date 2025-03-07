@@ -104,8 +104,6 @@ export default class SinglePlayerPongMode extends PongMode {
 
 		if (this.game.pongOpponent == null && this.game.pongPlayer == null)
 		{
-			console.log("pip");
-			
 			this.socket.send(JSON.stringify({ 
 				type: 'client_ready',
 				player_id: this.game.player_id

@@ -62,10 +62,13 @@ class ChangePasswordView(APIView):
 				validate_password(new_password, user=user)
 			except ValidationError as e:
 				return Response({"error": e.messages}, status=status.HTTP_400_BAD_REQUEST)
+	
 			user.set_password(new_password)
 			user.save()
+	
 		except Exception as e:
 			return Response({"server_error": f"{str(e)}"}, status=503)
+	
 		return Response({"message": "Password updated successfully"}, status=status.HTTP_200_OK)
 
 class UserProfileView(APIView):

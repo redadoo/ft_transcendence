@@ -32,7 +32,7 @@ export default class SceneManager
 
 		this.modelManager = null;
 		this.audioManager = null;
-		this.haveBadPerformace = false;
+		this.is42BadPc = false;
 
 		this.fov = 45;
 		this.nearPlane = 1;
@@ -125,28 +125,34 @@ export default class SceneManager
 	initializeRenderer(shadowMapType) 
 	{
 		this.renderer = new THREE.WebGLRenderer({ antialias: true });
-		
+	
 		this.renderer.setPixelRatio(1);
 		this.renderer.setSize(window.innerWidth * 1, window.innerHeight * 1, false);
 		this.renderer.shadowMap.enabled = true;
 		this.renderer.shadowMap.type = shadowMapType;
 		document.body.appendChild(this.renderer.domElement);
 
-		//info
+		//this is a specific check for 42pc who had bad old driver or bad performance
 		const gl = this.renderer.getContext();
-		const extensions = gl.getSupportedExtensions();
-		console.log("Supported Extensions: ", extensions);
-		
-		const maxTextureSize = gl.getParameter(gl.MAX_TEXTURE_SIZE);
-		console.log("Max Texture Size: ", maxTextureSize);
-
-		if (navigator.deviceMemory) {
-			const memory = navigator.deviceMemory;
-			console.log(`Device Memory: ${memory} GB`);
+		const debugInfo = gl.getExtension('WEBGL_debug_renderer_info');
+		if (debugInfo) 
+		{
+			const vendor = gl.getParameter(debugInfo.UNMASKED_VENDOR_WEBGL);
+			const renderInfo = gl.getParameter(debugInfo.UNMASKED_RENDERER_WEBGL);
+			
+			console.log('Vendor: ' + vendor);
+			console.log('Renderer: ' + renderInfo);
+	
+			if (renderInfo.includes("Vulkan")) 
+			{
+				this.is42BadPc = true;
+				console.log("Vulkan renderer detected.");
+			}
 		} else {
-			console.log('Device memory info not available');
+			console.log('WEBGL_debug_renderer_info is not supported.');
 		}
 	}
+	
 
 	/**
 	 * Initializes the camera with perspective settings.
