@@ -325,12 +325,19 @@ export default class Game
 
 			if (!this.playersOrder.includes(player.player_id)) 
 			{
-				console.log("sfogo", this.playersOrder);
 				this.playersOrder.push(player.player_id);
-				console.log("sfogo 1", this.players);
 				this.players[player.player_id] = new LiarsBarPlayer(null, player.player_id);
-				console.log("sfogo 2", this.players);
 			}
+		}
+
+		// Se la lobby è completa, avviamo il gioco
+		if (this.playersOrder.length === 4) 
+		{
+			this.gameSocket.send(JSON.stringify({ type: 'client_ready' }));
+			this.setCameraForPlayer(data);
+			console.log("sfogo", this.playersOrder);
+			console.log("sfogo 2", this.players);
+			document.getElementById('liarsbarOverlay').classList.remove('d-none');
 		}
 	}
 
@@ -354,9 +361,12 @@ export default class Game
 			this.players[joinedPlayerId] = new LiarsBarPlayer(null, joinedPlayerId);
 	
 		// Se la lobby è completa, avviamo il gioco
-		if (this.playersOrder.length === 4) {
+		if (this.playersOrder.length === 4) 
+		{
 			this.gameSocket.send(JSON.stringify({ type: 'client_ready' }));
 			this.setCameraForPlayer(data);
+			console.log("sfogo", this.playersOrder);
+			console.log("sfogo 2", this.players);
 			document.getElementById('liarsbarOverlay').classList.remove('d-none');
 		}
 	}
@@ -398,7 +408,6 @@ export default class Game
 			new THREE.Vector3(358, 80, 744),    //slimegun
 			new THREE.Vector3(108, 100, 1040),    //king boh
 		]; */
-	
 		// Prendi la posizione della camera e il target in base all'indice del giocatore
 		const cameraPos = cameraPositions[playerIndex];
 		const target = targets[playerIndex];
@@ -471,9 +480,6 @@ export default class Game
 		{
 			const playerId = playerData.player_id;
 			
-			// console.log("playerData: ", playerData);
-			// console.log("this.players: ", this.players);
-
 			// Verifica se il giocatore esiste già
 			if (this.players && this.players[playerId]) 
 			{
@@ -522,13 +528,18 @@ export default class Game
 	 */
 	updateTurnTimer(lobbyInfo) {
 		if (lobbyInfo.turn_duration !== undefined && lobbyInfo.time !== undefined) {
+			console.log("no more");
+
 			const totalTurnTime = lobbyInfo.turn_duration;
 			const elapsedTime = lobbyInfo.time;
 			
-			if (this.lastElapsedTime !== elapsedTime) {
-			this.lastElapsedTime = elapsedTime;
-			const remainingTime = totalTurnTime - elapsedTime;
-			this.updateClockDisplay(remainingTime);
+			if (this.lastElapsedTime !== elapsedTime) 
+			{
+				console.log("off");
+
+				this.lastElapsedTime = elapsedTime;
+				const remainingTime = totalTurnTime - elapsedTime;
+				this.updateClockDisplay(remainingTime);
 			}
 		}
 		}
@@ -549,30 +560,45 @@ export default class Game
 			this.playersOrder.forEach((playerId, index) => {
 				const player = this.players[playerId];
 		
-				if (!player || !icons[index] || !iconTexts[index]) return;
+				if (!player || !icons[index] || !iconTexts[index]) 
+				{
+					console.log("struggle");
+					return;
+				}
 		
 				const icon = icons[index];
 				const iconText = iconTexts[index];
 		
 				// Stato attivo (turno attuale)
 				const isActive = player.playerTurn;
-				if (icon.classList.contains("active") !== isActive) {
+				if (icon.classList.contains("active") !== isActive) 
+				{
+					console.log("struggle 2");
+
 					icon.classList.toggle("active", isActive);
 				}
 		
 				// Stato morto
 				const isDead = player.status === "DIED";
-				if (icon.classList.contains("died") !== isDead) {
+				if (icon.classList.contains("died") !== isDead) 
+				{
+					console.log("struggle 3");
 					icon.classList.toggle("died", isDead);
 				}
-				if (isActive && player.playerId === this.player_id) {
+				if (isActive && player.playerId === this.player_id) 
+				{
+					console.log("struggle 4");
 					isMyTurn = true;
 					console.log("player turn true")
 				}
 
-				if (yourTurnText) {
+				if (yourTurnText) 
+				{
 					const shouldBeVisible = isMyTurn ? "visible" : "hidden";
-					if (yourTurnText.style.visibility !== shouldBeVisible) {
+					console.log("aaaaa");
+					if (yourTurnText.style.visibility !== shouldBeVisible) 
+					{
+						console.log("aaaaa 234");
 						yourTurnText.style.visibility = shouldBeVisible;
 					}
 				}
@@ -582,7 +608,9 @@ export default class Game
 					? `Claims <span class="number">${player.selectedCards.length}</span> <span class="card-name">${cardRequired}</span>` 
 					: "";
 		
-				if (iconText.innerHTML !== newText) {
+				if (iconText.innerHTML !== newText) 
+				{
+					console.log("asniasnsain aisnianina234");
 					iconText.innerHTML = newText;
 					iconText.style.visibility = newText ? "visible" : "hidden";
 				}
@@ -600,9 +628,10 @@ export default class Game
 				this.updatePlayers(data);
 			
 			this.updateIcons(data);
-			if (data.lobby_info) {
+			if (data.lobby_info) 
+			{
 				this.updateTurnTimer(data.lobby_info);
-			  }
+			}
 		}
 		catch (error) {
 			console.error("An error occurred during game update state:", error);
