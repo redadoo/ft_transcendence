@@ -204,6 +204,24 @@ services:
         - monitoring
         - backend
 
+  nginx-exporter:
+    image: nginx-exporter
+    restart: unless-stopped
+    container_name: nginx-exporter
+    build:  monitoring/nginx-exporter
+    ports:
+        - "9113:9113"
+    depends_on:
+        prometheus:
+            condition: service_started
+        nginx:
+            condition: service_healthy
+    command:
+      - '--nginx.scrape-uri=http://nginx:8081/stub_status'
+    networks:
+        - monitoring
+        - backend
+
 networks:
   backend:
     driver: bridge
