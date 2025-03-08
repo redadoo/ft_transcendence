@@ -28,7 +28,7 @@ class LiarsBarGameManager(GameManager):
 		self.player_turn_index = 0
 		self.players_alive = 4
 		self.time_elapsed = 0
-		self.turn_duration = 2
+		self.turn_duration = 20
 		self.card_required = None
 		self.can_doubt = False
 
