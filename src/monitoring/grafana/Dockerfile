@@ -21,11 +21,13 @@ COPY tools/entrypoint.sh /usr/local/bin/entrypoint.sh
 COPY conf/prometheus.json /usr/local/bin/prometheus.json
 COPY conf/postgres.json /usr/local/bin/postgres.json
 COPY conf/nginx.json /usr/local/bin/nginx.json
+COPY conf/django.json /usr/local/bin/django.json
 
 RUN chmod +x /usr/local/bin/entrypoint.sh
 RUN chmod 644 /usr/local/bin/prometheus.json
 RUN chmod 644 /usr/local/bin/postgres.json
 RUN chmod 644 /usr/local/bin/nginx.json
+RUN chmod 644 /usr/local/bin/django.json
 
 USER $HOST_USER
 
