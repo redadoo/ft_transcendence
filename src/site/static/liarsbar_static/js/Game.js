@@ -4,6 +4,7 @@ import SceneManager from '../../common_static/js/SceneManager.js';
 import SocketManager from '../../common_static/js/SocketManager.js';
 
 import router from '../../site_static/js/router.js';
+import MatchmakingManager from '../../common_static/js/MatchmakingManager.js';
 
 const cardTextures = {
     'ACE': '/media/png/pox.png',
@@ -11,8 +12,6 @@ const cardTextures = {
     'KING': '/media/png/glim.png',
     'JOLLY': '/media/png/master.png'
 };
-
-
 
 /**
  * Game class for managing the Liar's Bar multiplayer game environment.
@@ -31,6 +30,7 @@ export default class Game
 		this.lastHand = null;
 		this.lastRequiredCard = null;
 		this.lastElapsedTime = null;
+		this.matchmakingManager = null;
 
 		this.close_window_event_beforeunload = null;
 		this.close_window_event_popstate = null;
@@ -85,45 +85,22 @@ export default class Game
 	}
 
 	/**
-	 * Fetches the player's ID by calling the profile API.
-	 * @todo Move this API call to `view.js` for better separation of concerns.
-	 * @returns {Promise<void>}
-	 */
-	async setPlayerId() 
+     * Initializes the game scene, mode, and environment.
+     */
+	async init() 
 	{
-		try
+		router.removeEventListeners();
+		
+		this.player_id = window.localStorage.getItem('id');
+		if (!this.player_id)
 		{
-			const response = await fetch("/api/profile?include=id");
-			const json_response = await response.json();
-			this.player_id = json_response["id"];
-		}
-		catch (error) {
-			console.error("Error when call profile api :", error);
-		}
-	}
-
-	/**
-	 * Sets up the WebSocket connection for the multiplayer Liar's Bar game.
-	 * @todo Implement matchmaking to dynamically assign room names.
-	 * @returns {Promise<void>}
-	 */
-	async setupMultiplayerLiarsBarSocket() 
-	{
-		this.gameSocket = new SocketManager(true);
-
-		const onOpen = () => {
-			this.gameSocket.send(JSON.stringify({ 
-				type: 'init_player', 
-				player_id: this.player_id
-			}));
+			console.error("Failed to set player ID. Aborting initialization.");
+			return;
 		}
 
-		this.gameSocket.initGameWebSocket(
-			'liarsbar',
-			this.handleSocketMessage.bind(this),
-			'test',
-			onOpen
-		);
+		await this.initGameEnviroment();
+
+		this.matchmakingManager = new MatchmakingManager("liarsbar", this.setupGameSocket.bind(this));
 	}
 
 	/**
@@ -163,15 +140,45 @@ export default class Game
 		this.sceneManager.setExternalFunction(() => this.fixedUpdate());
 	}
 
+
 	/**
-	 * Initializes the game by setting up the player, environment, and multiplayer socket.
+	 * Handles the opening of a socket connection and sends an initialization message for the player.
+	 */
+	onSocketOpen() 
+	{
+		this.gameSocket.send(JSON.stringify({
+			type: 'init_player',
+			player_id: this.player_id
+		}));
+	}
+
+	/**
+	 * Handles
+	 */
+	onSocketClose() 
+	{
+		// if(this.game.pongPlayer != null)
+		// {
+		// 	alert("the server is temporarily down");
+		// 	this.game.game_ended(false);
+		// }
+	}
+
+	/**
+	 * Sets up the WebSocket connection for the multiplayer Liar's Bar game.
+	 * @todo Implement matchmaking to dynamically assign room names.
 	 * @returns {Promise<void>}
 	 */
-	async init() 
+	setupGameSocket(data) 
 	{
-		await this.setPlayerId();
-		await this.initGameEnviroment();
-		await this.setupMultiplayerLiarsBarSocket();
+		this.gameSocket = new SocketManager(true);
+		this.gameSocket.initGameWebSocket(
+			'liarsbar',
+			this.handleSocketMessage.bind(this),
+			data.room_name,
+			this.onSocketOpen.bind(this),
+			this.onSocketClose.bind(this)
+		);
 	}
 
 	/**
@@ -307,6 +314,26 @@ export default class Game
 	
 	}
 
+	AddUsersToLobby(data)
+	{
+		const players = data.lobby_info.players;
+
+		for (const key in players) 
+		{
+			const player = players[key];
+			console.log(`Player ID: ${player.player_id}`);
+
+			if (!this.playersOrder.includes(player.player_id)) 
+			{
+				console.log("sfogo", this.playersOrder);
+				this.playersOrder.push(player.player_id);
+				console.log("sfogo 1", this.players);
+				this.players[player.player_id] = new LiarsBarPlayer(null, player.player_id);
+				console.log("sfogo 2", this.players);
+			}
+		}
+	}
+
 	/**
 	 * Adds a user to the lobby by cloning the human model and updating the scene.
 	 * @param {Object} data - Data about the joining player.
@@ -315,10 +342,11 @@ export default class Game
 		const joinedPlayerId = data.event_info.player_id;
 	
 		// Se il player non è già nell'array di ordine, lo aggiungiamo
-		if (!this.playersOrder.includes(joinedPlayerId)) {
+		if (!this.playersOrder.includes(joinedPlayerId)) 
+		{
 			this.playersOrder.push(joinedPlayerId);
 		}
-	
+
 		// Creiamo il nuovo giocatore
 		if (this.player_id == joinedPlayerId)
 			this.players[joinedPlayerId] = new LiarsBarPlayer(this.gameSocket, joinedPlayerId);
@@ -332,8 +360,6 @@ export default class Game
 			document.getElementById('liarsbarOverlay').classList.remove('d-none');
 		}
 	}
-	
-
 
 	setCameraForPlayer(data) {
 		// Trova l'indice del giocatore locale (quello con player_id)
@@ -397,10 +423,6 @@ export default class Game
 		}
 	}
 	
-	
-	
-	
-
 	/**
 	 * Updates the game state at fixed intervals.
 	 */
@@ -414,6 +436,8 @@ export default class Game
 	{
 		if (data.event_info.event_name === "player_join") 
 			this.AddUserToLobby(data);
+		if (data.event_info.event_name === "recover_player_data")
+			this.AddUsersToLobby(data);
 	}
 
 	/**
@@ -446,6 +470,9 @@ export default class Game
 		playersArray.forEach(playerData => 
 		{
 			const playerId = playerData.player_id;
+			
+			// console.log("playerData: ", playerData);
+			// console.log("this.players: ", this.players);
 
 			// Verifica se il giocatore esiste già
 			if (this.players && this.players[playerId]) 
@@ -511,7 +538,7 @@ export default class Game
 			const iconTexts = document.querySelectorAll("#verticalIcons .icon-text");
 			const yourTurnText = document.querySelector(".your-turn-text"); 
 
-			if (!data || !data.lobby_info || !data.lobby_info.card_required) {
+			if (!data || !data.lobby_info /* || !data.lobby_info.card_required */) {
 				console.error("Errore: lobby_info non definito o mancante.");
 				return;
 			}
@@ -739,6 +766,7 @@ export default class Game
 					console.log(data);
 					break;
 				case 'PLAYING':
+					console.log(data);
 					this.updateGameState(data);
 					if (this.currentPlayer.hand) {
 						const hasHandChanged = JSON.stringify(this.currentPlayer.hand) !== JSON.stringify(this.lastHand);

@@ -22,7 +22,6 @@ class LiarsBarMatchmaking(AsyncWebsocketConsumer):
 		"""Handles WebSocket disconnection"""
 		await self.channel_layer.group_discard(self.room_group_name, self.channel_name)
 		self.matchmaking_queue.discard(self.channel_name)
-		print(f"Player disconnected: {self.channel_name}")
 
 	async def receive(self, text_data):
 		"""Handles messages received from WebSocket clients"""
@@ -41,7 +40,7 @@ class LiarsBarMatchmaking(AsyncWebsocketConsumer):
 	async def check_for_match(self):
 		"""Checks if there are enough players to create a match"""
 		while len(self.matchmaking_queue) >= 4:
-			players = [self.matchmaking_queue.pop(0) for _ in range(4)]
+			players = [self.matchmaking_queue.pop() for _ in range(4)]
 			room_name = f"liarsbar_{uuid.uuid4()}"
 
 			for player in players:
@@ -73,9 +72,9 @@ class LiarsBarConsumer(AsyncWebsocketConsumer):
 		await self.channel_layer.group_add(self.lobby.room_group_name, self.channel_name)
 		await self.accept()
 
-		await self.lobby.add_player_to_lobby({"player_id": "-2"}, True)
-		await self.lobby.add_player_to_lobby({"player_id": "-3"}, True)
-		await self.lobby.add_player_to_lobby({"player_id": "-4"}, True)
+		# await self.lobby.add_player_to_lobby({"player_id": "-2"}, True)
+		# await self.lobby.add_player_to_lobby({"player_id": "-3"}, True)
+		# await self.lobby.add_player_to_lobby({"player_id": "-4"}, True)
 	
 	async def disconnect(self, close_code):
 		await self.lobby.broadcast_message({"type": "lobby_state"})
@@ -83,6 +82,9 @@ class LiarsBarConsumer(AsyncWebsocketConsumer):
 
 	async def receive(self, text_data):
 		data = json.loads(text_data)
+		if data.get("type") == "ping":
+			await self.send(text_data=json.dumps({'type': 'pong', 'time': data.get('time')}))
+			return
 		await self.lobby.manage_event(data)
 
 	async def lobby_state(self, event: dict):

@@ -63,7 +63,8 @@ export default class MatchmakingManager
 					this.setupLobby(data);
 					break;
 				default:
-					console.log(`Unhandled matchmaking event type: ${data.type}`);
+					console.log(`Unhandled matchmaking event: `, data);
+					break;
 			}
 		} catch (error) {
 			console.error('Error processing matchmaking WebSocket message:', error);

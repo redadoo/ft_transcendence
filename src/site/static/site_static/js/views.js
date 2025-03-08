@@ -150,7 +150,7 @@ const views = {
 	},
 
 	async liarsbar() {
-		return html.empty;
+		return html.liarsbar;
 	},
 
 	async pongScripts() {
