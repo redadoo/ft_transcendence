@@ -148,10 +148,11 @@ services:
     volumes:
        - prometheus:/prometheus
     command:
-      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--config.file=/tmp/prometheus.yml'
       - '--storage.tsdb.path=/prometheus'
     networks:
       - monitoring
+      - backend
     ports:
       - "9090:9090"
 
@@ -201,6 +202,7 @@ services:
             condition: service_healthy
     networks:
         - monitoring
+        - backend
 
 networks:
   backend:

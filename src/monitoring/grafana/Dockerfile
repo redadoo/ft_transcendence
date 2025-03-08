@@ -18,10 +18,12 @@ RUN groupadd -g $HOST_GID $HOST_GROUP && \
 RUN apt update && apt install -y jq curl && rm -rf /var/lib/apt/lists/*
 
 COPY tools/entrypoint.sh /usr/local/bin/entrypoint.sh
-COPY conf/15489_rev2.json /usr/local/bin/15489_rev2.json
+COPY conf/prometheus.json /usr/local/bin/prometheus.json
+COPY conf/postgres.json /usr/local/bin/postgres.json
 
 RUN chmod +x /usr/local/bin/entrypoint.sh
-RUN chmod 644 /usr/local/bin/15489_rev2.json
+RUN chmod 644 /usr/local/bin/prometheus.json
+RUN chmod 644 /usr/local/bin/postgres.json
 
 USER $HOST_USER
 

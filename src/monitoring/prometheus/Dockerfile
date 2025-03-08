@@ -17,4 +17,6 @@ RUN addgroup -g $HOST_GID $HOST_GROUP && \
 
 RUN chown -R $HOST_USER:$HOST_GROUP /prometheus
 
-USER $HOST_USER
+COPY conf/prometheus.yml /tmp/prometheus.yml 
+
+USER ${HOST_USER}

@@ -54,11 +54,18 @@ set -e
             "isDefault": true
           }'
 
-    echo "Configuring dashboard..."
+    echo "Configuring postgres dashboard..."
     curl -X POST http://localhost:3000/api/dashboards/import \
       -H "Content-Type: application/json" \
       -H "Authorization: Bearer $SERVICE_TOKEN" \
-      -d @/usr/local/bin/15489_rev2.json
+      -d @/usr/local/bin/postgres.json
+
+    echo "Configuring prometheus dashboard..."
+    curl -X POST http://localhost:3000/api/dashboards/import \
+      -H "Content-Type: application/json" \
+      -H "Authorization: Bearer $SERVICE_TOKEN" \
+      -d @/usr/local/bin/prometheus.json
+
 
     echo "Provisioning completed."
 ) &
