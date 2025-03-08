@@ -16,3 +16,6 @@ scrape_configs:
     metrics_path: '/metrics'
     static_configs:
       - targets: ['gunicorn:8000']
+
+rule_files:
+  - "/tmp/alerting_rules.yml"

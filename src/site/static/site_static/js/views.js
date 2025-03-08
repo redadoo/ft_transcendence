@@ -300,7 +300,6 @@ const views = {
 		const player1Name = document.getElementById('player1Name');
 		const player1Avatar = document.getElementById('player1Avatar');
 		const startButton = document.getElementById('startGame');
-		const backButton = document.getElementById('backButton');
 
 		const pongGame = new PongGame();
 		await pongGame.init();
@@ -317,10 +316,6 @@ const views = {
 		startButton.addEventListener('click', () => {
 			game.mode.sendStart();
 			router.navigateTo('/lobby/playing');
-		});
-
-		backButton.addEventListener('click', () => {
-			game.game_ended(false);
 		});
 	},
 
@@ -341,7 +336,6 @@ const views = {
 		const player2Name = document.getElementById('player2Name');
 		const player1Avatar = document.getElementById('player1Avatar');
 		const player2Avatar = document.getElementById('player2Avatar');
-		const backButton = document.getElementById('backButton');
 
 		api.getProfileInfo().then(data => {
 			player2Name.textContent = data.username;
@@ -356,11 +350,6 @@ const views = {
 		const pongGame = new PongGame();
 		await pongGame.init();
 		pongGame.sceneManager.animate();
-
-		backButton.addEventListener('click', () => {
-			game.game_ended(false);
-		});
-
 	},
 
 	async matchResult() {

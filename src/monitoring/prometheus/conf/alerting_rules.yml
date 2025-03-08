@@ -1,0 +1,20 @@
+groups:
+  - name: cpu_alert
+    rules:
+      - alert: HighCPUUsage
+        expr: avg(rate(cpu_usage_seconds_total[5m])) by (instance) > 0.9
+        for: 5m
+        labels:
+          severity: critical
+        annotations:
+          summary: "CPU usage is above 90% on {{ $labels.instance }}"
+          description: "CPU usage on instance {{ $labels.instance }} is above 90% for more than 5 minutes."
+
+      - alert: HighMemoryUsage
+        expr: avg(memory_usage_bytes / memory_total_bytes) by (instance) > 0.8
+        for: 10m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Memory usage is above 80% on {{ $labels.instance }}"
+          description: "Memory usage on instance {{ $labels.instance }} is above 80% for more than 10 minutes."

@@ -18,5 +18,6 @@ RUN addgroup -g $HOST_GID $HOST_GROUP && \
 RUN chown -R $HOST_USER:$HOST_GROUP /prometheus
 
 COPY conf/prometheus.yml /tmp/prometheus.yml 
+COPY conf/alerting_rules.yml /tmp/alerting_rules.yml 
 
 USER ${HOST_USER}

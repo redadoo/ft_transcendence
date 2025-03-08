@@ -150,6 +150,7 @@ services:
     command:
       - '--config.file=/tmp/prometheus.yml'
       - '--storage.tsdb.path=/prometheus'
+      - '--storage.tsdb.retention.time=30d'
     networks:
       - monitoring
       - backend
