@@ -103,6 +103,9 @@ class Lobby:
 		}
 		await self.broadcast_message(data_to_send)
 
+	def len_player(self)-> int:
+		return len(self.game_manager.players)
+
 	async def add_player_to_lobby(self, data: dict, is_bot: bool):
 		"""
 		Adds a player to the lobby. If there are already players in the lobby, 

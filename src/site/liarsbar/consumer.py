@@ -34,6 +34,10 @@ class LiarsBarMatchmaking(AsyncWebsocketConsumer):
 				return
 			
 			self.matchmaking_queue.add(self.channel_name)
+			if len(self.matchmaking_queue) == 1:
+				self.matchmaking_queue.add("-2")
+				self.matchmaking_queue.add("-3")
+
 			print(f"Player {self.channel_name} joined matchmaking. Queue size: {len(self.matchmaking_queue)}")
 			await self.check_for_match()
 
@@ -72,8 +76,9 @@ class LiarsBarConsumer(AsyncWebsocketConsumer):
 		await self.channel_layer.group_add(self.lobby.room_group_name, self.channel_name)
 		await self.accept()
 
-		# await self.lobby.add_player_to_lobby({"player_id": "-2"}, True)
-		# await self.lobby.add_player_to_lobby({"player_id": "-3"}, True)
+		if self.lobby.len_player() < 2:
+			await self.lobby.add_player_to_lobby({"player_id": "-2"}, True)
+			await self.lobby.add_player_to_lobby({"player_id": "-3"}, True)
 		# await self.lobby.add_player_to_lobby({"player_id": "-4"}, True)
 	
 	async def disconnect(self, close_code):
