@@ -11,8 +11,7 @@ export default class Tournament {
 		try {
 			const playersResponse = await api.getTournamentPlayers(this.room_name);
 			console.log("Tournament players:", playersResponse);
-
-			for (const player of playersResponse.usernames) {
+			for (const player of playersResponse) {
 				await this.addNewPlayer(player);
 			}
 		} catch (error) {
@@ -36,15 +35,14 @@ export default class Tournament {
 		updatePlayerDOM(4, this.player4);
 	}
 
-	async addNewPlayer(username) {
-		console.log("Adding new player to tournament:", username);
+	async addNewPlayer(player) 
+	{
+		console.log("Adding new player to tournament:", player);
 		const emptySlotIndex = this.players.findIndex((player) => player === null);
 		if (emptySlotIndex !== -1) {
-			const userDetails = await api.getUserProfile(username);
 			const newPlayerObj = {
-				username: userDetails.username,
-				alias: userDetails.username,
-				profile_picture: userDetails.image_url.avatar_url,
+				username: player.username,
+				profile_picture: player.image_url.avatar_url,
 			};
 			this.players[emptySlotIndex] = newPlayerObj;
 			this.updatePlayers();

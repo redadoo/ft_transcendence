@@ -12,6 +12,7 @@ from utilities.lobby import Lobby
 from utilities.Tournament import Tournament
 from .scripts.PongGameManager import PongGameManager
 from website.models import User
+from website.serializers import SimpleUserProfileSerializer
 
 class PongPlayersList(APIView):
 	def get(self, request):
@@ -26,16 +27,18 @@ class PongPlayersList(APIView):
 		elif isinstance(match, Tournament):
 			players =  match.to_dict().get("tournament_players", {})
 			player_ids = list(players)
-		usernames = []
+		
+		users = []
+
 		for pid in player_ids:
 			try:
 				user = User.objects.get(id=int(pid))
-				usernames.append(user.username)
-			except (User.DoesNotExist, ValueError):
-				usernames.append("Unknown")
+				users.append(user)
 			except Exception as e:
 				return Response({"server_error": f"{str(e)}"}, status=503)
-		return Response({"usernames": usernames}, status=status.HTTP_200_OK)
+			
+		serializer = SimpleUserProfileSerializer(users, many=True)
+		return Response(serializer.data, status=status.HTTP_200_OK)
 
 class PongRoomState(APIView):
 	def post(self, request):
