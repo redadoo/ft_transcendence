@@ -157,3 +157,26 @@ class LastPongMatchView(APIView):
 		
 		# If no match is found
 		return Response({"detail": "No matches found"}, status=status.HTTP_400_BAD_REQUEST)
+	
+class LastPongTournamentMatchView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        user = request.user
+
+        try:
+            last_tournament = PongTournament.objects.filter(
+                matches__in=PongMatch.objects.filter(
+                    Q(first_user=user) | Q(second_user=user)
+                )
+            ).last()
+
+            if last_tournament:
+                serializer = PongTournamentSerializer(last_tournament)
+                return Response(serializer.data)
+
+        except Exception as e:
+            return Response({"server_error": f"An error occurred: {str(e)}"}, status=status.HTTP_503_SERVICE_UNAVAILABLE)
+
+        return Response({"detail": "No matches found"}, status=status.HTTP_404_NOT_FOUND)
+

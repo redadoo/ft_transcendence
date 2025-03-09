@@ -127,48 +127,40 @@ class PongMatch(models.Model):
 		verbose_name = "Pong match"
 
 
-# class PongTournament(models.Model):
-#     """
-#     Model representing a pong tournament, which contains multiple matches.
-#     """
+class PongTournament(models.Model):
+	"""
+	Model representing a pong tournament, which contains multiple matches.
+	"""
 
-#     id = models.AutoField(primary_key=True)
+	id = models.AutoField(primary_key=True)
 
-#     name = models.CharField(
-# 		max_length=100, 
-# 		help_text="Name of the tournament."
-# 	)
+	matches = models.ManyToManyField(
+		PongMatch, 
+		related_name="tournaments", 
+		help_text="Matches in the tournament."
+	)
 
-#     matches = models.ManyToManyField(
-# 		PongMatch, 
-# 		related_name="tournaments", 
-# 		help_text="Matches in the tournament."
-# 	)
+	start_date = models.DateTimeField(
+		null=True, 
+		blank=True, 
+		help_text="Timestamp when the tournament started."
+	)
 
-#     start_date = models.DateTimeField(
-# 		null=True, 
-# 		blank=True, 
-# 		help_text="Timestamp when the tournament started."
-# 	)
-
-#     end_date = models.DateTimeField(
-# 		null=True, 
-# 		blank=True, 
-# 		help_text="Timestamp when the tournament ended."
-# 	)
+	end_date = models.DateTimeField(
+		null=True, 
+		blank=True, 
+		help_text="Timestamp when the tournament ended."
+	)
 	
-#     winner = models.ForeignKey(
-#         settings.AUTH_USER_MODEL,
-#         on_delete=models.SET_NULL,
-#         null=True,
-#         blank=True,
-#         related_name="won_tournaments",
-#         help_text="The winner of the tournament.",
-#     )
+	winner = models.ForeignKey(
+		settings.AUTH_USER_MODEL,
+		on_delete=models.SET_NULL,
+		null=True,
+		blank=True,
+		related_name="won_tournaments",
+		help_text="The winner of the tournament.",
+	)
 
-#     def __str__(self):
-#         return self.name
-
-#     class Meta:
-#         verbose_name = "Pong tournament"
-#         verbose_name_plural = "Pong tournaments"
+	class Meta:
+		verbose_name = "Pong tournament"
+		verbose_name_plural = "Pong tournaments"
