@@ -433,7 +433,7 @@ const views = {
 	},
 
 	async tournamentPlaying() {
-		return html.singleplayerPong;
+		return html.empty;
 	},
 };
 
