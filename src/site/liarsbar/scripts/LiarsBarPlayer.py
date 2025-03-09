@@ -65,7 +65,7 @@ class LiarsBarPlayer(Player):
 		Returns:
 			bool: True if the player fails (shoots themselves), False otherwise.
 		"""
-		return random.randint(1, 6) == 1
+		return random.randint(1, 3) == 1
 
 	def player_loop(self):
 		"""
