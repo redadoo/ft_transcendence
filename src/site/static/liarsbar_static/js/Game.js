@@ -37,6 +37,7 @@ export default class Game
 		this.close_window_event_unload = null;
 		this.shouldCleanupOnExit = false;
 		this.isSceneCreated = false;
+		this.isFirstRender = true;
 
 		this.previousPlayerState = {
 			selected_cards: [],
@@ -87,20 +88,16 @@ export default class Game
 	/**
      * Initializes the game scene, mode, and environment.
      */
-	async init() 
+	async init(player_id) 
 	{
 		router.removeEventListeners();
 		
-		this.player_id = window.localStorage.getItem('id');
-		if (!this.player_id)
-		{
-			console.error("Failed to set player ID. Aborting initialization.");
-			return;
-		}
+		this.player_id = player_id
 
 		await this.initGameEnviroment();
 
-		this.matchmakingManager = new MatchmakingManager("liarsbar", this.setupGameSocket.bind(this));
+		this.setupGameSocket();
+		// this.matchmakingManager = new MatchmakingManager("liarsbar", this.setupGameSocket.bind(this));
 	}
 
 	/**
@@ -111,7 +108,8 @@ export default class Game
 	{
 		this.sceneManager = new SceneManager(true);
 		this.sceneManager.initialize(true, true);
-
+		this.sceneManager.staticMode = true;
+		
 	/* 	this.sceneManager.setCameraState(
 			new THREE.Vector3(-34.619, 96.642, 233.726),
 			new THREE.Quaternion(-0.188, 0.223, 0, 0.95),
@@ -136,8 +134,6 @@ export default class Game
 		});
 
 		this.initLobbyScene();
-
-		this.sceneManager.setExternalFunction(() => this.fixedUpdate());
 	}
 
 
@@ -175,7 +171,7 @@ export default class Game
 		this.gameSocket.initGameWebSocket(
 			'liarsbar',
 			this.handleSocketMessage.bind(this),
-			data.room_name,
+			"test",
 			this.onSocketOpen.bind(this),
 			this.onSocketClose.bind(this)
 		);
@@ -247,29 +243,29 @@ export default class Game
 	 */
 	initLobbyScene() 
 	{
-		const LobbyScene = this.sceneManager.modelManager.getModel("LobbyScene");
+		const LobbyScene = this.sceneManager.modelManager.getModel("LobbyScene", true);
 		LobbyScene.scene.scale.setScalar(3);
 		LobbyScene.scene.rotation.y = 0;
 		LobbyScene.scene.position.set(0, -2.3, 0);
 
 		this.sceneManager.scene.add(LobbyScene.scene);
 
-		const bo = this.sceneManager.modelManager.getModel("Mew");
+		const bo = this.sceneManager.modelManager.getModel("Mew", true);
 		bo.scene.scale.setScalar(0.5);
 		bo.scene.rotation.y = 0;
 		bo.scene.position.set(0, 0.2, 0.5);
 
-		const slimegun = this.sceneManager.modelManager.getModel("Porygon");
+		const slimegun = this.sceneManager.modelManager.getModel("Porygon", true);
 		slimegun.scene.scale.setScalar(0.002);
 		slimegun.scene.rotation.y = 1.571;
 		slimegun.scene.position.set(-0.5, 0.03, 0);
 
-		const bo3 = this.sceneManager.modelManager.getModel("Magikarp");
+		const bo3 = this.sceneManager.modelManager.getModel("Magikarp", true);
 		bo3.scene.scale.setScalar(0.5);
 		bo3.scene.rotation.y = -1.571;
 		bo3.scene.position.set(0.5, 0.05, 0)
 
-		const bo4 = this.sceneManager.modelManager.getModel("Cubone");
+		const bo4 = this.sceneManager.modelManager.getModel("Cubone", true);
 		bo4.scene.scale.setScalar(0.5);
 		bo4.scene.rotation.y =  3.142;
 		bo4.scene.position.set(0, 0.15, -0.5);
@@ -433,11 +429,6 @@ export default class Game
 	}
 	
 	/**
-	 * Updates the game state at fixed intervals.
-	 */
-	fixedUpdate() {}
-
-	/**
 	 * Sets up the lobby based on socket data.
 	 * @param {Object} data - Socket data about the lobby event.
 	 */
@@ -497,12 +488,12 @@ export default class Game
 		});
 	}
 
-
 	  /**
    * Aggiorna il contenuto dell'elemento DOM del timer.
    * @param {number} timeLeft - Il tempo rimanente (in secondi) da mostrare.
    */
-	updateClockDisplay(timeLeft) {
+	updateClockDisplay(timeLeft) 
+	{
 		const clockContainer = document.getElementById('clockContainer');
 		const clockText = document.getElementById('clockText');
 	
@@ -526,100 +517,80 @@ export default class Game
 	 * Controlla se il tempo trascorso è cambiato e, in tal caso, aggiorna il display.
 	 * @param {Object} lobbyInfo - L'oggetto contenente le informazioni sulla lobby, inclusi time e turn_duration.
 	 */
-	updateTurnTimer(lobbyInfo) {
-		if (lobbyInfo.turn_duration !== undefined && lobbyInfo.time !== undefined) {
-			console.log("no more");
-
+	updateTurnTimer(lobbyInfo) 
+	{
+		if (lobbyInfo.turn_duration !== undefined && lobbyInfo.time !== undefined) 
+		{
 			const totalTurnTime = lobbyInfo.turn_duration;
 			const elapsedTime = lobbyInfo.time;
 			
 			if (this.lastElapsedTime !== elapsedTime) 
 			{
-				console.log("off");
-
 				this.lastElapsedTime = elapsedTime;
 				const remainingTime = totalTurnTime - elapsedTime;
 				this.updateClockDisplay(remainingTime);
 			}
 		}
+	}
+	
+	updateIcons(data) 
+	{
+		const icons = document.querySelectorAll("#verticalIcons .icon");
+		const iconTexts = document.querySelectorAll("#verticalIcons .icon-text");
+		const yourTurnText = document.querySelector(".your-turn-text"); 
+
+		if (!data || !data.lobby_info) 
+		{
+			console.error("Errore: lobby_info non definito o mancante.");
+			return;
 		}
 	
-		updateIcons(data) {
-			const icons = document.querySelectorAll("#verticalIcons .icon");
-			const iconTexts = document.querySelectorAll("#verticalIcons .icon-text");
-			const yourTurnText = document.querySelector(".your-turn-text"); 
-
-			if (!data || !data.lobby_info /* || !data.lobby_info.card_required */) {
-				console.error("Errore: lobby_info non definito o mancante.");
+		const cardRequired = data.lobby_info.card_required;
+		let isMyTurn = false;
+		
+		// Iteriamo usando l'ordine fisso salvato in playersOrder
+		this.playersOrder.forEach((playerId, index) => {
+			const player = this.players[playerId];
+	
+			if (!player || !icons[index] || !iconTexts[index]) 
 				return;
+	
+			const icon = icons[index];
+			const iconText = iconTexts[index];
+	
+			// Stato attivo (turno attuale)
+			const isActive = player.playerTurn;
+			if (icon.classList.contains("active") !== isActive) 
+				icon.classList.toggle("active", isActive);
+	
+			// Stato morto
+			const isDead = player.status === "DIED";
+			if (icon.classList.contains("died") !== isDead) 
+				icon.classList.toggle("died", isDead);
+
+			if (isActive && player.playerId === this.player_id) 
+				isMyTurn = true;
+
+			if (yourTurnText) 
+			{
+				const shouldBeVisible = isMyTurn ? "visible" : "hidden";
+				if (yourTurnText.style.visibility !== shouldBeVisible) 
+					yourTurnText.style.visibility = shouldBeVisible;
 			}
-		
-			const cardRequired = data.lobby_info.card_required;
-			let isMyTurn = false;
-			// Iteriamo usando l'ordine fisso salvato in playersOrder
-			this.playersOrder.forEach((playerId, index) => {
-				const player = this.players[playerId];
-		
-				if (!player || !icons[index] || !iconTexts[index]) 
-				{
-					console.log("struggle");
-					return;
-				}
-		
-				const icon = icons[index];
-				const iconText = iconTexts[index];
-		
-				// Stato attivo (turno attuale)
-				const isActive = player.playerTurn;
-				if (icon.classList.contains("active") !== isActive) 
-				{
-					console.log("struggle 2");
 
-					icon.classList.toggle("active", isActive);
-				}
+			// Aggiornamento testo solo se cambia
+			const newText = player.selectedCards.length > 0 
+				? `Claims <span class="number">${player.selectedCards.length}</span> <span class="card-name">${cardRequired}</span>` 
+				: "";
+	
+			if (iconText.innerHTML !== newText) 
+			{
+				iconText.innerHTML = newText;
+				iconText.style.visibility = newText ? "visible" : "hidden";
+			}
+		});
+	}
 		
-				// Stato morto
-				const isDead = player.status === "DIED";
-				if (icon.classList.contains("died") !== isDead) 
-				{
-					console.log("struggle 3");
-					icon.classList.toggle("died", isDead);
-				}
-				if (isActive && player.playerId === this.player_id) 
-				{
-					console.log("struggle 4");
-					isMyTurn = true;
-					console.log("player turn true")
-				}
-
-				if (yourTurnText) 
-				{
-					const shouldBeVisible = isMyTurn ? "visible" : "hidden";
-					console.log("aaaaa");
-					if (yourTurnText.style.visibility !== shouldBeVisible) 
-					{
-						console.log("aaaaa 234");
-						yourTurnText.style.visibility = shouldBeVisible;
-					}
-				}
-
-				// Aggiornamento testo solo se cambia
-				const newText = player.selectedCards.length > 0 
-					? `Claims <span class="number">${player.selectedCards.length}</span> <span class="card-name">${cardRequired}</span>` 
-					: "";
-		
-				if (iconText.innerHTML !== newText) 
-				{
-					console.log("asniasnsain aisnianina234");
-					iconText.innerHTML = newText;
-					iconText.style.visibility = newText ? "visible" : "hidden";
-				}
-			});
-		}
-		
-		
-		
-
 	updateGameState(data)
 	{
 		try
@@ -629,16 +600,16 @@ export default class Game
 			
 			this.updateIcons(data);
 			if (data.lobby_info) 
-			{
 				this.updateTurnTimer(data.lobby_info);
-			}
 		}
 		catch (error) {
 			console.error("An error occurred during game update state:", error);
 			console.error("data:", data);
 		}
 	}
-	updatePlayerCards(playerHand) {
+
+	updatePlayerCards(playerHand) 
+	{
 		const cardSlots = document.querySelectorAll('.col-1 .card'); // Seleziona tutte le carte esistenti
 		
 		cardSlots.forEach((slot, index) => {
@@ -668,7 +639,8 @@ export default class Game
 		}
 	}
 
-	selected_card(player) {
+	selected_card(player) 
+	{
         const cardSlots = document.querySelectorAll('.col-1 .card');
         const selectedIndex = player.selection_index;
 

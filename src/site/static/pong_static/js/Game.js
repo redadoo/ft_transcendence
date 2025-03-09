@@ -63,6 +63,7 @@ export default class Game
 		this.pongOpponent = null;
 		this.ball = null;
 		this.background = null;
+		this.lastScore = null; 
 
 		this.isSceneCreated = false;
 		this.manageWindowClose();
@@ -116,19 +117,14 @@ export default class Game
 	/**
      * Initializes the game scene, mode, and environment.
      */
-	async init()
+	async init(player_id)
 	{
 		router.removeEventListeners();
-		
-		this.player_id = window.localStorage.getItem('id');
-		if (!this.player_id)
-		{
-			console.error("Failed to set player ID. Aborting initialization.");
-			return;
-		}
+		this.player_id = player_id;
 
 		//init scene
 		this.sceneManager = new SceneManager(true);
+		
 		Object.assign(this.sceneManager, CAMERA_SETTINGS);
 		this.sceneManager.initialize(true, true);
 
@@ -190,7 +186,8 @@ export default class Game
 				this.bounds = new Bounds(bounds_data.xMin, bounds_data.xMax, bounds_data.yMin, bounds_data.yMax);
 				this.ball = new Ball(ball_data.radius);
 				this.background = new Background(this.sceneManager.scene, this.bounds.xMax * 2, this.bounds.yMax * 2);
-				// this.handleScoreSprites(scores_data);
+				this.handleScoreSprites(scores_data);
+				this.lastScore = scores_data;
 
 				this.sceneManager.scene.add(this.ball.mesh);
 
@@ -277,13 +274,12 @@ export default class Game
 	{
 		if (this.sceneManager.is42BadPc === false)
 		{
-			console.log("caricando");
-			const room = this.sceneManager.modelManager.getModel('Scene');
+			const room = this.sceneManager.modelManager.getModel('Scene', true);
 	
 			room.scene.scale.set(10, 10, 10);
 			room.scene.position.set(800, -134, 191);
 			room.scene.rotation.y = -Math.PI / 2;
-	
+
 			this.sceneManager.scene.add(room.scene);
 		}
 	}
@@ -306,8 +302,11 @@ export default class Game
 					this.pongOpponent.updatePosition(data.players[this.pongOpponent.playerId].y);
 			}
 
-			// if(data.scores)
-			// 	this.handleScoreSprites(data.scores);
+			if(this.lastScore != data.scores)
+			{
+				this.lastScore = data.scores;
+				this.handleScoreSprites(data.scores);
+			}
 		}
 		catch (error) {
 			console.error("An error occurred during game update state:", error);
@@ -443,6 +442,6 @@ export default class Game
 				this.pongOpponent = null;
 			}
 		}
-		// this.handleScoreSprites({"player1": 0, "player2": 0});
+		this.handleScoreSprites({"player1": 0, "player2": 0});
 	}
 }

@@ -31,7 +31,7 @@ export default class ModelManager
      * @param {string} name - The name of the model to retrieve.
      * @returns {Object|null} The loaded model or null if not found.
      */
-    getModel(name) 
+    getModel(name, isStatic = false) 
 	{
         const model = this.modelsLoaded[name];
         if (!model)
@@ -39,6 +39,9 @@ export default class ModelManager
             console.error(`Model "${name}" is not loaded! Available models:`, Object.keys(this.modelsLoaded));
             throw new Error('Model not found');
         }
+        
+        model.matrixAutoUpdate = !isStatic;
+
         return model;
     }
 

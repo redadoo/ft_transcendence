@@ -24,9 +24,6 @@ const views = {
 		const data = await api.getHeaderInfo();
 		console.log("Header info data:", data);
 
-		if (data.id != null)
-			window.localStorage.setItem('id', data.id);
-
 		this.player_id = data.id;
 		['profileBtn', 'notificationBtn'].forEach(id => document.getElementById(id).classList.remove('d-none'));
 		document.getElementById('headerUsername').textContent = data.username;
@@ -155,7 +152,7 @@ const views = {
 
 	async pongScripts() {
 		const pongGame = new PongGame();
-		await pongGame.init();
+		await pongGame.init(this.player_id);
 		pongGame.sceneManager.animate();
 	},
 
@@ -164,19 +161,19 @@ const views = {
 	
 	async singleplayerPongVsBotScripts() {
 		const pongGame = new PongGame();
-		await pongGame.init();
+		await pongGame.init(this.player_id);
 		pongGame.sceneManager.animate();
 	},
 
 	async singleplayerPongSameKeyboardScripts() {
 		const pongGame = new PongGame();
-		await pongGame.init();
+		await pongGame.init(this.player_id);
 		pongGame.sceneManager.animate();
 	},
 
 	async liarsbarScripts() {
 		const liarsGame = new LiarsGame();
-		await liarsGame.init();
+		await liarsGame.init(this.player_id);
 		liarsGame.sceneManager.animate();
 	},
 
@@ -302,7 +299,7 @@ const views = {
 		const startButton = document.getElementById('startGame');
 
 		const pongGame = new PongGame();
-		await pongGame.init();
+		await pongGame.init(this.player_id);
 		pongGame.sceneManager.animate();
 
 		await new Promise(resolve => setTimeout(resolve, 1000));
@@ -348,7 +345,7 @@ const views = {
 		});
 
 		const pongGame = new PongGame();
-		await pongGame.init();
+		await pongGame.init(this.player_id);
 		pongGame.sceneManager.animate();
 	},
 
@@ -388,7 +385,7 @@ const views = {
 		const startButton = document.getElementById('startTournament');
 
 		const pongGame = new PongGame();
-		await pongGame.init();
+		await pongGame.init(this.player_id);
 		pongGame.sceneManager.animate();
 
 
@@ -409,7 +406,7 @@ const views = {
 
 	async tournamentGuestScripts() {
 		const pongGame = new PongGame();
-		await pongGame.init();
+		await pongGame.init(this.player_id);
 		pongGame.sceneManager.animate();
 
 		await new Promise(resolve => setTimeout(resolve, 1000));

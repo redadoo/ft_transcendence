@@ -32,11 +32,14 @@ export default class SceneManager
 
 		this.modelManager = null;
 		this.audioManager = null;
+		
 		this.is42BadPc = false;
+		this.staticMode = false;
+		this.firstRender = false;
 
 		this.fov = 45;
 		this.nearPlane = 1;
-		this.farPlane = 10000;
+		this.farPlane = 1000;
 
 		this.needOrbital = needOrbital;
 		this.accumulatedTime = 0;
@@ -101,7 +104,20 @@ export default class SceneManager
 		this.initializeCamera();
 		this.initializeStats();
 
-		if (this.needOrbital) this.controls = new OrbitControls(this.camera, this.renderer.domElement);
+		if (this.needOrbital)
+		{
+			this.controls = new OrbitControls(this.camera, this.renderer.domElement);
+			this.controls.addEventListener('change', () => {
+				if(this.staticMode)
+				{
+					this.render();
+					if (this.stats) 
+						this.stats.update();
+				}
+			});
+		}
+		 
+			
 		if (needModelManager) this.modelManager = new ModelManager();
 		if (needAudioManager) this.audioManager = new AudioManager(this.camera);
 
@@ -132,27 +148,24 @@ export default class SceneManager
 		this.renderer.shadowMap.type = shadowMapType;
 		document.body.appendChild(this.renderer.domElement);
 
-		//this is a specific check for 42pc who had bad old driver or bad performance
 		const gl = this.renderer.getContext();
 		const debugInfo = gl.getExtension('WEBGL_debug_renderer_info');
 		if (debugInfo) 
 		{
-			const vendor = gl.getParameter(debugInfo.UNMASKED_VENDOR_WEBGL);
 			const renderInfo = gl.getParameter(debugInfo.UNMASKED_RENDERER_WEBGL);
 			
-			console.log('Vendor: ' + vendor);
-			console.log('Renderer: ' + renderInfo);
-	
+			// This check is useful for some 42 PCs that have old drivers or in any 
+			// case do not have excellent performance and these all have in common 
+			// the fact of using vulkan for renderer		
 			if (renderInfo.includes("Vulkan")) 
 			{
 				this.is42BadPc = true;
 				console.log("Vulkan renderer detected.");
 			}
-		} else {
+		} 
+		else 
 			console.log('WEBGL_debug_renderer_info is not supported.');
-		}
 	}
-	
 
 	/**
 	 * Initializes the camera with perspective settings.
@@ -185,27 +198,26 @@ export default class SceneManager
 		const animateLoop = () => {
 			const deltaTime = this.clock.getDelta();
 			this.accumulatedTime += deltaTime;
-
+		
 			while (this.accumulatedTime >= this.fixedTimeStep) 
 			{
 				if (this.externalFunction) this.externalFunction(this.fixedTimeStep);
 				this.accumulatedTime -= this.fixedTimeStep;
 			}
 			
-			if (this.renderer == null)
-				return;
-
-			this.render();
-			if (this.renderer != null)
-				this.stats.update();
-			if (this.needOrbital) this.controls.update();
-
+			if (!this.staticMode || (!this.firstRender && this.staticMode)) 
+			{
+				this.render();
+				if (this.stats) this.stats.update();
+				this.firstRender = true;
+			}
+			
 			window.requestAnimationFrame(animateLoop);
 		};
-
+		
 		animateLoop();
 	}
-
+	  
 	/**
 	 * Renders the scene using the camera.
 	 */
@@ -226,7 +238,6 @@ export default class SceneManager
 		this.renderer.setSize(window.innerWidth * 0.5, window.innerHeight * 0.5, false);
 	}
 	
-
 	/**
 	 * Disposes resources and removes event listeners.
 	 */

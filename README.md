@@ -56,6 +56,7 @@ The following resources were reviewed during the project. They were not necessar
   - [Three.js tutorial](https://github.com/SuboptimalEng/three-js-tutorials/tree/main)
   - [Example Three.js game](https://github.com/Rikki407/threejs-projects/blob/master/projects/shootout/Game.js#L256)
   - [Client-side prediction and server reconciliation](https://www.gabrielgambetta.com/client-side-prediction-server-reconciliation.html)
+  - [Threejs tips](https://discoverthreejs.com/tips-and-tricks/)
 
 - **Monitoring & Performance**
   - [Prometheus and Grafana](https://rezakhademix.medium.com/a-complete-guide-to-monitor-postgresql-with-prometheus-and-grafana-5611af229882)

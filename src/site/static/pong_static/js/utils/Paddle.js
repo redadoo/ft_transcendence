@@ -39,34 +39,30 @@ export default class Paddle {
 	 * @param {number} bounds.yMin - The minimum y-coordinate for the paddle.
 	 * @param {number} bounds.yMax - The maximum y-coordinate for the paddle.
 	 */
-	constrainMovement(bounds) {
-		if (this.mesh.position.x - this.mesh.geometry.parameters.width / 2 < bounds.xMin) {
-			this.mesh.position.x = bounds.xMin + this.mesh.geometry.parameters.width / 2;
-		}
 
-		if (this.mesh.position.x + this.mesh.geometry.parameters.width / 2 > bounds.xMax) {
-			this.mesh.position.x = bounds.xMax - this.mesh.geometry.parameters.width / 2;
-		}
-
-		if (this.mesh.position.y - this.mesh.geometry.parameters.height / 2 < bounds.yMin) {
-			this.mesh.position.y = bounds.yMin + this.mesh.geometry.parameters.height / 2;
-		}
-
-		if (this.mesh.position.y + this.mesh.geometry.parameters.height / 2 > bounds.yMax) {
-			this.mesh.position.y = bounds.yMax - this.mesh.geometry.parameters.height / 2;
-		}
+	constrainMovement(bounds) 
+	{
+		const halfWidth = this.mesh.geometry.parameters.width / 2;
+		const halfHeight = this.mesh.geometry.parameters.height / 2;
+		const pos = this.mesh.position;
+		
+		if (pos.x - halfWidth < bounds.xMin)
+			pos.x = bounds.xMin + halfWidth;
+		if (pos.x + halfWidth > bounds.xMax)
+			pos.x = bounds.xMax - halfWidth;
+		if (pos.y - halfHeight < bounds.yMin)
+			pos.y = bounds.yMin + halfHeight;
+		if (pos.y + halfHeight > bounds.yMax) 
+			pos.y = bounds.yMax - halfHeight;
 	}
 
 	deleteMesh(scene) 
 	{
 		if (this.mesh) 
 		{
-			if (scene)
-				scene.remove(this.mesh);
-	
+			if (scene) scene.remove(this.mesh);
 			this.mesh.geometry.dispose();
 			this.mesh.material.dispose();
-	
 			this.mesh = null;
 		}
 	}
