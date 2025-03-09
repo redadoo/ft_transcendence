@@ -135,7 +135,7 @@ class Lobby:
 		data_to_send = {
 			"type": "lobby_state",
 			"event_name": "player_join",
-			"player_id": player_id
+			"player_id": int(player_id)
 		}
 		await self.broadcast_message(data_to_send)
 

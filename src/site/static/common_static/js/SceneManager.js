@@ -236,6 +236,8 @@ export default class SceneManager
 		this.camera.aspect = window.innerWidth / window.innerHeight;
 		this.camera.updateProjectionMatrix();
 		this.renderer.setSize(window.innerWidth * 0.5, window.innerHeight * 0.5, false);
+		if (this.staticMode)
+			this.render();
 	}
 	
 	/**

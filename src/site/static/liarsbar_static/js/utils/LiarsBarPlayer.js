@@ -39,7 +39,6 @@ export default class LiarsBarPlayer
 			const key = Object.keys(this.controlKeys).find(
 				(k) => this.controlKeys[k] === event.code
 			);
-
 			if (key) 
 			{
 				this.socket.send

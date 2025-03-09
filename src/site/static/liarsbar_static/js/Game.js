@@ -174,6 +174,8 @@ export default class Game
 			this.onSocketOpen.bind(this),
 			this.onSocketClose.bind(this)
 		);
+
+		this.players[this.player_id] = new LiarsBarPlayer(this.gameSocket, this.player_id);
 	}
 
 	/**
@@ -330,8 +332,6 @@ export default class Game
 		{
 			this.gameSocket.send(JSON.stringify({ type: 'client_ready' }));
 			this.setCameraForPlayer(data);
-			console.log("sfogo", this.playersOrder);
-			console.log("sfogo 2", this.players);
 			document.getElementById('liarsbarOverlay').classList.remove('d-none');
 		}
 	}
@@ -342,17 +342,13 @@ export default class Game
 	 */
 	AddUserToLobby(data) {
 		const joinedPlayerId = data.event_info.player_id;
-	
+		
 		// Se il player non è già nell'array di ordine, lo aggiungiamo
 		if (!this.playersOrder.includes(joinedPlayerId)) 
-		{
 			this.playersOrder.push(joinedPlayerId);
-		}
 
 		// Creiamo il nuovo giocatore
-		if (this.player_id == joinedPlayerId)
-			this.players[joinedPlayerId] = new LiarsBarPlayer(this.gameSocket, joinedPlayerId);
-		else
+		if (this.player_id != joinedPlayerId)
 			this.players[joinedPlayerId] = new LiarsBarPlayer(null, joinedPlayerId);
 	
 		// Se la lobby è completa, avviamo il gioco
@@ -360,8 +356,6 @@ export default class Game
 		{
 			this.gameSocket.send(JSON.stringify({ type: 'client_ready' }));
 			this.setCameraForPlayer(data);
-			console.log("sfogo", this.playersOrder);
-			console.log("sfogo 2", this.players);
 			document.getElementById('liarsbarOverlay').classList.remove('d-none');
 		}
 	}
