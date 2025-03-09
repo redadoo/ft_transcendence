@@ -1,6 +1,6 @@
 const html = {
 	empty: `
-		<div> 
+		<div>
 		</div>
 	`,
 	home: `
@@ -360,9 +360,9 @@ const html = {
 		</div>
 		<div class="card-container">
 		<div class="your-turn-text">Your Turn!</div>
-		<div class="row h-100"> 
+		<div class="row h-100">
 					<div class="col-1"> </div>
-					<div class="col-1"> 
+					<div class="col-1">
 						<div class="card" data-card-type="ACE">
 							<img src="/media/png/pox.png" alt="ACE">
 						</div>
@@ -371,21 +371,21 @@ const html = {
 						<div class="card" data-card-type="QUEEN">
 							<img src="/media/png/momo.png" alt="QUEEN">
 						</div>
-					</div>	
+					</div>
 					<div class="col-1">
 						<div class="card" data-card-type="KING">
 							<img src="/media/png/glim.png" alt="KING">
 						</div>
 					</div>
 					<div class="col-1">
-					
+
 						<div class="card" data-card-type="JOLLY">
 							<img src="/media/png/master.png" alt="JOLLY">
 						</div>
 					</div>
-					
+
 					<div class="col-1">
-					
+
 						<div class="card" data-card-type="JOLLY">
 							<img src="/media/png/master.png" alt="JOLLY">
 						</div>
@@ -1033,6 +1033,80 @@ const html = {
 							<span class="pixel-font detail-value" id="matchEnd">--</span>
 						</div>
 					</div>
+				</div>
+			</div>
+		</div>
+	`,
+
+	tournamentResult: `
+		<div class="container-fluid game-container">
+			<div class="row h-100">
+				<div class="col-2 px-0">
+				<nav class="nav-wrapper">
+					<div class="d-flex flex-column">
+					<div class="nav-link-left back" data-link="/">
+						<span class="hundin-font back">BACK</span>
+					</div>
+					</div>
+				</nav>
+				</div>
+
+				<div class="col-10 d-flex align-items-center justify-content-center">
+				<div class="tournament-result-container">
+					<div class="title">
+					<span class="pixel-font tournament-result-title">TOURNAMENT RESULTS</span>
+					</div>
+
+					<!-- Winner Section -->
+					<div class="winner-section">
+					<div class="trophy-icon">
+						<img src="/media/img/trophy.png" alt="Trophy" id="trophyIcon" />
+					</div>
+					<div class="winner-content">
+						<div class="winner-avatar">
+						<img src="" alt="Winner" id="winnerAvatar" />
+						</div>
+						<div class="winner-info">
+						<span class="pixel-font winner-name" id="winnerName">Player 1</span>
+						<div class="winner-label">
+							<span class="pixel-font winner-text">WINNER</span>
+						</div>
+						</div>
+					</div>
+					</div>
+
+					<!-- Losers Section -->
+					<div class="losers-section">
+					<div class="losers-header">
+						<span class="pixel-font losers-title">OTHER PARTICIPANTS</span>
+					</div>
+					<div class="losers-list">
+						<div class="loser-card">
+						<div class="loser-avatar">
+							<img src="" alt="Loser 1" id="loser1Avatar" />
+						</div>
+						<span class="loser-name" id="loser1Name">Player 2</span>
+						<span class="loser-status">LOSER</span>
+						</div>
+
+						<div class="loser-card">
+						<div class="loser-avatar">
+							<img src="" alt="Loser 2" id="loser2Avatar" />
+						</div>
+						<span class="loser-name" id="loser2Name">Player 3</span>
+						<span class="loser-status">LOSER</span>
+						</div>
+
+						<div class="loser-card">
+						<div class="loser-avatar">
+							<img src="" alt="Loser 3" id="loser3Avatar" />
+						</div>
+						<span class="loser-name" id="loser3Name">Player 4</span>
+						<span class="loser-status">LOSER</span>
+						</div>
+					</div>
+					</div>
+				</div>
 				</div>
 			</div>
 		</div>

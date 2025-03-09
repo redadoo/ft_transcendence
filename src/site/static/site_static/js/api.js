@@ -190,6 +190,15 @@ const api = {
 		}
 	},
 
+	async getLastTournament() {
+		try {
+			return await this.fetchJson('/api/pong/last_tournament');
+		} catch (error) {
+			console.error('Last tournament error:', error);
+			return false;
+		}
+	},
+
 	async getLastMatch() {
 		try {
 			return await this.fetchJson('/api/pong/last_match');

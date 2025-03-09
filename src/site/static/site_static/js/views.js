@@ -158,7 +158,7 @@ const views = {
 
 	async singleplayerPongScripts() {
 	},
-	
+
 	async singleplayerPongVsBotScripts() {
 		const pongGame = new PongGame();
 		await pongGame.init(this.player_id);
@@ -256,7 +256,7 @@ const views = {
 		let longestGameSeconds = 0;
 		if (data.stat.longest_game_duration != null)
 			longestGameSeconds = parseTimeDelta(data.stat.longest_game_duration);
-		
+
 		const longestGame = formatTimeDelta(longestGameSeconds);
 		updateElement('profilePageLongestGame', `${longestGame}`);
 
@@ -374,6 +374,22 @@ const views = {
 
 		api.getUserProfile(data.second_user_username).then(data => {
 			document.getElementById('player2Avatar').src = data.image_url.avatar_url;
+		});
+	},
+
+	async tournamentResult() {
+		return html.tournamentResult;
+	},
+
+	async tournamentResultScripts() {
+		const data = await api.getTournamentResult();
+		const updateElement = (id, value) => document.getElementById(id).textContent = value;
+
+		updateElement('winnerName', data.winner);
+
+
+		api.getUserProfile(data.winner).then(data => {
+			document.getElementById('winnerAvatar').src = data.image_url.avatar_url;
 		});
 	},
 

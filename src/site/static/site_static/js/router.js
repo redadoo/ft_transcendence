@@ -29,6 +29,7 @@ const router = {
 			'/tournament': 'tournament',
 			'/tournament/guest': 'tournamentGuest',
 			'/tournament/playing': 'tournamentPlaying',
+			'/tournament-result': 'tournamentResult',
 			'/match-result': 'matchResult',
 			'/profile': 'profile',
 			'/register': 'register',
@@ -108,16 +109,16 @@ const router = {
 	navigateTo: async function(url, isFirst=true) {
 
 		Sound.play('navigationSound');
-		if (window.location.pathname !== url) 
+		if (window.location.pathname !== url)
 			history.pushState(null, null, url);
-		else 
+		else
 			history.replaceState(null, null, url);
 
 		if (isFirst === true)
 		{
-			let isAuth = await api.checkAuth(); 
-	
-			if (isAuth === false && url !== '/login' && url !== '/register' && url !== '/login42') 
+			let isAuth = await api.checkAuth();
+
+			if (isAuth === false && url !== '/login' && url !== '/register' && url !== '/login42')
 			{
 				console.log('Not authenticated, redirecting to login');
 				this.navigateTo('/login', false);
