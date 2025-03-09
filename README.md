@@ -8,6 +8,7 @@
 ## Table of Contents
 
 - [About](#about)
+- [Module](#Module)
 - [Usage](#usage)
 - [Resources](#resources)
 
@@ -18,6 +19,26 @@ This project is part of the common core of 42 and was done in collaboration with
 Read the [Subject](https://github.com/redadoo/ft_transcendence/blob/master/en.subject.pdf) for more information.
 
 ## Usage
+
+## Module
+
+| **Category** | **Description** | **Status** |
+|--------------|-----------------|------------|
+| **Major**    | Use a Framework as backend | ✅ |
+| **Minor**    | Use a front-end framework or toolkit | ✅ |
+| **Minor**    | Use a database for the backend | ✅ |
+| **Major**    | Standard user management, authentication, users across tournaments | ✅ |
+| **Major**    | Implementing a remote authentication | ✅ |
+| **Major**    | Remote players | ✅ |
+| **Major**    | Add Another Game with User History and Matchmaking. | ✅ |
+| **Major**    | Live chat | ✅ |
+| **Major**    | Introduce an AI Opponent | ✅ |
+| **Minor**    | Monitoring system | ✅ |
+| **Major**    | Use of advanced 3D techniques | ✅ |
+| **Major**    | Replacing Basic Pong with Server-Side Pong & Implementing an API | ✅ |
+| **Minor**    | Expanding Browser Compatibility | ✅ |
+| **Minor**    | Server-Side Rendering (SSR) Integration | ✅ |
+
 
 ## Resources
 
