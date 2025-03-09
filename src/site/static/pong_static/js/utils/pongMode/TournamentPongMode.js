@@ -18,7 +18,7 @@ export default class TournamentPongMode extends PongMode {
 			this.room_name = window.localStorage.getItem('room_name');
 		else
 		{
-			this.room_name = "test-room"//crypto.randomUUID();
+			this.room_name = crypto.randomUUID();
 			window.localStorage.setItem('room_name', this.room_name);
 		}
 
