@@ -376,17 +376,17 @@ export default class Game
 			return;
 		}
 		const cameraPositions = [
-				new THREE.Vector3(107.80899420126953, 261.37028568763486, 1040.2530466184585), //rimuru
-				new THREE.Vector3(358.8226249419454, 278.7692367678665, 743.608735250403), // kuriboh
-				new THREE.Vector3( -149.23606980454502, 260.49133716451746, 744.2613518306547), //slimegun
+			new THREE.Vector3(-2.5, 1.7, 0.5), //rimuru
+				new THREE.Vector3(0.5, 1.7, 2.5), // kuriboh
+				new THREE.Vector3(2.5, 1.7, -2.5), //slimegun
 				new THREE.Vector3(2.5, 1.7, 0.5), //Magikarp
 			];
 		
 			// Definiamo i target per ciascun giocatore (4 target distinti)
 			const targets = [
-				new THREE.Vector3(118, 10, 467),      // rimuru
-				new THREE.Vector3(-149, 100, 744), // kuriboh
-				new THREE.Vector3(358, 80, 744),    //slimegun
+				new THREE.Vector3(0, 0, 0),      // rimuru
+				new THREE.Vector3(0, 0, 0), // kuriboh
+				new THREE.Vector3(0, 0, 0),    //slimegun
 				new THREE.Vector3(0, 0, 0),    //Magikarp
 			];
 		// ---------------------OLD CAMERA---------------------------
