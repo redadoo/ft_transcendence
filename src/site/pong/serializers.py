@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import PongMatch
+from .models import PongMatch, PongTournament
 
 class PongMatchSerializer(serializers.ModelSerializer):
 	first_user_username = serializers.CharField(source='first_user.username', read_only=True)
@@ -21,9 +21,6 @@ class PongMatchSerializer(serializers.ModelSerializer):
 
 	def get_duration(self, obj):
 		return obj.get_duration()
-
-from rest_framework import serializers
-from .models import PongTournament, PongMatch
 
 class PongTournamentSerializer(serializers.ModelSerializer):
     """
