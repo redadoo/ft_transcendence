@@ -2190,6 +2190,20 @@ label {
     animation: pulsatered 1s infinite;
 }
 
+#PongClockText{
+	position: absolute;
+    top: 57%;
+    left: 50%;
+    transform: translate(-50%, -50%); /* Centra il testo */
+    font-family: 'PRESS START 2P', sans-serif;
+    font-size: 32px;
+    color: #fff;
+}
+
+#PongClockText.red {
+    color: red !important; /* Colore rosso */
+    text-shadow: 0 0 8px rgba(255, 0, 0, 0.8); /* Ombra rossa */
+}
 
 /* Stile per il testo */
 #clockText {

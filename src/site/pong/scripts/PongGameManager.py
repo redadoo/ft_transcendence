@@ -1,14 +1,13 @@
+import time
 from pong.scripts import constants
 from pong.models import *
 from pong.scripts.ball import Ball
 from pong.scripts.PongPlayer import PongPlayer
 from utilities.GameManager import GameManager
 from pong.scripts.ai import PongAI
-from utilities.Player import Player
 from website.models import User, MatchHistory, UserStats
 from channels.db import database_sync_to_async
 from django.utils import timezone
-from django.db.utils import OperationalError, DatabaseError
 
 class PongGameManager(GameManager):
 	
@@ -19,10 +18,13 @@ class PongGameManager(GameManager):
 		super().__init__(max_players=2)
 		self.ball = Ball()
 		self.scores = {"player1": 0, "player2": 0}
+		self.is_countdown_finish = False
+		self.time_elapsed = 0
 
 	def start_game(self):
 		"""Marks the game as started."""
 		self.start_match_timestamp = timezone.now()
+		self.time_start_match = time.time()
 		self.game_loop_is_active = True
 
 	async def clear_and_save(self, is_game_ended: bool, player_disconnected_id: int = None):
@@ -147,25 +149,31 @@ class PongGameManager(GameManager):
 	async def game_loop(self):
 		"""
 		Core game loop that updates the state of the players, ball, and handles collisions.
-		"""
-		players = self.players.values()
+		"""		
+		if self.is_countdown_finish == False:
+			self.time_elapsed = time.time() - self.time_start_match
+			if self.time_elapsed >= constants.COUNTDOWN:
+				self.is_countdown_finish = True
 
-		for player in players:
-			player.player_loop()
+		if self.is_countdown_finish == True:
+			players = self.players.values()
 
-		self.ball.update_position()
-		for player in players:
-			self.ball.handle_paddle_collision(player.paddle)
+			for player in players:
+				player.player_loop()
 
-		out_of_bounds = self.ball.is_out_of_bounds()
-		if out_of_bounds in {"right", "left"}:
-			scoring_player = "player1" if out_of_bounds == "right" else "player2"
-			self.scores[scoring_player] += 1
-			self.ball.reset()
+			self.ball.update_position()
+			for player in players:
+				self.ball.handle_paddle_collision(player.paddle)
 
-		if any(score >= constants.MAX_SCORE for score in self.scores.values()):
-			await self.clear_and_save(True)
-			return
+			out_of_bounds = self.ball.is_out_of_bounds()
+			if out_of_bounds in {"right", "left"}:
+				scoring_player = "player1" if out_of_bounds == "right" else "player2"
+				self.scores[scoring_player] += 1
+				self.ball.reset()
+
+			if any(score >= constants.MAX_SCORE for score in self.scores.values()):
+				await self.clear_and_save(True)
+				return
 
 	def get_loser(self):
 		player_list = list(self.players)
@@ -198,6 +206,7 @@ class PongGameManager(GameManager):
 			"ball": self.ball.to_dict(),
 			"scores": self.scores,
 			"bounds": constants.GAME_BOUNDS,
+			"count_down": int(constants.COUNTDOWN - self.time_elapsed)
 		})
 		return base_dict
 

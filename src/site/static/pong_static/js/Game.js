@@ -64,6 +64,8 @@ export default class Game
 		this.ball = null;
 		this.background = null;
 		this.lastScore = null; 
+		this.isClockVisible = false;
+		this.lastCountValue = 6;
 
 		this.isSceneCreated = false;
 		this.manageWindowClose();
@@ -285,6 +287,20 @@ export default class Game
 	}
 
 	/**
+	 * Aggiorna il contenuto dell'elemento DOM del timer.
+	 * @param {number} timeLeft - Il tempo rimanente (in secondi) da mostrare.
+	 */
+	updateClockDisplay(timeLeft) 
+	{
+		const clockText = document.getElementById('PongClockText');
+		
+		if (clockText)
+		{
+			clockText.textContent = timeLeft;
+		}
+	}
+
+	/**
      * Updates the game state with new data.
      * @param {Object} data - The game state data.
      */
@@ -292,6 +308,21 @@ export default class Game
 	{
 		try
 		{
+			if (this.isClockVisible == false)
+			{
+				document.getElementById('pongCountDown').classList.remove('d-none');
+				this.isClockVisible = true;
+			}
+
+			if(data.count_down < this.lastCountValue)
+			{
+				this.lastCountValue = data.count_down; 	
+				this.updateClockDisplay(data.count_down);
+			
+				if (data.count_down == 0)
+					document.getElementById('pongCountDown').classList.add('d-none');
+			}
+
 			if (data.ball)
 				this.ball.updatePosition(data.ball);
 			if (data.players)
@@ -395,6 +426,8 @@ export default class Game
 
 	game_ended(isGamefinished)
 	{
+		document.getElementById('pongCountDown').classList.add('d-none');
+
 		router.setupEventListeners();
 		if (this.sceneManager) {
 			this.sceneManager.dispose();

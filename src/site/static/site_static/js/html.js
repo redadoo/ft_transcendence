@@ -304,6 +304,19 @@ const html = {
 		</div>
 	`,
 
+	pongCountDown:
+	`
+		<div class="container-fluid">
+			<!-- Orologio posizionato in alto al centro -->
+			<div id="clockOverlay" style="position: fixed; top: 80px; left: 50%; transform: translateX(-50%); z-index: 1000;">
+				<div id="clockContainer" class="pulsatered" style="position: relative; width: 120px; height: 120px;">
+					<img id="clockImage" src="/media/png/timer.png" alt="Orologio">
+					<div id="PongClockText" class="red"></div>
+				</div>
+			</div>
+		</div>
+	`,
+
 	liarsbar: `
 		<div id="pong-container" class="container-fluid game-container d-flex justify-content-center align-items-center">
 			<div class="text-center">
