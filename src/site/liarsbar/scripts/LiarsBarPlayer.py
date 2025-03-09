@@ -95,6 +95,7 @@ class LiarsBarPlayer(Player):
 			if key not in {"KeyA", "KeyD", "KeyE", "Enter", "Space"}:
 				raise ValueError(f"Invalid key: {key}. Expected 'Enter', 'KeyA', 'KeyD', 'KeyE', or 'Space'.")
 
+			print("key")
 			if event_type == "key_down":
 				if key in self.keys_pressed:
 					# Tasto già premuto, ignorare l'azione.

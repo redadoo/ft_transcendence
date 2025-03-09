@@ -96,8 +96,7 @@ export default class Game
 
 		await this.initGameEnviroment();
 
-		this.setupGameSocket();
-		// this.matchmakingManager = new MatchmakingManager("liarsbar", this.setupGameSocket.bind(this));
+		this.matchmakingManager = new MatchmakingManager("liarsbar", this.setupGameSocket.bind(this));
 	}
 
 	/**
@@ -171,7 +170,7 @@ export default class Game
 		this.gameSocket.initGameWebSocket(
 			'liarsbar',
 			this.handleSocketMessage.bind(this),
-			"test",
+			data.room_name,
 			this.onSocketOpen.bind(this),
 			this.onSocketClose.bind(this)
 		);

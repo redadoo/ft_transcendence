@@ -81,6 +81,7 @@ class LiarsBarGameManager(GameManager):
 			KeyError: If the player ID is not found in the current players.
 		"""
 		try:
+			print("update")
 			player_id = data.get("playerId")
 			for index in self.players:
 				if self.players[index].player_id == player_id:
