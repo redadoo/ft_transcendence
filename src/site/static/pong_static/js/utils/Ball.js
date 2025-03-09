@@ -10,14 +10,9 @@ export default class Ball
 	 */
 	constructor(radius = 1) 
 	{
-		this.newPosX = 0;
-		this.newPosY = 0;
-
-		const geometry = new THREE.SphereGeometry(radius, 30, 30);
-		const material = new THREE.MeshStandardMaterial({ 
-			color: 'white', 
-		});
-
+		this.newPosition = new THREE.Vector3(0, 0, 0);
+		const geometry = new THREE.IcosahedronGeometry(radius, 1);
+		const material = new THREE.MeshBasicMaterial({ color: 'white' });
 		this.mesh = new THREE.Mesh(geometry, material);
 		this.mesh.position.set(0, 0, 0);
 	}
@@ -27,24 +22,21 @@ export default class Ball
 	 * 
 	 * @param {{x: number, y: number}} newPos - The new position coordinates.
 	 */
-	updatePosition(newPos)
+	updatePosition(newPos) 
 	{
-		this.newPosX = newPos.x;
-		this.newPosY = newPos.y;
+		this.newPosition.set(newPos.x, newPos.y, 0);
 	}
 
 	/**
 	 * Syncs the ball's mesh position with the updated coordinates.
 	 */
-  	syncPosition()
+	syncPosition() 
 	{
-		this.mesh.position.x = this.newPosX;
-		this.mesh.position.y = this.newPosY;
+		this.mesh.position.copy(this.newPosition);
 	}
 
-	setPosition(y, x)
+	setPosition(x, y) 
 	{
-		this.mesh.position.x = y;
-		this.mesh.position.y = x;
+		this.mesh.position.set(x, y, 0);
 	}
 }
