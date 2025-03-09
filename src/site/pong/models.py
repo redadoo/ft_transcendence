@@ -1,5 +1,6 @@
 from django.db import models
 from django.conf import settings
+from channels.db import database_sync_to_async
 
 class PongMatch(models.Model):
 	"""
@@ -126,7 +127,6 @@ class PongMatch(models.Model):
 	class Meta:	
 		verbose_name = "Pong match"
 
-
 class PongTournament(models.Model):
 	"""
 	Model representing a pong tournament, which contains multiple matches.
@@ -134,10 +134,10 @@ class PongTournament(models.Model):
 
 	id = models.AutoField(primary_key=True)
 
-	matches = models.ManyToManyField(
-		PongMatch, 
+	players = models.ManyToManyField(
+		settings.AUTH_USER_MODEL, 
 		related_name="tournaments", 
-		help_text="Matches in the tournament."
+		help_text="Users in the tournament."
 	)
 
 	start_date = models.DateTimeField(
@@ -160,6 +160,42 @@ class PongTournament(models.Model):
 		related_name="won_tournaments",
 		help_text="The winner of the tournament.",
 	)
+
+	@database_sync_to_async
+	def _get_players(self, players_id):
+		"""Fetch all players in one query (optimized)."""
+		from website.models import User
+		return list(User.objects.filter(id__in=players_id))
+
+	@database_sync_to_async
+	def _set_players(self, players):
+		"""Set players in the tournament."""
+		self.players.set(players)
+		self.save()
+
+	async def add_players_to_tournament(self, players_id):
+		"""Async method to add players to the tournament."""
+		print(players_id)
+		players = await self._get_players(players_id)
+		print(players)
+		await self._set_players(players)
+
+	@database_sync_to_async
+	def _get_winner(self, player_id):
+		"""Fetch winner asynchronously."""
+		from website.models import User
+		return User.objects.get(id=player_id)
+
+	@database_sync_to_async
+	def _save(self):
+		"""Save tournament asynchronously."""
+		self.save()
+
+	async def set_winner(self, player_id):
+		"""Async method to set the winner of the tournament."""
+		winner = await self._get_winner(player_id)
+		self.winner = winner
+		await self._save()
 
 	class Meta:
 		verbose_name = "Pong tournament"

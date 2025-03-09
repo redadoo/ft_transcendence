@@ -1,3 +1,4 @@
+import math
 import time
 from pong.scripts import constants
 from pong.models import *
@@ -60,7 +61,6 @@ class PongGameManager(GameManager):
 				start_date=self.start_match_timestamp or timezone.now()
 			)
 			await database_sync_to_async(match.save)()
-
 			try:
 				first_player_stats = await database_sync_to_async(
 					lambda: UserStats.objects.select_related('user').get(user=first_player)
@@ -194,6 +194,8 @@ class PongGameManager(GameManager):
 		self.ball.reset()
 		self.scores = {"player1": 0, "player2": 0}
 		self.game_loop_is_active = False
+		self.is_countdown_finish = False
+		self.time_elapsed = 0
 
 	def to_dict(self) -> dict:
 		"""
@@ -206,7 +208,7 @@ class PongGameManager(GameManager):
 			"ball": self.ball.to_dict(),
 			"scores": self.scores,
 			"bounds": constants.GAME_BOUNDS,
-			"count_down": int(constants.COUNTDOWN - self.time_elapsed)
+			"count_down": math.ceil(constants.COUNTDOWN - self.time_elapsed)
 		})
 		return base_dict
 

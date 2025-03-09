@@ -1,13 +1,14 @@
 import json
 import uuid
 
-from website.models import User
 from utilities.lobby import Lobby
+from website.models import User, UserImage
 from utilities.Tournament import Tournament
 from channels.db import database_sync_to_async
 from utilities.MatchManager import MatchManager
 from autobahn.websocket.protocol import Disconnected
 from pong.scripts.PongGameManager import PongGameManager
+from website.serializers import SimpleUserProfileSerializer
 from channels.generic.websocket import AsyncWebsocketConsumer
 
 class PongMatchmaking(AsyncWebsocketConsumer):
@@ -258,16 +259,30 @@ class PongTournament(BasePongConsumer):
 	async def handle_event(self, data: dict):
 		await self.tournament.manage_event(data)
 
+	@database_sync_to_async
+	def get_serialized_user(self, player_id):
+		"""Fetches user and serializes data in a synchronous context."""
+		try:
+			user = User.objects.get(id=player_id)
+			serializer = SimpleUserProfileSerializer(user)
+			return user.username, serializer.data.get("image_url")
+		except User.DoesNotExist:
+			return None, None
+
 	async def lobby_state(self, event: dict):
 		if event.get("event_name") == "player_join" and event.get("player_id"):
 			try:
-				user = await database_sync_to_async(User.objects.get)(id=event["player_id"])
+				username, image_url = await self.get_serialized_user(event["player_id"])
+				if not username:
+					raise ValueError("User not found")
+
+				await self.send_to_social({
+					"type": "user_join_tournament",
+					"username": username,
+					"user_image": image_url
+				})
 			except Exception as e:
-				raise ValueError(f"error while retrieving user: {str(e)}")
-			await self.send_to_social({
-				"type": "user_join_tournament",
-				"username": user.username,
-			})
+				raise ValueError(f"Error while retrieving user: {str(e)}")
 		else:
 			await self.safe_send({
 				"event_info": event,
