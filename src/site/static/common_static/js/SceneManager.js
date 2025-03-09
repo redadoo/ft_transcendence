@@ -223,7 +223,8 @@ export default class SceneManager
 	 */
 	render() 
 	{
-		this.renderer.render(this.scene, this.camera);
+		if (this.renderer)
+			this.renderer.render(this.scene, this.camera);
 	}
 
 	/**
@@ -280,7 +281,7 @@ export default class SceneManager
 			this.stats = null;
 		}
 	
-		window.removeEventListener("resize", this.onWindowResize);
+		window.removeEventListener("resize", this.onWindowResize.bind(this));
 	
 		if (this.modelManager) 
 		{

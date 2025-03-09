@@ -2,6 +2,8 @@ import asyncio
 from enum import Enum
 from utilities.GameManager import GameManager
 from channels.layers import get_channel_layer
+from pong.models import PongTournament
+from channels.db import database_sync_to_async
 
 PLAYER_NUMBER = 4
 MATCH_PLAYER_NUMBER = 2
@@ -22,8 +24,9 @@ class Tournament():
 		self.tournament_player = PLAYER_NUMBER
 		self.update_lock = asyncio.Lock()
 
-		self.players: list = []           
-		self.bracket: list = []           
+		self.players: list = []
+		self.all_players: list = []
+		self.bracket: list = []
 		self.current_round_winners: list = []  
 		self.current_round_index: int = 0 
 		self.game_loop_task = None
@@ -111,6 +114,7 @@ class Tournament():
 						"winner_id": self.current_round_winners[0],
 						"tournament_snapshot": snapshot,
 					})
+					print("dove")
 					return
 				current_round_matches = self.bracket[self.current_round_index]
 			else:
@@ -157,6 +161,7 @@ class Tournament():
 
 		player_id = int(data.get("player_id"))
 		self.players.append(player_id)
+		self.all_players.append(player_id)
 		snapshot = self.to_dict()
 		await self.broadcast_message({
 			"type": "lobby_state",
@@ -207,6 +212,9 @@ class Tournament():
 					"winner_id": self.current_round_winners[0],
 					"tournament_snapshot": snapshot,
 				})
+				tournament: PongTournament = await database_sync_to_async(PongTournament.objects.create)()
+				await tournament.add_players_to_tournament(self.all_players)
+				await tournament.set_winner(self.current_round_winners[0])
 			else:
 				print(f"game finish {self.players}")
 				await self.broadcast_message({

@@ -21,7 +21,7 @@ class PongMatchAdmin(admin.ModelAdmin):
 	autocomplete_fields = ["first_user", "second_user"]
 
 class PongMatchInline(admin.TabularInline):
-    model = PongTournament.matches.through
+    model = PongTournament.players.through
     extra = 1
 
 class PongTournamentAdmin(admin.ModelAdmin):

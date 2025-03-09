@@ -57,7 +57,6 @@ export default class Game
 		this.lightHelper = null;
 		this.screenLight = null;
 
-		// Game entities
 		this.bounds = null;
 		this.pongPlayer = null;
 		this.pongOpponent = null;
@@ -316,7 +315,7 @@ export default class Game
 
 			if(data.count_down < this.lastCountValue)
 			{
-				this.lastCountValue = data.count_down; 	
+				this.lastCountValue = data.count_down;
 				this.updateClockDisplay(data.count_down);
 			
 				if (data.count_down == 0)
@@ -475,6 +474,9 @@ export default class Game
 				this.pongOpponent = null;
 			}
 		}
+		document.getElementById('pongCountDown').classList.add('d-none');
+		this.lastCountValue = 6;
+		this.isClockVisible = false;
 		this.handleScoreSprites({"player1": 0, "player2": 0});
 	}
 }

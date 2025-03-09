@@ -38,9 +38,8 @@ class PongTournamentSerializer(serializers.ModelSerializer):
     def get_players(self, obj):
         players = set()
         
-        for match in obj.matches.all():
-            players.add(match.first_user)
-            players.add(match.second_user)
+        for player in obj.players.all():
+            players.add(player)
         
         return [player.username for player in players]
 
