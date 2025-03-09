@@ -188,10 +188,10 @@ class LiarsBarGameManager(GameManager):
 			self.handle_palyer_turn(self.players[self.player_turn_index])
 		elif not self.players[self.player_turn_index].card_sent and self.players[self.player_turn_index].status == LiarsBarPlayer.PlayerStatus.ALIVE:
 			self.time_elapsed = time.time() - self.turn_start
-			if self.player_turn_index == 2:
+			""" if self.player_turn_index == 2:
 				print(f"inserisco le carte nelle sue selected {self.players[self.player_turn_index].player_id}")
 				self.players[self.player_turn_index].card_sent = True
-				self.players[self.player_turn_index].selected_cards.append(self.players[self.player_turn_index].hand.pop(0))
+				self.players[self.player_turn_index].selected_cards.append(self.players[self.player_turn_index].hand.pop(0)) """
 			if self.time_elapsed > self.turn_duration:
 				# print("timeout")
 				if self.players[self.player_turn_index].shoot_yourself():
@@ -253,11 +253,11 @@ class LiarsBarGameManager(GameManager):
 									# print("fix index")
 									self.player_turn_index = 0
 							break
-		if self.players[self.player_turn_index].card_sent and self.started and self.players[self.player_turn_index].status == LiarsBarPlayer.PlayerStatus.ALIVE:
+		if self.players[self.player_turn_index].card_sent and self.players[self.player_turn_index].player_turn == True and self.started and self.players[self.player_turn_index].status == LiarsBarPlayer.PlayerStatus.ALIVE:
 			# # print("ho mandato carte\n")
 			self.can_doubt = True
 			if len(self.players[self.player_turn_index].hand) == 0:
-				# # print("hand cleared")
+				print(f"hand cleared by {self.players[self.player_turn_index].player_id}")
 				self.hands_cleared += 1
 			print(f"+1 sent {self.players[self.player_turn_index].player_id}")
 			self.players[self.player_turn_index].player_turn = False
