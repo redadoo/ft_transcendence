@@ -31,7 +31,8 @@ class Lobby:
 		self.update_lock = asyncio.Lock()
 		self.game_manager = game_manager
 		self.ready_players = set()
-		self.room_name = room_name
+		self.room_name = room_name	
+		self.game_loop_task = None
 
 	async def broadcast_message(self, message: dict):
 		"""
@@ -40,7 +41,8 @@ class Lobby:
 		Args:
 			message (dict): The message to send, typically containing event type and data.
 		"""
-		await self.channel_layer.group_send(self.room_group_name, message)
+		if self.channel_layer:
+			await self.channel_layer.group_send(self.room_group_name, message)
 
 	async def manage_event(self, data: dict):
 		"""
@@ -94,6 +96,9 @@ class Lobby:
 		Transitions the lobby into the PLAYING state, starts the game manager, and initiates the game loop.
 		Also broadcasts a 'game_started' event to all players.
 		"""
+		if self.game_loop_task != None:
+			return
+		
 		self.lobby_status = Lobby.LobbyStatus.PLAYING
 		self.game_manager.start_game()
 		self.game_loop_task = asyncio.create_task(self.game_loop())
@@ -173,16 +178,6 @@ class Lobby:
 
 		if self.lobby_status == self.LobbyStatus.PLAYING:
 			await self.game_manager.clear_and_save(False, player_disconnected_id)
-		else:
-			self.lobby_status = self.LobbyStatus.PLAYER_DISCONNECTED
-			self.game_manager.game_loop_is_active = False
-			data_to_send = {
-				"type": "lobby_state",
-				"event_name": "close_lobby",
-			}
-			await self.broadcast_message(data_to_send)
-
-		self.match_manager.remove_match(self.room_name)
 
 	def to_dict(self) -> dict:
 		"""

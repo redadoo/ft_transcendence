@@ -333,6 +333,7 @@ export default class Game
 			this.gameSocket.send(JSON.stringify({ type: 'client_ready' }));
 			this.setCameraForPlayer(data);
 			document.getElementById('liarsbarOverlay').classList.remove('d-none');
+			this.sceneManager.render();
 		}
 	}
 
@@ -357,6 +358,7 @@ export default class Game
 			this.gameSocket.send(JSON.stringify({ type: 'client_ready' }));
 			this.setCameraForPlayer(data);
 			document.getElementById('liarsbarOverlay').classList.remove('d-none');
+			this.sceneManager.render();
 		}
 	}
 

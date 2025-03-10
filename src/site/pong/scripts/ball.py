@@ -4,6 +4,7 @@ from pong.scripts import constants
 
 # TODO need to be refactored
 class Ball:
+	
 	def __init__(self):
 		self.x = constants.BALL_POSITION[0]
 		self.y = constants.BALL_POSITION[1]
@@ -13,7 +14,6 @@ class Ball:
 		self.bounds = constants.GAME_BOUNDS  # Limiti del campo di gioco
 		self.speed_multiplier = 1.0  # Fattore di incremento della velocità
 		
-
 	def reset(self):
 		"""Imposta la palla al centro dello schermo con una direzione casuale."""
 		self.x = (self.bounds["xMin"] + self.bounds["xMax"]) / 2
@@ -56,7 +56,6 @@ class Ball:
 		elif self.x - self.radius < self.bounds["xMin"]:
 			return "left"
 		return None
-
 
 	def handle_paddle_collision(self, paddle):
 		"""Gestisce le collisioni con una paddle considerando l'intera superficie della palla."""
@@ -107,8 +106,6 @@ class Ball:
 			if speed_magnitude != 0:
 				self.speed_x = (self.speed_x / speed_magnitude) * constants.BALL_SPEED_X
 				self.speed_y = (self.speed_y / speed_magnitude) * constants.BALL_SPEED_X
-
-
 
 	def to_dict(self):
 		return {

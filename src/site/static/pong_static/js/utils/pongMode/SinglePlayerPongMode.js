@@ -1,26 +1,6 @@
 import PongMode from './PongMode.js';
 import PongPlayer from '../../utils/PongPlayer.js';
 
-const FIRST_PLAYER_DATA = {
-	"x": 19,
-	"y": 0,
-	"height": 4,
-	"width": 0.7,
-	"depth": 1.2,
-	"speed": 0.9,
-	"color": 16777215
-};
-
-const SECOND_PLAYER_DATA = {
-	"x": -19,
-	"y": 0,
-	"height": 4,
-	"width": 0.7,
-	"depth": 1.2,
-	"speed": 0.9,
-	"color": 16777215
-};
-
 export default class SinglePlayerPongMode extends PongMode {
     
     constructor(game) {
@@ -30,8 +10,6 @@ export default class SinglePlayerPongMode extends PongMode {
 
 		this.mode = pathSegments[3] || 'default';
 		this.isVersusBot = this.mode == "vs_bot";
-		console.log("mode : ",this.mode);
-		console.log("this.isVersusBot : ",this.isVersusBot);
 	}
 
 	/**
@@ -104,16 +82,19 @@ export default class SinglePlayerPongMode extends PongMode {
 
 		if (this.game.pongOpponent == null && this.game.pongPlayer == null)
 		{
+			const playerData = data.lobby_info.players[1];
+			const secondPlayerData = data.lobby_info.players[-1];
+
+			this.game.pongPlayer = new PongPlayer(this.socket, this.game.player_id, playerData);
+			this.game.sceneManager.scene.add(this.game.pongPlayer.paddle.mesh);
+			
+			this.game.pongOpponent = new PongPlayer(this.socket, -1, secondPlayerData, true);
+			this.game.sceneManager.scene.add(this.game.pongOpponent.paddle.mesh);
+
 			this.socket.send(JSON.stringify({ 
 				type: 'client_ready',
 				player_id: this.game.player_id
 			}));
-			
-			this.game.pongPlayer = new PongPlayer(this.socket, this.game.player_id, FIRST_PLAYER_DATA);
-			this.game.sceneManager.scene.add(this.game.pongPlayer.paddle.mesh);
-
-			this.game.pongOpponent = new PongPlayer(this.socket, -1, SECOND_PLAYER_DATA, true);
-			this.game.sceneManager.scene.add(this.game.pongOpponent.paddle.mesh);
 		}
 	}
 }

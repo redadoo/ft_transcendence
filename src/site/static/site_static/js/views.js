@@ -310,10 +310,14 @@ const views = {
 			player1Avatar.src = data.image_url.avatar_url;
 		});
 
-		startButton.addEventListener('click', () => {
-			game.mode.sendStart();
+		startButton.addEventListener('click', function handleClick() {
+			pongGame.mode.sendStart();
 			router.navigateTo('/lobby/playing');
+		
+			// Remove the event listener to prevent further clicks
+			startButton.removeEventListener('click', handleClick);
 		});
+		
 	},
 
 	async lobbyGuest() {
@@ -321,7 +325,7 @@ const views = {
 	},
 
 	async lobbyPlaying() {
-		return html.singleplayerPong;
+		return html.empty;
 	},
 
 	async lobbyPlayingScripts() {

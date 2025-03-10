@@ -1,10 +1,11 @@
 import json
 import uuid
 
-from channels.generic.websocket import AsyncWebsocketConsumer
-from utilities.MatchManager import MatchManager
-from .scripts.LiarsBarGameManager import LiarsBarGameManager
 from utilities.lobby import Lobby
+from utilities.MatchManager import MatchManager
+from ft_transcendence.consumer import BaseConsumer
+from channels.generic.websocket import AsyncWebsocketConsumer
+from .scripts.LiarsBarGameManager import LiarsBarGameManager
 
 match_manager = MatchManager()
 
@@ -64,8 +65,7 @@ class LiarsBarMatchmaking(AsyncWebsocketConsumer):
 			"room_name": room_name
 		}))
 
-class LiarsBarConsumer(AsyncWebsocketConsumer):
-
+class LiarsBarConsumer(BaseConsumer):
 	async def connect(self):
 		self.room_name = self.scope["url_route"]["kwargs"]["room_name"]
 	
@@ -76,21 +76,13 @@ class LiarsBarConsumer(AsyncWebsocketConsumer):
 		await self.channel_layer.group_add(self.lobby.room_group_name, self.channel_name)
 		await self.accept()
 
-		# if self.lobby.len_player() < 2:
-		# 	await self.lobby.add_player_to_lobby({"player_id": "-2"}, True)
-		# 	await self.lobby.add_player_to_lobby({"player_id": "-3"}, True)
-		# await self.lobby.add_player_to_lobby({"player_id": "-4"}, True)
-	
 	async def disconnect(self, close_code):
 		await self.lobby.broadcast_message({"type": "lobby_state"})
 		await self.channel_layer.group_discard(self.lobby.room_group_name, self.channel_name)
 
-	async def receive(self, text_data):
-		data = json.loads(text_data)
-		if data.get("type") == "ping":
-			await self.send(text_data=json.dumps({'type': 'pong', 'time': data.get('time')}))
-			return
-		await self.lobby.manage_event(data)
+	async def handle_event(self, data: dict):
+		if self.lobby:
+			await self.lobby.manage_event(data)
 
 	async def lobby_state(self, event: dict):
 		"""Aggiorna lo stato lato client."""
@@ -102,7 +94,7 @@ class LiarsBarConsumer(AsyncWebsocketConsumer):
 			"lobby_info": lobby_info
 		}
 
-		await self.send(text_data=json.dumps(data_to_send))
+		await self.safe_send(data_to_send)
 
 		if event.get("event_name") == "player_join":
 			await self.lobby.mark_player_ready({"player_id": event.get("player_id")})
