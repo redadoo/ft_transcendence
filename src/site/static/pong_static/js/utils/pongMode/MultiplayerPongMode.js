@@ -19,8 +19,26 @@ export default class MultiplayerPongMode extends PongMode
 		this.matchmakingManager = new MatchmakingManager("pong", this.setupGameSocket.bind(this));
 	}
 
+	dispose(isGamefinished, player_id)
+	{
+		this.matchmakingManager.dispose();
+
+		let event_name = isGamefinished === true ? "quit_game" : "unexpected_quit";
+
+		if (this.socket) 
+		{
+			this.socket.send(JSON.stringify({
+				type: event_name,
+				player_id: player_id
+			}));
+			this.socket.close();
+		}
+	}
+
 	setupGameSocket(data)
 	{
+		console.log("chanins");
+
 		this.socket.initGameWebSocket(
 			'pong',
 			this.handleSocketMessage.bind(this),

@@ -17,7 +17,6 @@ async def get_active_users():
 	]
 	return await database_sync_to_async(lambda: list(User.objects.filter(status__in=active_statuses).values_list('id', flat=True)))()
 
-
 async def send_event_to_all_consumer(event_type: str, message: dict):
 	"""Send a WebSocket event to all active users."""
 	channel_layer = get_channel_layer()
@@ -33,7 +32,6 @@ async def send_event_to_all_consumer(event_type: str, message: dict):
 			await channel_layer.group_send(group_name, payload)
 		except Exception as e:
 			print(f"Failed to send event to {group_name}: {e}")
-
 
 class SocialConsumer(AsyncWebsocketConsumer):
 	async def connect(self):
@@ -93,7 +91,6 @@ class SocialConsumer(AsyncWebsocketConsumer):
 		"""
 		payload = {"type": event_type, **kwargs}
 		await self.send(text_data=json.dumps(payload))
-
 
 	async def get_update_users(self, event: dict):
 		await self.send_event("get_update_users", username=event["username"])

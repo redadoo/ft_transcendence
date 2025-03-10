@@ -7,30 +7,46 @@ export default class MatchmakingManager
 		this.onMatchFound = onMatchFound;
 		this.gameName = gameName;
 		this.gameSocket = null;
-		this.onSocketOpen = () => {
-			this.gameSocket.send(JSON.stringify(
-				{ action: 'join_matchmaking' }
-			));
-		}
-		this.addEventToButton();
+		
+		this.matchmakingButton = document.getElementById("startMatchmaking");
+		this.matchmakingStatus = document.getElementById("matchmakingStatus");
+		
+		this.matchmakingButton.addEventListener('click',this.onClick.bind(this));
 	}
 
-  	/**
-   	 * Sets up the UI and binds the matchmaking button to the matchmaking socket setup.
-   	 */
-	addEventToButton()
+	dispose()
 	{
-		const matchmakingButton = document.getElementById("startMatchmaking");
-		const matchmakingStatus = document.getElementById("matchmakingStatus");
-
-		if (matchmakingButton) {
-			matchmakingButton.addEventListener('click', () => {
-				matchmakingButton.innerText = "SEARCHING...";
-				matchmakingButton.disabled = true;
-				matchmakingStatus.innerText = "Looking for an opponent...";
-				this.setupMatchmakingSocket()
-			});
+		if (this.gameSocket) 
+		{
+			console.log("Closing WebSocket connection...");
+			this.gameSocket.close();
+			this.gameSocket = null;
 		}
+
+		if (this.matchmakingButton)
+			this.matchmakingButton.removeEventListener("click", this.onClick.bind(this));
+	}
+
+	onSocketOpen()
+	{
+		this.gameSocket.send(JSON.stringify({ 
+			action: 'join_matchmaking' 
+		}));
+	}
+
+	onSocketClose()
+	{
+		this.gameSocket.send(JSON.stringify({
+			action: 'close_matchmaking' 
+		}));
+	}
+
+	onClick()
+	{
+		this.matchmakingButton.innerText = "SEARCHING...";
+		this.matchmakingButton.disabled = true;
+		this.matchmakingStatus.innerText = "Looking for an opponent...";
+		this.setupMatchmakingSocket()
 	}
 
 	/**
@@ -42,7 +58,8 @@ export default class MatchmakingManager
 		this.gameSocket.initWebSocket(
 			`multiplayer/${this.gameName}/matchmaking`,
 			this.handleMatchmakingSocketMessage.bind(this),
-			this.onSocketOpen
+			this.onSocketOpen.bind(this),
+			this.onSocketClose.bind(this)
 		);
 	}
 
@@ -79,20 +96,17 @@ export default class MatchmakingManager
 		console.log("Cleaning up matchmaking UI...");
 	
 		setTimeout(() => {
-			const matchmakingButton = document.getElementById("startMatchmaking");
-			const matchmakingStatus = document.getElementById("matchmakingStatus");
-	
-			if (matchmakingButton) 
+			if (this.matchmakingButton) 
 			{
 				console.log("Resetting matchmaking button");
-				matchmakingButton.innerText = "START MATCHMAKING";
-				matchmakingButton.disabled = false;
+				this.matchmakingButton.innerText = "START MATCHMAKING";
+				this.matchmakingButton.disabled = false;
 			}
 
-			if (matchmakingStatus) 
+			if (this.matchmakingStatus) 
 			{
 				console.log("Resetting matchmaking status");
-				matchmakingStatus.innerText = "Click below to start matchmaking";
+				this.matchmakingStatus.innerText = "Click below to start matchmaking";
 			}
 	
 			const pongContainer = document.getElementById('pong-container');
@@ -104,13 +118,6 @@ export default class MatchmakingManager
 			else 
 			{
 				console.warn("pong-container not found!");
-			}
-	
-			if (this.gameSocket) 
-			{
-				console.log("Closing WebSocket connection...");
-				this.gameSocket.close();
-				this.gameSocket = null;
 			}
 
 			document.querySelectorAll('#pong-container').forEach(el => el.remove());

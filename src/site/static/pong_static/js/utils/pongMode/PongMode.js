@@ -28,6 +28,20 @@ export default class PongMode {
 		throw new Error("Method 'init()' must be implemented.");
 	}
 
+	dispose(isGamefinished, player_id)
+	{
+		let event_name = isGamefinished === true ? "quit_game" : "unexpected_quit";
+
+		if (this.socket) 
+		{
+			this.socket.send(JSON.stringify({
+				type: event_name,
+				player_id: player_id
+			}));
+			this.socket.close();
+		}
+	}
+
 	/**
 	 * Handles the opening of a socket connection and sends an initialization message for the player.
 	 */

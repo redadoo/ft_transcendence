@@ -1,8 +1,9 @@
 import json
 import uuid
+import time
 
 from utilities.lobby import Lobby
-from website.models import User
+from website.models import User, UserStats
 from utilities.Tournament import Tournament
 from channels.db import database_sync_to_async
 from utilities.MatchManager import MatchManager
@@ -12,20 +13,38 @@ from website.serializers import SimpleUserProfileSerializer
 from channels.generic.websocket import AsyncWebsocketConsumer
 
 class PongMatchmaking(AsyncWebsocketConsumer):
-	matchmaking_queue = set()
+	base_mmr_gap = 20
+	max_mmr_gap = 100
+	matchmaking_queue = list()
 	room_group_name = "pong_matchmaking"
 
 	async def connect(self):
 		"""Handles WebSocket connection"""
+		self.user = self.scope["user"]
+		self.user_id = self.user.id
+
+		user = await database_sync_to_async(User.objects.get)(id=self.user_id)
+		user_stat: UserStats = await database_sync_to_async(UserStats.objects.get)(user=user)
+		self.user_mmr = user_stat.mmr
+		self.join_time = time.time()
+
+		self.user_object = {
+			'channel_name': self.channel_name,
+			'user_id': self.user_id,
+			'mmr': self.user_mmr
+		}
+
 		await self.channel_layer.group_add(self.room_group_name, self.channel_name)
 		await self.accept()
-		print(f"Player connected: {self.channel_name}")
+
+		print(f"Player connected: {self.user_id} | MMR: {self.user_mmr}")
 
 	async def disconnect(self, close_code):
 		"""Handles WebSocket disconnection"""
 		await self.channel_layer.group_discard(self.room_group_name, self.channel_name)
-		self.matchmaking_queue.discard(self.channel_name)
-		print(f"Player disconnected: {self.channel_name}")
+		if self.user_object in self.matchmaking_queue:
+			self.matchmaking_queue.remove(self.user_object)
+		print(f"Player disconnected: {self.user_id} | MMR: {self.user_mmr}")
 
 	async def receive(self, text_data):
 		"""Handles messages received from WebSocket clients"""
@@ -33,37 +52,73 @@ class PongMatchmaking(AsyncWebsocketConsumer):
 		action = request.get("action")
 
 		if action == "join_matchmaking":
-			if self.channel_name in self.matchmaking_queue:
-				print(f"Player {self.channel_name} is already in the matchmaking queue.")
+			if any(obj['channel_name'] == self.channel_name for obj in self.matchmaking_queue):
+				print(f"Player {self.user_id} is already in the matchmaking queue.")
 				return
-			
-			self.matchmaking_queue.add(self.channel_name)
-			print(f"Player {self.channel_name} joined matchmaking. Queue size: {len(self.matchmaking_queue)}")
+
+			self.matchmaking_queue.append(self.user_object)
+			print(f"Player {self.user_id} joined matchmaking. Queue size: {len(self.matchmaking_queue)}")
 			await self.check_for_match()
+		elif action == "close_matchmaking":
+			self.disconnect(0)
 
 	async def check_for_match(self):
 		"""Checks if there are enough players to create a match"""
+
 		while len(self.matchmaking_queue) >= 2:
-			player1 = self.matchmaking_queue.pop()
-			player2 = self.matchmaking_queue.pop()
+			elapsed_time = time.time() - self.join_time
+			mmr_gap = self.base_mmr_gap
 
-			room_name = str(uuid.uuid4())
-			print(f"Match found: {player1} vs {player2} | Room: {room_name}")
+			if elapsed_time > 20:
+				mmr_gap = min(self.base_mmr_gap + (elapsed_time // 20) * 20, self.max_mmr_gap)
 
-			await self.channel_layer.send(
-				player1,
-				{
-					"type": "send.match.found",
-					"room_name": room_name,
-				}
-			)
-			await self.channel_layer.send(
-				player2,
-				{
-					"type": "send.match.found",
-					"room_name": room_name,
-				}
-			)
+			player1 = self.matchmaking_queue[0]
+			player2 = self.matchmaking_queue[1]
+
+			player1_mmr = player1['mmr']
+			player2_mmr = player2['mmr']
+
+			if abs(player1_mmr - player2_mmr) <= mmr_gap:
+				room_name = str(uuid.uuid4())
+				await self.channel_layer.send(
+					player1['channel_name'],
+					{
+						"type": "send.match.found",
+						"room_name": room_name,
+					}
+				)
+				await self.channel_layer.send(
+					player2['channel_name'],
+					{
+						"type": "send.match.found",
+						"room_name": room_name,
+					}
+				)
+
+				self.matchmaking_queue = self.matchmaking_queue[2:]
+
+			else:
+				self.matchmaking_queue.append(player1)
+				self.matchmaking_queue.append(player2)
+				self.matchmaking_queue = self.matchmaking_queue[2:]
+
+			if elapsed_time > 60:
+				room_name = str(uuid.uuid4())
+				await self.channel_layer.send(
+					player1['channel_name'],
+					{
+						"type": "send.match.found",
+						"room_name": room_name,
+					}
+				)
+				await self.channel_layer.send(
+					player2['channel_name'],
+					{
+						"type": "send.match.found",
+						"room_name": room_name,
+					}
+				)
+				break
 
 	async def send_match_found(self, event):
 		"""Sends match found event to a player"""

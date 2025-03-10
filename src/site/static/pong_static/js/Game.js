@@ -425,10 +425,14 @@ export default class Game
 
 	game_ended(isGamefinished)
 	{
-		document.getElementById('pongCountDown').classList.add('d-none');
+		
+		this.mode.dispose(isGamefinished, this.player_id);
 
+		document.getElementById('pongCountDown').classList.add('d-none');
 		router.setupEventListeners();
-		if (this.sceneManager) {
+		
+		if (this.sceneManager) 
+		{
 			this.sceneManager.dispose();
 			this.sceneManager = null;
 		}
@@ -436,16 +440,6 @@ export default class Game
 		this.ball = null;
 		this.pongPlayer = null;
 		this.pongOpponent = null;
-
-		let event_name = isGamefinished === true ? "quit_game" : "unexpected_quit";
-
-		if (this.mode && this.mode.socket) {
-			this.mode.socket.send(JSON.stringify({
-				type: event_name,
-				player_id: this.player_id
-			}));
-			this.mode.socket.close();
-		}
 
 		this.cleanupWindowClose();
 
