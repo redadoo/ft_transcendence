@@ -382,14 +382,21 @@ const views = {
 	},
 
 	async tournamentResultScripts() {
-		const data = await api.getTournamentResult();
+		const data = await api.getLastTournament();
 		const updateElement = (id, value) => document.getElementById(id).textContent = value;
 
 		updateElement('winnerName', data.winner);
-
-
 		api.getUserProfile(data.winner).then(data => {
 			document.getElementById('winnerAvatar').src = data.image_url.avatar_url;
+		});
+
+		let losers = data.players.filter(player => player.username !== data.winner);
+
+		losers.forEach((loser, index) => {
+			updateElement(`loser${index + 1}Name`, loser);
+			api.getUserProfile(loser).then(data => {
+				document.getElementById(`loser${index + 1}Avatar`).src = data.image_url.avatar_url;
+			});
 		});
 	},
 
