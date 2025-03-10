@@ -208,6 +208,15 @@ const api = {
 		}
 	},
 
+	async getLastLiarsbar() {
+		try {
+			return await this.fetchJson('/api/liarsbar/last_match');
+		} catch (error) {
+			console.error('Last liarsbar error:', error);
+			return false;
+		}
+	},
+
 	async getPendingFriendRequests() {
 		try {
 			const response = await this.fetchJson('/api/profile?include=friendships');
