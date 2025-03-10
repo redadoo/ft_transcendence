@@ -347,22 +347,26 @@ const html = {
     	</div>
 		<div id="centralText" class="central-text">CARDS SENT</div>
 		<div id="verticalIcons">
-			    <div class="icon-container">
-					<span class="icon-text">Claims <span class="number">5</span> <span class="card-name">Ace</span></span>
-					<img src="/media/png/porygon.png" alt="Icon 0" class="icon ">
-				</div>
-				<div class="icon-container">
-					<span class="icon-text">Claims <span class="number">3</span> <span class="card-name">Ace</span></span>
-					<img src="/media/png/mew.png" alt="Icon 1" class="icon">
-				</div>
-				<div class="icon-container">
-					<span class="icon-text">Claims <span class="number">7</span> <span class="card-name">Ace</span></span>
-					<img src="/media/png/cubone.png" alt="Icon 2" class="icon">
-				</div>
-				<div class="icon-container">
-					<span class="icon-text">Claims <span class="number">2</span> <span class="card-name">Ace</span></span>
-					<img src="/media/png/magikarp.png" alt="Icon 3" class="icon">
-				</div>
+			<div class="icon-container">
+				<span class="icon-text">Claims <span class="number">5</span> <span class="card-name">Ace</span></span>
+				<span class="doubt-text">DOUBT!</span> <!-- Nuovo elemento -->
+				<img src="/media/png/porygon.png" alt="Icon 0" class="icon">
+			</div>
+			<div class="icon-container">
+				<span class="icon-text">Claims <span class="number">3</span> <span class="card-name">Ace</span></span>
+				<span class="doubt-text">DOUBT!</span> <!-- Nuovo elemento -->
+				<img src="/media/png/mew.png" alt="Icon 1" class="icon">
+			</div>
+			<div class="icon-container">
+				<span class="icon-text">Claims <span class="number">7</span> <span class="card-name">Ace</span></span>
+				<span class="doubt-text">DOUBT!</span> <!-- Nuovo elemento -->
+				<img src="/media/png/cubone.png" alt="Icon 2" class="icon">
+			</div>
+			<div class="icon-container">
+				<span class="icon-text">Claims <span class="number">2</span> <span class="card-name">Ace</span></span>
+				<span class="doubt-text">DOUBT!</span> <!-- Nuovo elemento -->
+				<img src="/media/png/magikarp.png" alt="Icon 3" class="icon">
+			</div>
 		</div>
 		<div class="card-container">
 		<div class="your-turn-text">Your Turn!</div>

@@ -2371,30 +2371,27 @@ label {
 }
 
 .doubt-text {
-    font-family: 'PRESS START 2P', sans-serif;
-    color: red;
-    font-size: 1vw;
+	font-family: 'PRESS START 2P', sans-serif;
+    font-size: 0.8vw; /* Adatta alla dimensione dello schermo */
     font-weight: bold;
-    text-shadow: 0 0 10px rgba(255, 0, 0, 0.8);
-    opacity: 1; 
+    color: rgb(255, 0, 0);
+    text-shadow: 0 0 5px rgba(0, 0, 0, 0.7);
+    white-space: nowrap; /* Evita che il testo vada a capo */
+	text-align: right; /* Allinea il testo a destra */
+	visibility: hidden;
 }
 
-/* Animazione "DOUBT!" con durata forzata */
+/* Animazione per "DOUBT!" */
+.doubt-text.visible {
+    opacity: 1;
+    visibility: visible;
+    animation: doubtFlash 0.5s ease-in-out;
+}
+
 @keyframes doubtFlash {
     0% { transform: scale(1); opacity: 1; }
-    50% { transform: scale(1.3); opacity: 1; }
+    50% { transform: scale(1.2); opacity: 1; }
     100% { transform: scale(1); opacity: 1; }
-}
-
-.animate-doubt {
-    animation: doubtFlash 1s ease-in-out;
-    animation-fill-mode: forwards; /* Mantiene l'ultimo frame dell'animazione */
-}
-
-/* Testo per "CARDS SENT" */
-.central-text.cards-sent {
-    color: white;
-    font-size: 2.5vw;  /* Più piccolo per "CARDS SENT" */
 }
 
 /* ----------------------------------------------------------------------------------- */

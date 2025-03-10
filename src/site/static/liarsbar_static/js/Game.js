@@ -534,12 +534,14 @@ export default class Game
 			{
 				this.lastRequiredCard = lobbyInfo.card_required;
 				
+				// Aggiorna il testo della sezione TABLE'S CARD
 				const tableCardText = document.getElementById("tableCardText");
 				if (tableCardText) 
 				{
 					tableCardText.innerHTML = `TABLE'S CARD: <span class="card-name">${lobbyInfo.card_required}</span>`;
 				}
 	
+				// Aggiorna l'immagine della carta se disponibile
 				const tableCardImage = document.getElementById("tableCardImage");
 				if (tableCardImage) 
 				{
@@ -568,6 +570,7 @@ export default class Game
 		const cardRequired = data.lobby_info.card_required;
 		let isMyTurn = false;
 		
+		// Iteriamo usando l'ordine fisso salvato in playersOrder
 		this.playersOrder.forEach((playerId, index) => {
 			const player = this.players[playerId];
 	
@@ -577,10 +580,12 @@ export default class Game
 			const icon = icons[index];
 			const iconText = iconTexts[index];
 	
+			// Stato attivo (turno attuale)
 			const isActive = player.playerTurn;
 			if (icon.classList.contains("active") !== isActive) 
 				icon.classList.toggle("active", isActive);
 	
+			// Stato morto
 			const isDead = player.status === "DIED";
 			if (icon.classList.contains("died") !== isDead) 
 				icon.classList.toggle("died", isDead);
@@ -595,33 +600,29 @@ export default class Game
 					yourTurnText.style.visibility = shouldBeVisible;
 			}
 
-			const isDoubting = player.doubting;
-			const newText = isDoubting 
-				? `<span class="doubt-text animate-doubt">DOUBT!</span>` 
-				: player.selectedCards.length > 0 
-					? `Claims <span class="number">${player.selectedCards.length}</span> <span class="card-name">${cardRequired}</span>` 
-					: "";
+			// Aggiornamento testo solo se cambia
+			const newText = player.selectedCards.length > 0 
+				? `Claims <span class="number">${player.selectedCards.length}</span> <span class="card-name">${cardRequired}</span>` 
+				: "";
 	
 			if (iconText.innerHTML !== newText) 
 			{
-				console.log(newText);
-
 				iconText.innerHTML = newText;
 				iconText.style.visibility = newText ? "visible" : "hidden";
-				if (isDoubting) {
-					const doubtElement = iconText.querySelector('.doubt-text');
-			
-					if (doubtElement) {
-						doubtElement.classList.remove('animate-doubt');
-			
-						void doubtElement.offsetWidth;
-			
-						doubtElement.classList.add('animate-doubt');
-					}
-				}
 			}
+	
+			const isDoubting = player.doubting;
+        const doubtElement = iconText.parentElement.querySelector('.doubt-text');
+
+        if (doubtElement) {
+            if (isDoubting) {
+                doubtElement.classList.add('visible'); // Mostra l'elemento "DOUBT!"
+                setTimeout(() => {
+                    doubtElement.classList.remove('visible'); // Nascondi l'elemento dopo 1 secondo
+                }, 500); // Durata fissa di 1 secondo
+            }
+        }
 		});
-		
 	}
 		
 	updateGameState(data)
@@ -645,7 +646,7 @@ export default class Game
 
 	updatePlayerCards(playerHand) 
 	{
-		const cardSlots = document.querySelectorAll('.col-1 .card');
+		const cardSlots = document.querySelectorAll('.col-1 .card'); // Seleziona tutte le carte esistenti
 		
 		cardSlots.forEach((slot, index) => {
 			const shouldBeVisible = index < playerHand.length;
@@ -706,6 +707,7 @@ export default class Game
 			});
 		}
 	
+		// Applica l'effetto di selezione in base a selection_index
 		if (selectedIndex >= 0 && selectedIndex < cardSlots.length) {
 			const selectedSlot = cardSlots[selectedIndex];
 	
