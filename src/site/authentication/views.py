@@ -20,6 +20,9 @@ from .form import UserCreationForm
 from .serializers import UserSerializer
 from urllib.parse import urlencode
 
+from django.utils.crypto import get_random_string
+from django.middleware.csrf import get_token
+
 class UserViewSet(viewsets.ModelViewSet):
 	serializer_class = UserSerializer
 	queryset = User.objects.all()
@@ -72,7 +75,6 @@ class UserViewSet(viewsets.ModelViewSet):
 		except Exception as e:
 			return Response(status=503)
 
-
 class Auth42(View):
 	state = secrets.token_urlsafe(32)
 
@@ -88,7 +90,7 @@ class Auth42(View):
 		"""
 		# Build the redirect URI without pre-encoding
 		redirect_uri = request.build_absolute_uri(reverse("oauth_callback"))
-
+		print(f"redirect_uri {redirect_uri}")
 		if request.path == reverse("user_42login"):
 			return self.user_42login(redirect_uri)
 		elif request.path == reverse("oauth_callback"):
@@ -156,4 +158,11 @@ class Auth42(View):
 			UserImage.objects.create(user=user42)
 
 		login(request, user42)
-		return render(request, "main.html")
+		
+		nonce = get_random_string(16)
+		csrf_token = get_token(request)
+		csp_policy = (f"script-src 'self' 'nonce-{nonce}' blob:; ")
+		response = render(request, 'main.html', {'csrf_token': csrf_token, 'nonce': nonce})
+		response["Content-Security-Policy"] = csp_policy
+
+		return response
