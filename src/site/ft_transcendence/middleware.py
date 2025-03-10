@@ -1,4 +1,3 @@
-# myapp/middleware.py
 from django.db import DatabaseError, OperationalError
 from django.http import JsonResponse
 

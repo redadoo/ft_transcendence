@@ -8,6 +8,7 @@ urlpatterns = [
     path('', include('django_prometheus.urls')),
     path('', include("authentication.urls")),
     path('', include("pong.urls")),
+    path('', include("liarsbar.urls")),
     path('', include("social.urls")),
     path('', include("website.urls")),
 ]

@@ -62,7 +62,7 @@ export default class Game
 		this.pongOpponent = null;
 		this.ball = null;
 		this.background = null;
-		this.lastScore = null; 
+		this.lastScore = null;
 		this.isClockVisible = false;
 		this.lastCountValue = 6;
 
@@ -125,7 +125,7 @@ export default class Game
 
 		//init scene
 		this.sceneManager = new SceneManager(true);
-		
+
 		Object.assign(this.sceneManager, CAMERA_SETTINGS);
 		this.sceneManager.initialize(true, true);
 
@@ -135,7 +135,7 @@ export default class Game
 		//init camera setting
 		this.sceneManager.camera.position.copy(CAMERA_SETTINGS.POSITION);
 		this.sceneManager.camera.rotation.x = CAMERA_SETTINGS.ROTATION_X;
-		
+
 		//init light
 		this.ambientLight = new THREE.AmbientLight(0xA2C2E9, 3.2);
 		this.sceneManager.scene.add(this.ambientLight);
@@ -276,7 +276,7 @@ export default class Game
 		if (this.sceneManager.is42BadPc === false)
 		{
 			const room = this.sceneManager.modelManager.getModel('Scene', true);
-	
+
 			room.scene.scale.set(10, 10, 10);
 			room.scene.position.set(800, -134, 191);
 			room.scene.rotation.y = -Math.PI / 2;
@@ -289,10 +289,10 @@ export default class Game
 	 * Aggiorna il contenuto dell'elemento DOM del timer.
 	 * @param {number} timeLeft - Il tempo rimanente (in secondi) da mostrare.
 	 */
-	updateClockDisplay(timeLeft) 
+	updateClockDisplay(timeLeft)
 	{
 		const clockText = document.getElementById('PongClockText');
-		
+
 		if (clockText)
 		{
 			clockText.textContent = timeLeft;
@@ -317,7 +317,7 @@ export default class Game
 			{
 				this.lastCountValue = data.count_down;
 				this.updateClockDisplay(data.count_down);
-			
+
 				if (data.count_down == 0)
 					document.getElementById('pongCountDown').classList.add('d-none');
 			}
@@ -398,13 +398,15 @@ export default class Game
 	 */
 	AddUserToLobby(newPlayer_id, playerData, socket)
 	{
-		if (newPlayer_id == this.player_id)
+		if (newPlayer_id == this.player_id && this.pongPlayer == null)
 		{
+			console.log("da papapapaa 123");
 			this.pongPlayer = new PongPlayer(socket, this.player_id, playerData);
 			this.sceneManager.scene.add(this.pongPlayer.paddle.mesh);
 		}
-		else
+		else if (this.pongOpponent == null)
 		{
+			console.log("da papapapaa 123 1 1 1 1 1");
 			this.pongOpponent = new PongPlayer(null, newPlayer_id, playerData);
 			this.sceneManager.scene.add(this.pongOpponent.paddle.mesh);
 		}

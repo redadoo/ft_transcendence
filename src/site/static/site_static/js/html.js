@@ -1122,6 +1122,80 @@ const html = {
 		</div>
 	`,
 
+	liarsbarResult: `
+		<div class="container-fluid game-container">
+			<div class="row h-100">
+				<div class="col-2 px-0">
+				<nav class="nav-wrapper">
+					<div class="d-flex flex-column">
+					<div class="nav-link-left back" data-link="/">
+						<span class="hundin-font back">BACK</span>
+					</div>
+					</div>
+				</nav>
+				</div>
+
+				<div class="col-10 d-flex align-items-center justify-content-center">
+				<div class="liarsbar-result-container">
+					<div class="title">
+					<span class="pixel-font liarsbar-result-title">LIAR'S BAR RESULTS</span>
+					</div>
+
+					<!-- Winner Section -->
+					<div class="liarsbar-winner-section">
+					<div class="crown-icon">
+						<img src="/media/png/master.png" alt="Crown" id="crownIcon" />
+					</div>
+					<div class="liarsbar-winner-content">
+						<div class="liarsbar-winner-avatar">
+						<img src="" alt="Winner" id="liarsbarWinnerAvatar" />
+						</div>
+						<div class="liarsbar-winner-info">
+						<span class="pixel-font liarsbar-winner-name" id="liarsbarWinnerName">Player 1</span>
+						<div class="liarsbar-winner-label">
+							<span class="pixel-font liarsbar-winner-text">TRUTH BEARER</span>
+						</div>
+						</div>
+					</div>
+					</div>
+
+					<!-- Losers Section -->
+					<div class="liarsbar-losers-section">
+					<div class="liarsbar-losers-header">
+						<span class="pixel-font liarsbar-losers-title">THE DECEIVED</span>
+					</div>
+					<div class="liarsbar-losers-list">
+						<div class="liarsbar-loser-card">
+						<div class="liarsbar-loser-avatar">
+							<img src="" alt="Loser 1" id="liarsbarLoser1Avatar" />
+						</div>
+						<span class="liarsbar-loser-name" id="liarsbarLoser1Name">Player 2</span>
+						<span class="liarsbar-loser-status">DECEIVED</span>
+						</div>
+
+						<div class="liarsbar-loser-card">
+						<div class="liarsbar-loser-avatar">
+							<img src="" alt="Loser 2" id="liarsbarLoser2Avatar" />
+						</div>
+						<span class="liarsbar-loser-name" id="liarsbarLoser2Name">Player 3</span>
+						<span class="liarsbar-loser-status">DECEIVED</span>
+						</div>
+
+						<div class="liarsbar-loser-card">
+						<div class="liarsbar-loser-avatar">
+							<img src="" alt="Loser 3" id="liarsbarLoser3Avatar" />
+						</div>
+						<span class="liarsbar-loser-name" id="liarsbarLoser3Name">Player 4</span>
+						<span class="liarsbar-loser-status">DECEIVED</span>
+						</div>
+					</div>
+					</div>
+				</div>
+				</div>
+			</div>
+			</div>
+	`,
+
 	tournament: `
 		<div class="container-fluid game-container">
 			<div class="row h-100">
