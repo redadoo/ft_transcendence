@@ -99,6 +99,8 @@ services:
       interval: 5s
       timeout: 3s
       retries: 5
+    volumes:
+      - redis_data:/redisdata
 
   # === WEB SERVER SERVICES ===
   nginx:
@@ -233,6 +235,8 @@ volumes:
   grafana:
   postgres-exporter:
   prometheus:
+  redis_data:
+    driver: local
   pg_data:
     driver: local
   static_volume:

@@ -81,7 +81,8 @@ if not DEBUG:
     CHANNEL_LAYERS = {
         "default": {
             "BACKEND": "channels_redis.core.RedisChannelLayer",
-            "CONFIG": {"hosts": [("redis", 6379)]},
+            "CONFIG": {
+                "hosts": [("redis", 6379)],},
         },
     }
     # Secure cookies.
@@ -110,12 +111,7 @@ CSP_STYLE_SRC = ("'self'",)
 # --- CSRF SETTINGS ---
 CSRF_COOKIE_HTTPONLY = False
 CSRF_COOKIE_NAME = 'csrftoken'
-CSRF_TRUSTED_ORIGINS = [
-    "https://transcendence",
-    "https://localhost",
-    "http://localhost:8000",
-    "https://localhost:8080",
-]
+CSRF_TRUSTED_ORIGINS = [origin.strip() for origin in os.getenv('DJANGO_CSRF_TRUSTED_ORIGINS', '').split(',') if origin.strip()]
 CSRF_TRUSTED_ORIGINS.extend(add_ip_range_to_allowed_hosts("10.12", use_https=True))
 
 # --- REST FRAMEWORK CONFIGURATION ---
@@ -127,8 +123,8 @@ REST_FRAMEWORK = {
     ],
     'DEFAULT_THROTTLE_RATES': {
         'burst': '20/second',
-        'user': '2000/day',
-        'anon': '2000/day',
+        'user': '1000/day',
+        'anon': '500/day',
     },
 }
 
