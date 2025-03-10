@@ -400,6 +400,34 @@ const views = {
 		});
 	},
 
+	async liarsbarResult() {
+		return html.liarsbarResult;
+	},
+
+	async liarsbarResultScripts() {
+		const data = await api.getLastLiarsbar();
+		const updateElement = (id, value) => document.getElementById(id).textContent = value;
+
+		updateElement('liarsbarWinnerName', data.user_winner_username);
+		api.getUserProfile(data.user_winner_username).then(data => {
+			document.getElementById('liarsbarWinnerAvatar').src = data.image_url.avatar_url;
+		});
+
+		let losers = [
+			data.first_user_username,
+			data.second_user_username,
+			data.third_user_username,
+			data.fourth_user_username
+		].filter(loser => loser !== data.user_winner_username);
+
+		losers.forEach((loser, index) => {
+			updateElement(`liarsbarLoser${index + 1}Name`, loser);
+			api.getUserProfile(loser).then(data => {
+				document.getElementById(`liarsbarLoser${index + 1}Avatar`).src = data.image_url.avatar_url;
+			});
+		});
+	},
+
 	async tournament() {
 		return html.tournament;
 	},
