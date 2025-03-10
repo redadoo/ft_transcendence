@@ -8,9 +8,11 @@ urlpatterns = [
     path('', include('django_prometheus.urls')),
     path('', include("authentication.urls")),
     path('', include("pong.urls")),
+    path('', include("liarsbar.urls")),
     path('', include("social.urls")),
     path('', include("website.urls")),
 ]
+
 
 if settings.DEBUG:
     urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
