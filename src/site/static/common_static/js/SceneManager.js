@@ -149,7 +149,7 @@ export default class SceneManager
 		document.body.appendChild(this.renderer.domElement);
 
 		const gl = this.renderer.getContext();
-		const debugInfo = gl.getExtension('WEBGL_debug_renderer_info');
+		const debugInfo = gl.getParameter(gl.RENDERER);
 		if (debugInfo) 
 		{
 			const renderInfo = gl.getParameter(debugInfo.UNMASKED_RENDERER_WEBGL);
