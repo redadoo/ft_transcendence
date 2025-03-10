@@ -149,20 +149,16 @@ export default class SceneManager
 		document.body.appendChild(this.renderer.domElement);
 
 		const gl = this.renderer.getContext();
-		const debugInfo = gl.getParameter(gl.RENDERER);
-		if (debugInfo) 
+		const renderInfo = gl.getParameter(gl.RENDERER);
+		
+		// This check is useful for some 42 PCs that have old drivers or in any 
+		// case do not have excellent performance and these all have in common 
+		// the fact of using vulkan for renderer		
+		if (renderInfo.includes("Vulkan")) 
 		{
-			const renderInfo = gl.getParameter(debugInfo.UNMASKED_RENDERER_WEBGL);
-			
-			// This check is useful for some 42 PCs that have old drivers or in any 
-			// case do not have excellent performance and these all have in common 
-			// the fact of using vulkan for renderer		
-			if (renderInfo.includes("Vulkan")) 
-			{
-				this.is42BadPc = true;
-				console.log("Vulkan renderer detected.");
-			}
-		} 
+			this.is42BadPc = true;
+			console.log("Vulkan renderer detected.");
+		}
 		else 
 			console.log('WEBGL_debug_renderer_info is not supported.');
 	}

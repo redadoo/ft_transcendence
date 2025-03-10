@@ -173,14 +173,16 @@ class PongSingleplayerConsumer(BasePongConsumer):
 		if event_type == "init_player":
 			self.useBot = data.get("mode") == "vs_bot"
 			
+			await self.lobby.manage_event(data)
+
 			if self.useBot:
 				await self.lobby.add_player_to_lobby({"player_id": "-1"}, True)
 			else:
 				await self.lobby.add_player_to_lobby({"player_id": "-1"}, False)
 			
 			await self.lobby.mark_player_ready({"player_id": "-1"})
-
-		await self.lobby.manage_event(data)
+		else:
+			await self.lobby.manage_event(data)
 
 class PongLobbyConsumer(BasePongConsumer):
 	async def connect(self):

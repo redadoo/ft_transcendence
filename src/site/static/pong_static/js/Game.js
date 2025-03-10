@@ -398,13 +398,15 @@ export default class Game
 	 */
 	AddUserToLobby(newPlayer_id, playerData, socket)
 	{
-		if (newPlayer_id == this.player_id)
+		if (newPlayer_id == this.player_id && this.pongPlayer == null)
 		{
+			console.log("da papapapaa 123");
 			this.pongPlayer = new PongPlayer(socket, this.player_id, playerData);
 			this.sceneManager.scene.add(this.pongPlayer.paddle.mesh);
 		}
-		else
+		else if (this.pongOpponent == null)
 		{
+			console.log("da papapapaa 123 1 1 1 1 1");
 			this.pongOpponent = new PongPlayer(null, newPlayer_id, playerData);
 			this.sceneManager.scene.add(this.pongOpponent.paddle.mesh);
 		}
