@@ -30,7 +30,7 @@ class LiarsBarPlayer(Player):
 		self.card_selection_index = 0
 		self.player_turn = False
 		self.card_sent = False
-		self.doubting = False		
+		self.doubting = False	
 		self.keys_pressed = set()
 
 	def add_cards_to_hand(self, cards: list):
@@ -75,7 +75,7 @@ class LiarsBarPlayer(Player):
 		"""
 		
 
-	def update_player_data(self, data: dict):
+	def update_player_data(self, data: dict, canDoubt):
 		"""
 		Updates the player's data based on an input dictionary.
 
@@ -139,7 +139,7 @@ class LiarsBarPlayer(Player):
 							self.selected_index.clear()
 						self.card_sent = True
 				elif key == "Space":
-					if self.player_turn and not self.doubting:
+					if self.player_turn and not self.doubting and canDoubt:
 						self.doubting = True
 
 			elif event_type == "key_up":

@@ -85,7 +85,7 @@ class LiarsBarGameManager(GameManager):
 			player_id = data.get("playerId")
 			for index in self.players:
 				if self.players[index].player_id == player_id:
-					self.players[index].update_player_data(data)
+					self.players[index].update_player_data(data, self.can_doubt)
 		except (KeyError, ValueError) as e:
 			print(f"Error updating player data: {e}")
 
