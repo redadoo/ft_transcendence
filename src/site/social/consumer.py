@@ -4,7 +4,6 @@ from social.scripts.SocialUser import SocialUser
 from channels.layers import get_channel_layer
 from website.models import User
 from channels.db import database_sync_to_async
-from django.db.utils import OperationalError, DatabaseError
 
 async def get_active_users():
 	"""Fetch active users asynchronously (Online, Away, Busy, Matchmaking, Playing)."""

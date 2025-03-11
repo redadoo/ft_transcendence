@@ -82,7 +82,10 @@ if not DEBUG:
         "default": {
             "BACKEND": "channels_redis.core.RedisChannelLayer",
             "CONFIG": {
-                "hosts": [("redis", 6379)],},
+                "hosts": [("redis", 6379)],
+                "capacity": 1500,
+                "expiry": 10,
+            },
         },
     }
     # Secure cookies.

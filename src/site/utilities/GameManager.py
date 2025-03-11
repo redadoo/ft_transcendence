@@ -56,7 +56,7 @@ class GameManager(ABC):
 	
 	def players_to_dict(self) -> dict[str, any]:
 		return {
-			"players": {player_id: player.to_dict() for player_id, player in self.players.items()},
+			"players": {str(player_id): player.to_dict() for player_id, player in self.players.items()},
 		}
 
 	def to_dict(self) -> dict[str, any]:

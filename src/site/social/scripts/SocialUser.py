@@ -4,7 +4,6 @@ from website.models import Friendships, User
 from channels.layers import get_channel_layer
 from social.models import ChatMessage
 from django.utils.html import escape
-from django.db.utils import OperationalError, DatabaseError
 
 MAX_MESSAGE_LENGTH = 500
 
