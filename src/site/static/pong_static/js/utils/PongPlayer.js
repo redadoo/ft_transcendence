@@ -19,9 +19,7 @@ export default class PongPlayer {
 		this.playerId = parseInt(playerId);
 		this.socket = socket;
 		this.paddle = new Paddle(data.width, data.height, data.depth, data.color);
-
 		this.input = null;
-
 		this.newY = data.y;
 		this.paddle.mesh.position.y = data.y;
 		this.paddle.mesh.position.x = data.x;
