@@ -96,7 +96,7 @@ class Ball:
 
 			# Aggiusta la velocità verticale in base alla posizione d'impatto
 			offset = (self.y - paddle_y) / (paddle_height / 2)
-			self.speed_y += offset * 0.25
+			self.speed_y += offset * 0.15
 
 			# Incrementa il moltiplicatore di velocità
 			self.speed_multiplier *= 1.05

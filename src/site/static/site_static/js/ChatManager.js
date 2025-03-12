@@ -148,8 +148,17 @@ export default class ChatManager {
 
 	sendMessage() {
 		const messageInput = document.getElementById('messageInput');
-		if (!messageInput) return;
-
+		
+		if (!messageInput) 
+			return;
+		
+		if (messageInput.value.length > 500)
+		{
+			messageInput.value = "";
+			alert("message too long");
+			return;
+		}
+		
 		const message = messageInput.value.trim();
 		if (!message || !this.activeChat) return;
 

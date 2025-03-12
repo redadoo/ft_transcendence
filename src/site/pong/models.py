@@ -109,7 +109,7 @@ class PongMatch(models.Model):
 		loser_mmr_gain = mmr_base_lose + winner_mmr_gain
 
 		# Ensure the MMR loss for the loser doesn't fall below -1
-		if loser_mmr_gain < -1:
+		if loser_mmr_gain > -1:
 			loser_mmr_gain = -1
 
 		# Assign the MMR gain/loss based on the winner

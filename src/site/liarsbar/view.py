@@ -17,7 +17,7 @@ class LastLiarsbarMatchView(APIView):
 		
 		try:
 			last_match = LiarsBarMatch.objects.filter(
-				Q(first_user=user) | Q(second_user=user)
+				Q(first_user=user) | Q(second_user=user) | Q(third_user=user) | Q(fourth_user=user)
 			).last()
 		except Exception as e:
 			return Response({"server_error": f"{str(e)}"}, status=503)

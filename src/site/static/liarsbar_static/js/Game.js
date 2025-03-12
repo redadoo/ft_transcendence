@@ -184,10 +184,10 @@ export default class Game
 	initLights() 
 	{
 		// Luce ambientale blu scuro (notturna)
-		this.ambientLight = new THREE.AmbientLight(0x0d1b2a, 0.4);
+		this.ambientLight = new THREE.AmbientLight(0x0d1b2a, 0.8);
 
 		// Luce lunare (PointLight azzurra)
-		this.moonLight = new THREE.PointLight(0xADD8E6, 1.2, 10); 
+		this.moonLight = new THREE.PointLight(0xADD8E6, 5, 10); 
 		this.moonLight.position.set(2, 3, -1);
 		this.moonLight.castShadow = true;
 		this.moonLight.shadow.camera.near = 1;
@@ -786,7 +786,7 @@ export default class Game
 		this.cleanupWindowClose();
 		
 		if (isGamefinished === true)
-			router.navigateTo('/match-result');
+			router.navigateTo('/liarsbar-result');
 		else
 			router.navigateTo('/multiplayer');
 	}

@@ -55,7 +55,7 @@ class MatchManager:
 		"""
 		removed_match = self.matches.pop(room_name, None)
 		if removed_match is None:
-			print(f"Match room '{room_name}' not found.")
+			print(f"Match room '{room_name}' not found.", flush=True)
 		else:
-			print(f"Match room '{room_name}' was removed.")
+			print(f"Match room '{room_name}' was removed.", flush=True)
 			
