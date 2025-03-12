@@ -114,7 +114,6 @@ class Tournament():
 						"winner_id": self.current_round_winners[0],
 						"tournament_snapshot": snapshot,
 					})
-					print("dove")
 					return
 				current_round_matches = self.bracket[self.current_round_index]
 			else:
@@ -205,7 +204,6 @@ class Tournament():
 			self.tournament_status = self.TournamentStatus.ENDED
 			snapshot = self.to_dict()
 			if len(self.players) == 1:
-				print("tournament_finished")
 				await self.broadcast_message({
 					"type": "lobby_state",
 					"event": "tournament_finished",
@@ -229,3 +227,16 @@ class Tournament():
 		tournament_data.update({"tournament_players": self.players})
 		tournament_data.update(self.game_manager.to_dict())
 		return tournament_data
+
+	# def from_dict(cls, data: dict, game_manager: GameManager, match_manager):
+	# 	"""Create an instance of Tournament from the serialized dictionary."""
+	# 	instance = cls(
+	# 		game_name=data.get('game_name', ''),
+	# 		room_name=data.get('room_name', ''),
+	# 		game_manager=game_manager,
+	# 		matchManager=match_manager
+	# 	)
+	# 	instance.players = data.get('tournament_players', [])
+	# 	instance.tournament_status = Tournament.TournamentStatus[data.get('current_tournament_status', 'TO_SETUP')]
+	# 	# Re-initialize other attributes from the dictionary data if necessary
+	# 	return instance

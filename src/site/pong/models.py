@@ -195,9 +195,7 @@ class PongTournament(models.Model):
 
 	async def add_players_to_tournament(self, players_id):
 		"""Async method to add players to the tournament."""
-		print(players_id)
 		players = await self._get_players(players_id)
-		print(players)
 		await self._set_players(players)
 
 	@database_sync_to_async

@@ -7,7 +7,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.views import APIView
 from rest_framework import status
 from django.db.models import Q
-from .consumer import match_manager
+from pong.consumer import match_manager
 from utilities.lobby import Lobby
 from utilities.Tournament import Tournament
 from .scripts.PongGameManager import PongGameManager
@@ -25,7 +25,9 @@ class PongPlayersList(APIView):
 			players =  match.to_dict().get("players", {})
 			player_ids = list(players.keys())
 		elif isinstance(match, Tournament):
+			print(f"cap match esiste dict {match.to_dict()}",flush=True)
 			players =  match.to_dict().get("tournament_players", {})
+			print(f"cap match esiste players {players}",flush=True)
 			player_ids = list(players)
 		
 		users = []

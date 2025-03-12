@@ -244,6 +244,7 @@ class PongTournament(BaseConsumer):
 				"room_name": self.room_name,
 			})
 
+
 		self.tournament: Tournament = match_manager.get_match(self.room_name)
 		if self.tournament is None:
 			self.tournament: Tournament = match_manager.create_match("pong", self.room_name, PongGameManager(), "tournament")
