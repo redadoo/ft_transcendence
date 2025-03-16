@@ -81,7 +81,7 @@ class PongInitView(APIView):
 		Create a new game.
 		"""
 		room_name = str(uuid.uuid4())
-		match: Lobby = match_manager.create_match("pong", room_name, PongGameManager(), "Lobby")
+		match: Lobby = match_manager.create_match("pong", room_name, PongGameManager(False), "Lobby")
 
 		async_to_sync(match.add_player_to_lobby)({"player_id": "-1"}, False)
 		async_to_sync(match.mark_player_ready)({"player_id": "-1"})

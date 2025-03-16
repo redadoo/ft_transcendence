@@ -12,7 +12,7 @@ from django.utils import timezone
 
 class PongGameManager(GameManager):
 	
-	def __init__(self):
+	def __init__(self, has_ranked_value):
 		"""
 		Initialize the Pong game manager with a maximum of 2 players, ball, and score tracking.
 		"""
@@ -20,6 +20,7 @@ class PongGameManager(GameManager):
 		self.ball = Ball()
 		self.scores = {"player1": 0, "player2": 0}
 		self.is_countdown_finish = False
+		self.has_ranked_value = has_ranked_value
 		self.time_elapsed = 0
 
 	def start_game(self):
@@ -54,8 +55,9 @@ class PongGameManager(GameManager):
 				start_date=self.start_match_timestamp or timezone.now()
 			)
 
-			# Calculate MMR gains
-			match.set_player_mmr_gained()
+			# Calculate MMR gains if is ranked 
+			if self.has_ranked_value == True:
+				match.set_player_mmr_gained()
 
 			await database_sync_to_async(match.save)()
 

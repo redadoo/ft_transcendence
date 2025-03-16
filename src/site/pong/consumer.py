@@ -138,7 +138,7 @@ class PongMultiplayerConsumer(BaseConsumer):
 
 		self.lobby: Lobby = match_manager.get_match(self.room_name, LOBBY_NAME)
 		if self.lobby is None:
-			self.lobby: Lobby = match_manager.create_match("pong", self.room_name, PongGameManager(), LOBBY_NAME)
+			self.lobby: Lobby = match_manager.create_match("pong", self.room_name, PongGameManager(True), LOBBY_NAME)
 
 		await self.join_group(self.lobby.room_group_name)
 		await self.accept()
@@ -159,7 +159,7 @@ class PongSingleplayerConsumer(BaseConsumer):
 
 	async def connect(self):
 		self.room_name = self.generate_random_room_name()
-		self.lobby: Lobby = match_manager.create_match("pong", self.room_name, PongGameManager(), LOBBY_NAME)
+		self.lobby: Lobby = match_manager.create_match("pong", self.room_name, PongGameManager(False), LOBBY_NAME)
 
 		await self.join_group(self.lobby.room_group_name)
 		await self.accept()
@@ -201,7 +201,7 @@ class PongLobbyConsumer(BaseConsumer):
 
 		self.lobby: Lobby = match_manager.get_match(self.room_name, LOBBY_NAME)
 		if self.lobby is None:
-			self.lobby: Lobby = match_manager.create_match("pong", self.room_name, PongGameManager(), LOBBY_NAME)
+			self.lobby: Lobby = match_manager.create_match("pong", self.room_name, PongGameManager(False), LOBBY_NAME)
 
 		await self.join_group(self.lobby.room_group_name)
 		await self.accept()
@@ -247,7 +247,7 @@ class PongTournament(BaseConsumer):
 
 		self.tournament: Tournament = match_manager.get_match(self.room_name, TOURNAMENT_NAME)
 		if self.tournament is None:
-			self.tournament: Tournament = match_manager.create_match("pong", self.room_name, PongGameManager(), TOURNAMENT_NAME)
+			self.tournament: Tournament = match_manager.create_match("pong", self.room_name, PongGameManager(False), TOURNAMENT_NAME)
 
 		await self.join_group(self.tournament.room_group_name)
 		await self.accept()
