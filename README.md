@@ -83,6 +83,9 @@ The following resources were reviewed during the project. They were not necessar
   - [Prometheus and Grafana](https://rezakhademix.medium.com/a-complete-guide-to-monitor-postgresql-with-prometheus-and-grafana-5611af229882)
   - [Prometheus and Grafana (alternative)](https://nelsoncode.medium.com/how-to-monitor-posgresql-with-prometheus-and-grafana-docker-36d216532ea2)
 
+- **Redis**
+  - [Caching in Django with Redis](https://medium.com/django-unleashed/caching-in-django-with-redis-a-step-by-step-guide-40e116cb4540)
+
 - **Additional Reads**
   - [Comparing ASGI servers: Uvicorn, Hypercorn, and Daphne](https://medium.com/@onegreyonewhite/2024-comparing-asgi-servers-uvicorn-hypercorn-and-daphne-addb2fd70c57)
 

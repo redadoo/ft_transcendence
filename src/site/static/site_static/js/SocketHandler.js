@@ -216,12 +216,13 @@ export default class SocketHandler {
 		});
 	}
 
-	handleTournamentPlayerJoined(playerData) 
+	handleTournamentPlayerJoined(playersData) 
 	{
-		if (playerData.username !== window.localStorage['username']) 
+		console.log('👥 Handling tournament player joined:', playersData);
+		for (const playerId in playersData.players) 
 		{
-			console.log('👥 Handling tournament player joined:', playerData);
-			router.tournament.addNewPlayer(playerData);
+			const player = playersData.players[playerId];
+			router.tournament.addNewPlayer(player.username, player.image_url);
 		}
 	}
 

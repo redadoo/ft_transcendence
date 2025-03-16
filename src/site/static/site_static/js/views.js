@@ -313,11 +313,8 @@ const views = {
 		startButton.addEventListener('click', function handleClick() {
 			pongGame.mode.sendStart();
 			router.navigateTo('/lobby/playing');
-		
-			// Remove the event listener to prevent further clicks
 			startButton.removeEventListener('click', handleClick);
 		});
-		
 	},
 
 	async lobbyGuest() {
@@ -443,12 +440,6 @@ const views = {
 		await pongGame.init(this.player_id);
 		pongGame.sceneManager.animate();
 
-
-		await new Promise(resolve => setTimeout(resolve, 1000));
-		console.log("room_name:", window.localStorage['room_name']);
-
-		await router.tournament.initialize(window.localStorage['room_name']);
-
 		startButton.addEventListener('click', () => {
 			pongGame.mode.sendStart();
 			router.navigateTo('/tournament/playing');
@@ -463,12 +454,6 @@ const views = {
 		const pongGame = new PongGame();
 		await pongGame.init(this.player_id);
 		pongGame.sceneManager.animate();
-
-		await new Promise(resolve => setTimeout(resolve, 1000));
-		console.log("room_name:", window.localStorage['room_name']);
-
-		await router.tournament.initialize(window.localStorage['room_name']);
-
 	},
 
 	async tournamentPlaying() {

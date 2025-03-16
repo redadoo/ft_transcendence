@@ -64,7 +64,7 @@ INSTALLED_APPS = [
 
 # --- MIDDLEWARE CONFIGURATION ---
 MIDDLEWARE = [
-    "ft_transcendence.middleware.DatabaseExceptionMiddleware",
+    "ft_transcendence.middleware.RequestExceptionMiddleware",
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',

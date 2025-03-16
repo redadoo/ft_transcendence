@@ -7,6 +7,7 @@ from ft_transcendence.consumer import BaseConsumer
 from channels.generic.websocket import AsyncWebsocketConsumer
 from .scripts.LiarsBarGameManager import LiarsBarGameManager
 
+LOBBY_NAME = "lobby"
 match_manager = MatchManager()
 
 class LiarsBarMatchmaking(AsyncWebsocketConsumer):
@@ -35,9 +36,6 @@ class LiarsBarMatchmaking(AsyncWebsocketConsumer):
 				return
 			
 			self.matchmaking_queue.add(self.channel_name)
-			# if len(self.matchmaking_queue) == 1:
-			# 	self.matchmaking_queue.add("-2")
-			# 	self.matchmaking_queue.add("-3")
 
 			print(f"Player {self.channel_name} joined matchmaking. Queue size: {len(self.matchmaking_queue)}")
 			await self.check_for_match()
@@ -69,9 +67,9 @@ class LiarsBarConsumer(BaseConsumer):
 	async def connect(self):
 		self.room_name = self.scope["url_route"]["kwargs"]["room_name"]
 	
-		self.lobby: Lobby = match_manager.get_match(self.room_name) 
+		self.lobby: Lobby = match_manager.get_match(self.room_name, LOBBY_NAME) 
 		if self.lobby == None:
-			self.lobby = match_manager.create_match("liarsbar", self.room_name,  LiarsBarGameManager(), "lobby")
+			self.lobby = match_manager.create_match("liarsbar", self.room_name,  LiarsBarGameManager(), LOBBY_NAME)
 
 		await self.channel_layer.group_add(self.lobby.room_group_name, self.channel_name)
 		await self.accept()

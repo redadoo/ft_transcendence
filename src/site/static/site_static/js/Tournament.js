@@ -1,22 +1,7 @@
-import api from "./api.js";
 
 export default class Tournament {
 	constructor() {
 		this.players = new Array(4).fill(null);
-	}
-
-	async initialize(room_name) {
-		this.room_name = room_name;
-
-		try {
-			const playersResponse = await api.getTournamentPlayers(this.room_name);
-			console.log("Tournament players:", playersResponse);
-			for (const player of playersResponse) {
-				await this.addNewPlayer(player);
-			}
-		} catch (error) {
-			console.error("Error initializing tournament", error);
-		}
 	}
 
 	updatePlayers() {
@@ -25,7 +10,7 @@ export default class Tournament {
 			const nameEl = document.getElementById(`player${index}Name`);
 			const avatarEl = document.getElementById(`player${index}Avatar`);
 
-			if (nameEl) nameEl.textContent = player.alias;
+			if (nameEl) nameEl.textContent = player.username;
 			if (avatarEl) avatarEl.src = player.profile_picture;
 		};
 
@@ -35,23 +20,38 @@ export default class Tournament {
 		updatePlayerDOM(4, this.player4);
 	}
 
-	async addNewPlayer(player) 
+	async addNewPlayer(username, image_url) 
 	{
-		console.log("Adding new player to tournament:", player);
-		const emptySlotIndex = this.players.findIndex((player) => player === null);
-		if (emptySlotIndex !== -1) {
+		console.log(`Adding new player to tournament: ${username}, ${image_url}`);
+	
+		const playerExists = this.players.some(player => player && player.username === username);
+	
+		if (playerExists) 
+		{
+			console.warn(`Player ${username} is already in the tournament.`);
+			return;
+		}
+
+		const emptySlotIndex = this.players.indexOf(null);
+	
+		if (emptySlotIndex !== -1)
+		{
 			const newPlayerObj = {
-				username: player.username,
-				profile_picture: player.image_url.avatar_url,
+				username: username,
+				profile_picture: image_url.avatar_url,
 			};
+	
 			this.players[emptySlotIndex] = newPlayerObj;
 			this.updatePlayers();
-
-			if (this.isLobbyFull() && window.localStorage['username'] === this.player1.username) {
+	
+			if (this.isLobbyFull() && window.localStorage['username'] === this.player1.username) 
+			{
 				const startButton = document.getElementById('startTournament');
 				startButton.disabled = false;
 			}
-		} else {
+		} 
+		else 
+		{
 			console.warn("No empty slot available to add a new player.");
 		}
 	}

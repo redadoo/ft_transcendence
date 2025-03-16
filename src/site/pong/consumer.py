@@ -9,8 +9,11 @@ from channels.db import database_sync_to_async
 from utilities.MatchManager import MatchManager
 from ft_transcendence.consumer import BaseConsumer
 from pong.scripts.PongGameManager import PongGameManager
-from website.serializers import SimpleUserProfileSerializer
 from channels.generic.websocket import AsyncWebsocketConsumer
+
+match_manager = MatchManager()
+LOBBY_NAME = "lobby"
+TOURNAMENT_NAME = "tournament"
 
 class PongMatchmaking(AsyncWebsocketConsumer):
 	base_mmr_gap = 20
@@ -128,16 +131,14 @@ class PongMatchmaking(AsyncWebsocketConsumer):
 			"room_name": room_name
 		}))
 
-match_manager = MatchManager()
-
 class PongMultiplayerConsumer(BaseConsumer):
 	async def connect(self):
 		self.user_id = self.scope["user"].id
 		self.room_name = self.scope["url_route"]["kwargs"]["room_name"]
 
-		self.lobby: Lobby = match_manager.get_match(self.room_name)
+		self.lobby: Lobby = match_manager.get_match(self.room_name, LOBBY_NAME)
 		if self.lobby is None:
-			self.lobby: Lobby = match_manager.create_match("pong", self.room_name, PongGameManager(), "lobby")
+			self.lobby: Lobby = match_manager.create_match("pong", self.room_name, PongGameManager(), LOBBY_NAME)
 
 		await self.join_group(self.lobby.room_group_name)
 		await self.accept()
@@ -148,7 +149,7 @@ class PongMultiplayerConsumer(BaseConsumer):
 
 	async def handle_event(self, data: dict):
 		if self.lobby:
-			await self.lobby.manage_event(data)
+			await self.lobby.manage_event(data, match_manager)
 
 class PongSingleplayerConsumer(BaseConsumer):
 	def generate_random_room_name(self) -> str:
@@ -158,7 +159,7 @@ class PongSingleplayerConsumer(BaseConsumer):
 
 	async def connect(self):
 		self.room_name = self.generate_random_room_name()
-		self.lobby: Lobby = match_manager.create_match("pong", self.room_name, PongGameManager(), "Lobby")
+		self.lobby: Lobby = match_manager.create_match("pong", self.room_name, PongGameManager(), LOBBY_NAME)
 
 		await self.join_group(self.lobby.room_group_name)
 		await self.accept()
@@ -173,7 +174,7 @@ class PongSingleplayerConsumer(BaseConsumer):
 		if event_type == "init_player":
 			self.useBot = data.get("mode") == "vs_bot"
 			
-			await self.lobby.manage_event(data)
+			await self.lobby.manage_event(data, match_manager)
 
 			if self.useBot:
 				await self.lobby.add_player_to_lobby({"player_id": "-1"}, True)
@@ -182,7 +183,7 @@ class PongSingleplayerConsumer(BaseConsumer):
 			
 			await self.lobby.mark_player_ready({"player_id": "-1"})
 		else:
-			await self.lobby.manage_event(data)
+			await self.lobby.manage_event(data, match_manager)
 
 class PongLobbyConsumer(BaseConsumer):
 	async def connect(self):
@@ -198,9 +199,9 @@ class PongLobbyConsumer(BaseConsumer):
 				"room_name": self.room_name,
 			})
 
-		self.lobby: Lobby = match_manager.get_match(self.room_name)
+		self.lobby: Lobby = match_manager.get_match(self.room_name, LOBBY_NAME)
 		if self.lobby is None:
-			self.lobby: Lobby = match_manager.create_match("pong", self.room_name, PongGameManager(), "lobby")
+			self.lobby: Lobby = match_manager.create_match("pong", self.room_name, PongGameManager(), LOBBY_NAME)
 
 		await self.join_group(self.lobby.room_group_name)
 		await self.accept()
@@ -217,7 +218,7 @@ class PongLobbyConsumer(BaseConsumer):
 				"event_name": "host_started_game",
 			})
 
-		await self.lobby.manage_event(data)
+		await self.lobby.manage_event(data, match_manager)
 
 	async def lobby_state(self, event: dict):
 		if event.get("event_name") == "player_join" and event.get("player_id"):
@@ -244,10 +245,9 @@ class PongTournament(BaseConsumer):
 				"room_name": self.room_name,
 			})
 
-
-		self.tournament: Tournament = match_manager.get_match(self.room_name)
+		self.tournament: Tournament = match_manager.get_match(self.room_name, TOURNAMENT_NAME)
 		if self.tournament is None:
-			self.tournament: Tournament = match_manager.create_match("pong", self.room_name, PongGameManager(), "tournament")
+			self.tournament: Tournament = match_manager.create_match("pong", self.room_name, PongGameManager(), TOURNAMENT_NAME)
 
 		await self.join_group(self.tournament.room_group_name)
 		await self.accept()
@@ -257,32 +257,20 @@ class PongTournament(BaseConsumer):
 			await self.leave_group(self.tournament.room_group_name)
 
 	async def handle_event(self, data: dict):
-		await self.tournament.manage_event(data)
+		event_type = data.get("type")
+		if not event_type:
+			print("Event type is missing in the received data.")
+			return
 
-	@database_sync_to_async
-	def get_serialized_user(self, player_id):
-		"""Fetches user and serializes data in a synchronous context."""
-		try:
-			user = User.objects.get(id=player_id)
-			serializer = SimpleUserProfileSerializer(user)
-			return user.username, serializer.data.get("image_url")
-		except User.DoesNotExist:
-			return None, None
+		await self.tournament.manage_event(data, match_manager)
 
 	async def lobby_state(self, event: dict):
-		if event.get("event_name") == "player_join" and event.get("player_id"):
-			try:
-				username, image_url = await self.get_serialized_user(event["player_id"])
-				if not username:
-					raise ValueError("User not found")
-
-				await self.send_to_social({
-					"type": "user_join_tournament",
-					"username": username,
-					"user_image": image_url
-				})
-			except Exception as e:
-				raise ValueError(f"Error while retrieving user: {str(e)}")
+		event_type = event.get("event_name")
+		if event_type == "player_join":
+			await self.send_to_social({
+				"type": "user_join_tournament",
+				"players": event.get("players")
+			})
 		else:
 			await self.safe_send({
 				"event_info": event,

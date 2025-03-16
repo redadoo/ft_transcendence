@@ -137,4 +137,4 @@ class SocialConsumer(AsyncWebsocketConsumer):
 		await self.send_event("get_tournament_invite", room_name=event["room_name"], username=event["username"])
 
 	async def user_join_tournament(self, event):
-		await self.send_event("get_tournament_player_joined", username=event["username"], image_url=event["user_image"])
+		await self.send_event("get_tournament_player_joined", players=event["players"])

@@ -87,7 +87,6 @@ class PongGameManager(GameManager):
 
 		self.game_loop_is_active = False
 
-
 	def add_player(self, players_id: int, is_bot: bool):
 		"""
 		Initialize player with unique IDs and assign them to the game.
@@ -208,5 +207,3 @@ class PongGameManager(GameManager):
 			"count_down": math.ceil(constants.COUNTDOWN - self.time_elapsed)
 		})
 		return base_dict
-
-

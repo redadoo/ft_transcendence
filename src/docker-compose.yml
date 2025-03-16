@@ -50,7 +50,7 @@ services:
         condition: service_healthy
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8000/"]
-      interval: 5s
+      interval: 10s
       retries: 3
       start_period: 10s
       timeout: 5s
@@ -129,7 +129,7 @@ services:
       - media_volume:/home/ft_transcendence/media
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost"]
-      interval: 10s
+      interval: 3s
       timeout: 3s
       retries: 3
 

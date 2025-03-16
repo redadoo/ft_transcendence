@@ -7,44 +7,15 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.views import APIView
 from rest_framework import status
 from django.db.models import Q
-from pong.consumer import match_manager
+from utilities.MatchManager import MatchManager
 from utilities.lobby import Lobby
-from utilities.Tournament import Tournament
 from .scripts.PongGameManager import PongGameManager
 from website.models import User
-from website.serializers import SimpleUserProfileSerializer
 
-class PongPlayersList(APIView):
-	def get(self, request):
-		room_name = request.query_params.get('room_name')
-		match = match_manager.get_match(room_name)
-		if not match:
-			return Response({"error": "Match not found."}, status=status.HTTP_404_NOT_FOUND)
-
-		if isinstance(match, Lobby):
-			players =  match.to_dict().get("players", {})
-			player_ids = list(players.keys())
-		elif isinstance(match, Tournament):
-			print(f"cap match esiste dict {match.to_dict()}",flush=True)
-			players =  match.to_dict().get("tournament_players", {})
-			print(f"cap match esiste players {players}",flush=True)
-			player_ids = list(players)
-		
-		users = []
-
-		for pid in player_ids:
-			try:
-				user = User.objects.get(id=int(pid))
-				users.append(user)
-			except Exception as e:
-				return Response({"server_error": f"{str(e)}"}, status=503)
-			
-		serializer = SimpleUserProfileSerializer(users, many=True)
-		return Response(serializer.data, status=status.HTTP_200_OK)
+match_manager = MatchManager()
 
 class PongRoomState(APIView):
 	def post(self, request):
-
 		room_name = request.data.get('room_name')
 		match: Lobby = match_manager.get_match(room_name)
 		if not match:

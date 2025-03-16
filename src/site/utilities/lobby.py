@@ -15,7 +15,7 @@ class Lobby:
 		ENDED = "ended"
 		PLAYER_DISCONNECTED = "PLAYER_DISCONNECTED"
 
-	def __init__(self, game_name: str, room_name: str, game_manager: GameManager, match_manager):
+	def __init__(self, game_name: str, room_name: str, game_manager: GameManager):
 		"""
 		Initializes a new lobby with the specified room name and game manager.
 
@@ -27,11 +27,10 @@ class Lobby:
 		self.room_group_name = f"{game_name}_lobby_{room_name}"
 		self.lobby_status = Lobby.LobbyStatus.TO_SETUP
 		self.channel_layer = get_channel_layer()
-		self.match_manager = match_manager
 		self.update_lock = asyncio.Lock()
 		self.game_manager = game_manager
 		self.ready_players = set()
-		self.room_name = room_name	
+		self.room_name = room_name
 		self.game_loop_task = None
 
 	async def broadcast_message(self, message: dict):
@@ -44,7 +43,7 @@ class Lobby:
 		if self.channel_layer:
 			await self.channel_layer.group_send(self.room_group_name, message)
 
-	async def manage_event(self, data: dict):
+	async def manage_event(self, data: dict,  match_manager):
 		"""
 		Handles incoming events for the lobby, such as player actions or game state updates.
 

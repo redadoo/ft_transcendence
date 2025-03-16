@@ -19,6 +19,17 @@ export default class MultiplayerPongMode extends PongMode
 		this.matchmakingManager = new MatchmakingManager("pong", this.setupGameSocket.bind(this));
 	}
 
+	setupGameSocket(data)
+	{
+		this.socket.initGameWebSocket(
+			'pong',
+			this.handleSocketMessage.bind(this),
+			data.room_name,
+			this.onSocketOpen.bind(this),
+			this.onSocketClose.bind(this)
+		);
+	}
+
 	dispose(isGamefinished, player_id)
 	{
 		this.matchmakingManager.dispose();
@@ -33,18 +44,5 @@ export default class MultiplayerPongMode extends PongMode
 			}));
 			this.socket.close();
 		}
-	}
-
-	setupGameSocket(data)
-	{
-		console.log("chanins");
-
-		this.socket.initGameWebSocket(
-			'pong',
-			this.handleSocketMessage.bind(this),
-			data.room_name,
-			this.onSocketOpen.bind(this),
-			this.onSocketClose.bind(this)
-		);
 	}
 }
