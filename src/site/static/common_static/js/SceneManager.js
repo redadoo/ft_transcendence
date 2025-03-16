@@ -148,17 +148,19 @@ export default class SceneManager
 		this.renderer.shadowMap.type = shadowMapType;
 		document.body.appendChild(this.renderer.domElement);
 
-		const gl = this.renderer.getContext();
-		const renderInfo = gl.getParameter(gl.RENDERER);
-		
 		// This check is useful for some 42 PCs that have old drivers or in any 
 		// case do not have excellent performance and these all have in common 
 		// the fact of using vulkan for renderer		
-		if (renderInfo.includes("Vulkan")) 
+		if (debugInfo)
 		{
-			this.is42BadPc = true;
-			console.log("Vulkan renderer detected.");
-		}
+			const renderInfo = gl.getParameter(debugInfo.UNMASKED_RENDERER_WEBGL);
+				
+			if (renderInfo.includes("Vulkan")) 
+			{
+				this.is42BadPc = true;
+				console.log("Vulkan renderer detected.");
+			}
+		} 
 		else 
 			console.log('WEBGL_debug_renderer_info is not supported.');
 	}
