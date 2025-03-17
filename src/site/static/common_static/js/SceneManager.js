@@ -150,7 +150,9 @@ export default class SceneManager
 
 		// This check is useful for some 42 PCs that have old drivers or in any 
 		// case do not have excellent performance and these all have in common 
-		// the fact of using vulkan for renderer		
+		// the fact of using vulkan
+		const gl = this.renderer.getContext();
+		const debugInfo = gl.getExtension('WEBGL_debug_renderer_info');
 		if (debugInfo)
 		{
 			const renderInfo = gl.getParameter(debugInfo.UNMASKED_RENDERER_WEBGL);

@@ -1,5 +1,6 @@
 from utilities.lobby import Lobby
-from utilities import Tournament, GameManager
+from utilities.Tournament import Tournament
+from utilities.GameManager import GameManager
 
 
 class MatchManager:

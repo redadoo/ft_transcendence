@@ -136,7 +136,7 @@ class PongMultiplayerConsumer(BaseConsumer):
 		self.user_id = self.scope["user"].id
 		self.room_name = self.scope["url_route"]["kwargs"]["room_name"]
 
-		self.lobby: Lobby = match_manager.get_match(self.room_name, LOBBY_NAME)
+		self.lobby: Lobby = match_manager.get_match(self.room_name)
 		if self.lobby is None:
 			self.lobby: Lobby = match_manager.create_match("pong", self.room_name, PongGameManager(True), LOBBY_NAME)
 
@@ -199,7 +199,7 @@ class PongLobbyConsumer(BaseConsumer):
 				"room_name": self.room_name,
 			})
 
-		self.lobby: Lobby = match_manager.get_match(self.room_name, LOBBY_NAME)
+		self.lobby: Lobby = match_manager.get_match(self.room_name)
 		if self.lobby is None:
 			self.lobby: Lobby = match_manager.create_match("pong", self.room_name, PongGameManager(False), LOBBY_NAME)
 
@@ -245,7 +245,7 @@ class PongTournament(BaseConsumer):
 				"room_name": self.room_name,
 			})
 
-		self.tournament: Tournament = match_manager.get_match(self.room_name, TOURNAMENT_NAME)
+		self.tournament: Tournament = match_manager.get_match(self.room_name)
 		if self.tournament is None:
 			self.tournament: Tournament = match_manager.create_match("pong", self.room_name, PongGameManager(False), TOURNAMENT_NAME)
 
