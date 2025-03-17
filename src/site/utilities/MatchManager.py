@@ -52,6 +52,7 @@ class MatchManager:
 			room_name (str): The name of the match room to remove.
 		"""
 		if room_name in self.matches:
+			print(f"Room '{room_name}' deleted.")
 			del self.matches[room_name]
 		else:
 			print(f"Room '{room_name}' not found.")

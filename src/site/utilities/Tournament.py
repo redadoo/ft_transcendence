@@ -52,9 +52,19 @@ class Tournament():
 				self.game_manager.update_player(data)
 			case "waiting_next_match":
 				await self.tournament_start()
+			case "unexpected_quit":
+				self.quit(match_manager)
+			case "quit_game":
+				self.quit(match_manager)
 			case _:
 				print(f"Unhandled event type: {event_type}. Full data: {data}")
 
+	def quit(self, match_manager):
+		if self.tournament_status == Tournament.TournamentStatus.TO_SETUP:
+			match_manager.remove_match(self.room_name)
+		else:
+			return
+		
 	def setup_first_round(self):
 		"""Builds the first round from the joined players."""
 		if len(self.players) < MATCH_PLAYER_NUMBER:
