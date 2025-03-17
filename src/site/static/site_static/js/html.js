@@ -566,13 +566,6 @@ const html = {
 									<span class="hundin-font ranked text-down">CLIMB THE LEADERBOARD</span>
 								</div>
 							</a>
-							<a class="nav-link-right unranked" data-link="/multiplayer/pong_unranked">
-								<span class="pixel-font unranked">UNK</span>
-								<div class="column-text">
-									<span class="hundin-font unranked text-up">UNRANKED</span>
-									<span class="hundin-font unranked text-down">RELAX AND PLAY</span>
-								</div>
-							</a>
 							<a class="nav-link-right lobby" data-link="/lobby">
 								<span class="pixel-font lobby">LBY</span>
 								<div class="column-text">

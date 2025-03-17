@@ -15,7 +15,6 @@ const HeaderText = {
 	multiplayer: 'MULTIPLAYER',
 	multiplayerLiarsbar: 'MULTIPLAYER LIAR\'S BAR',
 	multiplayerPongRanked: 'MULTIPLAYER PONG',
-	multiplayerPongUnranked: 'MULTIPLAYER PONG',
 	multiplayerPongSelection: 'MULTIPLAYER PONG SELECTION',
 	tournament: 'TOURNAMENT',
 	tournamentGuest: 'TOURNAMENT GUEST',
@@ -63,7 +62,6 @@ const FooterText = {
 	tournamentResult: 'View the final results of the tournament.',
 	multiplayerLiarsbar: 'Deceive and detect in Liar\'s Bar multiplayer mode.',
 	multiplayerPongRanked: 'Compete in ranked Pong matches to climb the leaderboard.',
-	multiplayerPongUnranked: 'Play casual Pong matches with no pressure.',
 	multiplayerPongSelection: 'Select your preferred Pong game mode.',
 	empty: ''
 }

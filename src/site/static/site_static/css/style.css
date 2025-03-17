@@ -37,7 +37,6 @@
 .pixel-font.Vs-bot { color: #ff6232; font-size: 85px; text-shadow: 10px 10px 1px rgba(0, 0, 0, 0.4); }
 .pixel-font.Same-keyboard { color: #7881bf; font-size: 85px; text-shadow: 10px 10px 1px rgba(0, 0, 0, 0.4); }
 .pixel-font.ranked { color: #cc594e; font-size: 85px; text-shadow: 10px 10px 1px rgba(0, 0, 0, 0.4); }
-.pixel-font.unranked { color: #7881bf; font-size: 85px; text-shadow: 10px 10px 1px rgba(0, 0, 0, 0.4); }
 .pixel-font.lobby { color: #70aab5; font-size: 85px; text-shadow: 10px 10px 1px rgba(0, 0, 0, 0.4); }
 .pixel-font.profile-name { color: #686868; font-size: 24px; margin-bottom: 0.5rem;}
 .pixel-font.profile-level { color: #a0a0a0; font-size: 16px; }
@@ -67,7 +66,6 @@
 .hundin-font.text-up.Vs-bot { color: #f79666; }
 .hundin-font.text-up.Same-keyboard { color: #a8b9e0; }
 .hundin-font.text-up.ranked { color: #f59595; }
-.hundin-font.text-up.unranked { color: #a8b9e0; }
 .hundin-font.text-up.lobby { color: #a7d0ce; }
 .hundin-font.text-up.user-status { position: relative; top: 5px; }
 .hundin-font.text-up.user-status.online { color: #4ba644; }
@@ -84,7 +82,6 @@
 .hundin-font.text-down.Vs-bot { color: #f79666; }
 .hundin-font.text-down.Same-keyboard { color: #7d859d; }
 .hundin-font.text-down.ranked { color: #9a5454; }
-.hundin-font.text-down.unranked { color: #7d859d; }
 .hundin-font.text-down.lobby { color: #829f9d; }
 .hundin-font.text-down.user-status { color: #6c5d77; position: relative; top: 5px; }
 
@@ -268,7 +265,6 @@ body {
 .nav-link-right.Vs-bot { background-color: #532314; }
 .nav-link-right.Same-keyboard { background-color: #343946; }
 .nav-link-right.ranked { background-color: #4f1818; }
-.nav-link-right.unranked { background-color: #343946; }
 .nav-link-right.lobby { background-color: #3a4746; }
 .nav-link-right.user-status { background-color: #1a161d; }
 

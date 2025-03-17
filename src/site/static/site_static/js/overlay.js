@@ -14,7 +14,6 @@ export default class SocialOverlayManager {
 			'/lobby/guest',
 			'/lobby/playing',
 			'/multiplayer/pong_ranked',
-			'/multiplayer/pong_unranked',
 			'/tournament',
 			'/tournament/guest',
 			'/tournament/playing',
