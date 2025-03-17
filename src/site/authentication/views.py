@@ -83,6 +83,7 @@ class Auth42(View):
 		super().__init__(**kwargs)
 		self.client_id = os.environ.get("42_CLIENT_ID")
 		self.client_secret = os.environ.get("42_AUTH_CLIENT_SECRET")
+		self.redirect_uri = os.environ.get("42_REDIRECT_URI")
 
 	def get(self, request, *args, **kwargs):
 		"""
@@ -90,30 +91,27 @@ class Auth42(View):
 		Use the same redirect_uri for both authorization and token exchange.
 		"""
 
-		redirect_uri = request.build_absolute_uri(reverse("oauth_callback"))
-		request.session['oauth_state'] = self.state
-
 		if request.path == reverse("user_42login"):
-			return self.user_42login(redirect_uri)
+			return self.user_42login()
 		elif request.path == reverse("oauth_callback"):
-			return self.handle_callback(request, redirect_uri)
+			return self.handle_callback(request)
 		return HttpResponseBadRequest("Invalid path.")
 
-	def user_42login(self, redirect_uri):
+	def user_42login(self):
 		"""
 		Redirect the user to 42's OAuth login page.
 		The query string is built using urlencode to handle proper percent-encoding.
 		"""
 		params_auth = {
 			"client_id": self.client_id,
-			"redirect_uri": redirect_uri,
+			"redirect_uri": self.redirect_uri,
 			"response_type": "code",
 			"state": self.state
 		}
 		auth_url = "https://api.intra.42.fr/oauth/authorize?" + urlencode(params_auth)
 		return redirect(auth_url)
 
-	def handle_callback(self, request, redirect_uri):
+	def handle_callback(self, request):
 		"""
 		Handle OAuth callback, exchange code for token, and authenticate user.
 		"""
@@ -127,7 +125,7 @@ class Auth42(View):
 				"grant_type": "authorization_code",
 				"client_id": self.client_id,
 				"client_secret": self.client_secret,
-				"redirect_uri": redirect_uri,
+				"redirect_uri": self.redirect_uri,
 				"code": code
 			},
 		)
