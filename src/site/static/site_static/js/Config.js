@@ -1,4 +1,5 @@
 import api from './api.js';
+import router from './router.js';
 
 const setupConfigEventListeners = async () => {
 	const fileInput = document.getElementById('profileImageInput');
@@ -61,8 +62,15 @@ const setupConfigEventListeners = async () => {
 				return;
 			}
 			try {
-				await api.updateUsername(newUsername);
-				alert('Username updated successfully. Go to the homepage to see changes');
+				const response = await api.updateUsername(newUsername);
+
+				if (response.error) {
+					alert(response.error.username[0]);
+				} else if (response.message) {
+					alert(response.message);
+				} else {
+					alert('Error updating username');
+				}
 			} catch (error) {
 					console.error('Error updating username:', error);
 					alert('Error updating username');
@@ -80,8 +88,15 @@ const setupConfigEventListeners = async () => {
 			}
 
 			try {
-				await api.updateEmail(newEmail);
-				alert('Email updated successfully. Go to the homepage to see changes');
+				const response = await api.updateEmail(newEmail);
+
+				if (response.error) {
+					alert(response.error.email[0]);
+				} else if (response.message) {
+					alert(response.message);
+				} else {
+					alert('Error updating email');
+				}
 			} catch (error) {
 				console.error('Error updating email:', error);
 				alert('Error updating email');
@@ -112,11 +127,25 @@ const setupConfigEventListeners = async () => {
 			}
 
 			try {
-				await api.updatePassword(currentPassword, newPassword);
-				alert('Password updated successfully');
+				const response = await api.updatePassword(currentPassword, newPassword);
+				console.log('Password update response:', response);
+
+				if (response.error) {
+					alert(response.error[0]);
+					return;
+				} else if (response.message) {
+					alert(response.message);
+				} else {
+					alert('Error updating password');
+					return;
+				}
+
 				document.getElementById('currentPassword').value = '';
 				document.getElementById('newPassword').value = '';
 				document.getElementById('confirmPassword').value = '';
+
+
+
 			} catch (error) {
 				console.error('Error updating password:', error);
 				alert('Error updating password');
