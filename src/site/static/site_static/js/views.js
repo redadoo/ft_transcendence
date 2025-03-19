@@ -442,7 +442,7 @@ const views = {
 
 		startButton.addEventListener('click', () => {
 			pongGame.mode.sendStart();
-			router.navigateTo('/tournament/playing');
+			startButton.disabled = true;
 		});
 	},
 
