@@ -1,4 +1,5 @@
 import SocketManager from './SocketManager.js';
+import Sound from '../../site_static/js/Sound.js';
 
 export default class MatchmakingManager
 {
@@ -43,6 +44,7 @@ export default class MatchmakingManager
 
 	onClick()
 	{
+		Sound.play("matchmakingSound");
 		this.matchmakingButton.innerText = "SEARCHING...";
 		this.matchmakingButton.disabled = true;
 		this.matchmakingStatus.innerText = "Looking for an opponent...";

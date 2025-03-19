@@ -54,7 +54,8 @@ const router = {
 		this.onBodyClick = this.handleBodyClick.bind(this);
 
 		this.setupEventListeners();
-		this.navigateTo(window.location.pathname);
+
+		this.navigateTo('/');
 	},
 
 	async handleLocation() {

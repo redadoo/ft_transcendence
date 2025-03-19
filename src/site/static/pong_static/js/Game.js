@@ -74,7 +74,7 @@ export default class Game
 	{
 		const leavePage = window.confirm("Do you want to leave?");
 		if (leavePage)
-			this.game_ended(false);
+			this.game_ended(false, '/');
 		else
 			history.pushState(null, document.title, location.href);
 	}
@@ -97,7 +97,7 @@ export default class Game
 
 		this.close_window_event_unload = () => {
 			if (this.shouldCleanupOnExit)
-				this.game_ended(false);
+				this.game_ended(false, '/');
 		};
 
 		window.addEventListener("beforeunload", this.close_window_event_beforeunload);
@@ -423,9 +423,8 @@ export default class Game
 		this.ball.syncPosition();
 	}
 
-	game_ended(isGamefinished)
+	game_ended(isGamefinished, pathToRedirect)
 	{
-		
 		this.mode.dispose(isGamefinished, this.player_id);
 
 		document.getElementById('pongCountDown').classList.add('d-none');
@@ -443,10 +442,7 @@ export default class Game
 
 		this.cleanupWindowClose();
 
-		if (isGamefinished === true)
-			router.navigateTo('/match-result');
-		else
-			router.navigateTo('/');
+		router.navigateTo(pathToRedirect);
 	}
 
 	reset()

@@ -54,7 +54,7 @@ export default class Game
 	{
 		const leavePage = window.confirm("Do you want to leave?");
 		if (leavePage)
-			this.game_ended(false);
+			this.game_ended(false, '/');
 		else
 			history.pushState(null, document.title, location.href);
 	}
@@ -77,7 +77,7 @@ export default class Game
 
 		this.close_window_event_unload = () => {
 			if (this.shouldCleanupOnExit)
-				this.game_ended(false);
+				this.game_ended(false, '/');
 		};
 
 		window.addEventListener("beforeunload", this.close_window_event_beforeunload);
@@ -155,7 +155,7 @@ export default class Game
 		// if(this.game.pongPlayer != null)
 		// {
 		// 	alert("the server is temporarily down");
-		// 	this.game.game_ended(false);
+		// 	this.game.game_ended('/');
 		// }
 	}
 
@@ -547,7 +547,7 @@ export default class Game
 				const tableCardImage = document.getElementById("tableCardImage");
 				if (tableCardImage) 
 				{
-					const texturePath = cardTextures[lobbyInfo.card_required] || '/media/png/default.png';
+					const texturePath = cardTextures[lobbyInfo.card_required];
 					tableCardImage.src = texturePath;
 					tableCardImage.alt = lobbyInfo.card_required;
 				}
@@ -816,7 +816,7 @@ export default class Game
 					this.selected_card(this.currentPlayer);
 					break;
 				case 'ENDED':
-					this.game_ended(true);
+					this.game_ended('/match-result');
 					break;
 				case 'PLAYER_DISCONNECTED':
 					break;

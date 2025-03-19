@@ -1,6 +1,7 @@
 // MultiplayerPongMode.js
 import PongMode from './PongMode.js';
 import MatchmakingManager from '../../../../common_static/js/MatchmakingManager.js';
+import Sound from '../../../../site_static/js/Sound.js';
 
 export default class MultiplayerPongMode extends PongMode 
 {
@@ -21,6 +22,8 @@ export default class MultiplayerPongMode extends PongMode
 
 	setupGameSocket(data)
 	{
+		Sound.play('startGameSound');
+
 		this.socket.initGameWebSocket(
 			'pong',
 			this.handleSocketMessage.bind(this),

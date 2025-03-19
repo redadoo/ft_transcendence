@@ -63,6 +63,32 @@ class SocialUser:
 		for group, payload in notifications:
 			await self.channel_layer.group_send(group, payload)
 
+	async def notify_friend_status(self, friend_user):
+		try:
+			friendship = await database_sync_to_async(
+				Friendships.objects.filter(
+					(Q(first_user=self.user, second_user=friend_user) | Q(first_user=friend_user, second_user=self.user))
+					& Q(status=Friendships.FriendshipsStatus.FRIENDS)
+				).select_related("first_user", "second_user").first
+			)()
+			
+			if not friendship:
+				return
+
+		except Exception as e:
+			raise ValueError(f"error while getting friendship: {str(e)}")
+
+		actor = self.user
+		recipient = friend_user
+
+		payload = {
+			"type": "get_status_change",
+			"friend_username": actor.username,
+			"status": User.get_status_name(actor.status),
+		}
+
+		await self.channel_layer.group_send(f"user_{recipient.id}", payload)
+
 	async def change_status(self, data: dict):
 		"""
 		Block a user, preventing further interaction.
@@ -246,6 +272,8 @@ class SocialUser:
 		}
 
 		await self.channel_layer.group_send(f"user_{target_user.id}", payload)
+
+		await self.notify_friend_status(target_user)
 
 	async def send_message(self, data: dict):
 		target_username = await self._validate_user(data.get("username"))

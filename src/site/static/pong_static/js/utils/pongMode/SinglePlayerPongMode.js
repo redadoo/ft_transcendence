@@ -62,10 +62,10 @@ export default class SinglePlayerPongMode extends PongMode {
 				this.game.updateGameState(lobby_info);
 				break;
 			case 'ENDED':
-				this.game.game_ended(true);
+				this.game.game_ended(true, '/match-result');
 				break;
 			case 'PLAYER_DISCONNECTED':
-				this.game.game_ended(false);
+				this.game.game_ended(false, '/');
 				break;
 			default:
 				console.warn("Unhandled lobby status:", lobby_info.current_lobby_status);

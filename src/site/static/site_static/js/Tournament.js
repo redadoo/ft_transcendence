@@ -27,10 +27,7 @@ export default class Tournament {
 		const playerExists = this.players.some(player => player && player.username === username);
 	
 		if (playerExists) 
-		{
-			console.warn(`Player ${username} is already in the tournament.`);
 			return;
-		}
 
 		const emptySlotIndex = this.players.indexOf(null);
 	

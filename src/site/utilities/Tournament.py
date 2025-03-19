@@ -71,7 +71,7 @@ class Tournament():
 			print("Not enough players to start a tournament.")
 			return
 		matches = []
-		players_queue = list(self.players)
+		players_queue = list({player["id"] for player in self.players})
 		while len(players_queue) >= MATCH_PLAYER_NUMBER:
 			match = [players_queue.pop(0), players_queue.pop(0)]
 			matches.append(match)
@@ -143,7 +143,7 @@ class Tournament():
 		await self.broadcast_message({
 			"type": "lobby_state",
 			"event_name": "player_to_setup",
-			"players": self.game_manager.players_to_dict(),
+			"players": [match[0] , match[1]],
 			"tournament_snapshot": snapshot,
 		})
 
@@ -228,7 +228,7 @@ class Tournament():
 
 			self.tournament_status = self.TournamentStatus.ENDED
 			snapshot = self.to_dict()
-			if len(self.players) == 1:
+			if len(self.current_round_index) == 3:
 				await self.broadcast_message({
 					"type": "lobby_state",
 					"event": "tournament_finished",
