@@ -131,7 +131,7 @@ const setupConfigEventListeners = async () => {
 				console.log('Password update response:', response);
 
 				if (response.error) {
-					alert(response.error[0]);
+					alert(response.error);
 					return;
 				} else if (response.message) {
 					alert(response.message);

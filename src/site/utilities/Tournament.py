@@ -225,15 +225,16 @@ class Tournament():
 			self.match_played += 1
 			try:
 				if self.match_played == 3:
+					tournament: PongTournament = await database_sync_to_async(PongTournament.objects.create)()
+					await tournament.add_players_to_tournament(list({player["id"] for player in self.players}))
+					await tournament.set_winner(self.current_round_winners[0])
+
 					await self.broadcast_message({
 						"type": "lobby_state",
 						"event": "tournament_finished",
 						"winner_id": self.current_round_winners[0],
 						"tournament_snapshot": snapshot,
 					})
-					tournament: PongTournament = await database_sync_to_async(PongTournament.objects.create)()
-					await tournament.add_players_to_tournament(list({player["id"] for player in self.players}))
-					await tournament.set_winner(self.current_round_winners[0])
 				else:
 					await self.broadcast_message({
 						"type": "lobby_state",
@@ -242,7 +243,7 @@ class Tournament():
 						"tournament_snapshot": snapshot,
 					})
 			except Exception as e:
-				print(" error game loop {e}")
+				print(f" error game loop {e}")
 	def to_dict(self) -> dict:
 		tournament_data = {
 			"current_tournament_status": self.tournament_status.name,
