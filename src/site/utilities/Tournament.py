@@ -32,7 +32,8 @@ class Tournament():
 		self.players: list = []
 		self.bracket: list = []
 		self.current_round_winners: list = []  
-		self.current_round_index: int = 0 
+		self.current_round_index: int = 0
+		self.match_played: int = 0
 		self.game_loop_task = None
 
 	async def broadcast_message(self, message: dict):
@@ -118,13 +119,6 @@ class Tournament():
 			if self.current_round_winners:
 				await self.setup_next_round(self.current_round_winners)
 				if len(self.current_round_winners) == 1:
-					snapshot = self.to_dict()
-					await self.broadcast_message({
-						"type": "lobby_state",
-						"event": "tournament_finished",
-						"winner_id": self.current_round_winners[0],
-						"tournament_snapshot": snapshot,
-					})
 					return
 				current_round_matches = self.bracket[self.current_round_index]
 			else:
@@ -152,6 +146,7 @@ class Tournament():
 		if not self.bracket:
 			print("Tournament not set up properly.")
 			return
+
 		await self.setup_pong_manager()
 
 		self.game_manager.start_game()
@@ -223,29 +218,31 @@ class Tournament():
 		finally:
 			loser_id = self.game_manager.get_loser()
 			winner_id = self.game_manager.get_winner()
-
 			self.current_round_winners.append(winner_id)
-
 			self.tournament_status = self.TournamentStatus.ENDED
 			snapshot = self.to_dict()
-			if len(self.current_round_index) == 3:
-				await self.broadcast_message({
-					"type": "lobby_state",
-					"event": "tournament_finished",
-					"winner_id": self.current_round_winners[0],
-					"tournament_snapshot": snapshot,
-				})
-				tournament: PongTournament = await database_sync_to_async(PongTournament.objects.create)()
-				await tournament.add_players_to_tournament(list(self.players))
-				await tournament.set_winner(self.current_round_winners[0])
-			else:
-				await self.broadcast_message({
-					"type": "lobby_state",
-					"event": "match_finished",
-					"loser_id": loser_id,
-					"tournament_snapshot": snapshot,
-				})
 
+			self.match_played += 1
+			try:
+				if self.match_played == 3:
+					await self.broadcast_message({
+						"type": "lobby_state",
+						"event": "tournament_finished",
+						"winner_id": self.current_round_winners[0],
+						"tournament_snapshot": snapshot,
+					})
+					tournament: PongTournament = await database_sync_to_async(PongTournament.objects.create)()
+					await tournament.add_players_to_tournament(list({player["id"] for player in self.players}))
+					await tournament.set_winner(self.current_round_winners[0])
+				else:
+					await self.broadcast_message({
+						"type": "lobby_state",
+						"event": "match_finished",
+						"loser_id": loser_id,
+						"tournament_snapshot": snapshot,
+					})
+			except Exception as e:
+				print(" error game loop {e}")
 	def to_dict(self) -> dict:
 		tournament_data = {
 			"current_tournament_status": self.tournament_status.name,

@@ -181,22 +181,21 @@ class PongTournament(models.Model):
 		help_text="The winner of the tournament.",
 	)
 
-	@database_sync_to_async
-	def _get_players(self, players_id):
-		"""Fetch all players in one query (optimized)."""
-		from website.models import User
-		return list(User.objects.filter(id__in=players_id))
-
-	@database_sync_to_async
-	def _set_players(self, players):
-		"""Set players in the tournament."""
-		self.players.set(players)
-		self.save()
-
 	async def add_players_to_tournament(self, players_id):
 		"""Async method to add players to the tournament."""
-		players = await self._get_players(players_id)
-		await self._set_players(players)
+		from website.models import User
+		try:
+			for id in players_id:
+				user = await database_sync_to_async(User.objects.get)(id=id)
+				await database_sync_to_async(self.players.add)(user)
+				await database_sync_to_async(self.save)()
+				print(f"Player {user.username} added to tournament successfully.")
+		except PongTournament.DoesNotExist:
+			print("Tournament not found.")
+		except User.DoesNotExist:
+			print("User not found.")
+		except Exception as e:
+			print(f" dsadsa dsa dsa DSAd sa {str(e)}")
 
 	@database_sync_to_async
 	def _get_winner(self, player_id):
