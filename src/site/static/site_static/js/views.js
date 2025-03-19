@@ -391,7 +391,7 @@ const views = {
 			document.getElementById('winnerAvatar').src = data.image_url.avatar_url;
 		});
 
-		let losers = data.players.filter(player => player.username !== data.winner);
+		let losers = data.players.filter(player => player !== data.winner);
 
 		losers.forEach((loser, index) => {
 			updateElement(`loser${index + 1}Name`, loser);
