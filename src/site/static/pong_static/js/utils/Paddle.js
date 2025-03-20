@@ -12,9 +12,13 @@ export default class Paddle {
 	 * @param {number} [depth=0.1] - The depth of the paddle.
 	 * @param {number} [color=0x00ff00] - The color of the paddle.
 	 */
-	constructor(width = 10, height = 50, depth = 0.1, color = 0x00ff00) {
-
-		this.geometry = new THREE.BoxGeometry(width, height, depth);
+	constructor(width = 10, height = 50, depth = 0.1, color = 0x00ff00,  is3D = false) {
+		this.is3D = is3D;
+		if (this.is3D) {
+            this.geometry = new THREE.BoxGeometry(width, height, depth);
+        } else {
+            this.geometry = new THREE.PlaneGeometry(width, height);
+        }
 		this.material = new THREE.MeshStandardMaterial({ color: color });
 
 		this.mesh = new THREE.Mesh(this.geometry, this.material);

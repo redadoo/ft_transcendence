@@ -8,12 +8,19 @@ export default class Ball
 	 * @constructor
 	 * @param {number} [radius=1] - The radius of the ball.
 	 */
-	constructor(radius = 1) 
+	constructor(radius = 1, is3D = false) 
 	{
+		this.is3D = is3D;
 		this.newPosition = new THREE.Vector3(0, 0, 0);
-		const geometry = new THREE.IcosahedronGeometry(radius, 1);
-		const material = new THREE.MeshBasicMaterial({ color: 'white' });
-		this.mesh = new THREE.Mesh(geometry, material);
+		if (this.is3D) {
+            const geometry = new THREE.IcosahedronGeometry(radius, 1);
+            const material = new THREE.MeshBasicMaterial({ color: 'white' });
+            this.mesh = new THREE.Mesh(geometry, material);
+        } else {
+            const geometry = new THREE.PlaneGeometry(radius * 2, radius * 2);
+            const material = new THREE.MeshBasicMaterial({ color: 'white', side: THREE.DoubleSide });
+            this.mesh = new THREE.Mesh(geometry, material);
+        }
 		this.mesh.position.set(0, 0, 0);
 	}
 
