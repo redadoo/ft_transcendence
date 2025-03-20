@@ -167,7 +167,7 @@ class PongGameManager(GameManager):
 			if out_of_bounds in {"right", "left"}:
 				scoring_player = "player1" if out_of_bounds == "right" else "player2"
 				self.scores[scoring_player] += 1
-				self.ball.reset()
+				self.ball.reset(scoring_player)
 
 			if any(score >= constants.MAX_SCORE for score in self.scores.values()):
 				await self.clear_and_save(True)
@@ -189,7 +189,7 @@ class PongGameManager(GameManager):
 
 	def reset(self):
 		self.players.clear()
-		self.ball.reset()
+		self.ball.start()
 		self.scores = {"player1": 0, "player2": 0}
 		self.game_loop_is_active = False
 		self.is_countdown_finish = False

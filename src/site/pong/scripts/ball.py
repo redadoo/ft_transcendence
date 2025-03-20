@@ -14,7 +14,7 @@ class Ball:
 		self.bounds = constants.GAME_BOUNDS  # Limiti del campo di gioco
 		self.speed_multiplier = 1.0  # Fattore di incremento della velocità
 		
-	def reset(self):
+	def start(self):
 		"""Imposta la palla al centro dello schermo con una direzione casuale."""
 		self.x = (self.bounds["xMin"] + self.bounds["xMax"]) / 2
 		self.y = (self.bounds["yMin"] + self.bounds["yMax"]) / 2
@@ -36,6 +36,32 @@ class Ball:
 		self.speed_x = constants.BALL_SPEED_X * speed_x
 		self.speed_y = constants.BALL_SPEED_Y * speed_y
 
+	def reset(self, scored_player):
+		"""Imposta la palla al centro e la manda verso il giocatore che ha subito il punto."""
+		self.x = (self.bounds["xMin"] + self.bounds["xMax"]) / 2
+		self.y = (self.bounds["yMin"] + self.bounds["yMax"]) / 2
+		self.speed_multiplier = 1.0
+
+		# Se `player1` ha segnato, manda la palla verso `player2`, e viceversa
+		if scored_player == "player1":
+			direction_x = 1  # Verso destra
+		else:
+			direction_x = -1  # Verso sinistra
+
+		angle = random.uniform(-math.pi / 4, math.pi / 4)
+
+		speed_x = direction_x * math.cos(angle)
+		speed_y = math.sin(angle)
+
+		# Normalizzazione
+		speed_magnitude = math.sqrt(speed_x**2 + speed_y**2)
+		if speed_magnitude != 0:
+			speed_x /= speed_magnitude
+			speed_y /= speed_magnitude
+
+		self.speed_x = constants.BALL_SPEED_X * speed_x
+		self.speed_y = constants.BALL_SPEED_Y * speed_y
+  
 	def update_position(self):
 		"""Aggiorna la posizione della palla in base alla velocità corrente."""
 		self.x += self.speed_x * self.speed_multiplier
