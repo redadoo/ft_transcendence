@@ -67,10 +67,10 @@ export default class FriendListManager {
 				<img src="${avatarUrl}" alt="avatar" class="friend-avatar">
 				<span class="friend-name pixel-font" data-link="/friends-profile" data-username="${username}">${username}</span>
 				<span class="friend-status ${status.toLowerCase()}">${status}</span>
-				<span class="friend-action" id="blockUser">🔒</span>
-				<span class="friend-action" id="removeFriend">💔</span>
 				<span class="friend-chat-action" id="openChat">💬</span>
-				<span class="friend-action" id="inviteToGame">🎮</span>
+				<span class="friend-action" id="inviteToGame">⚔️</span>
+				<span class="friend-action" id="blockUser">🚫</span>
+				<span class="friend-action" id="removeFriend">❌</span>
 			</div>
 		`;
 	}
@@ -90,7 +90,7 @@ export default class FriendListManager {
 			<div class="friend-item" id="friendItem">
 				<img src="${avatarUrl}" alt="avatar" class="friend-avatar">
 				<span class="friend-name pixel-font">${username}</span>
-				<span class="friend-action" id="addFriend">❤️</span>
+				<span class="friend-action" id="addFriend">👋</span>
 			</div>
 		`;
 	}

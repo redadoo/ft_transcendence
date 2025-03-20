@@ -2368,26 +2368,26 @@ label {
 
 .doubt-text {
 	font-family: 'PRESS START 2P', sans-serif;
-    font-size: 0.8vw; /* Adatta alla dimensione dello schermo */
-    font-weight: bold;
-    color: rgb(255, 0, 0);
-    text-shadow: 0 0 5px rgba(0, 0, 0, 0.7);
-    white-space: nowrap; /* Evita che il testo vada a capo */
+	font-size: 0.8vw; /* Adatta alla dimensione dello schermo */
+	font-weight: bold;
+	color: rgb(255, 0, 0);
+	text-shadow: 0 0 5px rgba(0, 0, 0, 0.7);
+	white-space: nowrap; /* Evita che il testo vada a capo */
 	text-align: right; /* Allinea il testo a destra */
 	visibility: hidden;
 }
 
 /* Animazione per "DOUBT!" */
 .doubt-text.visible {
-    opacity: 1;
-    visibility: visible;
-    animation: doubtFlash 0.5s ease-in-out;
+	opacity: 1;
+	visibility: visible;
+	animation: doubtFlash 0.5s ease-in-out;
 }
 
 @keyframes doubtFlash {
-    0% { transform: scale(1); opacity: 1; }
-    50% { transform: scale(1.2); opacity: 1; }
-    100% { transform: scale(1); opacity: 1; }
+	0% { transform: scale(1); opacity: 1; }
+	50% { transform: scale(1.2); opacity: 1; }
+	100% { transform: scale(1); opacity: 1; }
 }
 
 /* ----------------------------------------------------------------------------------- */
@@ -2783,5 +2783,147 @@ label {
 	.crown-icon {
 	margin-right: 0;
 	margin-bottom: 1rem;
+	}
+}
+
+/* Tournament Matchups Styles */
+.matchups-display {
+	background-color: rgba(30, 30, 30, 0.95);
+	border-radius: 8px;
+	padding: 1.5rem;
+	margin-bottom: 2rem;
+	border: 1px solid rgba(255, 98, 50, 0.3);
+}
+
+.matchup-title {
+	color: #ff6232;
+	font-size: 1.5rem;
+	text-align: center;
+	display: block;
+	margin-bottom: 1.5rem;
+	text-shadow: 2px 2px 1px rgba(0, 0, 0, 0.4);
+}
+
+.matchup-container {
+	display: flex;
+	flex-direction: column;
+	gap: 2rem;
+}
+
+.matchup {
+	position: relative;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	background-color: rgba(25, 25, 25, 0.8);
+	border-radius: 6px;
+	padding: 1rem;
+	border: 1px solid rgba(104, 104, 104, 0.2);
+}
+
+.matchup-vs {
+	position: absolute;
+	left: 50%;
+	top: 50%;
+	transform: translate(-50%, -50%);
+	z-index: 10;
+	background-color: #532314;
+	width: 60px;
+	height: 60px;
+	border-radius: 50%;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	border: 2px solid #ff6232;
+	box-shadow: 0 0 10px rgba(255, 98, 50, 0.5);
+}
+
+.vs-text {
+	color: #f79666;
+	font-size: 1rem;
+}
+
+.matchup-players {
+	width: 100%;
+	display: flex;
+	justify-content: space-between;
+}
+
+.matchup-player {
+	width: 100%;
+	display: flex;
+	justify-content: space-between;
+}
+
+.player-slot.semifinal {
+	width: 45%;
+	background-color: #2a2a2a;
+	padding: 1rem;
+	border-radius: 8px;
+	display: flex;
+	align-items: center;
+	gap: 1rem;
+	border: 1px solid rgba(104, 104, 104, 0.3);
+}
+
+/* Hide the players grid in visual display but keep it for script access */
+.players-grid {
+	display: none;
+}
+
+/* Highlight the first matchup with a different color */
+.matchup:first-child {
+	background-color: rgba(83, 35, 20, 0.3);
+	border: 1px solid rgba(255, 98, 50, 0.2);
+}
+
+/* Update tournament-controls to have more clear styling */
+.tournament-controls {
+	margin-top: 2rem;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+}
+
+.start-button {
+	background-color: #ff6232;
+	color: white;
+	border: none;
+	padding: 1rem 2rem;
+	font-size: 1.2rem;
+	border-radius: 5px;
+	cursor: pointer;
+	transition: all 0.3s ease;
+	min-width: 300px;
+}
+
+.start-button:hover:not(:disabled) {
+	background-color: #cc4f28;
+	transform: translateY(-2px);
+	box-shadow: 0 5px 15px rgba(255, 98, 50, 0.3);
+}
+
+.start-button:disabled {
+	background-color: #2a2a2a;
+	color: #686868;
+	cursor: not-allowed;
+}
+
+/* Responsive adjustments */
+@media (max-width: 992px) {
+	.matchup-player {
+	flex-direction: column;
+	gap: 1rem;
+	}
+
+	.player-slot.semifinal {
+	width: 100%;
+	}
+
+	.matchup-vs {
+	width: 40px;
+	height: 40px;
+	font-size: 0.8rem;
 	}
 }

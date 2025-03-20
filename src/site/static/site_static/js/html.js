@@ -1191,144 +1191,172 @@ const html = {
 
 	tournament: `
 		<div class="container-fluid game-container">
-			<div class="row h-100">
+		<div class="row h-100">
+			<div class="col-12 px-0">
+			<div class="nav-wrapper">
+			<div class="tournament-container">
+				<div class="tournament-header">
+				<span class="pixel-font tournament-title">TOURNAMENT LOBBY</span>
+				</div>
 
-				<div class="col-12 px-0">
-					<nav class="nav-wrapper">
-						<div class="tournament-container">
-							<div class="tournament-header">
-								<span class="pixel-font tournament-title">TOURNAMENT LOBBY</span>
+				<div class="tournament-content">
+				<!-- Matchups Display -->
+				<div class="matchups-display">
+					<span class="pixel-font matchup-title">TOURNAMENT MATCHUPS</span>
+
+					<div class="matchup-container">
+					<!-- First Matchup -->
+					<div class="matchup">
+						<div class="matchup-vs">
+						<span class="pixel-font vs-text">VS</span>
+						</div>
+						<div class="matchup-players">
+						<div class="matchup-player">
+							<div class="player-slot semifinal">
+							<div class="player-avatar">
+								<img src="" alt="Player 1" id="player1Avatar">
 							</div>
-
-							<div class="tournament-content">
-								<div class="players-grid">
-									<div class="player-cell">
-										<div class="player-slot">
-											<div class="player-avatar">
-												<img src="" alt="Player 1" id="player1Avatar">
-											</div>
-											<div class="player-info">
-												<span class="pixel-font player-name" id="player1Name">WAITING...</span>
-												<span class="pixel-font player-status host">HOST</span>
-											</div>
-										</div>
-									</div>
-
-									<div class="player-cell">
-										<div class="player-slot empty">
-											<div class="player-avatar">
-												<img src="" alt="Player 2" id="player2Avatar">
-											</div>
-											<div class="player-info">
-												<span class="pixel-font player-name" id="player2Name">WAITING...</span>
-												<span class="pixel-font player-status">PLAYER</span>
-											</div>
-										</div>
-									</div>
-
-									<div class="player-cell">
-										<div class="player-slot empty">
-											<div class="player-avatar">
-												<img src="" alt="Player 3" id="player3Avatar">
-											</div>
-											<div class="player-info">
-												<span class="pixel-font player-name" id="player3Name">WAITING...</span>
-												<span class="pixel-font player-status">PLAYER</span>
-											</div>
-										</div>
-									</div>
-
-									<div class="player-cell">
-										<div class="player-slot empty">
-											<div class="player-avatar">
-												<img src="" alt="Player 4" id="player4Avatar">
-											</div>
-											<div class="player-info">
-												<span class="pixel-font player-name" id="player4Name">WAITING...</span>
-												<span class="pixel-font player-status">PLAYER</span>
-											</div>
-										</div>
-									</div>
-								</div>
+							<div class="player-info">
+								<span class="pixel-font player-name" id="player1Name">WAITING...</span>
+								<span class="pixel-font player-status host">HOST</span>
 							</div>
-							<div class="tournament-controls">
-								<button class="start-button pixel-font" id="startTournament" disabled>
-									START TOURNAMENT
-								</button>
+							</div>
+							<div class="player-slot semifinal">
+							<div class="player-avatar">
+								<img src="" alt="Player 2" id="player2Avatar">
+							</div>
+							<div class="player-info">
+								<span class="pixel-font player-name" id="player2Name">WAITING...</span>
+								<span class="pixel-font player-status">PLAYER</span>
+							</div>
 							</div>
 						</div>
-					</nav>
+						</div>
+					</div>
+
+					<!-- Second Matchup -->
+					<div class="matchup">
+						<div class="matchup-vs">
+						<span class="pixel-font vs-text">VS</span>
+						</div>
+						<div class="matchup-players">
+						<div class="matchup-player">
+							<div class="player-slot semifinal">
+							<div class="player-avatar">
+								<img src="" alt="Player 3" id="player1Avatar">
+							</div>
+							<div class="player-info">
+								<span class="pixel-font player-name" id="player3Name">WAITING...</span>
+								<span class="pixel-font player-status">PLAYER</span>
+							</div>
+							</div>
+							<div class="player-slot semifinal">
+							<div class="player-avatar">
+								<img src="" alt="Player 4" id="player2Avatar">
+							</div>
+							<div class="player-info">
+								<span class="pixel-font player-name" id="player4Name">WAITING...</span>
+								<span class="pixel-font player-status">PLAYER</span>
+							</div>
+							</div>
+						</div>
+						</div>
+					</div>
+					</div>
+				</div>
+				</div>
+				<div class="tournament-controls">
+				<button class="start-button pixel-font" id="startTournament" disabled>
+					START TOURNAMENT
+				</button>
 				</div>
 			</div>
+			</div>
+			</div>
+		</div>
 		</div>
 	`,
 
 	tournamentGuest: `
-		<div class="container-fluid game-container">
-			<div class="row h-100">
+				<div class="container-fluid game-container">
+		<div class="row h-100">
+			<div class="col-12 px-0">
+			<div class="nav-wrapper">
+			<div class="tournament-container">
+				<div class="tournament-header">
+				<span class="pixel-font tournament-title">TOURNAMENT LOBBY</span>
+				</div>
 
-				<div class="col-12 px-0">
-					<nav class="nav-wrapper">
-						<div class="tournament-container">
-							<div class="tournament-header">
-								<span class="pixel-font tournament-title">TOURNAMENT LOBBY</span>
+				<div class="tournament-content">
+				<!-- Matchups Display -->
+				<div class="matchups-display">
+					<span class="pixel-font matchup-title">TOURNAMENT MATCHUPS</span>
+
+					<div class="matchup-container">
+					<!-- First Matchup -->
+					<div class="matchup">
+						<div class="matchup-vs">
+						<span class="pixel-font vs-text">VS</span>
+						</div>
+						<div class="matchup-players">
+						<div class="matchup-player">
+							<div class="player-slot semifinal">
+							<div class="player-avatar">
+								<img src="" alt="Player 1" id="player1Avatar">
 							</div>
-
-							<div class="tournament-content">
-								<div class="players-grid">
-									<div class="player-cell">
-										<div class="player-slot">
-											<div class="player-avatar">
-												<img src="" alt="Player 1" id="player1Avatar">
-											</div>
-											<div class="player-info">
-												<span class="pixel-font player-name" id="player1Name">WAITING...</span>
-												<span class="pixel-font player-status host">HOST</span>
-											</div>
-										</div>
-									</div>
-
-									<div class="player-cell">
-										<div class="player-slot empty">
-											<div class="player-avatar">
-												<img src="" alt="Player 2" id="player2Avatar">
-											</div>
-											<div class="player-info">
-												<span class="pixel-font player-name" id="player2Name">WAITING...</span>
-												<span class="pixel-font player-status">PLAYER</span>
-											</div>
-										</div>
-									</div>
-
-									<div class="player-cell">
-										<div class="player-slot empty">
-											<div class="player-avatar">
-												<img src="" alt="Player 3" id="player3Avatar">
-											</div>
-											<div class="player-info">
-												<span class="pixel-font player-name" id="player3Name">WAITING...</span>
-												<span class="pixel-font player-status">PLAYER</span>
-											</div>
-										</div>
-									</div>
-
-									<div class="player-cell">
-										<div class="player-slot empty">
-											<div class="player-avatar">
-												<img src="" alt="Player 4" id="player4Avatar">
-											</div>
-											<div class="player-info">
-												<span class="pixel-font player-name" id="player4Name">WAITING...</span>
-												<span class="pixel-font player-status">PLAYER</span>
-											</div>
-										</div>
-									</div>
-								</div>
+							<div class="player-info">
+								<span class="pixel-font player-name" id="player1Name">WAITING...</span>
+								<span class="pixel-font player-status host">HOST</span>
+							</div>
+							</div>
+							<div class="player-slot semifinal">
+							<div class="player-avatar">
+								<img src="" alt="Player 2" id="player2Avatar">
+							</div>
+							<div class="player-info">
+								<span class="pixel-font player-name" id="player2Name">WAITING...</span>
+								<span class="pixel-font player-status">PLAYER</span>
+							</div>
 							</div>
 						</div>
-					</nav>
+						</div>
+					</div>
+
+					<!-- Second Matchup -->
+					<div class="matchup">
+						<div class="matchup-vs">
+						<span class="pixel-font vs-text">VS</span>
+						</div>
+						<div class="matchup-players">
+						<div class="matchup-player">
+							<div class="player-slot semifinal">
+							<div class="player-avatar">
+								<img src="" alt="Player 3" id="player1Avatar">
+							</div>
+							<div class="player-info">
+								<span class="pixel-font player-name" id="player3Name">WAITING...</span>
+								<span class="pixel-font player-status">PLAYER</span>
+							</div>
+							</div>
+							<div class="player-slot semifinal">
+							<div class="player-avatar">
+								<img src="" alt="Player 4" id="player2Avatar">
+							</div>
+							<div class="player-info">
+								<span class="pixel-font player-name" id="player4Name">WAITING...</span>
+								<span class="pixel-font player-status">PLAYER</span>
+							</div>
+							</div>
+						</div>
+						</div>
+					</div>
+					</div>
+				</div>
 				</div>
 			</div>
+			</div>
+			</div>
+		</div>
 		</div>
 	`,
 };
