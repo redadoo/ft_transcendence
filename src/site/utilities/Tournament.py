@@ -54,17 +54,32 @@ class Tournament():
 			case "waiting_next_match":
 				await self.tournament_start()
 			case "unexpected_quit":
-				self.quit(match_manager)
+				await self.quit(data, match_manager)
 			case "quit_game":
-				self.quit(match_manager)
+				await self.quit(data, match_manager)
 			case _:
 				print(f"Unhandled event type: {event_type}. Full data: {data}")
 
-	def quit(self, match_manager):
-		if self.tournament_status == Tournament.TournamentStatus.TO_SETUP:
-			match_manager.remove_match(self.room_name)
-		else:
+	async def quit(self, data: dict, match_manager):
+		
+		id = data.get("player_id",None)
+		if id == None:
+			print("cant find id value")
 			return
+		
+		players_id = list(self.game_manager.players.keys())
+		
+		if id in players_id:
+			print(f"player with id  {id} is playing a game")
+			await self.game_manager.clear_and_save(False, id)
+			for player in self.players:
+				if player["id"] == id:
+					self.players.remove(player)
+		else:
+			print(f"player with id  {id} is not playing a game")
+			for player in self.players:
+				if player["id"] == id:
+					self.players.remove(player)
 		
 	def setup_first_round(self):
 		"""Builds the first round from the joined players."""
@@ -84,13 +99,7 @@ class Tournament():
 		"""Creates the next round from the winners of the previous round.
 		   If there's an odd number of winners, the last one gets a bye."""
 		if len(winners) < MATCH_PLAYER_NUMBER:
-			snapshot = self.to_dict()
-			await self.broadcast_message({
-				"type": "lobby_state",
-				"event": "tournament_finished",
-				"winner_id": self.current_round_winners[0],
-				"tournament_snapshot": snapshot,
-			})
+			self.close_and_save()
 			return
 
 		next_round_matches = []
@@ -220,22 +229,14 @@ class Tournament():
 			winner_id = self.game_manager.get_winner()
 			self.current_round_winners.append(winner_id)
 			self.tournament_status = self.TournamentStatus.ENDED
-			snapshot = self.to_dict()
 
 			self.match_played += 1
 			try:
 				if self.match_played == 3:
-					tournament: PongTournament = await database_sync_to_async(PongTournament.objects.create)()
-					await tournament.add_players_to_tournament(list({player["id"] for player in self.players}))
-					await tournament.set_winner(self.current_round_winners[0])
-
-					await self.broadcast_message({
-						"type": "lobby_state",
-						"event": "tournament_finished",
-						"winner_id": self.current_round_winners[0],
-						"tournament_snapshot": snapshot,
-					})
+					self.close_and_save()
 				else:
+					snapshot = self.to_dict()
+					
 					await self.broadcast_message({
 						"type": "lobby_state",
 						"event": "match_finished",
@@ -244,6 +245,20 @@ class Tournament():
 					})
 			except Exception as e:
 				print(f" error game loop {e}")
+	
+	async def close_and_save(self):
+		snapshot = self.to_dict()
+		tournament: PongTournament = await database_sync_to_async(PongTournament.objects.create)()
+		await tournament.add_players_to_tournament(list({player["id"] for player in self.players}))
+		await tournament.set_winner(self.current_round_winners[0])
+
+		await self.broadcast_message({
+			"type": "lobby_state",
+			"event": "tournament_finished",
+			"winner_id": self.current_round_winners[0],
+			"tournament_snapshot": snapshot,
+		})
+
 	def to_dict(self) -> dict:
 		tournament_data = {
 			"current_tournament_status": self.tournament_status.name,

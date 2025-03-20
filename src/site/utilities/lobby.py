@@ -149,7 +149,6 @@ class Lobby:
 		broadcasts updates to all players, and terminates when the game is no longer active.
 		"""
 		try:
-			# Main game loop
 			while self.game_manager.game_loop_is_active:
 				async with self.update_lock:
 					await self.game_manager.game_loop()
