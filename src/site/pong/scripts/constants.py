@@ -23,5 +23,5 @@ GAME_BOUNDS = {
 }
 
 # game data
-MAX_SCORE = 1
+MAX_SCORE = 5
 COUNTDOWN = 5
