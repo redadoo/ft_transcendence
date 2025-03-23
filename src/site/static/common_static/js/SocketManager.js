@@ -7,16 +7,16 @@ import router from '../../site_static/js/router.js';
 export default class SocketManager 
 {
 	constructor(activePing) {
-		this.socket = undefined;
-		this.connected = false;
-		this.activePing = activePing;
-		this.pingInterval = null;
+		
 		this.lastPingTime = 0;
-		this.pingThreshold = 200; // ms threshold for slow connection
+		this.connected = false;
+		this.socket = undefined;
+		this.pingThreshold = 200;
+		this.pingInterval = null;
+		this.onSlowConnection = null;
+		this.activePing = activePing;
 		this.isSlowConnection = false;
-		// Optional callbacks for handling slow/normal connection events
-		this.onSlowConnection = null;    // Called when ping > pingThreshold
-		this.onNormalConnection = null;  // Called when ping returns to normal
+		this.onNormalConnection = null;
 	}
 
 	/**

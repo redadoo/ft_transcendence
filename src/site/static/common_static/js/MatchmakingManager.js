@@ -1,6 +1,9 @@
 import SocketManager from './SocketManager.js';
 import Sound from '../../site_static/js/Sound.js';
 
+/**
+ * Manages the matchmaking process for multiplayer games.
+ */
 export default class MatchmakingManager
 {
 	constructor(gameName, onMatchFound) {
@@ -15,19 +18,9 @@ export default class MatchmakingManager
 		this.matchmakingButton.addEventListener('click',this.onClick.bind(this));
 	}
 
-	dispose()
-	{
-		if (this.gameSocket) 
-		{
-			console.log("Closing WebSocket connection...");
-			this.gameSocket.close();
-			this.gameSocket = null;
-		}
-
-		if (this.matchmakingButton)
-			this.matchmakingButton.removeEventListener("click", this.onClick.bind(this));
-	}
-
+    /**
+     * Sends a request to join matchmaking when the WebSocket opens.
+     */
 	onSocketOpen()
 	{
 		this.gameSocket.send(JSON.stringify({ 
@@ -35,6 +28,9 @@ export default class MatchmakingManager
 		}));
 	}
 
+    /**
+     * Sends a request to close matchmaking when the WebSocket closes.
+     */
 	onSocketClose()
 	{
 		this.gameSocket.send(JSON.stringify({
@@ -42,6 +38,10 @@ export default class MatchmakingManager
 		}));
 	}
 
+   	/**
+     * Handles matchmaking button click event.
+     * Plays a matchmaking sound and updates the UI while initiating matchmaking.
+     */
 	onClick()
 	{
 		Sound.play("matchmakingSound");
@@ -51,9 +51,9 @@ export default class MatchmakingManager
 		this.setupMatchmakingSocket()
 	}
 
-	/**
-	 * Initializes the matchmaking WebSocket and defines its behavior.
-	 */
+    /**
+     * Initializes the matchmaking WebSocket and sets up event handlers.
+     */
 	setupMatchmakingSocket()
 	{
 		this.gameSocket = new SocketManager(false);
@@ -65,10 +65,10 @@ export default class MatchmakingManager
 		);
 	}
 
-	/**
-	 * Handles incoming messages from the matchmaking WebSocket.
-	 * @param {MessageEvent} event - The WebSocket message event.
-	 */
+    /**
+     * Handles incoming messages from the matchmaking WebSocket.
+     * @param {Object} data - The WebSocket message data.
+     */
 	handleMatchmakingSocketMessage(data)
 	{
 		try
@@ -90,52 +90,54 @@ export default class MatchmakingManager
 		}
 	}
 
-	/**
-	 * Cleans up the matchmaking UI and WebSocket resources.
-	 */
+    /**
+     * Cleans up the matchmaking UI and removes any previous elements.
+     */
 	cleanUp()
 	{
-		console.log("Cleaning up matchmaking UI...");
-	
 		setTimeout(() => {
 			if (this.matchmakingButton) 
 			{
-				console.log("Resetting matchmaking button");
 				this.matchmakingButton.innerText = "START MATCHMAKING";
 				this.matchmakingButton.disabled = false;
 			}
 
 			if (this.matchmakingStatus) 
-			{
-				console.log("Resetting matchmaking status");
 				this.matchmakingStatus.innerText = "Click below to start matchmaking";
-			}
 	
 			const pongContainer = document.getElementById('pong-container');
 			if (pongContainer) 
-			{
-				console.log("Removing pong-container");
 				pongContainer.remove();
-			} 
 			else 
-			{
 				console.warn("pong-container not found!");
-			}
 
-			document.querySelectorAll('#pong-container').forEach(el => el.remove());
+				document.querySelectorAll('#pong-container').forEach(el => el.remove());
 
 		}, 100);
 	}
 	
-	
-
-	/**
-	 * Sets up the lobby based on the provided data.
-	 * @param {Object} data - The data received for the lobby setup.
-	 */
+    /**
+     * Sets up the game lobby when matchmaking is successful.
+     * @param {Object} data - The lobby setup data received from the WebSocket.
+     */
 	setupLobby(data)
 	{
 		this.cleanUp();
 		this.onMatchFound(data);
+	}
+
+    /**
+     * Disposes of the matchmaking manager by closing the WebSocket and removing event listeners.
+     */
+	dispose()
+	{
+		if (this.gameSocket) 
+		{
+			this.gameSocket.close();
+			this.gameSocket = null;
+		}
+
+		if (this.matchmakingButton)
+			this.matchmakingButton.removeEventListener("click", this.onClick.bind(this));
 	}
 }

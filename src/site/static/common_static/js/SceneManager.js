@@ -2,7 +2,6 @@ import * as THREE from "https://cdn.jsdelivr.net/npm/three@latest/build/three.mo
 import { OrbitControls } from 'https://cdn.jsdelivr.net/npm/three@latest/examples/jsm/controls/OrbitControls.js';
 import Stats from 'https://cdn.jsdelivr.net/npm/three@latest/examples/jsm/libs/stats.module.js';
 import ModelManager from './ModelManager.js';
-import AudioManager from './AudioManager.js';
 
 /**
  * SceneManager is a class to manage a 3D scene using Three.js. It handles
@@ -31,7 +30,6 @@ export default class SceneManager
 		this.directionalLight = null;
 
 		this.modelManager = null;
-		this.audioManager = null;
 		
 		this.is42BadPc = false;
 		this.staticMode = false;
@@ -95,9 +93,8 @@ export default class SceneManager
 	/**
 	 * Initializes the scene manager components.
 	 * @param {boolean} [needModelManager=false] - Whether to initialize a model manager.
-	 * @param {boolean} [needAudioManager=false] - Whether to initialize an audio manager.
 	 */
-	initialize(needModelManager = false, needAudioManager = false) 
+	initialize(needModelManager = false) 
 	{
 		this.initializeScene();
 		this.initializeRenderer(THREE.PCFSoftShadowMap);
@@ -119,7 +116,6 @@ export default class SceneManager
 		 
 			
 		if (needModelManager) this.modelManager = new ModelManager();
-		if (needAudioManager) this.audioManager = new AudioManager(this.camera);
 
 		window.addEventListener("resize", this.onWindowResize.bind(this));
 	}
@@ -288,15 +284,9 @@ export default class SceneManager
 			this.modelManager.dispose();
 			this.modelManager = null;
 		}
-		if (this.audioManager) 
-		{
-			this.audioManager.dispose();
-			this.audioManager = null;
-		}
 	
 		if (this.renderer) 
 		{
-			
 			this.renderer.forceContextLoss();
 			this.renderer.context = null;
 
