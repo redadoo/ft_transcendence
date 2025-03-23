@@ -27,7 +27,9 @@ export default class ModelManager
     /**
      * Retrieves a loaded model by name.
      * @param {string} name - The name of the model to retrieve.
-     * @returns {Object|null} The loaded model or null if not found.
+     * @param {boolean} [isStatic=false] - Whether the model should be static (disables matrix auto-update).
+     * @returns {THREE.Group} The loaded model.
+     * @throws {Error} If the model is not found.
      */
     getModel(name, isStatic = false) 
 	{
@@ -44,22 +46,11 @@ export default class ModelManager
     }
 
     /**
-     * Creates a clone of a loaded model.
-     * @param {string} name - The name of the model to clone.
-     * @returns {Object|null} A clone of the model or null if not found.
-     */
-    getClone(name) 
-	{
-        const model = this.getModel(name);
-        return model ? model.scene.clone() : null;
-    }
-
-    /**
      * Loads multiple models asynchronously.
      * @param {Object} models - A dictionary where keys are file paths and values are model names.
      * @param {Function} [onProgress] - Optional callback for tracking loading progress.
      * @param {Function} [onCustomProcess] - Optional callback for custom processing of each loaded model.
-     * @returns {Promise<void[]>} Resolves when all models are loaded.
+     * @returns {Promise<void>} Resolves when all models are loaded.
      */
     loadModel(models, onProgress, onCustomProcess) 
 	{
@@ -152,7 +143,8 @@ export default class ModelManager
     }
 
     /**
-     * Unloads and disposes of all loaded models to free up memory.
+     * Unloads and disposes of all loaded models, freeing memory.
+     * Also resets the GLTF loader reference.
      */
     dispose() 
     {

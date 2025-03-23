@@ -144,9 +144,9 @@ export default class SceneManager
 		this.renderer.shadowMap.type = shadowMapType;
 		document.body.appendChild(this.renderer.domElement);
 
-		// This check is useful for some 42 PCs that have old drivers or in any 
-		// case do not have excellent performance and these all have in common 
-		// the fact of using vulkan
+		// This check is necessary for some 42 PCs that have old drivers 
+		// or otherwise do not have very good performance, 
+		// they all have in common the fact that they use vulkan
 		const gl = this.renderer.getContext();
 		const debugInfo = gl.getExtension('WEBGL_debug_renderer_info');
 		if (debugInfo)
