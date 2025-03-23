@@ -88,10 +88,14 @@ export default class Pong3D extends Game
 	 */
 	initScene(data)
 	{
+		
 		super.initScene(data);
 
-		this.ball.init(this.style);
-		this.sceneManager.scene.add(this.ball.mesh);
+		if (this.ball.mesh == null)
+		{
+			this.ball.init(this.style);
+			this.sceneManager.scene.add(this.ball.mesh);
+		}
 
 		const room = this.sceneManager.modelManager.getModel('Scene', true);
 
