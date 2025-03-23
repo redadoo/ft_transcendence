@@ -152,7 +152,7 @@ export default class Game
 			const player1Element = document.getElementById('player1');
 			const player2Element = document.getElementById('player2');
 
-			if (player1Element && player2Element)
+			if (player1Element && player2Element && data.players != undefined)
 			{
 				player1Element.textContent = data.players[this.pongPlayer.playerId].username || "Player 1";
 				player2Element.textContent = data.players[this.pongOpponent.playerId].username || "Player 2";
