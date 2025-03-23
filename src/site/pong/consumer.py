@@ -98,14 +98,10 @@ class PongMatchmaking(AsyncWebsocketConsumer):
 					}
 				)
 
-				self.matchmaking_queue = self.matchmaking_queue[2:]
+				self.matchmaking_queue.remove(player1)
+				self.matchmaking_queue.remove(player2)
 
-			else:
-				self.matchmaking_queue.append(player1)
-				self.matchmaking_queue.append(player2)
-				self.matchmaking_queue = self.matchmaking_queue[2:]
-
-			if elapsed_time > 30:
+			if elapsed_time > 60:
 				room_name = str(uuid.uuid4())
 				await self.channel_layer.send(
 					player1['channel_name'],
@@ -121,6 +117,9 @@ class PongMatchmaking(AsyncWebsocketConsumer):
 						"room_name": room_name,
 					}
 				)
+
+				self.matchmaking_queue.remove(player1)
+				self.matchmaking_queue.remove(player2)
 				break
 
 	async def send_match_found(self, event):
