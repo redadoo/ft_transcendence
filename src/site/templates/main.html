@@ -7,6 +7,29 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<title>Transcendence</title>
 
+	<!-- Meta Tags for SEO -->
+	<meta name="description" content="Transcendence is an immersive experience where users explore the world of [add brief content or theme of your website].">
+	<meta name="keywords" content="Transcendence, immersive experience, 3D, web app, interactive">
+	<meta name="author" content="galgarad">
+	<meta name="robots" content="index, follow">
+
+	<!-- Open Graph Tags for social media -->
+	<meta property="og:title" content="Transcendence">
+	<meta property="og:description" content="Explore ft_ranscendence a 42 project.">
+	<meta property="og:image" content="{% static 'site_static/media/img/42.png' %}">
+	<meta property="og:url" content="https://localhost:8080/">
+	<meta property="og:type" content="website">
+
+	<!-- Twitter Card Tags for Twitter sharing -->
+	<meta name="twitter:card" content="summary_large_image">
+	<meta name="twitter:title" content="Transcendence">
+	<meta name="twitter:description" content="Explore an immersive experience with Transcendence.">
+	<meta name="twitter:image" content="{% static 'site_static/media/img/42.png' %}">
+	<meta name="twitter:url" content="https://localhost:8080/">
+
+	<!-- Canonical URL -->
+	<link rel="canonical" href="https://localhost:8080/">
+
 	<!-- Favicon -->
 	<link rel="shortcut icon" type="image/png" href="{% static 'site_static/media/favicon.ico' %}">
 
@@ -23,8 +46,10 @@
 	<script type="importmap" nonce="{{ nonce }}">
 		{
 			"imports": {
-				"three": "https://cdn.jsdelivr.net/npm/three@latest/build/three.module.js",
-				"Background": "{% static 'pong_static/js/Scripts/Class/Background.js' %}"
+			  "three": "https://cdn.jsdelivr.net/npm/three@latest/build/three.module.js",
+			  "Stats": "https://cdn.jsdelivr.net/npm/three@latest/examples/jsm/libs/stats.module.js",
+			  "OrbitControls": "https://cdn.jsdelivr.net/npm/three@latest/examples/jsm/controls/OrbitControls.js",
+			  "GLTFLoader": "https://cdn.jsdelivr.net/npm/three@latest/examples/jsm/loaders/GLTFLoader.js"
 			}
 		}
 	</script>

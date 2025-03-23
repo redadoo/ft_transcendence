@@ -1,5 +1,5 @@
-import BaseInput from '../../../common_static/js/BaseInput.js';
 import Paddle from './Paddle.js';
+import BaseInput from '../../../common_static/js/BaseInput.js';
 
 /**
  * Represents a Pong player, handling input and paddle synchronization.
@@ -105,6 +105,10 @@ export default class PongPlayer {
 		}
 	}
 
+	/**
+	 * Deletes the paddle from the scene and cleans up the paddle object.
+	 * @param {Object} scene - The scene from which the paddle mesh will be removed.
+	 */
 	deletePaddle(scene) 
 	{
 		if (this.paddle) 

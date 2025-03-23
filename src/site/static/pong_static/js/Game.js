@@ -1,17 +1,20 @@
+import Ball from './utils/Ball.js';
 import router from '../../site_static/js/router.js';
 import SocketManager from '../../common_static/js/SocketManager.js';
 import TournamentPongMode from './utils/pongMode/TournamentPongMode.js';
 import MultiplayerPongMode from './utils/pongMode/MultiplayerPongMode.js';
 import SinglePlayerPongMode from './utils/pongMode/SinglePlayerPongMode.js';
 import PrivateLobbyPongMode from './utils/pongMode/PrivateLobbyPongMode.js';
-import Bounds from './utils/Bounds.js';
-import Ball from './utils/Ball.js';
 
-
+/**
+ * Represents the Pong game, managing game modes, player data, ball, score, and game state.
+ * Handles initialization, window events, game state updates, and cleanup.
+ * @class
+ */
 export default class Game
 {
-    constructor()
-    {
+	constructor()
+	{
 		this.ball = null;
 		this.bounds = null;
 		this.player_id = null;
@@ -20,17 +23,22 @@ export default class Game
 		this.lastCountValue = 6;
 		this.pongOpponent = null;
 		this.isClockVisible = false;
-        this.isSceneCreated = false; 
+		this.isSceneCreated = false; 
 		this.shouldCleanupOnExit = false;
 		this.close_window_event_unload = null;
 		this.close_window_event_popstate = null;
 		this.close_window_event_beforeunload = null;
 		this.lastScore = { player1: 0, player2: 0 };
 
-        this.manageWindowClose();
-    }
+		this.manageWindowClose();
+	}
 
-    handleExit(event)
+	/**
+	 * Handles the event of closing or navigating away from the game window.
+	 * Ensures that the game socket is closed properly before leaving.
+	 * @param {Event} event - The event triggered when attempting to leave the page.
+	 */
+	handleExit(event)
 	{
 		const leavePage = window.confirm("Do you want to leave?");
 		if (leavePage)
@@ -40,9 +48,9 @@ export default class Game
 	}
 
 	/**
-     * Handles the event of closing or navigating away from the game window.
-     * Ensures that the game socket is closed properly before leaving.
-     */
+	 * Handles the event of closing or navigating away from the game window.
+	 * Ensures that the game socket is closed properly before leaving.
+	 */
 	manageWindowClose()
 	{
 		history.pushState(null, document.title, location.href);
@@ -75,130 +83,129 @@ export default class Game
 		window.removeEventListener('popstate', this.close_window_event_popstate);
 	}
 
-    init(player_id)
-    {
-        router.removeEventListeners();
+   	/**
+	 * Initializes the game with the provided player ID and sets up the corresponding game mode.
+	 * @param {string} player_id - The unique identifier for the player.
+	 */
+	init(player_id)
+	{
+		router.removeEventListeners();
 		this.player_id = player_id;
 
-        switch (SocketManager.getModeFromPath())
-        {
-            case 'singleplayer':
-                this.mode = new SinglePlayerPongMode(this);
-                break;
-            case 'multiplayer':
-                this.mode = new MultiplayerPongMode(this);
-                break;
-            case 'lobby':
-                this.mode = new PrivateLobbyPongMode(this);
-                break;
-            case 'tournament':
-                this.mode = new TournamentPongMode(this);
-                break;
-            default:
-                console.error("Modalità di gioco non valida.");
-        }
-        
-        if (this.mode)
-            this.mode.init();
-    }
-
-    initScene(data)
-    {
-        if(this.isSceneCreated == false)
-        {
-            const bounds_data = data?.lobby_info?.bounds;
-            const ball_data = data?.lobby_info?.ball;
-            const scores_data = data?.lobby_info?.scores;
-
-            if (!bounds_data || !ball_data || !scores_data)
-            {
-                console.error("Game data is missing or incomplete:", { bounds_data, ball_data, scores_data });
-                return;
-            }
-
-            this.bounds = new Bounds(bounds_data.xMin, bounds_data.xMax, bounds_data.yMin, bounds_data.yMax);
-            this.ball = new Ball(ball_data.radius);
-            this.lastScore = scores_data;
-
-            this.isSceneCreated = true;
-        }
-    }
-
-    AddUserToLobby(newPlayer_id, playerData, socket)
-	{
-        throw new Error("Method 'AddUserToLobby()' must be implemented.");
+		switch (SocketManager.getModeFromPath())
+		{
+			case 'singleplayer':
+				this.mode = new SinglePlayerPongMode(this);
+				break;
+			case 'multiplayer':
+				this.mode = new MultiplayerPongMode(this);
+				break;
+			case 'lobby':
+				this.mode = new PrivateLobbyPongMode(this);
+				break;
+			case 'tournament':
+				this.mode = new TournamentPongMode(this);
+				break;
+			default:
+				console.error("Modalità di gioco non valida.");
+		}
+		
+		if (this.mode)
+			this.mode.init();
 	}
 
-    addPlayersToScene()
-    {
-        throw new Error("Method 'addPlayersToScene()' must be implemented.");
-    }
-
-    handleScoreSprites(score)
-    {
-        throw new Error("Method 'handleScoreSprites()' must be implemented.");
-    }
-
-    updateClockDisplay(data)
+	/**
+	 * Initializes the game scene with the provided data, creating the ball and setting up the score.
+	 * @param {Object} data - The data used to initialize the game scene (e.g., ball info and scores).
+	 */
+	initScene(data)
 	{
-        if (this.isClockVisible == false)
-        {
-            document.getElementById('pongCountDown').classList.remove('d-none');
-            this.isClockVisible = true;
-        }
+		if(this.isSceneCreated == false)
+		{
+			const ball_data = data?.lobby_info?.ball;
+			const scores_data = data?.lobby_info?.scores;
 
-        if(data.count_down < this.lastCountValue)
-        {
-            this.lastCountValue = data.count_down;
-            const clockText = document.getElementById('PongClockText');
+			if (!ball_data || !scores_data)
+			{
+				console.error("Game data is missing or incomplete:", {ball_data, scores_data });
+				return;
+			}
 
-            if (clockText)
-            {
-                clockText.textContent = this.lastCountValue;
-            }
+			this.ball = new Ball(ball_data.radius);
+			this.lastScore = scores_data;
 
-            if (data.count_down == 0)
-                document.getElementById('pongCountDown').classList.add('d-none');
-        }
+			this.isSceneCreated = true;
+		}
 	}
 
-    updateGameState(data)
-    {
-        try
-        {
-            this.updateClockDisplay(data);
+	/**
+	 * Updates the game clock display based on the count-down data received from the server.
+	 * @param {Object} data - The data containing the count-down value.
+	 */
+	updateClockDisplay(data)
+	{
+		if (this.isClockVisible == false)
+		{
+			document.getElementById('pongCountDown').classList.remove('d-none');
+			this.isClockVisible = true;
+		}
 
-            if (data.ball)
-                this.ball.updatePosition(data.ball);
+		if(data.count_down < this.lastCountValue)
+		{
+			this.lastCountValue = data.count_down;
+			const clockText = document.getElementById('PongClockText');
 
-            if (data.players)
-            {
-                if (data.players[this.pongPlayer.playerId] != undefined)
-                    this.pongPlayer.updatePosition(data.players[this.pongPlayer.playerId].y);
-                if (data.players[this.pongOpponent.playerId] != undefined)
-                    this.pongOpponent.updatePosition(data.players[this.pongOpponent.playerId].y);
-            }
+			if (clockText)
+			{
+				clockText.textContent = this.lastCountValue;
+			}
 
-            if(this.lastScore != data.scores)
-            {
-                this.lastScore = data.scores;
-                this.handleScoreSprites(this.lastScore);
-            }
-        }
-        catch (error) {
-            console.error("An error occurred during game update state:", error);
-            console.error("data:", data);
-        }
-    }
-    
-    animate()
-    {
-        throw new Error("Method 'animate()' must be implemented.");
-    }
+			if (data.count_down == 0)
+				document.getElementById('pongCountDown').classList.add('d-none');
+		}
+	}
 
-    game_ended(isGamefinished, pathToRedirect)
-    {
-        this.mode.dispose(isGamefinished, this.player_id);
+	/**
+	 * Updates the game state with new data, including ball position, player positions, and score.
+	 * @param {Object} data - The data containing the updated game state.
+	 */
+	updateGameState(data)
+	{
+		try
+		{
+			this.updateClockDisplay(data);
+
+			if (data.ball)
+				this.ball.updatePosition(data.ball);
+
+			if (data.players)
+			{
+				if (data.players[this.pongPlayer.playerId] != undefined)
+					this.pongPlayer.updatePosition(data.players[this.pongPlayer.playerId].y);
+				if (data.players[this.pongOpponent.playerId] != undefined)
+					this.pongOpponent.updatePosition(data.players[this.pongOpponent.playerId].y);
+			}
+
+			if(this.lastScore != data.scores)
+			{
+				this.lastScore = data.scores;
+				this.handleScoreSprites(this.lastScore);
+			}
+		}
+		catch (error) {
+			console.error("An error occurred during game update state:", error);
+			console.error("data:", data);
+		}
+	}
+
+	/**
+	 * Ends the game and cleans up resources, then redirects to a specified path.
+	 * @param {boolean} isGamefinished - Whether the game has finished.
+	 * @param {string} pathToRedirect - The path to redirect the player to after the game ends.
+	 */
+	game_ended(isGamefinished, pathToRedirect)
+	{
+		this.mode.dispose(isGamefinished, this.player_id);
 
 		document.getElementById('pongCountDown').classList.add('d-none');
 		router.setupEventListeners();
@@ -210,15 +217,55 @@ export default class Game
 		this.cleanupWindowClose();
 
 		router.navigateTo(pathToRedirect);
-    }
+	}
 
-    reset()
+	/**
+	 * Resets the game state, including resetting the ball and hiding the countdown.
+	 */
+	reset()
 	{
 		if (this.ball != null)
 			this.ball.updatePosition(0,0);
-        
-        document.getElementById('pongCountDown').classList.add('d-none');
-        this.lastCountValue = 6;
-        this.isClockVisible = false;
+		
+		document.getElementById('pongCountDown').classList.add('d-none');
+		this.lastCountValue = 6;
+		this.isClockVisible = false;
 	}
+
+	/**
+	 * Abstract method to animate the game. Must be implemented in subclasses.
+	 */
+	animate()
+	{
+		throw new Error("Method 'animate()' must be implemented.");
+	}
+
+	/**
+	 * Abstract method to add a user to the game lobby. Must be implemented in subclasses.
+	 * @param {string} newPlayer_id - The ID of the new player.
+	 * @param {Object} playerData - The data associated with the new player.
+	 * @param {Object} socket - The socket object associated with the new player.
+	 */
+	AddUserToLobby(newPlayer_id, playerData, socket)
+	{
+		throw new Error("Method 'AddUserToLobby()' must be implemented.");
+	}
+
+	/**
+	 * Abstract method to add players to the game scene. Must be implemented in subclasses.
+	 */
+	addPlayersToScene()
+	{
+		throw new Error("Method 'addPlayersToScene()' must be implemented.");
+	}
+
+   	/**
+	 * Abstract method to handle the display of score sprites. Must be implemented in subclasses.
+	 * @param {Object} score - The current game score to display.
+	 */
+	handleScoreSprites(score)
+	{
+		throw new Error("Method 'handleScoreSprites()' must be implemented.");
+	}
+
 }

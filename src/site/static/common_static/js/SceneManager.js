@@ -1,7 +1,10 @@
-import * as THREE from "https://cdn.jsdelivr.net/npm/three@latest/build/three.module.js";
-import { OrbitControls } from 'https://cdn.jsdelivr.net/npm/three@latest/examples/jsm/controls/OrbitControls.js';
-import Stats from 'https://cdn.jsdelivr.net/npm/three@latest/examples/jsm/libs/stats.module.js';
-import ModelManager from './ModelManager.js';
+import Stats from 'Stats';
+import * as THREE from 'three';
+import { OrbitControls } from 'OrbitControls';
+import ModelManager from "./ModelManager.js";
+
+// Your Three.js setup and usage code here
+
 
 /**
  * SceneManager is a class to manage a 3D scene using Three.js. It handles

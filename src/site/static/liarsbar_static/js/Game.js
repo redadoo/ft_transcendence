@@ -1,4 +1,4 @@
-import * as THREE from "https://cdn.jsdelivr.net/npm/three@latest/build/three.module.js";
+import * as THREE from 'three';
 import LiarsBarPlayer from './utils/LiarsBarPlayer.js';
 import SceneManager from '../../common_static/js/SceneManager.js';
 import SocketManager from '../../common_static/js/SocketManager.js';

@@ -1,7 +1,7 @@
-import SceneManager from '../../common_static/js/SceneManager.js';
-import * as THREE from "https://cdn.jsdelivr.net/npm/three@latest/build/three.module.js";
 import Game from './Game.js';
+import * as THREE from 'three';
 import PongPlayer from './utils/PongPlayer.js';
+import SceneManager from '../../common_static/js/SceneManager.js';
 
 /**
  * Camera configuration settings for the scene.
@@ -22,8 +22,21 @@ const CAMERA_SETTINGS = {
 	ROTATION_X: Math.PI / 6,
 };
 
+/**
+ * @class Pong3D
+ * @extends Game
+ * 
+ * This class handles the 3D logic for a Pong game using Three.js.
+ * It manages the initialization of the game scene, the camera setup, lighting, 
+ * player paddle rendering, and score rendering in 3D space. The game uses 
+ * 3D models, lights, and textures to create an immersive environment.
+ */
 export default class Pong3D extends Game
 {
+	/**
+	 * Creates an instance of the Pong3D class.
+	 * Initializes default properties.
+	 */
 	constructor()
 	{
 		super();
@@ -37,6 +50,12 @@ export default class Pong3D extends Game
 		this.screenLight = null;
 	}
 
+	/**
+	 * Initializes the 3D environment, camera, lighting, and scene.
+	 * Loads 3D models and sets the camera to the proper settings.
+	 * @param {string} player_id - The ID of the player.
+	 * @returns {Promise<void>} - A promise indicating the completion of initialization.
+	 */
 	async init(player_id)
 	{
 		
@@ -63,12 +82,20 @@ export default class Pong3D extends Game
 		super.init(player_id);
 	}
 
+	/**
+	 * Initializes the game scene with provided data.
+	 * @param {Object} data - The data used to initialize the game scene.
+	 */
 	initScene(data)
 	{
+		
 		super.initScene(data);
 
-		this.ball.init(this.style);
-		this.sceneManager.scene.add(this.ball.mesh);
+		if (this.ball.mesh == null)
+		{
+			this.ball.init(this.style);
+			this.sceneManager.scene.add(this.ball.mesh);
+		}
 
 		const room = this.sceneManager.modelManager.getModel('Scene', true);
 
@@ -80,6 +107,12 @@ export default class Pong3D extends Game
 		this.handleScoreSprites(this.lastScore);
 	}
 
+	/**
+	 * Adds a new player to the game lobby.
+	 * @param {string} newPlayer_id - The ID of the new player.
+	 * @param {Object} playerData - The data of the new player.
+	 * @param {Object} socket - The socket connection of the new player.
+	 */
 	AddUserToLobby(newPlayer_id, playerData, socket)
 	{
 		if (newPlayer_id == this.player_id && this.pongPlayer == null)
@@ -94,6 +127,9 @@ export default class Pong3D extends Game
 		}
 	}
 
+	/**
+	 * Adds players' paddles to the scene.
+	 */
 	addPlayersToScene()
 	{
 		if (this.pongPlayer != null)
@@ -102,6 +138,10 @@ export default class Pong3D extends Game
 			this.sceneManager.scene.add(this.pongOpponent.paddle.mesh);
 	}
 
+	/**
+	 * Handles the creation and updating of score sprites in the 3D scene.
+	 * @param {Object} scores - The current scores of both players.
+	 */
 	handleScoreSprites(scores) 
 	{
 		try 
@@ -140,6 +180,11 @@ export default class Pong3D extends Game
 		}
 	}
 
+	/**
+	 * Creates a 3D text sprite for the score display.
+	 * @param {string} text - The text to display on the sprite.
+	 * @returns {Promise<THREE.Sprite>} - The created sprite.
+	 */
 	createTextSprite(text) 
 	{
 		return new Promise((resolve, reject) => {
@@ -169,6 +214,11 @@ export default class Pong3D extends Game
 		});
 	}
 
+	/**
+	 * Updates the texture of a score sprite.
+	 * @param {THREE.Sprite} sprite - The sprite to update.
+	 * @param {string} text - The new text to display on the sprite.
+	 */
 	updateSpriteTexture(sprite, text)
 	{
 		if (!sprite || !sprite.material || !sprite.material.map) 
@@ -201,6 +251,13 @@ export default class Pong3D extends Game
 		} 
 	}
 
+	/**
+	 * Draws text on the canvas used for a sprite texture.
+	 * @param {CanvasRenderingContext2D} context - The 2D rendering context.
+	 * @param {HTMLCanvasElement} canvas - The canvas element.
+	 * @param {string} text - The text to draw.
+	 * @param {THREE.CanvasTexture} texture - The texture to update.
+	 */
 	drawTextOnCanvas(context, canvas, text, texture)
 	{
 		context.font = '150px "Press Start 2P"';
@@ -212,11 +269,18 @@ export default class Pong3D extends Game
 		texture.needsUpdate = true;
 	}
 
+	/**
+	 * Starts the animation loop for the game.
+	 * Continuously updates the scene and renders the frame.
+	 */
 	animate()
 	{
 		this.sceneManager.animate();
 	}
 
+	/**
+	 * Resets the game state and clears the 3D scene.
+	 */
 	reset()
 	{
 		super.reset();
@@ -240,6 +304,11 @@ export default class Pong3D extends Game
 		this.handleScoreSprites({"player1": 0, "player2": 0});
 	}
 
+	/**
+	 * Ends the game and performs any necessary cleanup.
+	 * @param {boolean} isGamefinished - Whether the game is finished or not.
+	 * @param {string} pathToRedirect - Path to redirect after the game ends.
+	 */
 	game_ended(isGamefinished, pathToRedirect)
 	{
 		super.game_ended(isGamefinished, pathToRedirect);
