@@ -22,7 +22,6 @@ class Ball:
 
 		angle = random.uniform(-math.pi / 4, math.pi / 4)
 		direction_x = random.choice([-1, 1])
-
 		speed_x = direction_x * math.cos(angle)
 		speed_y = math.sin(angle)
 		speed_magnitude = math.sqrt(speed_x**2 + speed_y**2)
@@ -43,7 +42,6 @@ class Ball:
 			direction_x = 1
 		else:
 			direction_x = -1
-
 		angle = random.uniform(-math.pi / 4, math.pi / 4)
 
 		speed_x = direction_x * math.cos(angle)
@@ -112,6 +110,8 @@ class Ball:
 			self.speed_y += offset * 0.15
 
 			self.speed_multiplier *= 1.05
+			if self.speed_multiplier > 2.5:
+				self.speed_multiplier = 2.5
 
 			speed_magnitude = math.sqrt(self.speed_x**2 + self.speed_y**2)
 			if speed_magnitude != 0:

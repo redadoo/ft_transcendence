@@ -28,6 +28,8 @@ class PongGameManager(GameManager):
 		self.start_match_timestamp = timezone.now()
 		self.time_start_match = time.time()
 		self.game_loop_is_active = True
+		self.ball.start()
+
 
 	async def clear_and_save(self, is_game_ended: bool, player_disconnected_id: int = None):
 		"""Saves the match results and updates players' match history."""
@@ -191,7 +193,6 @@ class PongGameManager(GameManager):
 
 	def reset(self):
 		self.players.clear()
-		self.ball.start()
 		self.scores = {"player1": 0, "player2": 0}
 		self.game_loop_is_active = False
 		self.is_countdown_finish = False
