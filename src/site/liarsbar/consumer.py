@@ -69,7 +69,7 @@ class LiarsBarConsumer(BaseConsumer):
 	
 		self.lobby: Lobby = match_manager.get_match(self.room_name) 
 		if self.lobby == None:
-			self.lobby = match_manager.create_match("liarsbar", self.room_name,  LiarsBarGameManager())
+			self.lobby = match_manager.create_match("liarsbar", self.room_name,  LiarsBarGameManager(), LOBBY_NAME)
 
 		await self.channel_layer.group_add(self.lobby.room_group_name, self.channel_name)
 		await self.accept()
