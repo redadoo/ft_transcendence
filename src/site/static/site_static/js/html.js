@@ -6,6 +6,7 @@ const html = {
 	home: `
 		<div class="main-container container-fluid mt-5 pt-3">
 			<div class="row h-100">
+			
 				<div class="col-2 px-0">
 					<nav class="nav-wrapper">
 						<div class="d-flex flex-column">

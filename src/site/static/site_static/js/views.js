@@ -26,6 +26,8 @@ async function instantiateGameClass(player_id)
 	}
     
     pongGame.animate();
+
+	return pongGame;
 }
 
 const views = {
@@ -312,10 +314,10 @@ const views = {
 		const player1Avatar = document.getElementById('player1Avatar');
 		const startButton = document.getElementById('startGame');
 
-		await instantiateGameClass(this.player_id);
+		const pongGame = await instantiateGameClass(this.player_id);
 
 		await new Promise(resolve => setTimeout(resolve, 1000));
-		console.log("room_name:", window.localStorage['room_name']);
+
 		lobbyCode.textContent = window.localStorage['room_name'];
 		api.getProfileInfo().then(data => {
 			player1Name.textContent = data.username;
@@ -446,7 +448,7 @@ const views = {
 	async tournamentScripts() {
 		const startButton = document.getElementById('startTournament');
 
-		await instantiateGameClass(this.player_id);
+		const pongGame = await instantiateGameClass(this.player_id);
 
 		startButton.addEventListener('click', () => {
 			pongGame.mode.sendStart();

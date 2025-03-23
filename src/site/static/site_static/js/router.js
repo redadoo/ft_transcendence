@@ -96,13 +96,16 @@ const router = {
 
 	handleBodyClick: function(e) {
 		const link = e.target.closest('[data-link]');
-		if (link) {
+		if (link) 
+		{
 			e.preventDefault();
 			const path = link.getAttribute('data-link');
+
 			console.log('Navigating to:', path);
-			if (path === '/friends-profile') {
+
+			if (path === '/friends-profile')
 				this.friendProfile = link.getAttribute('data-username');
-			}
+
 			this.navigateTo(path);
 		}
 	},
