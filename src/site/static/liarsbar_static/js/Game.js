@@ -176,6 +176,8 @@ export default class Game
 		);
 
 		this.players[this.player_id] = new LiarsBarPlayer(this.gameSocket, this.player_id);
+		this.sceneManager.render();
+		this.sceneManager.render();
 	}
 
 	/**
