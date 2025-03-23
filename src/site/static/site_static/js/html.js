@@ -852,11 +852,16 @@ const html = {
 									<button class="config-button" id="updateUsernameBtn">Update Username</button>
 								</div>
 							</div>
-							
+
 							<div class="config-section mb-5">
-								<h2 class="section-title">Change pong style</h2>
-								<div class="input-group">
-									<button class="config-button" id="changePongStyleBtn">Change pong style</button>
+								<h2 class="section-title">PONG STYLE</h2>
+								<div class="d-flex align-items-center">
+									<div class="custom-toggle mr-3">
+										<input type="checkbox" id="pongStyleToggle" class="toggle-checkbox">
+										<label for="pongStyleToggle" class="toggle-label"></label>
+									</div>
+									<span class="ml-3 pong-style-text">Classic Mode</span>
+									<span class="ml-3 pong-style-text-3d d-none">3D Mode</span>
 								</div>
 							</div>
 

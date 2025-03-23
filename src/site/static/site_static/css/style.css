@@ -2932,3 +2932,65 @@ canvas {
 	background: #000;
 	border: 2px solid #fff;
 }
+
+/* Custom toggle switch styling */
+.custom-toggle {
+	position: relative;
+	display: inline-block;
+	width: 60px;
+	height: 34px;
+}
+
+.toggle-checkbox {
+	opacity: 0;
+	width: 0;
+	height: 0;
+}
+
+.toggle-label {
+	position: absolute;
+	cursor: pointer;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	background-color: #2a2a2a;
+	transition: .4s;
+	border-radius: 34px;
+	border: 1px solid #404040;
+}
+
+.toggle-label:before {
+	position: absolute;
+	content: "";
+	height: 26px;
+	width: 26px;
+	left: 4px;
+	bottom: 3px;
+	background-color: #de4f5d;
+	transition: .4s;
+	border-radius: 50%;
+}
+
+.toggle-checkbox:checked + .toggle-label {
+	background-color: #1c263e;
+	border-color: #1d57d3;
+}
+
+.toggle-checkbox:checked + .toggle-label:before {
+	transform: translateX(26px);
+	background-color: #1d57d3;
+}
+
+.pong-style-text, .pong-style-text-3d {
+	font-family: "Press Start 2P";
+	font-size: 0.8rem;
+}
+
+.pong-style-text {
+	color: #de4f5d;
+}
+
+.pong-style-text-3d {
+	color: #1d57d3;
+}

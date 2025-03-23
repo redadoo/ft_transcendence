@@ -53,13 +53,36 @@ const setupConfigEventListeners = async () => {
 		});
 	}
 
-	const changePongStyleBtn = document.getElementById('changePongStyleBtn');
-	if (changePongStyleBtn) 
-	{
-		changePongStyleBtn.addEventListener('click', () => {
-			router.is2dPong = !router.is2dPong; 
+	const pongStyleToggle = document.getElementById('pongStyleToggle');
+	if (pongStyleToggle) {
+		pongStyleToggle.checked = !router.is2dPong;
+
+		const classicText = document.querySelector('.pong-style-text');
+		const modernText = document.querySelector('.pong-style-text-3d');
+
+		if (pongStyleToggle.checked) {
+			classicText.classList.add('d-none');
+			modernText.classList.remove('d-none');
+		} else {
+			classicText.classList.remove('d-none');
+			modernText.classList.add('d-none');
+		}
+
+		pongStyleToggle.addEventListener('change', function() {
+			if (this.checked) {
+				classicText.classList.add('d-none');
+				modernText.classList.remove('d-none');
+				router.is2dPong = false;
+			} else {
+				classicText.classList.remove('d-none');
+				modernText.classList.add('d-none');
+				router.is2dPong = true;
+			}
+
+			console.log('Pong style updated:', router.is2dPong ? '2D' : '3D');
 		});
 	}
+
 
 	const usernameBtn = document.getElementById('updateUsernameBtn');
 	if (usernameBtn) {
