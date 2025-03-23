@@ -154,8 +154,8 @@ export default class Game
 
 			if (player1Element && player2Element)
 			{
-				player1Element.textContent = this.pongPlayer.username || "Player 1";
-				player2Element.textContent = this.pongOpponent.username || "Player 2";
+				player1Element.textContent = data.players[this.pongPlayer.playerId].username || "Player 1";
+				player2Element.textContent = data.players[this.pongOpponent.playerId].username || "Player 2";
 			}
 		}
 
@@ -184,6 +184,7 @@ export default class Game
 		try
 		{
 			this.updateClockDisplay(data);
+
 			if (data.ball)
 				this.ball.updatePosition(data.ball);
 
@@ -203,7 +204,6 @@ export default class Game
 		}
 		catch (error) {
 			console.error("An error occurred during game update state:", error);
-			console.error("data:", data);
 		}
 	}
 
@@ -272,9 +272,6 @@ export default class Game
 	 * Abstract method to handle the display of score sprites. Must be implemented in subclasses.
 	 * @param {Object} score - The current game score to display.
 	 */
-	handleScoreSprites(score)
-	{
-		throw new Error("Method 'handleScoreSprites()' must be implemented.");
-	}
+	handleScoreSprites(score){}
 
 }

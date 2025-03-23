@@ -134,6 +134,7 @@ class Lobby:
 				"type": "lobby_state",
 				"event_name": "recover_player_data",
 			}
+		
 			await self.broadcast_message(data_to_send)
 
 		data_to_send = {

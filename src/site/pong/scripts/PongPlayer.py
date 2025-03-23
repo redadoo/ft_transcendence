@@ -21,6 +21,7 @@ class PongPlayer(Player):
 		self.paddle = Paddle(color,x)
 		self.isMovingUp = False
 		self.isMovingDown = False
+		self.username = None
 
 	async def get_username(self):
 		return await database_sync_to_async(
@@ -87,10 +88,13 @@ class PongPlayer(Player):
 		:return: A dictionary containing the player's state and attributes.
 		"""
 		base_dict = super().to_dict()
-		base_dict.update({"username": self.username})
 		base_dict.update(self.paddle.to_dict())
 		base_dict.update({
 			"isMovingUp": self.isMovingUp,
 			"isMovingDown": self.isMovingDown,
 		})
+
+		if self.username != None:
+			base_dict.update({"username": self.username})
+
 		return base_dict

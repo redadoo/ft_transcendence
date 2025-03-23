@@ -105,7 +105,7 @@ class PongMatchmaking(AsyncWebsocketConsumer):
 				self.matchmaking_queue.append(player2)
 				self.matchmaking_queue = self.matchmaking_queue[2:]
 
-			if elapsed_time > 60:
+			if elapsed_time > 30:
 				room_name = str(uuid.uuid4())
 				await self.channel_layer.send(
 					player1['channel_name'],
