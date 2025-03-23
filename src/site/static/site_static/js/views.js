@@ -190,7 +190,7 @@ const views = {
 	async liarsbarScripts() {
 		const liarsGame = new LiarsGame();
 		await liarsGame.init(this.player_id);
-		liarsGame.animate();
+		liarsGame.sceneManager.animate();
 	},
 
 	// Profile views
