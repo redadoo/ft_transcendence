@@ -80,7 +80,7 @@ class LiarsBarConsumer(BaseConsumer):
 
 	async def handle_event(self, data: dict):
 		if self.lobby:
-			await self.lobby.manage_event(data)
+			await self.lobby.manage_event(data, match_manager)
 
 	async def lobby_state(self, event: dict):
 		"""Aggiorna lo stato lato client."""
