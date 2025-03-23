@@ -314,6 +314,10 @@ const html = {
 					<div id="PongClockText" class="red"></div>
 				</div>
 			</div>
+			<div class="players-container">
+				<div class="player-text" id="player1">Player 1</div>
+				<div class="player-text" id="player2">Player 2</div>
+			</div>
 		</div>
 	`,
 

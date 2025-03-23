@@ -36,10 +36,16 @@ class PongAI():
 
 		if self.current_target is not None:
 			distance_to_target = self.current_target - self.paddle.y
-			move = min(abs(distance_to_target), self.paddle.speed)
-			self.paddle.y += move * (1 if distance_to_target > 0 else -1)
+			paddle_top = self.paddle.y + self.paddle.height / 2
+			paddle_bottom = self.paddle.y - self.paddle.height / 2
 
-			if abs(distance_to_target) <= self.paddle.speed:
+			if not (paddle_bottom <= self.current_target <= paddle_top):
+				if distance_to_target > 0:
+					self.paddle.y += self.paddle.speed 
+				elif distance_to_target < 0:
+					self.paddle.y -= self.paddle.speed
+
+			if paddle_bottom <= self.current_target <= paddle_top:
 				self.waiting = True
 				self.current_target = None
 				self.tracking_ball = False
