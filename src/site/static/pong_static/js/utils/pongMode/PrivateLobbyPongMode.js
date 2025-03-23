@@ -1,9 +1,15 @@
 import PongMode from './PongMode.js';
 import router from '../../../../site_static/js/router.js';
 
+/**
+ * Represents the private lobby mode for the Pong game, handling room creation, lobby setup, and socket communication.
+ * @class
+ * @extends PongMode
+ */
 export default class PrivateLobbyPongMode extends PongMode {
 	/**
 	 * Constructor for PrivateLobbyPongMode.
+	 * Initializes the private lobby mode and prepares the room name.
 	 * @param {Game} game - Reference to the main Game instance.
 	 */
 	constructor(game) 
@@ -13,7 +19,9 @@ export default class PrivateLobbyPongMode extends PongMode {
 	}
 
 	/**
-	 * Retrieves or generates a room name for the lobby.
+	 * Retrieves or generates a room name for the private lobby.
+	 * The room name is either fetched from local storage (for guest users) or generated randomly.
+	 * @returns {void}
 	 */
 	getRoomName() 
 	{
@@ -30,7 +38,8 @@ export default class PrivateLobbyPongMode extends PongMode {
 	}
 
 	/**
-	 * Initializes the private lobby mode.
+	 * Initializes the private lobby mode by fetching the room name and setting up the WebSocket connection.
+	 * @returns {void}
 	 */
 	init() 
 	{
@@ -45,22 +54,25 @@ export default class PrivateLobbyPongMode extends PongMode {
 	}
 
 	/**
-	 * Sends a start signal to the server to confirm lobby setup.
+	 * Sends a start signal to the server to confirm that the lobby setup is complete and the client is ready.
+	 * @returns {void}
 	 */
 	sendStart() 
 	{
 		this.socket.send(JSON.stringify({ 
 			type: 'client_ready',
 			player_id: this.game.player_id
-		 }));
+		}));
 	}
 
 	/**
-	 * Configures the lobby based on the received server data.
-	 * @param {Object} data - The data received from the WebSocket.
+	 * Configures the lobby based on the data received from the server.
+	 * This includes initializing the game scene, managing player setup, and handling game start events.
+	 * @param {Object} data - The data received from the WebSocket containing event and lobby information.
+	 * @returns {void}
 	 */
 	setUpLobby(data) 
-  	{
+	{
 		this.game.initScene(data);
 		  
 		const { event_info, lobby_info } = data;

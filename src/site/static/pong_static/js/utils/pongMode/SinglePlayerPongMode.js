@@ -1,8 +1,18 @@
 import PongMode from './PongMode.js';
 import PongPlayer from '../../utils/PongPlayer.js';
 
+/**
+ * Represents the single player mode for the Pong game, including support for playing against a bot.
+ * @class
+ * @extends PongMode
+ */
 export default class SinglePlayerPongMode extends PongMode {
     
+    /**
+     * Constructor for SinglePlayerPongMode.
+     * Initializes the game mode, including whether the player is facing a bot or not.
+     * @param {Game} game - Reference to the main Game instance.
+     */
     constructor(game) {
 		super(game);
 
@@ -14,6 +24,7 @@ export default class SinglePlayerPongMode extends PongMode {
 
 	/**
 	 * Handles the opening of a socket connection and sends an initialization message for the player.
+	 * This sends the player's ID and the mode (whether it's versus bot or not) to the server.
 	 */
 	onSocketOpen() 
 	{
@@ -25,7 +36,8 @@ export default class SinglePlayerPongMode extends PongMode {
 	}
 
 	/**
-	 * Initializes the single player mode.
+	 * Initializes the single player mode by setting up the WebSocket connection.
+	 * This method is called when the mode is initialized.
 	 */
 	init() 
 	{
@@ -38,8 +50,8 @@ export default class SinglePlayerPongMode extends PongMode {
 	}
 
 	/**
-	 * Handles incoming socket messages.
-	 * @param {Object} data - The incoming data from the socket.
+	 * Handles incoming socket messages by processing the data and updating the game state accordingly.
+	 * @param {Object} parsedData - The data received from the socket, which includes lobby and event information.
 	 */
 	handleSocketMessage(parsedData) 
 	{
@@ -73,8 +85,10 @@ export default class SinglePlayerPongMode extends PongMode {
 	}
 
 	/**
-	 * Configures the lobby based on the received server data.
-	 * @param {Object} data - The data received from the WebSocket.
+	 * Configures the lobby based on the received server data for the "vs bot" mode.
+	 * Sets up the game scene, initializes player objects, and sends a ready signal to the server.
+	 * @param {Object} data - The data received from the WebSocket containing lobby and player information.
+	 * @returns {void}
 	 */
 	CustomsetUpLobby(data)
 	{

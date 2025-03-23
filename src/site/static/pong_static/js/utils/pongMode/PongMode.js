@@ -2,6 +2,7 @@ import SocketManager from '../../../../common_static/js/SocketManager.js';
 
 /**
  * Represents the base class for Pong game modes, handling socket communication and game state updates.
+ * This class manages the connection to the server, sending and receiving messages, and updating the game state accordingly.
  * @class
  */
 export default class PongMode {
@@ -27,6 +28,11 @@ export default class PongMode {
 		throw new Error("Method 'init()' must be implemented.");
 	}
 
+	/**
+	 * Disposes of the game mode by sending a quit message and closing the socket.
+	 * @param {boolean} isGamefinished - Whether the game has finished or was unexpectedly quit.
+	 * @param {number} player_id - The unique identifier of the player quitting.
+	 */
 	dispose(isGamefinished, player_id)
 	{
 		let event_name = isGamefinished === true ? "quit_game" : "unexpected_quit";
@@ -53,7 +59,8 @@ export default class PongMode {
 	}
 
 	/**
-	 * Handles
+	 * Handles the closure of the socket connection.
+	 * Alerts the player that the server is temporarily down and ends the game.
 	 */
 	onSocketClose() 
 	{
@@ -66,7 +73,8 @@ export default class PongMode {
 
 	/**
 	 * Handles incoming socket messages.
-	 * @param {Object} data - The incoming data from the socket.
+	 * Updates the game state or performs actions based on the server's response.
+	 * @param {Object} parsedData - The incoming data from the socket.
 	 */
 	handleSocketMessage(parsedData) 
 	{
@@ -98,7 +106,8 @@ export default class PongMode {
 
 	/**
 	 * Configures the lobby based on the received server data.
-	 * @param {Object} data - The data received from the WebSocket.
+	 * Initializes the scene and notifies the server if both players are ready.
+	 * @param {Object} data - The data received from the WebSocket containing lobby info and event info.
 	 */
 	setUpLobby(data)
 	{
@@ -115,6 +124,10 @@ export default class PongMode {
 			this.managePlayerSetup(data);
 	}
 
+	/**
+	 * Manages the player setup by adding users to the lobby based on the received event data.
+	 * @param {Object} data - The data received from the WebSocket containing event info and player data.
+	 */
 	managePlayerSetup(data)
 	{
 		if (data.event_info.event_name === "recover_player_data")
@@ -125,7 +138,7 @@ export default class PongMode {
 			{
 				if (this.game.pongPlayer != null && this.game.pongPlayer.playerId == parseInt(key))
 					continue;
-				this.game.AddUserToLobby(key,value, this.socket);
+				this.game.AddUserToLobby(key, value, this.socket);
 			}
 		}
 
@@ -137,11 +150,19 @@ export default class PongMode {
 		}
 	}
 
+	/**
+	 * Handles the scenario where a slow connection is detected.
+	 * @param {number} ping - The ping value (latency) in milliseconds.
+	 */
 	handleSlowConnection(ping) 
 	{
 		console.warn(`High ping detected: ${ping} ms. Disabling player actions.`);
 	}
 
+	/**
+	 * Handles the scenario where the connection returns to normal.
+	 * @param {number} ping - The ping value (latency) in milliseconds.
+	 */
 	handleNormalConnection(ping) 
 	{
 		console.log(`Ping back to normal: ${ping} ms. Enabling player actions.`);

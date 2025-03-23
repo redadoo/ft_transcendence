@@ -1,4 +1,4 @@
-import { GLTFLoader } from "https://cdn.jsdelivr.net/npm/three@latest/examples/jsm/loaders/GLTFLoader.js";
+import { GLTFLoader } from 'GLTFLoader';
 
 /**
  * Manages the loading, retrieval, and unloading of 3D models using a GLTF loader.

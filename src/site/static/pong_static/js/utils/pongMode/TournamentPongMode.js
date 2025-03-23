@@ -1,8 +1,17 @@
 import PongMode from './PongMode.js';
 import router from '../../../../site_static/js/router.js';
 
+/**
+ * Represents the tournament mode for the Pong game, where players compete in a series of matches.
+ * @class
+ * @extends PongMode
+ */
 export default class TournamentPongMode extends PongMode {
 
+    /**
+     * Constructor for TournamentPongMode.
+     * @param {Game} game - Reference to the main Game instance.
+     */
     constructor(game) {
 		super(game);
 		this.room_name = null;
@@ -11,6 +20,8 @@ export default class TournamentPongMode extends PongMode {
 
 	/**
 	 * Retrieves or generates a room name for the lobby.
+	 * If the player is in a guest mode, it retrieves the room name from localStorage.
+	 * Otherwise, it generates a new UUID and stores it in localStorage.
 	 */
 	getRoomName()
 	{
@@ -27,7 +38,7 @@ export default class TournamentPongMode extends PongMode {
 	}
 
 	/**
-	 * Initializes the private lobby mode.
+	 * Initializes the private lobby mode by setting up the WebSocket connection and preparing the game.
 	 */
 	init()
 	{
@@ -43,16 +54,20 @@ export default class TournamentPongMode extends PongMode {
 	}
 
 	/**
-	 * Sends a start signal to the server to confirm lobby setup.
+	 * Sends a start signal to the server to confirm the lobby setup and start the tournament.
 	 */
 	sendStart()
 	{
 		this.socket.send(JSON.stringify({
 			type: 'host_start_tournament',
 			player_id: this.game.player_id
-		 }));
+		}));
 	}
 
+	/**
+	 * Handles incoming socket messages and updates the game state accordingly.
+	 * @param {Object} parsedData - The data received from the WebSocket, containing lobby and event information.
+	 */
 	handleSocketMessage(parsedData)
 	{
 		const {lobby_info, event_info } = parsedData;
@@ -81,6 +96,11 @@ export default class TournamentPongMode extends PongMode {
 		}
 	}
 
+	/**
+	 * Sets up the lobby based on the incoming data for the tournament mode.
+	 * This includes adding players to the lobby and displaying the game scene.
+	 * @param {Object} data - The data received from the WebSocket, containing lobby and event information.
+	 */
 	setUpLobby(data)
   	{
 		this.game.initScene(data);
@@ -102,6 +122,11 @@ export default class TournamentPongMode extends PongMode {
 		}
 	}
 
+	/**
+	 * Manages the match state once the tournament is in progress.
+	 * Updates the game state or navigates to the match page based on the event received.
+	 * @param {Object} data - The data received from the WebSocket, containing event and lobby information.
+	 */
 	manageMatch(data)
 	{
 		if (this.isPlaying == true)
@@ -116,6 +141,10 @@ export default class TournamentPongMode extends PongMode {
 		}
 	}
 
+	/**
+	 * Manages the end of the match and processes the outcome.
+	 * @param {Object} data - The data received from the WebSocket, containing event and lobby information.
+	 */
 	manageEndMatch(data)
 	{
 		const { event_info, lobby_info } = data;
