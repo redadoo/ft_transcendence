@@ -89,7 +89,7 @@ class PongGameManager(GameManager):
 
 		self.game_loop_is_active = False
 
-	def add_player(self, players_id: int, is_bot: bool):
+	async def add_player(self, players_id: int, is_bot: bool):
 		"""
 		Initialize player with unique IDs and assign them to the game.
 
@@ -114,6 +114,8 @@ class PongGameManager(GameManager):
 				x=pos_x,
 				color=constants.PADDLE_COLOR,
 			)
+
+			await self.players[players_id].setup()
 
 	def update_player(self, data: dict):
 		"""

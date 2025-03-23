@@ -10,5 +10,4 @@ urlpatterns = [
     path('api/pong/player_control', PongPlayerControlView.as_view()),
     path('api/pong/last_match', LastPongMatchView.as_view()),
     path('api/pong/last_tournament', LastPongTournamentMatchView.as_view()),
-
 ]

@@ -16,6 +16,7 @@ export default class PongPlayer {
 	constructor(socket, playerId, data, isSecondPlayer = false, style = "2D") {
 		this.BaseBotId = '-1';
 
+		this.username = data.username;
 		this.playerId = parseInt(playerId);
 		this.socket = socket;
 

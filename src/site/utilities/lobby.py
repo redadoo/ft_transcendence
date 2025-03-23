@@ -126,7 +126,7 @@ class Lobby:
 		if not player_id:
 			raise ValueError("Invalid data: 'player_id' is required.")
 
-		self.game_manager.add_player(player_id, is_bot)
+		await self.game_manager.add_player(player_id, is_bot)
 
 		# If more than one player is present, instruct the new player to recover existing players' data
 		if len(self.game_manager.players) > 1:

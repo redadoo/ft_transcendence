@@ -1,6 +1,8 @@
+from website.models import User
 from pong.scripts import constants
 from utilities.Player import Player
 from pong.scripts.Paddle import Paddle
+from channels.db import database_sync_to_async
 
 class PongPlayer(Player):
 	"""
@@ -19,6 +21,14 @@ class PongPlayer(Player):
 		self.paddle = Paddle(color,x)
 		self.isMovingUp = False
 		self.isMovingDown = False
+
+	async def get_username(self):
+		return await database_sync_to_async(
+			lambda: User.objects.values_list("username", flat=True).get(id=self.player_id)
+		)()
+
+	async def setup(self):
+		self.username = await self.get_username()
 
 	def player_loop(self):
 		"""
@@ -84,6 +94,7 @@ class PongPlayer(Player):
 		:return: A dictionary containing the player's state and attributes.
 		"""
 		base_dict = super().to_dict()
+		base_dict.update({"username": self.username})
 		base_dict.update(self.paddle.to_dict())
 		base_dict.update({
 			"isMovingUp": self.isMovingUp,

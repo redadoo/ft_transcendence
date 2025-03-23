@@ -138,8 +138,8 @@ class Tournament():
 		match = current_round_matches.pop(0)
 		self.game_manager.reset()
 		self.game_loop_task = None
-		self.game_manager.add_player(match[0], False)
-		self.game_manager.add_player(match[1], False)
+		await self.game_manager.add_player(match[0], False)
+		await self.game_manager.add_player(match[1], False)
 		self.tournament_status = self.TournamentStatus.TO_SETUP
 
 		snapshot = self.to_dict()
