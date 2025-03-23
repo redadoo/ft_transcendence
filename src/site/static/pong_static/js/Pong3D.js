@@ -84,12 +84,12 @@ export default class Pong3D extends Game
 	{
 		if (newPlayer_id == this.player_id && this.pongPlayer == null)
 		{
-			this.pongPlayer = new PongPlayer(socket, this.player_id, playerData, this.style);
+			this.pongPlayer = new PongPlayer(socket, this.player_id, playerData,false, this.style);
 			this.sceneManager.scene.add(this.pongPlayer.paddle.mesh);
 		}
 		else if (this.pongOpponent == null)
 		{
-			this.pongOpponent = new PongPlayer(null, newPlayer_id, playerData, this.style);
+			this.pongOpponent = new PongPlayer(null, newPlayer_id, playerData,false, this.style);
 			this.sceneManager.scene.add(this.pongOpponent.paddle.mesh);
 		}
 	}
