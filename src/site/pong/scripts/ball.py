@@ -11,8 +11,8 @@ class Ball:
 		self.radius = constants.BALL_RADIUS
 		self.speed_x = constants.BALL_SPEED_X
 		self.speed_y = constants.BALL_SPEED_Y
-		self.bounds = constants.GAME_BOUNDS  # Limiti del campo di gioco
-		self.speed_multiplier = 1.0  # Fattore di incremento della velocità
+		self.bounds = constants.GAME_BOUNDS 
+		self.speed_multiplier = 1.0
 		
 	def start(self):
 		"""Imposta la palla al centro dello schermo con una direzione casuale."""
@@ -20,19 +20,16 @@ class Ball:
 		self.y = (self.bounds["yMin"] + self.bounds["yMax"]) / 2
 		self.speed_multiplier = 1.0
 
-		# Genera un angolo casuale tra -pi/4 e pi/4 (da -45° a 45°)
 		angle = random.uniform(-math.pi / 4, math.pi / 4)
-		direction_x = random.choice([-1, 1])  # -1 = sinistra, 1 = destra
+		direction_x = random.choice([-1, 1])
 
 		speed_x = direction_x * math.cos(angle)
 		speed_y = math.sin(angle)
-		# Normalizzazione del vettore
 		speed_magnitude = math.sqrt(speed_x**2 + speed_y**2)
 		if speed_magnitude != 0:
 			speed_x /= speed_magnitude
 			speed_y /= speed_magnitude
 
-		# Applica la velocità
 		self.speed_x = constants.BALL_SPEED_X * speed_x
 		self.speed_y = constants.BALL_SPEED_Y * speed_y
 
@@ -42,18 +39,16 @@ class Ball:
 		self.y = (self.bounds["yMin"] + self.bounds["yMax"]) / 2
 		self.speed_multiplier = 1.0
 
-		# Se `player1` ha segnato, manda la palla verso `player2`, e viceversa
 		if scored_player == "player1":
-			direction_x = 1  # Verso destra
+			direction_x = 1
 		else:
-			direction_x = -1  # Verso sinistra
+			direction_x = -1
 
 		angle = random.uniform(-math.pi / 4, math.pi / 4)
 
 		speed_x = direction_x * math.cos(angle)
 		speed_y = math.sin(angle)
 
-		# Normalizzazione
 		speed_magnitude = math.sqrt(speed_x**2 + speed_y**2)
 		if speed_magnitude != 0:
 			speed_x /= speed_magnitude
@@ -67,7 +62,6 @@ class Ball:
 		self.x += self.speed_x * self.speed_multiplier
 		self.y += self.speed_y * self.speed_multiplier
 
-		# Controlla i rimbalzi contro i muri superiori e inferiori
 		if self.y + self.radius > self.bounds["yMax"]:
 			self.y = self.bounds["yMax"] - self.radius
 			self.speed_y *= -1
@@ -91,43 +85,34 @@ class Ball:
 		paddle_width = paddle.width
 		paddle_height = paddle.height
 
-		# Calcola i bordi della paddle
 		paddle_left = paddle_x - paddle_width / 2
 		paddle_right = paddle_x + paddle_width / 2
 		paddle_top = paddle_y - paddle_height / 2
 		paddle_bottom = paddle_y + paddle_height / 2
 
-		# Trova il punto più vicino della paddle alla palla
 		closest_x = max(paddle_left, min(self.x, paddle_right))
 		closest_y = max(paddle_top, min(self.y, paddle_bottom))
 
-		# Calcola la distanza tra il centro della palla e il punto più vicino della paddle
 		distance_x = self.x - closest_x
 		distance_y = self.y - closest_y
 		distance = math.sqrt(distance_x**2 + distance_y**2)
 
-		# Se la distanza tra il centro della palla e il punto più vicino della paddle è minore o uguale al raggio, c'è una collisione
 		if distance <= self.radius:
-			# Correggi la posizione della palla per evitare l'interpenetrazione
 			penetration = self.radius - distance
 			if distance != 0:
 				self.x += distance_x / distance * penetration
 				self.y += distance_y / distance * penetration
 
-			# Inverti la direzione della velocità in base alla direzione della collisione
 			if closest_x == paddle_left or closest_x == paddle_right:
-				self.speed_x *= -1  # Collisione laterale
+				self.speed_x *= -1
 			if closest_y == paddle_top or closest_y == paddle_bottom:
-				self.speed_y *= -1  # Collisione verticale
+				self.speed_y *= -1
 
-			# Aggiusta la velocità verticale in base alla posizione d'impatto
 			offset = (self.y - paddle_y) / (paddle_height / 2)
 			self.speed_y += offset * 0.15
 
-			# Incrementa il moltiplicatore di velocità
 			self.speed_multiplier *= 1.05
 
-			# Normalizza la velocità
 			speed_magnitude = math.sqrt(self.speed_x**2 + self.speed_y**2)
 			if speed_magnitude != 0:
 				self.speed_x = (self.speed_x / speed_magnitude) * constants.BALL_SPEED_X

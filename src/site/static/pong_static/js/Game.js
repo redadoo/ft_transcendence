@@ -148,6 +148,15 @@ export default class Game
 		{
 			document.getElementById('pongCountDown').classList.remove('d-none');
 			this.isClockVisible = true;
+
+			const player1Element = document.getElementById('player1');
+			const player2Element = document.getElementById('player2');
+
+			if (player1Element && player2Element)
+			{
+				player1Element.textContent = this.pongPlayer.username || "Player 1";
+				player2Element.textContent = this.pongOpponent.username || "Player 2";
+			}
 		}
 
 		if(data.count_down < this.lastCountValue)
@@ -165,6 +174,7 @@ export default class Game
 		}
 	}
 
+
 	/**
 	 * Updates the game state with new data, including ball position, player positions, and score.
 	 * @param {Object} data - The data containing the updated game state.
@@ -174,7 +184,6 @@ export default class Game
 		try
 		{
 			this.updateClockDisplay(data);
-
 			if (data.ball)
 				this.ball.updatePosition(data.ball);
 

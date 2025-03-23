@@ -35,23 +35,16 @@ class PongPlayer(Player):
 		Updates the player's position based on the current movement state.
 		Ensures the paddle remains within the game bounds.
 		"""
-		if self.can_move("up"):
+  
+		min_y_reachable = constants.GAME_BOUNDS["yMin"] + self.paddle.height / 2
+		max_y_reachable = constants.GAME_BOUNDS["yMax"] - self.paddle.height / 2
+		if self.isMovingUp:
 			self.paddle.y += self.paddle.speed
-		if self.can_move("down"):
+
+		if self.isMovingDown:
 			self.paddle.y -= self.paddle.speed
+		self.paddle.y = max(min_y_reachable, min(max_y_reachable, self.paddle.y))
 
-	def can_move(self, direction: str) -> bool:
-		"""
-		Checks if the paddle can move in a given direction within bounds.
-
-		:param direction: Direction to check ("up" or "down").
-		:return: True if movement is possible; otherwise, False.
-		"""
-		if direction == "up":
-			return self.isMovingUp and self.paddle.y + self.paddle.speed + self.paddle.height / 2 < constants.GAME_BOUNDS["yMax"]
-		elif direction == "down":
-			return self.isMovingDown and self.paddle.y - self.paddle.speed - self.paddle.height / 2 > constants.GAME_BOUNDS["yMin"]
-		return False
 
 	def update_player_data(self, data: dict):
 		"""

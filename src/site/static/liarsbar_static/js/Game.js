@@ -183,10 +183,8 @@ export default class Game
 	 */
 	initLights() 
 	{
-		// Luce ambientale blu scuro (notturna)
 		this.ambientLight = new THREE.AmbientLight(0x0d1b2a, 0.8);
 
-		// Luce lunare (PointLight azzurra)
 		this.moonLight = new THREE.PointLight(0xADD8E6, 5, 10); 
 		this.moonLight.position.set(2, 3, -1);
 		this.moonLight.castShadow = true;
@@ -200,7 +198,6 @@ export default class Game
 		this.sceneManager.scene.add(this.moonLight);
 		this.sceneManager.scene.add(moonLightHelper);
 
-		// Aggiunta della luce ambientale
 		this.sceneManager.scene.add(this.ambientLight);
 		//-----------------------------------------heavy graphics-------------------------
 		/* this.ambientLight = new THREE.AmbientLight(0xb0e0e6, 1.1);
@@ -302,12 +299,6 @@ export default class Game
 		this.sceneManager.scene.add(slimegun.scene);
 		this.sceneManager.scene.add(bo3.scene);
 		this.sceneManager.scene.add(bo4.scene);
-
-		const axesHelper = new THREE.AxesHelper(500); // La dimensione determina la lunghezza degli assi
-		this.sceneManager.scene.add(axesHelper);
-		const gridHelper = new THREE.GridHelper(10000, 10); // (Dimensione, Divisioni)
-		this.sceneManager.scene.add(gridHelper);
-
 	
 	}
 
@@ -327,7 +318,6 @@ export default class Game
 			}
 		}
 
-		// Se la lobby è completa, avviamo il gioco
 		if (this.playersOrder.length === 4) 
 		{
 			this.gameSocket.send(JSON.stringify({ type: 'client_ready' }));
@@ -344,15 +334,12 @@ export default class Game
 	AddUserToLobby(data) {
 		const joinedPlayerId = data.event_info.player_id;
 		
-		// Se il player non è già nell'array di ordine, lo aggiungiamo
 		if (!this.playersOrder.includes(joinedPlayerId)) 
 			this.playersOrder.push(joinedPlayerId);
 
-		// Creiamo il nuovo giocatore
 		if (this.player_id != joinedPlayerId)
 			this.players[joinedPlayerId] = new LiarsBarPlayer(null, joinedPlayerId);
 	
-		// Se la lobby è completa, avviamo il gioco
 		if (this.playersOrder.length === 4) 
 		{
 			this.gameSocket.send(JSON.stringify({ type: 'client_ready' }));
@@ -363,7 +350,6 @@ export default class Game
 	}
 
 	setCameraForPlayer(data) {
-		// Trova l'indice del giocatore locale (quello con player_id)
 		const playerIndex = this.playersOrder.indexOf(this.player_id);
 		console.log(playerIndex);
 		if (playerIndex === -1) {
@@ -377,7 +363,6 @@ export default class Game
 				new THREE.Vector3(2.5, 1.7, 0.5), //Magikarp
 			];
 		
-			// Definiamo i target per ciascun giocatore (4 target distinti)
 			const targets = [
 				new THREE.Vector3(0, 0, 0),      // rimuru
 				new THREE.Vector3(0, 0, 0), // kuriboh
@@ -399,25 +384,19 @@ export default class Game
 			new THREE.Vector3(358, 80, 744),    //slimegun
 			new THREE.Vector3(108, 100, 1040),    //king boh
 		]; */
-		// Prendi la posizione della camera e il target in base all'indice del giocatore
 		const cameraPos = cameraPositions[playerIndex];
 		const target = targets[playerIndex];
 	
-		// Calcoliamo la direzione verso il target
 		const direction = target.clone().sub(cameraPos).normalize();  // Cambia la direzione verso il target specificato
 	
-		// Creiamo un quaternion per la rotazione della camera affinché guardi al target
 		const cameraRot = new THREE.Quaternion().setFromUnitVectors(new THREE.Vector3(0, 0, 1), direction);
 	
-		// Disabilita temporaneamente i controlli orbitali se sono attivi
 		if (this.sceneManager.controls) {
 			this.sceneManager.controls.enabled = false;
 		}
 	
-		// Impostiamo la camera nella scena
 		this.sceneManager.setCameraState(cameraPos, cameraRot, target);
 	
-		// Riabilita i controlli orbitali
 		if (this.sceneManager.controls) {
 			this.sceneManager.controls.enabled = true;
 		}
@@ -441,7 +420,6 @@ export default class Game
 	 */
 	updatePlayers(data) 
 	{
-		// Verifica che i dati contengano informazioni sui giocatori
 		if (!data) 
 		{
 			console.error('1Dati non validi o mancanti per aggiornare i giocatori.');
@@ -458,18 +436,14 @@ export default class Game
 			return;
 		}
 
-		// Converti l'oggetto players in un array
 		const playersArray = Object.values(data.lobby_info.players);
 
-		// Itera sui giocatori nei dati ricevuti
 		playersArray.forEach(playerData => 
 		{
 			const playerId = playerData.player_id;
 			
-			// Verifica se il giocatore esiste già
 			if (this.players && this.players[playerId]) 
 			{
-				// Aggiorna lo stato del giocatore esistente
 				this.players[playerId].updateState(data.lobby_info);
 			} 
 			else 
@@ -495,13 +469,10 @@ export default class Game
 		if (clockContainer && clockText) {
 			clockText.textContent = timeLeft;
 	
-			// Controlla se mancano 5 secondi o meno
 			if (timeLeft <= 5) {
-				// Aggiungi la classe per far pulsare il contenitore e cambiare il colore del testo
 				clockContainer.classList.add('pulsatered');
 				clockText.classList.add('red');
 			} else {
-				// Rimuovi le classi se il tempo è superiore a 5 secondi
 				clockContainer.classList.remove('pulsatered');
 				clockText.classList.remove('red');
 			}
@@ -536,14 +507,12 @@ export default class Game
 			{
 				this.lastRequiredCard = lobbyInfo.card_required;
 				
-				// Aggiorna il testo della sezione TABLE'S CARD
 				const tableCardText = document.getElementById("tableCardText");
 				if (tableCardText) 
 				{
 					tableCardText.innerHTML = `TABLE'S CARD: <span class="card-name">${lobbyInfo.card_required}</span>`;
 				}
 	
-				// Aggiorna l'immagine della carta se disponibile
 				const tableCardImage = document.getElementById("tableCardImage");
 				if (tableCardImage) 
 				{

@@ -31,38 +31,38 @@ class PongAI():
 		
 		current_time = asyncio.get_event_loop().time()
 		
-		# Calculate the Y-axis limits reachable by the paddle
 		min_y_reachable = constants.GAME_BOUNDS["yMin"] + self.paddle.height / 2
 		max_y_reachable = constants.GAME_BOUNDS["yMax"] - self.paddle.height / 2
 
-		# Move towards the current target (if set)
 		if self.current_target is not None:
 			distance_to_target = self.current_target - self.paddle.y
-			move = min(abs(distance_to_target), self.paddle.speed)
-			self.paddle.y += move * (1 if distance_to_target > 0 else -1)
+			paddle_top = self.paddle.y + self.paddle.height / 2
+			paddle_bottom = self.paddle.y - self.paddle.height / 2
 
-			if abs(distance_to_target) <= self.paddle.speed:
+			if not (paddle_bottom <= self.current_target <= paddle_top):
+				if distance_to_target > 0:
+					self.paddle.y += self.paddle.speed 
+				elif distance_to_target < 0:
+					self.paddle.y -= self.paddle.speed
+
+			if paddle_bottom <= self.current_target <= paddle_top:
 				self.waiting = True
 				self.current_target = None
 				self.tracking_ball = False
 				self.returning_to_center = False
 
-		# Wait for decision delay before recalculating target
 		if current_time - self.last_decision_time < self.decision_delay:
 			return
 
 		self.last_decision_time = current_time
 
-		# Ensure the paddle stays within bounds
 		self.paddle.y = max(min_y_reachable, min(max_y_reachable, self.paddle.y))
 
-		# Reset the waiting state when necessary
 		if self.ball.speed_x > 0 and self.waiting and not self.tracking_ball:
 			self.waiting = False
 		elif self.ball.speed_x < 0 and self.waiting and not self.returning_to_center:
 			self.waiting = False
 
-		# Determine new target position based on ball's position and direction
 		if not self.waiting:
 			if self.ball.speed_x > 0 and not self.tracking_ball:
 				self.tracking_ball = True
@@ -72,43 +72,34 @@ class PongAI():
 				self.returning_to_center = True
 
 			if self.tracking_ball and self.current_target is None:
-				# Calcola il tempo per raggiungere la racchetta
 				time_to_reach_paddle = abs((self.paddle.x - self.ball.x) / (self.ball.speed_x * self.ball.speed_multiplier))
 				
-				# Usa una copia di speed_y per la simulazione
 				simulated_speed_y = self.ball.speed_y
 				predicted_y = self.ball.y
 				remaining_time = time_to_reach_paddle
 
 				while remaining_time > 0:
-					# Calcola la distanza verticale che la palla può percorrere prima del prossimo rimbalzo
 					if simulated_speed_y > 0:
 						distance_to_next_bounce = constants.GAME_BOUNDS["yMax"] - predicted_y
 					else:
 						distance_to_next_bounce = predicted_y - constants.GAME_BOUNDS["yMin"]
 
-					# Calcola il tempo necessario per raggiungere il prossimo rimbalzo
 					time_to_next_bounce = distance_to_next_bounce / abs(simulated_speed_y * self.ball.speed_multiplier)
 
 					if time_to_next_bounce > remaining_time:
-						# Se non c'è abbastanza tempo per un rimbalzo, aggiorna la posizione e interrompi
 						predicted_y += simulated_speed_y * remaining_time * self.ball.speed_multiplier
 						break
 					else:
-						# Altrimenti, aggiorna la posizione e il tempo rimanente
 						predicted_y += simulated_speed_y * time_to_next_bounce * self.ball.speed_multiplier
 						remaining_time -= time_to_next_bounce
 
-						# Inverte la direzione verticale della palla (simula il rimbalzo)
-						simulated_speed_y *= -1  # Usa la copia, non self.ball.speed_y
+						simulated_speed_y *= -1
 
-				# Imposta il target della racchetta
 				self.current_target = max(min_y_reachable, min(max_y_reachable, predicted_y))
 
 			elif self.returning_to_center and self.current_target is None:
-				# Calculate the center position of the paddle
 				center_target = (constants.GAME_BOUNDS["yMax"] + constants.GAME_BOUNDS["yMin"]) / 2
-				offset = random.uniform(-2, 2) # Add some randomness to the center
+				offset = random.uniform(-2, 2)
 				self.current_target = max(min_y_reachable, min(max_y_reachable, center_target + offset))
 
 	def to_dict(self) -> dict:

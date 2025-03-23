@@ -2223,6 +2223,38 @@ label {
 	height: 120px;
 }
 
+/* Contenitore dei testi dei giocatori */
+.players-container {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    width: 90%;
+    transform: translate(-50%, -50%);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+/* Testi dei giocatori */
+.player-text {
+	font-family: 'PRESS START 2P', sans-serif;
+	font-weight: bold;
+    font-size: 3vw; /* Scalabile con lo schermo */
+    font-weight: bold;
+    color: rgb(255, 233, 36);
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+#player1 {
+    position: absolute;
+    left: 10%;
+}
+
+#player2 {
+    position: absolute;
+    right: 10%;
+}
+
 #verticalIcons {
 	position: fixed;
 	top: 9vh; /* Posizione dall'alto relativa all'altezza dello schermo */

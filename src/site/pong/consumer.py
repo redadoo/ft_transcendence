@@ -191,7 +191,6 @@ class PongLobbyConsumer(BaseConsumer):
 		self.user_id = self.user.id
 		self.room_name = self.scope["url_route"]["kwargs"].get("room_name")
 
-		# If no room_name is provided, generate one and notify via the social channel(for manage lobby invite).
 		if self.room_name is None:
 			self.room_name = str(uuid.uuid4())
 			await self.send_to_social({

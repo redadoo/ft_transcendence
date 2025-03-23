@@ -91,28 +91,21 @@ class PongMatch(models.Model):
 
 		The loser will never gain MMR, and the minimum loss will be capped at -1.
 		"""
-		# Base values
 		mmr_base_lose = -20
 		mmr_base_gain_per_second = 1 / 10
 
-		# Validate that both start_date and end_date are set
 		if not self.start_date or not self.end_date:
 			raise ValueError("Both start_date and end_date must be set for MMR calculation.")
 		
-		# Calculate the match duration in seconds
 		duration_seconds = (self.end_date - self.start_date).total_seconds()
 
-		# Calculate MMR gain for the winner based on match duration
 		winner_mmr_gain = duration_seconds * mmr_base_gain_per_second
 
-		# Calculate MMR loss for the loser, including a base penalty
 		loser_mmr_gain = mmr_base_lose + winner_mmr_gain
 
-		# Ensure the MMR loss for the loser doesn't fall below -1
 		if loser_mmr_gain > -1:
 			loser_mmr_gain = -1
 
-		# Assign the MMR gain/loss based on the winner
 		if self.first_user.username == self.get_winner():
 			self.first_user_mmr_gain = winner_mmr_gain
 			self.second_user_mmr_gain = loser_mmr_gain
