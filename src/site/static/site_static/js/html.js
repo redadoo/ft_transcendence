@@ -852,6 +852,13 @@ const html = {
 									<button class="config-button" id="updateUsernameBtn">Update Username</button>
 								</div>
 							</div>
+							
+							<div class="config-section mb-5">
+								<h2 class="section-title">Change pong style</h2>
+								<div class="input-group">
+									<button class="config-button" id="changePongStyleBtn">Change pong style</button>
+								</div>
+							</div>
 
 							<div class="config-section mb-5">
 								<h2 class="section-title">EMAIL</h2>
@@ -1359,6 +1366,15 @@ const html = {
 		</div>
 		</div>
 	`,
+
+	pongJs:
+	`
+		<!-- Center content using Bootstrap container and flex utilities -->
+		<div class="container vh-100 d-flex flex-column justify-content-center align-items-center">
+			<h1 class="text-white mb-4">Pong Game</h1>
+			<canvas id="gameCanvas" width="800" height="600"></canvas>
+		</div>
+	`
 };
 
 

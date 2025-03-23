@@ -1,5 +1,4 @@
 import SocketManager from '../../../../common_static/js/SocketManager.js';
-import router from '../../../../site_static/js/router.js';
 
 /**
  * Represents the base class for Pong game modes, handling socket communication and game state updates.
@@ -103,7 +102,7 @@ export default class PongMode {
 	 */
 	setUpLobby(data)
 	{
-		this.game.initGameEnvironment(data);
+		this.game.initScene(data);
 
 		if (this.game.pongOpponent != null && this.game.pongPlayer != null)
 		{

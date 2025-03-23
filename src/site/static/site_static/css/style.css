@@ -2927,3 +2927,8 @@ label {
 	font-size: 0.8rem;
 	}
 }
+
+canvas {
+	background: #000;
+	border: 2px solid #fff;
+}

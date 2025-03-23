@@ -53,6 +53,14 @@ const setupConfigEventListeners = async () => {
 		});
 	}
 
+	const changePongStyleBtn = document.getElementById('changePongStyleBtn');
+	if (changePongStyleBtn) 
+	{
+		changePongStyleBtn.addEventListener('click', () => {
+			router.is2dPong = !router.is2dPong; 
+		});
+	}
+
 	const usernameBtn = document.getElementById('updateUsernameBtn');
 	if (usernameBtn) {
 		usernameBtn.addEventListener('click', async () => {

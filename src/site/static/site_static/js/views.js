@@ -3,10 +3,30 @@ import html from './html.js';
 import matchHistory from './matchHistory.js';
 import router from './router.js';
 import setupConfigEventListeners from './Config.js';
-import PongGame from '../../pong_static/js/Game.js';
+import Pong2D from '../../pong_static/js/Pong2D.js';
+import Pong3D from '../../pong_static/js/Pong3D.js';
+
 import LiarsGame from '../../liarsbar_static/js/Game.js';
 import dateFormatter from './dateFormatter.js';
 import './Tournament.js';
+
+async function instantiateGameClass(player_id)
+{
+	let pongGame;
+
+    if (router.is2dPong)
+	{
+		pongGame = new Pong2D();
+		pongGame.init(player_id);
+	}   
+    else
+	{
+        pongGame = new Pong3D();
+		await pongGame.init(player_id);
+	}
+    
+    pongGame.animate();
+}
 
 const views = {
 	// Auth views
@@ -151,30 +171,24 @@ const views = {
 	},
 
 	async pongScripts() {
-		const pongGame = new PongGame();
-		await pongGame.init(this.player_id);
-		pongGame.sceneManager.animate();
+		await instantiateGameClass(this.player_id);
 	},
 
 	async singleplayerPongScripts() {
 	},
 
 	async singleplayerPongVsBotScripts() {
-		const pongGame = new PongGame();
-		await pongGame.init(this.player_id);
-		pongGame.sceneManager.animate();
+		await instantiateGameClass(this.player_id);
 	},
 
 	async singleplayerPongSameKeyboardScripts() {
-		const pongGame = new PongGame();
-		await pongGame.init(this.player_id);
-		pongGame.sceneManager.animate();
+		await instantiateGameClass(this.player_id);
 	},
 
 	async liarsbarScripts() {
 		const liarsGame = new LiarsGame();
 		await liarsGame.init(this.player_id);
-		liarsGame.sceneManager.animate();
+		liarsGame.animate();
 	},
 
 	// Profile views
@@ -298,9 +312,7 @@ const views = {
 		const player1Avatar = document.getElementById('player1Avatar');
 		const startButton = document.getElementById('startGame');
 
-		const pongGame = new PongGame();
-		await pongGame.init(this.player_id);
-		pongGame.sceneManager.animate();
+		await instantiateGameClass(this.player_id);
 
 		await new Promise(resolve => setTimeout(resolve, 1000));
 		console.log("room_name:", window.localStorage['room_name']);
@@ -345,9 +357,7 @@ const views = {
 			player1Avatar.src = data.image_url.avatar_url;
 		});
 
-		const pongGame = new PongGame();
-		await pongGame.init(this.player_id);
-		pongGame.sceneManager.animate();
+		await instantiateGameClass(this.player_id);
 	},
 
 	async matchResult() {
@@ -436,9 +446,7 @@ const views = {
 	async tournamentScripts() {
 		const startButton = document.getElementById('startTournament');
 
-		const pongGame = new PongGame();
-		await pongGame.init(this.player_id);
-		pongGame.sceneManager.animate();
+		await instantiateGameClass(this.player_id);
 
 		startButton.addEventListener('click', () => {
 			pongGame.mode.sendStart();
@@ -451,9 +459,7 @@ const views = {
 	},
 
 	async tournamentGuestScripts() {
-		const pongGame = new PongGame();
-		await pongGame.init(this.player_id);
-		pongGame.sceneManager.animate();
+		await instantiateGameClass(this.player_id);
 	},
 
 	async tournamentPlaying() {

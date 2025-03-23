@@ -4,24 +4,43 @@ export default class Ball
 {
 	/**
 	 * Creates a new Ball instance.
-	 * 
+	 *
 	 * @constructor
 	 * @param {number} [radius=1] - The radius of the ball.
+	 * @param {string} [style='2D'] - The rendering style: '2D', '2.5D', or '3D'.
 	 */
-	constructor(radius = 1, is3D = false) 
+	constructor(radius = 1) {
+		this.radius = radius;
+		this.position = { x: 0, y: 0 };
+		this.mesh = null;
+	}
+
+	init(style)
 	{
-		this.is3D = is3D;
-		this.newPosition = new THREE.Vector3(0, 0, 0);
-		if (this.is3D) {
-            const geometry = new THREE.IcosahedronGeometry(radius, 1);
-            const material = new THREE.MeshBasicMaterial({ color: 'white' });
-            this.mesh = new THREE.Mesh(geometry, material);
-        } else {
-            const geometry = new THREE.PlaneGeometry(radius * 2, radius * 2);
-            const material = new THREE.MeshBasicMaterial({ color: 'white', side: THREE.DoubleSide });
-            this.mesh = new THREE.Mesh(geometry, material);
-        }
-		this.mesh.position.set(0, 0, 0);
+		this.style = style.toUpperCase();
+
+		switch (this.style) 
+		{
+			case '3D':
+			  this.geometry = new THREE.IcosahedronGeometry(this.radius, 1);
+			  this.material = new THREE.MeshBasicMaterial({ color: 'white' });
+			  this.mesh = new THREE.Mesh(this.geometry, this.material);
+			  this.mesh.position.set(0, 0, 0);
+			  break;
+			case '2.5D':
+			  this.geometry = new THREE.PlaneGeometry(this.radius * 2, this.radius * 2);
+			  this.material = new THREE.MeshBasicMaterial({ color: 'white', side: THREE.DoubleSide });
+			  this.mesh = new THREE.Mesh(this.geometry, this.material);
+			  this.mesh.position.set(0, 0, 0);
+			  break;
+			case '2D':
+				let newX = (this.position.x + 20) * 20;
+				let newY = 600 - ((this.position.y + 15) * 20);
+				this.position = { x: newX, y: newY};
+				break;
+			default:
+			  console.warn("Unhandled style:", this.style);
+		}
 	}
 
 	/**
@@ -31,19 +50,24 @@ export default class Ball
 	 */
 	updatePosition(newPos) 
 	{
-		this.newPosition.set(newPos.x, newPos.y, 0);
+		if (this.style === '2D')
+		{
+			let x = (newPos.x + 20) * 20;
+			let y = 600 - ((newPos.y + 15) * 20);
+			this.position = { x: x, y: y };
+		}
+		else
+			this.position = { x: newPos.x, y: newPos.y};
+		
+		if (this.mesh)
+			this.mesh.position.set(newPos.x, newPos.y, 0);
 	}
 
-	/**
-	 * Syncs the ball's mesh position with the updated coordinates.
-	 */
-	syncPosition() 
+	render2D(ctx) 
 	{
-		this.mesh.position.copy(this.newPosition);
-	}
-
-	setPosition(x, y) 
-	{
-		this.mesh.position.set(x, y, 0);
+		ctx.fillStyle = "#fff";
+		ctx.beginPath();
+		ctx.arc(this.position.x, this.position.y, this.radius * 20, 0, Math.PI * 2);
+		ctx.fill();
 	}
 }

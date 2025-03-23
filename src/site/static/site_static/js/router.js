@@ -44,14 +44,15 @@ const router = {
 		document.getElementById('statusOverlay').innerHTML = html.statusOverlay;
 		document.getElementById('pongOverlay').innerHTML = html.pongOverlay;
 		document.getElementById('pongCountDown').innerHTML = html.pongCountDown;
+		document.getElementById('pongJs').innerHTML = html.pongJs;
 		document.getElementById('liarsbarOverlay').innerHTML = html.liarsbarOverlay;
 		document.getElementById('header').innerHTML = html.header;
 
 		this.tournament = new Tournament();
 		this.overlay = new overlayManager();
-
 		this.onPopState = this.handleLocation.bind(this);
 		this.onBodyClick = this.handleBodyClick.bind(this);
+		this.is2dPong = false;
 
 		this.setupEventListeners();
 

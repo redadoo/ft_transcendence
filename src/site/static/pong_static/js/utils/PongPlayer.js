@@ -13,16 +13,28 @@ export default class PongPlayer {
 	 * @param {number} playerId - The unique identifier for the player.
 	 * @param {Object} data - The initial data for the player (including paddle attributes).
 	 */
-	constructor(socket, playerId, data, isSecondPlayer = false) {
+	constructor(socket, playerId, data, isSecondPlayer = false, style = "2D") {
 		this.BaseBotId = '-1';
 
 		this.playerId = parseInt(playerId);
 		this.socket = socket;
-		this.paddle = new Paddle(data.width, data.height, data.depth, data.color);
+
+		this.paddle = new Paddle(data.width, data.height, data.depth, data.color, style);
 		this.input = null;
 		this.newY = data.y;
-		this.paddle.mesh.position.y = data.y;
-		this.paddle.mesh.position.x = data.x;
+
+		this.style = style;
+
+		if (this.style == "2D")
+		{
+			this.paddle.position.x = (data.x + 20) * 20;
+			this.paddle.position.y = (data.y + 15) * 20;
+		}
+		else
+		{
+			this.paddle.mesh.position.y = data.y;
+			this.paddle.mesh.position.x = data.x;
+		}
 
 		this.setUpKeys(isSecondPlayer);
 	}
@@ -33,23 +45,10 @@ export default class PongPlayer {
 	 */
 	updatePosition(newY) 
 	{
-		if (this.newY != newY)
-			this.newY = newY;
-	}
-
-	/**
-	 * Synchronizes the paddle's position to match the updated y-position.
-	 */
-	syncPosition() 
-	{
-		if (this.newY != this.paddle.mesh.position.y)
-			this.paddle.mesh.position.y = this.newY;
-	}
-
-	setPosition(y) 
-	{
-		if (this.paddle.mesh.position.y != y)
-			this.paddle.mesh.position.y = y;
+		if (this.style === "2D")
+			this.paddle.position.y = 600 - ((newY + 15) * 20);
+		else
+			this.paddle.mesh.position.y = newY;
 	}
 
 	/**
