@@ -154,8 +154,11 @@ export default class Game
 
 			if (player1Element && player2Element && data.players != undefined)
 			{
-				player1Element.textContent = data.players[this.pongPlayer.playerId].username || "Player 1";
-				player2Element.textContent = data.players[this.pongOpponent.playerId].username || "Player 2";
+				if (data.players[this.pongOpponent.playerId] != undefined && data.players[this.pongPlayer.playerId] != undefined)
+				{
+					player1Element.textContent = data.players[this.pongPlayer.playerId].username || "Player 1";
+					player2Element.textContent = data.players[this.pongOpponent.playerId].username || "Player 2";
+				}
 			}
 		}
 
