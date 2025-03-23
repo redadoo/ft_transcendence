@@ -122,7 +122,7 @@ class UserStats(models.Model):
 	)
 
 	exp = models.PositiveIntegerField(default=0, validators=[MinValueValidator(0)])
-	mmr = models.PositiveIntegerField(default=100, validators=[MinValueValidator(0)])
+	mmr = models.PositiveIntegerField(default=100)
 	win = models.PositiveIntegerField(default=0, validators=[MinValueValidator(0)])
 	lose = models.PositiveIntegerField(default=0, validators=[MinValueValidator(0)])
 	current_winstreak = models.PositiveIntegerField(default=0, validators=[MinValueValidator(0)])
