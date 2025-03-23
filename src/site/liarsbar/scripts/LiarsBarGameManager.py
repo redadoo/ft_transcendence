@@ -55,7 +55,7 @@ class LiarsBarGameManager(GameManager):
 		self.turn_assigned = False
 		return deck
 
-	def add_player(self, players_id: int, is_bot: bool):
+	async def add_player(self, players_id: int, is_bot: bool):
 		"""
 		Adds a new player to the game using their unique ID.
 
