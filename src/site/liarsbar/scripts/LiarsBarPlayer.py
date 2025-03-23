@@ -95,47 +95,37 @@ class LiarsBarPlayer(Player):
 			if key not in {"KeyA", "KeyD", "KeyE", "Enter", "Space"}:
 				raise ValueError(f"Invalid key: {key}. Expected 'Enter', 'KeyA', 'KeyD', 'KeyE', or 'Space'.")
 
-			print("key")
 			if event_type == "key_down":
 				if key in self.keys_pressed:
-					# Tasto già premuto, ignorare l'azione.
 					return
-				self.keys_pressed.add(key)  # Registra il tasto come premuto.
+				self.keys_pressed.add(key)
 
-				# Esegui azione solo al primo evento di pressione.
 				if key == "KeyD":
 					if self.card_selection_index == len(self.hand) - 1:
 						self.card_selection_index = 0
 					else:
 						self.card_selection_index += 1
-					print(self.card_selection_index)
 				elif key == "KeyA":
 					if self.card_selection_index == 0:
 						self.card_selection_index = len(self.hand) - 1
 					else:
 						self.card_selection_index -= 1
-					print(self.card_selection_index)
 				elif key == "KeyE":
 					if self.player_turn:
 						
 						index = self.card_selection_index
 						if index in self.selected_index:
 							self.selected_index.remove(index)
-							print(f"Index {index} removed. Current indices: {self.selected_index}")
 						else:
 							self.selected_index.append(index)
-							print(f"Index {index} added. Current indices: {self.selected_index}")
 				elif key == "Enter":
 					if self.player_turn and not self.card_sent and self.selected_index:
 						self.card_selection_index = 0
-						print("premuto enter e passato controllo")
 						self.selected_cards.clear()
-						# Ordina gli indici in ordine decrescente per evitare problemi di rimozione
 						for index in sorted(self.selected_index, reverse=True):
-							if 0 <= index < len(self.hand):  # Controlla che l'indice sia valido
+							if 0 <= index < len(self.hand):
 								self.selected_cards.append(self.hand.pop(index))
 
-						# Svuota la lista degli indici selezionati dopo aver rimosso le carte
 							self.selected_index.clear()
 						self.card_sent = True
 				elif key == "Space":
