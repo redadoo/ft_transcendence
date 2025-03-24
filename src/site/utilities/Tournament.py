@@ -54,10 +54,10 @@ class Tournament():
 				self.game_manager.update_player(data)
 			case "waiting_next_match":
 				await self.tournament_start()
-			case "unexpected_quit":
-				await self.quit(data, match_manager)
-			case "quit_game":
-				await self.quit(data, match_manager)
+			# case "unexpected_quit":
+			# 	await self.quit(data, match_manager)
+			# case "quit_game":
+			# 	await self.quit(data, match_manager)
 			case _:
 				print(f"Unhandled event type: {event_type}. Full data: {data}")
 
