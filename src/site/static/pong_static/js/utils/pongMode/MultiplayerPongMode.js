@@ -38,7 +38,7 @@ export default class MultiplayerPongMode extends PongMode
 	 */
 	setupGameSocket(data)
 	{
-		Sound.play('startGameSound');
+		// Sound.play('startGameSound');
 
 		this.socket.initGameWebSocket(
 			'pong',

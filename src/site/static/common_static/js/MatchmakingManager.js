@@ -33,9 +33,12 @@ export default class MatchmakingManager
      */
 	onSocketClose()
 	{
-		this.gameSocket.send(JSON.stringify({
-			action: 'close_matchmaking' 
-		}));
+		if (this.gameSocket != null)
+		{
+			this.gameSocket.send(JSON.stringify({
+				action: 'close_matchmaking' 
+			}));	
+		}
 	}
 
    	/**
@@ -44,7 +47,7 @@ export default class MatchmakingManager
      */
 	onClick()
 	{
-		Sound.play("matchmakingSound");
+		// Sound.play("matchmakingSound");
 		this.matchmakingButton.innerText = "SEARCHING...";
 		this.matchmakingButton.disabled = true;
 		this.matchmakingStatus.innerText = "Looking for an opponent...";
@@ -133,6 +136,7 @@ export default class MatchmakingManager
 	{
 		if (this.gameSocket) 
 		{
+			this.onSocketClose();
 			this.gameSocket.close();
 			this.gameSocket = null;
 		}

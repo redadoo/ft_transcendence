@@ -50,6 +50,7 @@ const views = {
 		this.player_id = data.id;
 		['profileBtn', 'notificationBtn'].forEach(id => document.getElementById(id).classList.remove('d-none'));
 		document.getElementById('headerUsername').textContent = data.username;
+		window.localStorage['username'] = data.username;
 		document.getElementById('headerLevel').textContent = "LV." + data.stat.level;
 		document.getElementById('headerProfileImage').src = data.image_url.avatar_url;
 		return html.home;
@@ -64,7 +65,6 @@ const views = {
 			e.preventDefault();
 			const res = await api.login(document.getElementById('username').value, document.getElementById('password').value);
 			if (res.success === 'true') {
-				window.localStorage['username'] = document.getElementById('username').value;
 				router.navigateTo('/');
 			}
 			else {

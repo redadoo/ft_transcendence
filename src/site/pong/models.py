@@ -98,11 +98,10 @@ class PongMatch(models.Model):
 			raise ValueError("Both start_date and end_date must be set for MMR calculation.")
 		
 		duration_seconds = (self.end_date - self.start_date).total_seconds()
-
 		winner_mmr_gain = duration_seconds * mmr_base_gain_per_second
+		winner_mmr_gain = round(winner_mmr_gain, 0)
 
 		loser_mmr_gain = mmr_base_lose + winner_mmr_gain
-
 		if loser_mmr_gain > -1:
 			loser_mmr_gain = -1
 

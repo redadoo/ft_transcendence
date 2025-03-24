@@ -97,13 +97,16 @@ export default class Pong3D extends Game
 			this.sceneManager.scene.add(this.ball.mesh);
 		}
 
-		const room = this.sceneManager.modelManager.getModel('Scene', true);
+		if (!this.sceneManager.is42BadPc)
+		{
+			const room = this.sceneManager.modelManager.getModel('Scene', true);
+	
+			room.scene.scale.set(10, 10, 10);
+			room.scene.position.set(800, -134, 191);
+			room.scene.rotation.y = -Math.PI / 2;
+			this.sceneManager.scene.add(room.scene);
+		}
 
-		room.scene.scale.set(10, 10, 10);
-		room.scene.position.set(800, -134, 191);
-		room.scene.rotation.y = -Math.PI / 2;
-
-		this.sceneManager.scene.add(room.scene);
 		this.handleScoreSprites(this.lastScore);
 	}
 
@@ -117,6 +120,10 @@ export default class Pong3D extends Game
 	{
 		if (newPlayer_id == this.player_id && this.pongPlayer == null)
 		{
+			if (this.pongOpponent == null)
+			{
+				this.isOpponentFirst = true;
+			}
 			this.pongPlayer = new PongPlayer(socket, this.player_id, playerData,false, this.style);
 			this.sceneManager.scene.add(this.pongPlayer.paddle.mesh);
 		}
@@ -125,6 +132,9 @@ export default class Pong3D extends Game
 			this.pongOpponent = new PongPlayer(null, newPlayer_id, playerData,false, this.style);
 			this.sceneManager.scene.add(this.pongOpponent.paddle.mesh);
 		}
+
+		console.log("this.isOpponentFirst", this.isOpponentFirst);
+
 	}
 
 	/**

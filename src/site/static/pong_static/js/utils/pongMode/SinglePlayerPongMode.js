@@ -99,9 +99,17 @@ export default class SinglePlayerPongMode extends PongMode {
 			const playerData = Object.values(data.lobby_info.players)[0];
 			const secondPlayerData = Object.values(data.lobby_info.players)[1];
 
+			if (this.game.pongOpponent == null)
+			{
+				this.game.isOpponentFirst = true;
+			}
+			
 			this.game.pongPlayer = new PongPlayer(this.socket, this.game.player_id, playerData, false, this.game.style);
 			this.game.pongOpponent = new PongPlayer(this.socket, -1, secondPlayerData, true, this.game.style);
 			
+			console.log("this.isOpponentFirst", this.game.isOpponentFirst);
+
+
 			this.game.addPlayersToScene();
 
 			this.socket.send(JSON.stringify({ 

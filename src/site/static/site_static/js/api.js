@@ -107,7 +107,7 @@ const api = {
 				body: formData
 			});
 		} catch (error) {
-			console.error('Password change error:', error);
+			console.error('image change error:', error);
 			return false;
 		}
 	},

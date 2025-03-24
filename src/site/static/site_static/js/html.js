@@ -347,7 +347,7 @@ const html = {
 		<div id="tableCardOverlay">
         	<span id="tableCardText">TABLE'S CARD</span>
         	<div id="tableCardContainer">
-            	<img id="tableCardImage" src="/media/img/michele.jpg" alt="Table Card">
+            	<img id="tableCardImage" src="/media/png/timer.png" alt="Table Card">
         	</div>
     	</div>
 		<div id="centralText" class="central-text">CARDS SENT</div>

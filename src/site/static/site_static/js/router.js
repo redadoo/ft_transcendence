@@ -113,7 +113,7 @@ const router = {
 
 	navigateTo: async function(url, isFirst=true) {
 
-		Sound.play('navigationSound');
+		// Sound.play('navigationSound');
 		if (window.location.pathname !== url)
 			history.pushState(null, null, url);
 		else

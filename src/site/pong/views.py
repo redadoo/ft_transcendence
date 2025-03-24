@@ -32,31 +32,39 @@ class PongCheckLobby(APIView):
 				status=status.HTTP_400_BAD_REQUEST
 			)
 
+		print(f" room to find {room_name}")
+		print(f" all  matchs {match_manager.matches}")
+
 		match = match_manager.get_match(room_name)
 		if not match:
 			print(f" sadas das dsa {match_manager.matches}")
 			return Response({"success": "false"}, status=status.HTTP_404_NOT_FOUND)
 
-		if not match.game_manager.players:
-			return Response(
-				{"success": "false", "error": "No players in the lobby."},
-				status=status.HTTP_404_NOT_FOUND
-			)
+		print(" qua noooo")
 
-		host_id = next(iter(match.game_manager.players.keys()))
+		# if not match.game_manager.players:
+			# print(" diiooodooo")
+			# return Response(
+				# {"success": "false", "error": "No players in the lobby."},
+				# status=status.HTTP_404_NOT_FOUND
+			# )
+		
+		print(" qua vaaaaa")
+		
+		# host_id = next(iter(match.game_manager.players.keys()))
 
-		try:
-			host_username = User.objects.values_list('username', flat=True).get(id=host_id)
-		except User.DoesNotExist:
-			return Response(
-				{"success": "false", "error": "Host not found."},
-				status=status.HTTP_404_NOT_FOUND
-			)
-		except Exception as e:
-			return Response({"server_error": f"{str(e)}"}, status=503)
+		# try:
+		# 	host_username = User.objects.values_list('username', flat=True).get(id=host_id)
+		# except User.DoesNotExist:
+		# 	return Response(
+		# 		{"success": "false", "error": "Host not found."},
+		# 		status=status.HTTP_404_NOT_FOUND
+		# 	)
+		# except Exception as e:
+		# 	return Response({"server_error": f"{str(e)}"}, status=503)
 
 		return Response(
-			{"success": "true", "host": host_username},
+			{"success": "true"},
 			status=status.HTTP_200_OK
 		)
 
@@ -114,24 +122,24 @@ class PongPlayerControlView(APIView):
 		return Response({"lobby_info": match.to_dict()}, status=status.HTTP_200_OK)
 
 class LastPongMatchView(APIView):
+    permission_classes = [IsAuthenticated]
 
-	permission_classes = [IsAuthenticated]
+    def get(self, request):
+        user = request.user
+        
+        try:
+            last_match = PongMatch.objects.filter(
+                Q(first_user=user) | Q(second_user=user)
+            ).order_by('-start_date').first()
+            
+        except Exception as e:
+            return Response({"server_error": str(e)}, status=503)
 
-	def get(self, request):
-		user = request.user
-		
-		try:
-			last_match = PongMatch.objects.filter(
-				Q(first_user=user) | Q(second_user=user)
-			).last()
-		except Exception as e:
-			return Response({"server_error": f"{str(e)}"}, status=503)
-
-		if last_match:
-			serializer = PongMatchSerializer(last_match)
-			return Response(serializer.data)
-		
-		return Response({"detail": "No matches found"}, status=status.HTTP_400_BAD_REQUEST)
+        if last_match:
+            serializer = PongMatchSerializer(last_match)
+            return Response(serializer.data)
+        
+        return Response({"detail": "No matches found"}, status=status.HTTP_404_NOT_FOUND)
 	
 class LastPongTournamentMatchView(APIView):
 	permission_classes = [IsAuthenticated]

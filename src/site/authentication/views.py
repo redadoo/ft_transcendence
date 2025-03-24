@@ -155,6 +155,8 @@ class Auth42(View):
 			user42.save()
 			UserStats.objects.create(user=user42)
 			UserImage.objects.create(user=user42)
+
+		async_to_sync(send_event_to_all_consumer)("get_update_users", {"username": user42.account42Nickname})
 		login(request, user42)
 		
 		nonce = get_random_string(16)

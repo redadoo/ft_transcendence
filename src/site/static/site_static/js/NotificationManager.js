@@ -29,7 +29,7 @@ export default class NotificationManager {
 		};
 
 		// Play notification sound (ensure Sound.play exists and works as expected)
-		Sound.play('notificationSound');
+		// Sound.play('notificationSound');
 
 		this.notifications.unshift(notificationData);
 		this.notificationCount++;

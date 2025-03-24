@@ -23,6 +23,7 @@ export default class Game
 		this.lastCountValue = 6;
 		this.pongOpponent = null;
 		this.isClockVisible = false;
+		this.isOpponentFirst = false;
 		this.isSceneCreated = false; 
 		this.shouldCleanupOnExit = false;
 		this.close_window_event_unload = null;
@@ -152,11 +153,24 @@ export default class Game
 			const player1Element = document.getElementById('player1');
 			const player2Element = document.getElementById('player2');
 
-			if (player1Element && player2Element && data.players !== undefined) {
-				if (data.players[this.pongOpponent.playerId] !== undefined && data.players[this.pongPlayer.playerId] !== undefined) {
-					const player1Name = data.players[this.pongPlayer.playerId].username || "Player 1";
-					const player2Name = data.players[this.pongOpponent.playerId].username || "Player 2";
-		
+			if (player1Element && player2Element && data.players !== undefined) 
+			{
+				if (data.players[this.pongOpponent.playerId] !== undefined && data.players[this.pongPlayer.playerId] !== undefined) 
+				{
+					let player1Name = "";
+					let player2Name = "";
+
+					if(this.isOpponentFirst)
+					{
+						player1Name = data.players[this.pongPlayer.playerId].username || "Player 1";
+						player2Name = data.players[this.pongOpponent.playerId].username || "Player 2";
+					}
+					else
+					{
+						player1Name = data.players[this.pongOpponent.playerId].username || "Player 1";
+						player2Name = data.players[this.pongPlayer.playerId].username || "Player 2";
+					}
+
 					this.animateText(player1Element, player1Name);
 					this.animateText(player2Element, player2Name);
 				}

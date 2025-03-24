@@ -175,7 +175,7 @@ class UserStats(models.Model):
 			match (PongMatch): The match instance containing match data.
 		"""
 		self.exp += match.get_player_xp_gained(self.user.username)
-		self.mmr += match.get_player_mmr_gained(self.user.username)
+		self.mmr += match.get_player_mmr_gained(self.user)
 		if match.get_winner() == self.user.username:
 			self.win += 1
 		else:

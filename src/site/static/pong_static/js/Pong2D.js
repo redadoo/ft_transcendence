@@ -51,9 +51,20 @@ export default class Pong2D extends Game {
 	AddUserToLobby(newPlayer_id, playerData, socket) 
 	{
 		if (newPlayer_id == this.player_id && this.pongPlayer == null)
+		{
+			if (this.pongOpponent == null)
+			{
+				this.isOpponentFirst = true;
+			}
+
 			this.pongPlayer = new PongPlayer(socket, this.player_id, playerData);
+		}
 		else if (this.pongOpponent == null)
+		{
 			this.pongOpponent = new PongPlayer(null, newPlayer_id, playerData);
+		}
+
+		console.log("this.isOpponentFirst", this.isOpponentFirst);
 	}
 
 	/**

@@ -10,8 +10,9 @@ from .scripts.LiarsBarGameManager import LiarsBarGameManager
 LOBBY_NAME = "lobby"
 match_manager = MatchManager()
 
+
 class LiarsBarMatchmaking(AsyncWebsocketConsumer):
-	matchmaking_queue = set()
+	matchmaking_queue = list()
 	room_group_name = "liarsbar_matchmaking"
 
 	async def connect(self):
@@ -23,7 +24,8 @@ class LiarsBarMatchmaking(AsyncWebsocketConsumer):
 	async def disconnect(self, close_code):
 		"""Handles WebSocket disconnection"""
 		await self.channel_layer.group_discard(self.room_group_name, self.channel_name)
-		self.matchmaking_queue.discard(self.channel_name)
+		if self.channel_name in self.matchmaking_queue:
+			self.matchmaking_queue.remove(self.channel_name)
 
 	async def receive(self, text_data):
 		"""Handles messages received from WebSocket clients"""
@@ -35,10 +37,12 @@ class LiarsBarMatchmaking(AsyncWebsocketConsumer):
 				print(f"Player {self.channel_name} is already in the matchmaking queue.")
 				return
 			
-			self.matchmaking_queue.add(self.channel_name)
+			self.matchmaking_queue.append(self.channel_name)
 
 			print(f"Player {self.channel_name} joined matchmaking. Queue size: {len(self.matchmaking_queue)}")
 			await self.check_for_match()
+		elif action == "close_matchmaking":
+			self.disconnect(0)
 
 	async def check_for_match(self):
 		"""Checks if there are enough players to create a match"""

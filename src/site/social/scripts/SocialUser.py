@@ -101,17 +101,24 @@ class SocialUser:
 		"""
 		new_status = data.get("new_status")
 		
-		if new_status is None:
-			raise ValueError(f"bad dict cant retrieve new_status")
+		try:
 
-		if not User.is_valid_status(new_status):
-			raise ValueError(f"Invalid status: {new_status}")
+			if new_status is None:
+				raise ValueError(f"bad dict cant retrieve new_status")
 
-		status_key = User.get_status_key(new_status)
-		if status_key is None:
-			raise ValueError(f"Invalid status: {new_status}")
+			if not User.is_valid_status(new_status):
+				raise ValueError(f"Invalid status: {new_status}")
 
-		self.user.status = status_key
+			status_key = User.get_status_key(new_status)
+			if status_key is None:
+				raise ValueError(f"Invalid status: {new_status}")
+
+			self.user.status = status_key
+		
+		except Exception as e:
+			print(f" error change status {e}")
+			return
+		
 		try:
 			await database_sync_to_async(self.user.save)(update_fields=["status"])
 		except Exception as e:
@@ -132,7 +139,8 @@ class SocialUser:
 		friendship = await self._get_friendship(user_to_block)
 
 		if friendship.status != Friendships.FriendshipsStatus.FRIENDS:
-			raise ValueError(f"User '{user_to_block}' isnt friend with '{self.user.username}'.")
+			print(f"User '{user_to_block}' isnt friend with '{self.user.username}'.")
+			return
 
 		try:
 			block_target = await database_sync_to_async(User.objects.get)(username=user_to_block)
@@ -198,7 +206,8 @@ class SocialUser:
 			)()
 
 			if existing_friendship:
-				raise ValueError(f"A friendship or pending request already exists with '{target_username}'.")
+				print(f"A friendship or pending request already exists with '{target_username}'.")
+				return 
 
 			await database_sync_to_async(Friendships.objects.create)(
 				first_user=self.user,
@@ -232,8 +241,9 @@ class SocialUser:
 		target_username = await self._validate_user(data.get("username"))
 		friendship =  await self._get_friendship(target_username)
 
-		if friendship.status != Friendships.FriendshipsStatus.FRIENDS:
-			raise ValueError(f"Friendship status with user '{target_username}' and '{self.user.username}'isnt Friends.")
+		if friendship is None:
+			print(f"Friendship with user '{target_username}' and '{self.user.username}' dont exist.")
+			return
 
 		try:
 			target_user = await database_sync_to_async(User.objects.get)(username=target_username)
@@ -288,7 +298,8 @@ class SocialUser:
 		_friendship =  await self._get_friendship(target_username)
 
 		if _friendship.status != Friendships.FriendshipsStatus.FRIENDS:
-			raise ValueError(f"User '{target_username}' isnt friend with {self.user.username}.")
+			print(f"User '{target_username}' isnt friend with {self.user.username}.")
+			return
 
 		message: str = data.get("message")
 

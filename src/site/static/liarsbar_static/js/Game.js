@@ -54,7 +54,7 @@ export default class Game
 	{
 		const leavePage = window.confirm("Do you want to leave?");
 		if (leavePage)
-			this.game_ended(false, '/');
+			this.game_ended(false);
 		else
 			history.pushState(null, document.title, location.href);
 	}
@@ -77,7 +77,7 @@ export default class Game
 
 		this.close_window_event_unload = () => {
 			if (this.shouldCleanupOnExit)
-				this.game_ended(false, '/');
+				this.game_ended(false);
 		};
 
 		window.addEventListener("beforeunload", this.close_window_event_beforeunload);
@@ -152,10 +152,10 @@ export default class Game
 	 */
 	onSocketClose() 
 	{
-		// if(this.game.pongPlayer != null)
+		// if(this.pongPlayer != null)
 		// {
-		// 	alert("the server is temporarily down");
-		// 	this.game.game_ended('/');
+		// alert("the server is temporarily down");
+		// this.game.game_ended('/');
 		// }
 	}
 
@@ -175,6 +175,7 @@ export default class Game
 			this.onSocketClose.bind(this)
 		);
 
+		this.matchmakingManager = null;
 		this.players[this.player_id] = new LiarsBarPlayer(this.gameSocket, this.player_id);
 		this.sceneManager.render();
 		this.sceneManager.render();
@@ -740,6 +741,11 @@ export default class Game
 		this.players = null;
 		let event_name = isGamefinished === true ? "quit_game" : "unexpected_quit";
 
+		if (this.matchmakingManager != null)
+		{
+			this.matchmakingManager.dispose();
+		}
+
 		if (this.gameSocket) 
 		{
 			this.gameSocket.send(JSON.stringify({
@@ -782,7 +788,7 @@ export default class Game
 					this.selected_card(this.currentPlayer);
 					break;
 				case 'ENDED':
-					this.game_ended('/match-result');
+					this.game_ended(true);
 					break;
 				case 'PLAYER_DISCONNECTED':
 					break;
