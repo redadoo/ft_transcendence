@@ -361,9 +361,17 @@ export default class SocialOverlayManager {
 		router.navigateTo('/lobby/guest');
 	}
 
-	acceptInviteToTournament(inviteData) {
+	async acceptInviteToTournament(inviteData) {
 		if (this.invalidPathnames.includes(window.location.pathname)) {
 			alert('You cannot accept a tournament invite while in a game lobby');
+			return;
+		}
+
+		const resp = await api.checkLobby(inviteData.room_name);
+
+		if (resp.success == "false")
+		{
+			alert("the lobby no longer exists");
 			return;
 		}
 
