@@ -88,6 +88,7 @@ class Tournament():
 					self.players.remove(player)
 		
 	def setup_first_round(self):
+		print(f" setup_first_round ")
 		"""Builds the first round from the joined players."""
 		if len(self.players) < MATCH_PLAYER_NUMBER:
 			print("Not enough players to start a tournament.")
@@ -100,12 +101,14 @@ class Tournament():
 		self.bracket = [matches]
 		self.current_round_winners = []
 		self.current_round_index = 0
+		print(f" setup_first_round end")
 
 	async def setup_next_round(self, winners: list):
 		"""Creates the next round from the winners of the previous round.
 		   If there's an odd number of winners, the last one gets a bye."""
+		print(f" setup_next_round ")
 		if len(winners) < MATCH_PLAYER_NUMBER:
-			self.close_and_save()
+			await self.close_and_save()
 			return
 
 		next_round_matches = []
@@ -120,9 +123,13 @@ class Tournament():
 		if next_round_matches:
 			self.bracket.append(next_round_matches)
 		self.current_round_index += 1
+		print(f" setup_next_round  end")
 
 	async def setup_pong_manager(self):
 		"""Prepares the next match from the current round in the bracket."""
+		print(f" setup_pong_manager")
+		self.game_manager.reset()
+
 		# Ensure there is a current round.
 		if not self.bracket or self.current_round_index >= len(self.bracket):
 			print("No more matches available in the bracket.")
@@ -155,12 +162,17 @@ class Tournament():
 			"players": [match[0] , match[1]],
 			"tournament_snapshot": snapshot,
 		})
+		print(f" setup_pong_manager end")
 
 	async def tournament_start(self):
 		"""Starts the tournament by kicking off the game loop and the first match."""
+		print(f" tournament_start")
+
 		if not self.bracket:
 			print("Tournament not set up properly.")
 			return
+
+		print("as as as as as a a aas asasasa s as")
 
 		await self.setup_pong_manager()
 
@@ -174,6 +186,7 @@ class Tournament():
 			"event_name": "match_start",
 			"tournament_snapshot": snapshot,
 		})
+		print(f" tournament_start end")
 
 	@database_sync_to_async
 	def get_serialized_user(self, player_id):
@@ -186,7 +199,8 @@ class Tournament():
 			return None
 
 	async def add_player_to_tournament(self, data: dict):
-		
+		print(f" add_player_to_tournament")
+
 		if not data.get("player_id"):
 			raise ValueError("Invalid data: 'player_id' is required.")
 
@@ -212,6 +226,7 @@ class Tournament():
 		if len(self.players) == PLAYER_NUMBER:
 			self.all_players = self.players
 			self.setup_first_round()
+		print(f" add_player_to_tournament end")
 
 	async def game_loop(self):
 		"""
@@ -232,6 +247,7 @@ class Tournament():
 		except asyncio.CancelledError:
 			print("Game loop task was cancelled.")
 		finally:
+			print(f" lucaaaa", flush=True)
 			loser_id = self.game_manager.get_loser()
 			winner_id = self.game_manager.get_winner()
 			self.current_round_winners.append(winner_id)
@@ -240,8 +256,11 @@ class Tournament():
 			self.match_played += 1
 			try:
 				if self.match_played == 3:
-					self.close_and_save()
+					print(f" end", flush=True)
+					await self.close_and_save()
 				else:
+					print(f" alleto", flush=True)
+
 					snapshot = self.to_dict()
 					
 					await self.broadcast_message({
@@ -254,18 +273,21 @@ class Tournament():
 				print(f" error game loop {e}")
 	
 	async def close_and_save(self):
-		snapshot = self.to_dict()
-		tournament: PongTournament = await database_sync_to_async(PongTournament.objects.create)()
-		await tournament.add_players_to_tournament(list({player["id"] for player in self.all_players}))
-		await tournament.set_winner(self.current_round_winners[0])
+		try:
+			snapshot = self.to_dict()
+			tournament: PongTournament = await database_sync_to_async(PongTournament.objects.create)()
+			await tournament.add_players_to_tournament(list({player["id"] for player in self.all_players}))
+			await tournament.set_winner(self.current_round_winners[0])
 
-		await self.broadcast_message({
-			"type": "lobby_state",
-			"event": "tournament_finished",
-			"winner_id": self.current_round_winners[0],
-			"tournament_snapshot": snapshot,
-		})
-
+			await self.broadcast_message({
+				"type": "lobby_state",
+				"event": "tournament_finished",
+				"winner_id": self.current_round_winners[0],
+				"tournament_snapshot": snapshot,
+			})
+		except Exception as e:
+			print(f" test {e}",flush=True)
+	
 	def to_dict(self) -> dict:
 		tournament_data = {
 			"current_tournament_status": self.tournament_status.name,
