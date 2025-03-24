@@ -54,10 +54,10 @@ class Tournament():
 				self.game_manager.update_player(data)
 			case "waiting_next_match":
 				await self.tournament_start()
-			# case "unexpected_quit":
-			# 	await self.quit(data, match_manager)
-			# case "quit_game":
-			# 	await self.quit(data, match_manager)
+			case "unexpected_quit":
+				await self.quit(data, match_manager)
+			case "quit_game":
+				await self.quit(data, match_manager)
 			case _:
 				print(f"Unhandled event type: {event_type}. Full data: {data}")
 
@@ -70,10 +70,7 @@ class Tournament():
 		
 		players_id = list(self.game_manager.players.keys())
 		
-		if id in players_id:
-			print(f"player with id  {id} is playing a game")
-			await self.game_manager.clear_and_save(False, id)
-		elif self.tournament_status == Tournament.TournamentStatus.TO_SETUP:
+		if self.tournament_status == Tournament.TournamentStatus.TO_SETUP:
 			self.tournament_status = Tournament.TournamentStatus.PLAYER_DISCONNECTED
 			snapshot = self.to_dict()
 			await self.broadcast_message({
@@ -83,9 +80,6 @@ class Tournament():
 			})
 		else:
 			print(f"player with id  {id} is not playing a game")
-			# for player in self.players:
-			# 	if player["id"] == id:
-			# 		self.players.remove(player)
 		
 	def setup_first_round(self):
 		print(f" setup_first_round ")
