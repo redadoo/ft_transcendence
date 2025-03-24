@@ -83,6 +83,9 @@ class Tournament():
 			})
 		else:
 			print(f"player with id  {id} is not playing a game")
+			for player in self.players:
+				if player["id"] == id:
+					self.players.remove(player)
 		
 	def setup_first_round(self):
 		"""Builds the first round from the joined players."""
