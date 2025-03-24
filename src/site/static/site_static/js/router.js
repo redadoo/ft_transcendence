@@ -52,7 +52,7 @@ const router = {
 		this.overlay = new overlayManager();
 		this.onPopState = this.handleLocation.bind(this);
 		this.onBodyClick = this.handleBodyClick.bind(this);
-		this.is2dPong = true;
+		this.is2dPong = false;
 
 		this.setupEventListeners();
 

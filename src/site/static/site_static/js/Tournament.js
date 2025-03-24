@@ -4,6 +4,11 @@ export default class Tournament {
 		this.players = new Array(4).fill(null);
 	}
 
+	reset()
+	{
+		this.players.fill(null);
+	}
+
 	updatePlayers() {
 		console.log("Updating players in tournament:", this.players);
 		const updatePlayerDOM = (index, player) => {
@@ -22,27 +27,33 @@ export default class Tournament {
 
 	async addNewPlayer(username, image_url) 
 	{
-		console.log(`Adding new player to tournament: ${username}, ${image_url}`);
+		console.log(`Adding new player to tournament: ${username}, ${image_url.avatar_url}`);
 	
 		const playerExists = this.players.some(player => player && player.username === username);
 	
-		if (playerExists) 
+		if (playerExists)
+		{
+			console.log("playerExists)");
 			return;
+		}
 
 		const emptySlotIndex = this.players.indexOf(null);
 	
 		if (emptySlotIndex !== -1)
 		{
+			
 			const newPlayerObj = {
 				username: username,
 				profile_picture: image_url.avatar_url,
 			};
-	
+			
+			console.log("player dont Exists");
 			this.players[emptySlotIndex] = newPlayerObj;
 			this.updatePlayers();
 	
 			if (this.isLobbyFull() && window.localStorage['username'] === this.player1.username) 
 			{
+				console.log("lobby is full");
 				const startButton = document.getElementById('startTournament');
 				startButton.disabled = false;
 			}

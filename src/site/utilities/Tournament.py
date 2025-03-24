@@ -30,6 +30,7 @@ class Tournament():
 		self.room_name = room_name
 
 		self.players: list = []
+		self.all_players: list = []
 		self.bracket: list = []
 		self.current_round_winners: list = []  
 		self.current_round_index: int = 0
@@ -72,14 +73,16 @@ class Tournament():
 		if id in players_id:
 			print(f"player with id  {id} is playing a game")
 			await self.game_manager.clear_and_save(False, id)
-			for player in self.players:
-				if player["id"] == id:
-					self.players.remove(player)
+		elif self.tournament_status == Tournament.TournamentStatus.TO_SETUP:
+			self.tournament_status = Tournament.TournamentStatus.PLAYER_DISCONNECTED
+			snapshot = self.to_dict()
+			await self.broadcast_message({
+				"type": "lobby_state",
+				"event": "tournament_finished",
+				"tournament_snapshot": snapshot,
+			})
 		else:
 			print(f"player with id  {id} is not playing a game")
-			for player in self.players:
-				if player["id"] == id:
-					self.players.remove(player)
 		
 	def setup_first_round(self):
 		"""Builds the first round from the joined players."""
@@ -204,6 +207,7 @@ class Tournament():
 		})
 
 		if len(self.players) == PLAYER_NUMBER:
+			self.all_players = self.players
 			self.setup_first_round()
 
 	async def game_loop(self):
@@ -249,7 +253,7 @@ class Tournament():
 	async def close_and_save(self):
 		snapshot = self.to_dict()
 		tournament: PongTournament = await database_sync_to_async(PongTournament.objects.create)()
-		await tournament.add_players_to_tournament(list({player["id"] for player in self.players}))
+		await tournament.add_players_to_tournament(list({player["id"] for player in self.all_players}))
 		await tournament.set_winner(self.current_round_winners[0])
 
 		await self.broadcast_message({

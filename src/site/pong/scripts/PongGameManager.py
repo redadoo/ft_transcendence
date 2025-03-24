@@ -30,7 +30,6 @@ class PongGameManager(GameManager):
 		self.game_loop_is_active = True
 		self.ball.start()
 
-
 	async def clear_and_save(self, is_game_ended: bool, player_disconnected_id: int = None):
 		"""Saves the match results and updates players' match history."""
 		players_list = list(self.players.keys())

@@ -149,17 +149,17 @@ export default class Game
 			document.getElementById('pongCountDown').classList.remove('d-none');
 			this.isClockVisible = true;
 
-			const player1Element = document.getElementById('player1');
-			const player2Element = document.getElementById('player2');
+			// const player1Element = document.getElementById('player1');
+			// const player2Element = document.getElementById('player2');
 
-			if (player1Element && player2Element && data.players != undefined)
-			{
-				if (data.players[this.pongOpponent.playerId] != undefined && data.players[this.pongPlayer.playerId] != undefined)
-				{
-					player1Element.textContent = data.players[this.pongPlayer.playerId].username || "Player 1";
-					player2Element.textContent = data.players[this.pongOpponent.playerId].username || "Player 2";
-				}
-			}
+			// if (player1Element && player2Element && data.players != undefined)
+			// {
+			// 	if (data.players[this.pongOpponent.playerId] != undefined && data.players[this.pongPlayer.playerId] != undefined)
+			// 	{
+			// 		player1Element.textContent = data.players[this.pongPlayer.playerId].username || "Player 1";
+			// 		player2Element.textContent = data.players[this.pongOpponent.playerId].username || "Player 2";
+			// 	}
+			// }
 		}
 
 		if(data.count_down < this.lastCountValue)

@@ -446,6 +446,9 @@ const views = {
 	},
 
 	async tournamentScripts() {
+		
+		router.tournament.reset();
+
 		const startButton = document.getElementById('startTournament');
 
 		const pongGame = await instantiateGameClass(this.player_id);
@@ -461,6 +464,8 @@ const views = {
 	},
 
 	async tournamentGuestScripts() {
+		router.tournament.reset();
+
 		await instantiateGameClass(this.player_id);
 	},
 
