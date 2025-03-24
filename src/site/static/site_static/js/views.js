@@ -18,13 +18,13 @@ async function instantiateGameClass(player_id)
 	{
 		pongGame = new Pong2D();
 		pongGame.init(player_id);
-	}   
+	}
     else
 	{
         pongGame = new Pong3D();
 		await pongGame.init(player_id);
 	}
-    
+
     pongGame.animate();
 
 	return pongGame;
@@ -116,10 +116,12 @@ const views = {
 	},
 
 	async logout() {
-		router.overlay.cleanup();
-		router.init();
-		await api.logout();
-		['profileBtn', 'notificationBtn'].forEach(id => document.getElementById(id).classList.add('d-none'));
+		const success = await api.logout();
+		if (success) {
+			router.overlay.cleanup();
+			router.init();
+			['profileBtn', 'notificationBtn'].forEach(id => document.getElementById(id).classList.add('d-none'));
+		}
 		router.navigateTo('/login');
 	},
 
@@ -446,7 +448,7 @@ const views = {
 	},
 
 	async tournamentScripts() {
-		
+
 		router.tournament.reset();
 
 		const startButton = document.getElementById('startTournament');
