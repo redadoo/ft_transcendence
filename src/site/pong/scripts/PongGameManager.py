@@ -150,32 +150,35 @@ class PongGameManager(GameManager):
 	async def game_loop(self):
 		"""
 		Core game loop that updates the state of the players, ball, and handles collisions.
-		"""		
-		if self.is_countdown_finish == False:
-			self.time_elapsed = time.time() - self.time_start_match
-			if self.time_elapsed >= constants.COUNTDOWN:
-				self.is_countdown_finish = True
+		"""	
+		try:
+			if self.is_countdown_finish == False:
+				self.time_elapsed = time.time() - self.time_start_match
+				if self.time_elapsed >= constants.COUNTDOWN:
+					self.is_countdown_finish = True
 
-		if self.is_countdown_finish == True:
-			players = self.players.values()
+			if self.is_countdown_finish == True:
+				players = self.players.values()
 
-			for player in players:
-				player.player_loop()
+				for player in players:
+					player.player_loop()
 
-			self.ball.update_position()
-			for player in players:
-				self.ball.handle_paddle_collision(player.paddle)
+				self.ball.update_position()
+				for player in players:
+					self.ball.handle_paddle_collision(player.paddle)
 
-			out_of_bounds = self.ball.is_out_of_bounds()
-			if out_of_bounds in {"right", "left"}:
-				scoring_player = "player1" if out_of_bounds == "right" else "player2"
-				self.scores[scoring_player] += 1
-				self.ball.reset(scoring_player)
+				out_of_bounds = self.ball.is_out_of_bounds()
+				if out_of_bounds in {"right", "left"}:
+					scoring_player = "player1" if out_of_bounds == "right" else "player2"
+					self.scores[scoring_player] += 1
+					self.ball.reset(scoring_player)
 
-			if any(score >= constants.MAX_SCORE for score in self.scores.values()):
-				print(f" game finit for {self.scores} amnd  sa sa {self.players}", flush=True)
-				await self.clear_and_save(True)
-				return
+				if any(score >= constants.MAX_SCORE for score in self.scores.values()):
+					print(f" game finit for {self.scores} amnd  sa sa {self.players}", flush=True)
+					await self.clear_and_save(True)
+					return
+		except Exception as e:
+			print(f" teste di modi {e}", flush=True)
 
 	def get_loser(self):
 		player_list = list(self.players)
