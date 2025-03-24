@@ -135,19 +135,14 @@ class LiarsBarGameManager(GameManager):
 			player.card_sent = False
 			player.doubting = False
 			player.selected_cards.clear()
-			card_names = [card.to_dict() for card in player.hand]
-			print(f"\n\n Player {player.player_id} has the following cards: {card_names} and candoutb {self.can_doubt}")
 			if self.hands_cleared == (self.players_alive - 1):
 				player.doubting = True
-				print("forced doubt")
 			if len(player.hand) == 0 and not player.doubting:
-				print("turn skipping for empty hand")
 				self.player_turn_index += 1
 				if self.player_turn_index > 3:
 						self.player_turn_index = 0
 				player.player_turn = False
 		else:
-			print(f"+1 {player.player_id} Dead")
 			self.player_turn_index += 1
 			if self.player_turn_index > 3:
 					self.player_turn_index = 0
@@ -171,72 +166,54 @@ class LiarsBarGameManager(GameManager):
 			self.init_round()
 			self.started = True
 		if self.players[self.player_turn_index].player_turn == False:
-			print(f"turn handle {self.players[self.player_turn_index].player_id}")
 			self.handle_palyer_turn(self.players[self.player_turn_index])
 		elif not self.players[self.player_turn_index].card_sent and self.players[self.player_turn_index].status == LiarsBarPlayer.PlayerStatus.ALIVE:
 			self.time_elapsed = time.time() - self.turn_start
-			""" if self.player_turn_index == 2:
-				print(f"inserisco le carte nelle sue selected {self.players[self.player_turn_index].player_id}")
-				self.players[self.player_turn_index].card_sent = True
-				self.players[self.player_turn_index].selected_cards.append(self.players[self.player_turn_index].hand.pop(0)) """
 			if self.time_elapsed > self.turn_duration:
 				if self.players[self.player_turn_index].shoot_yourself():
 					self.players[self.player_turn_index].status = LiarsBarPlayer.PlayerStatus.DIED
 					self.players_alive -= 1
 					self.started = False
 					self.player_turn_index += 1
-					print("+1 timeout morto")
 					if self.player_turn_index > 3:
 						self.player_turn_index = 0
 				else:
 					self.started = False
 					self.player_turn_index += 1
-					print("+1 timeout vivo")
 					if self.player_turn_index > 3:
 						self.player_turn_index = 0
 			elif self.players[self.player_turn_index].doubting and self.can_doubt:
-				print(f"Player {self.players[self.player_turn_index].player_id} Doubt")
 				self.players[self.player_turn_index].doubting = False
 				for i in range(1, 4):
 					check_index = (self.player_turn_index - i) % 4
-					print(f"{self.players[check_index].player_id}, {self.players[check_index].status}, {self.players[check_index].card_sent} ")
 					if self.players[check_index].status == LiarsBarPlayer.PlayerStatus.ALIVE and self.players[check_index].card_sent:
 						card_names = [card.to_dict() for card in self.players[check_index].selected_cards]
-						print(f"Player {self.players[check_index].player_id} has the following cards: {card_names}")
 						if all(card.seed == self.card_required or card.seed == Card.CardSeed.JOLLY for card in self.players[check_index].selected_cards):
-							print(f"player {self.players[check_index].player_id} had the required card")
 							if self.players[self.player_turn_index].shoot_yourself():
 								self.players[self.player_turn_index].status = LiarsBarPlayer.PlayerStatus.DIED
 								self.players_alive -= 1
-								print(f"dead {self.players[self.player_turn_index].player_id}")
 								self.started = False
 							else:
 								self.started = False
 							self.player_turn_index += 1
-							print("+1 doubt")
 							if self.player_turn_index > 3:
 									self.player_turn_index = 0
 							break
 						else:
-							print(f"player {self.players[check_index].player_id} had not the required card")
 							if self.players[check_index].shoot_yourself():
 								self.players[check_index].status = LiarsBarPlayer.PlayerStatus.DIED
 								self.players_alive -= 1
-								print(f"dead {self.players[check_index].player_id}\n")
 								self.started = False
 							else:
 								self.started = False
 							self.player_turn_index += 1
-							print("+1 doubt")
 							if self.player_turn_index > 3:
 									self.player_turn_index = 0
 							break
 		if self.players[self.player_turn_index].card_sent and self.players[self.player_turn_index].player_turn == True and self.started and self.players[self.player_turn_index].status == LiarsBarPlayer.PlayerStatus.ALIVE:
 			self.can_doubt = True
 			if len(self.players[self.player_turn_index].hand) == 0:
-				print(f"hand cleared by {self.players[self.player_turn_index].player_id}")
 				self.hands_cleared += 1
-			print(f"+1 sent {self.players[self.player_turn_index].player_id}")
 			self.players[self.player_turn_index].player_turn = False
 			self.player_turn_index += 1
 			if self.player_turn_index > 3:
@@ -249,7 +226,6 @@ class LiarsBarGameManager(GameManager):
 			"""to do: controlli se ci sono tutti i player, se il player si disconnette"""
 			players_list = list(self.players.keys())
 			if len(players_list) < 4:
-				print("Not enough players to save the match.")
 				return
 			users = []
 			winner_user = None
@@ -258,12 +234,6 @@ class LiarsBarGameManager(GameManager):
 				users.append(user)
 				if player.status == LiarsBarPlayer.PlayerStatus.ALIVE:
 					winner_user = user
-
-			""" if not is_game_ended:
-				if player_disconnected_id == players_list[0]:
-					self.scores["player1"], self.scores["player2"] = 0, 5
-				else:
-					self.scores["player1"], self.scores["player2"] = 5, 0 """
 
 			match = await database_sync_to_async(LiarsBarMatch.objects.create)(
 				first_user=users[0],

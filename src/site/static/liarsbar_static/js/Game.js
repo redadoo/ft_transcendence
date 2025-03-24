@@ -389,7 +389,7 @@ export default class Game
 		const cameraPos = cameraPositions[playerIndex];
 		const target = targets[playerIndex];
 	
-		const direction = target.clone().sub(cameraPos).normalize();  // Cambia la direzione verso il target specificato
+		const direction = target.clone().sub(cameraPos).normalize(); 
 	
 		const cameraRot = new THREE.Quaternion().setFromUnitVectors(new THREE.Vector3(0, 0, 1), direction);
 	
@@ -543,7 +543,6 @@ export default class Game
 		const cardRequired = data.lobby_info.card_required;
 		let isMyTurn = false;
 		
-		// Iteriamo usando l'ordine fisso salvato in playersOrder
 		this.playersOrder.forEach((playerId, index) => {
 			const player = this.players[playerId];
 	
@@ -553,12 +552,10 @@ export default class Game
 			const icon = icons[index];
 			const iconText = iconTexts[index];
 	
-			// Stato attivo (turno attuale)
 			const isActive = player.playerTurn;
 			if (icon.classList.contains("active") !== isActive) 
 				icon.classList.toggle("active", isActive);
 	
-			// Stato morto
 			const isDead = player.status === "DIED";
 			if (icon.classList.contains("died") !== isDead) 
 				icon.classList.toggle("died", isDead);
@@ -573,7 +570,6 @@ export default class Game
 					yourTurnText.style.visibility = shouldBeVisible;
 			}
 
-			// Aggiornamento testo solo se cambia
 			const newText = player.selectedCards.length > 0 
 				? `Claims <span class="number">${player.selectedCards.length}</span> <span class="card-name">${cardRequired}</span>` 
 				: "";
@@ -589,10 +585,10 @@ export default class Game
 
         if (doubtElement) {
             if (isDoubting) {
-                doubtElement.classList.add('visible'); // Mostra l'elemento "DOUBT!"
+                doubtElement.classList.add('visible');
                 setTimeout(() => {
-                    doubtElement.classList.remove('visible'); // Nascondi l'elemento dopo 1 secondo
-                }, 500); // Durata fissa di 1 secondo
+                    doubtElement.classList.remove('visible');
+                }, 500);
             }
         }
 		});
@@ -619,7 +615,7 @@ export default class Game
 
 	updatePlayerCards(playerHand) 
 	{
-		const cardSlots = document.querySelectorAll('.col-1 .card'); // Seleziona tutte le carte esistenti
+		const cardSlots = document.querySelectorAll('.col-1 .card');
 		
 		cardSlots.forEach((slot, index) => {
 			const shouldBeVisible = index < playerHand.length;
@@ -680,7 +676,6 @@ export default class Game
 			});
 		}
 	
-		// Applica l'effetto di selezione in base a selection_index
 		if (selectedIndex >= 0 && selectedIndex < cardSlots.length) {
 			const selectedSlot = cardSlots[selectedIndex];
 	
