@@ -11,8 +11,7 @@ from utilities.MatchManager import MatchManager
 from utilities.lobby import Lobby
 from .scripts.PongGameManager import PongGameManager
 from website.models import User
-
-match_manager = MatchManager()
+from pong.consumer import match_manager
 
 class PongRoomState(APIView):
 	def post(self, request):
@@ -35,6 +34,7 @@ class PongCheckLobby(APIView):
 
 		match = match_manager.get_match(room_name)
 		if not match:
+			print(f" sadas das dsa {match_manager.matches}")
 			return Response({"success": "false"}, status=status.HTTP_404_NOT_FOUND)
 
 		if not match.game_manager.players:

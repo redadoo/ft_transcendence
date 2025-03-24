@@ -341,9 +341,17 @@ export default class SocialOverlayManager {
 		}
 	}
 
-	acceptInviteToGame(inviteData) {
+	async acceptInviteToGame(inviteData) {
 		if (this.invalidPathnames.includes(window.location.pathname)) {
 			alert('You cannot accept a game invite while in a game lobby');
+			return;
+		}
+
+		const resp = await api.checkLobby(inviteData.room_name);
+
+		if (resp.success == "false")
+		{
+			alert("the lobby no longer exists");
 			return;
 		}
 

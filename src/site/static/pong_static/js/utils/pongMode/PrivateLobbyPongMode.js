@@ -72,13 +72,12 @@ export default class PrivateLobbyPongMode extends PongMode {
 	 * @returns {void}
 	 */
 	setUpLobby(data) 
-	{
-		this.game.initScene(data);
-		  
+	{		  
 		const { event_info, lobby_info } = data;
 		  
 		if (event_info.event_name === "host_started_game") 
 		{
+			this.game.initScene(data);
 			this.sendStart();
 			router.navigateTo('/lobby/playing');
 			return;

@@ -63,9 +63,9 @@ class Lobby:
 			case "update_player":
 				self.game_manager.update_player(data)
 			case "unexpected_quit":
-				await self.close_lobby(data)
+				await self.close_lobby(data, match_manager)
 			case "quit_game":
-				await self.close_lobby(data)
+				await self.close_lobby(data, match_manager)
 			case _:
 				print(f"Unhandled event type: {event_type}. Full data: {data}")
 	
@@ -171,12 +171,14 @@ class Lobby:
 				"lobby_snapshot": snapshot,
 			})
 
-	async def close_lobby(self, data: dict):
+	async def close_lobby(self, data: dict, match_manager):
 		player_disconnected_id = data.get("player_id")
 		player_disconnected_id = int(player_disconnected_id)
 
 		if self.lobby_status == self.LobbyStatus.PLAYING or self.lobby_status == self.LobbyStatus.ENDED:
 			await self.game_manager.clear_and_save(False, player_disconnected_id)
+		
+		match_manager.remove_match(self.room_name)
 
 	def to_dict(self) -> dict:
 		"""

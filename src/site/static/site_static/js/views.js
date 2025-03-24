@@ -326,7 +326,7 @@ const views = {
 
 		startButton.addEventListener('click', function handleClick() {
 			pongGame.mode.sendStart();
-			router.navigateTo('/lobby/playing');
+			// router.navigateTo('/lobby/playing');
 			startButton.removeEventListener('click', handleClick);
 		});
 	},

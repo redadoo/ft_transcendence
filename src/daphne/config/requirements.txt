@@ -7,3 +7,4 @@ python-dotenv==1.0.1
 psycopg2-binary==2.9.10
 django-csp==3.8
 django-prometheus==2.3.1
+requests==2.30
