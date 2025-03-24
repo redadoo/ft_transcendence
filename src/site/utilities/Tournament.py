@@ -256,6 +256,7 @@ class Tournament():
 		except asyncio.CancelledError:
 			print("Game loop task was cancelled.")
 		finally:
+			print(f" score {self.game_manager.scores}", flush=True)
 			print(f" lucaaaa", flush=True)
 			loser_id = self.game_manager.get_loser()
 			winner_id = self.game_manager.get_winner()
@@ -271,7 +272,6 @@ class Tournament():
 					print(f" alleto", flush=True)
 
 					snapshot = self.to_dict()
-					
 					await self.broadcast_message({
 						"type": "lobby_state",
 						"event": "match_finished",
