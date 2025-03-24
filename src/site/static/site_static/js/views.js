@@ -42,6 +42,7 @@ const views = {
 	},
 
 	async home() {
+		if (await api.checkAuth() == false) { return router.navigateTo('/login'); }
 		await router.overlay.initialize();
 		const data = await api.getHeaderInfo();
 		console.log("Header info data:", data);
