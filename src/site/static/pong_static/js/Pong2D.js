@@ -130,4 +130,22 @@ export default class Pong2D extends Game {
 		document.getElementById('pongJs').classList.add('d-none');
 		super.game_ended(isGamefinished, pathToRedirect);
 	}
+
+	reset()
+	{
+		super.reset();
+
+		if (this.pongPlayer != null)
+		{
+			delete this.pongPlayer;
+			this.pongPlayer = null;
+		}
+		if (this.pongOpponent != null)
+		{
+			delete this.pongOpponent;
+			this.pongOpponent = null;
+		}
+		this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+
+	}
 }

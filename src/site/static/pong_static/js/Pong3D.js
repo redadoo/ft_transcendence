@@ -289,15 +289,15 @@ export default class Pong3D extends Game
 		{
 			if (this.pongPlayer != null)
 			{
-			this.pongPlayer.deletePaddle(this.sceneManager.scene);
-			delete this.pongPlayer;
-			this.pongPlayer = null;
+				this.pongPlayer.deletePaddle(this.sceneManager.scene);
+				delete this.pongPlayer;
+				this.pongPlayer = null;
 			}
 			if (this.pongOpponent != null)
 			{
-			this.pongOpponent.deletePaddle(this.sceneManager.scene);
-			delete this.pongOpponent;
-			this.pongOpponent = null;
+				this.pongOpponent.deletePaddle(this.sceneManager.scene);
+				delete this.pongOpponent;
+				this.pongOpponent = null;
 			}
 		}
 
