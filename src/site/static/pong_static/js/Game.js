@@ -149,17 +149,18 @@ export default class Game
 			document.getElementById('pongCountDown').classList.remove('d-none');
 			this.isClockVisible = true;
 
-			// const player1Element = document.getElementById('player1');
-			// const player2Element = document.getElementById('player2');
+			const player1Element = document.getElementById('player1');
+			const player2Element = document.getElementById('player2');
 
-			// if (player1Element && player2Element && data.players != undefined)
-			// {
-			// 	if (data.players[this.pongOpponent.playerId] != undefined && data.players[this.pongPlayer.playerId] != undefined)
-			// 	{
-			// 		player1Element.textContent = data.players[this.pongPlayer.playerId].username || "Player 1";
-			// 		player2Element.textContent = data.players[this.pongOpponent.playerId].username || "Player 2";
-			// 	}
-			// }
+			if (player1Element && player2Element && data.players !== undefined) {
+				if (data.players[this.pongOpponent.playerId] !== undefined && data.players[this.pongPlayer.playerId] !== undefined) {
+					const player1Name = data.players[this.pongPlayer.playerId].username || "Player 1";
+					const player2Name = data.players[this.pongOpponent.playerId].username || "Player 2";
+		
+					this.animateText(player1Element, player1Name);
+					this.animateText(player2Element, player2Name);
+				}
+			}
 		}
 
 		if(data.count_down < this.lastCountValue)
@@ -177,6 +178,18 @@ export default class Game
 		}
 	}
 
+	animateText(element, text) {
+        element.innerHTML = ""; // Svuota il contenuto
+
+        text.split("").forEach((letter, index) => {
+            let span = document.createElement("span");
+            span.innerText = letter;
+            span.style.opacity = "0";
+            span.style.display = "inline-block";
+            span.style.animation = `letterFadeIn 0.5s ease-in-out ${index * 0.1}s forwards, glowEffect 1s ease-in-out ${index * 0.1}s forwards`;
+            element.appendChild(span);
+        });
+    }
 
 	/**
 	 * Updates the game state with new data, including ball position, player positions, and score.

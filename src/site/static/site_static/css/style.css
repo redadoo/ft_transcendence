@@ -2235,14 +2235,44 @@ label {
     align-items: center;
 }
 
-/* Testi dei giocatori */
+@keyframes letterFadeIn {
+    0% {
+        opacity: 0;
+        transform: translateY(-10px) scale(0.8);
+    }
+    50% {
+        opacity: 0.5;
+        transform: translateY(5px) scale(1.1);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+@keyframes glowEffect {
+    0% {
+        text-shadow: 0 0 2px rgba(255, 233, 36, 0.5);
+    }
+    50% {
+        text-shadow: 0 0 10px rgba(255, 233, 36, 0.8), 0 0 20px rgba(255, 233, 36, 0.6);
+    }
+    100% {
+        text-shadow: 0 0 5px rgba(255, 233, 36, 0.7);
+    }
+}
 .player-text {
-	font-family: 'PRESS START 2P', sans-serif;
-	font-weight: bold;
-    font-size: 3vw; /* Scalabile con lo schermo */
-    font-weight: bold;
+    font-family: 'PRESS START 2P', sans-serif;
+    font-size: 3vw;
     color: rgb(255, 233, 36);
-    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+	text-shadow: 2px 2px 10px rgba(0, 0, 0, 0.7), 0 0 20px rgba(255, 233, 36, 0.8);
+    display: inline-block;
+}
+
+.player-text span {
+    opacity: 0;
+    display: inline-block;
+    animation: appear 0.5s ease-out forwards;
 }
 
 #player1 {
