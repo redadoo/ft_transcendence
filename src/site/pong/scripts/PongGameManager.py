@@ -173,6 +173,7 @@ class PongGameManager(GameManager):
 				self.ball.reset(scoring_player)
 
 			if any(score >= constants.MAX_SCORE for score in self.scores.values()):
+				print(f" game finit for {self.scores} amnd  sa sa {self.players}", flush=True)
 				await self.clear_and_save(True)
 				return
 

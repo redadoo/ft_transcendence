@@ -83,9 +83,9 @@ class Tournament():
 			})
 		else:
 			print(f"player with id  {id} is not playing a game")
-			for player in self.players:
-				if player["id"] == id:
-					self.players.remove(player)
+			# for player in self.players:
+			# 	if player["id"] == id:
+			# 		self.players.remove(player)
 		
 	def setup_first_round(self):
 		print(f" setup_first_round ")
@@ -128,7 +128,6 @@ class Tournament():
 	async def setup_pong_manager(self):
 		"""Prepares the next match from the current round in the bracket."""
 		print(f" setup_pong_manager")
-		self.game_manager.reset()
 
 		# Ensure there is a current round.
 		if not self.bracket or self.current_round_index >= len(self.bracket):
@@ -138,13 +137,23 @@ class Tournament():
 		current_round_matches = self.bracket[self.current_round_index]
 
 		if not current_round_matches:
+			print("test 1", flush=True)
+			print(f"test {self.bracket} ", flush=True)
+			print(f"test {self.current_round_index}", flush=True)
+			print(f"test {self.current_round_winners}", flush=True)
+			print("test 1", flush=True)
+
 			if self.current_round_winners:
+				print("test 2", flush=True)
 				await self.setup_next_round(self.current_round_winners)
+				print("test 3", flush=True)
 				if len(self.current_round_winners) == 1:
+					print("test 4", flush=True)
 					return
 				current_round_matches = self.bracket[self.current_round_index]
+				print("test 5", flush=True)
 			else:
-				print("No winners to set up next round.")
+				print("No winners to set up next round.",flush=True)
 				return
 
 		# Start the next match in the current round.
